@@ -13,13 +13,9 @@ import (
 )
 
 // GetAgendas handles GET /api/agendas
-// Optional query params:
-// - start_date: YYYY-MM-DD
-// - end_date: YYYY-MM-DD
-// - status: upcoming, completed, cancelled, all
 func GetAgendas(c *fiber.Ctx) error {
 	var agendas []models.Agenda
-	query := config.DB.Model(&models.Agenda{})
+	query := config.DB.Model(&models.Agenda{}).Preload("ClientForm")
 
 	// Filter rentang tanggal
 	startDateStr := c.Query("start_date")
@@ -50,6 +46,20 @@ func GetAgendas(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil data agenda: " + err.Error(),
 		})
+	}
+
+	// Pastikan semua agenda punya FormToken & FormStatus default
+	for i := range agendas {
+		if agendas[i].FormToken == "" {
+			agendas[i].FormToken = uuid.New().String()[:8]
+			if agendas[i].FormStatus == "" {
+				agendas[i].FormStatus = "pending"
+			}
+			config.DB.Model(&models.Agenda{}).Where("id = ?", agendas[i].ID).Updates(map[string]interface{}{
+				"form_token":  agendas[i].FormToken,
+				"form_status": agendas[i].FormStatus,
+			})
+		}
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -123,18 +133,22 @@ func CreateAgenda(c *fiber.Ctx) error {
 		packageName = "Paket Khusus"
 	}
 
-	// Buat Agenda ID baru
+	// Buat Agenda ID & Form Token baru
 	agendaID := fmt.Sprintf("agd_%s", uuid.New().String()[:8])
+	formToken := uuid.New().String()[:8]
 
 	agenda := models.Agenda{
 		ID:            agendaID,
 		ClientName:    strings.TrimSpace(req.ClientName),
+		ClientPhone:   strings.TrimSpace(req.ClientPhone),
 		BackdropTitle: strings.TrimSpace(req.BackdropTitle),
 		EventDateTime: eventTime,
 		MapsURL:       strings.TrimSpace(req.MapsURL),
 		PackageID:     req.PackageID,
 		PackageName:   packageName,
 		Status:        "upcoming",
+		FormToken:     formToken,
+		FormStatus:    "pending",
 		Notes:         strings.TrimSpace(req.Notes),
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"dekorin_apps_api/internal/models"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -16,7 +17,8 @@ var DB *gorm.DB
 // ConnectDB membuka koneksi ke PostgreSQL
 func ConnectDB() {
 	// Credentials sesuai dengan input user
-	dsn := "host=localhost user=postgres password=postgres dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := "host=localhost user=magnatech password=123456 dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	// dsn := "host=localhost user=postgres password=postgres dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta"
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -27,7 +29,7 @@ func ConnectDB() {
 	DB = db
 
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
-	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{})
+	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{})
 	if err != nil {
 		log.Fatal("Gagal melakukan auto migrate: ", err)
 	}

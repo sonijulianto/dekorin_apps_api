@@ -37,6 +37,11 @@ func main() {
 	api.Post("/agendas", handlers.CreateAgenda)
 	api.Get("/packages", handlers.GetPackages)
 
+	// Client Web Form routes
+	app.Get("/form/:token", handlers.ShowClientForm)             // Public HTML form view
+	api.Post("/client-form/:token", handlers.SubmitClientForm)   // Submit form API
+	api.Get("/agendas/:id/client-form", handlers.GetClientFormByAgendaID) // Fetch submitted form for Flutter app
+
 	// Start server on port 3000
 	log.Println("Server started at http://localhost:3000")
 	log.Fatal(app.Listen(":3000"))
