@@ -32,6 +32,11 @@ func main() {
 	// User routes
 	api.Get("/users", handlers.GetAllUsers)
 
+	// Agenda & Package routes
+	api.Get("/agendas", handlers.GetAgendas)
+	api.Post("/agendas", handlers.CreateAgenda)
+	api.Get("/packages", handlers.GetPackages)
+
 	// Start server on port 3000
 	log.Println("Server started at http://localhost:3000")
 	log.Fatal(app.Listen(":3000"))
