@@ -17,8 +17,7 @@ var DB *gorm.DB
 // ConnectDB membuka koneksi ke PostgreSQL
 func ConnectDB() {
 	// Credentials sesuai dengan input user
-	dsn := "host=localhost user=magnatech password=123456 dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta"
-	// dsn := "host=localhost user=postgres password=postgres dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := "host=localhost user=postgres password=postgres dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta client_encoding=UTF8"
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
