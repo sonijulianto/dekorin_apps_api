@@ -77,60 +77,48 @@ func CreateAgenda(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validasi input
+	// Validasi input (hanya nama client yang strictly required di HTTP API)
 	if strings.TrimSpace(req.ClientName) == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Nama client wajib diisi",
 		})
 	}
-	if strings.TrimSpace(req.BackdropTitle) == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Nama di backdrop wajib diisi",
-		})
-	}
-	if strings.TrimSpace(req.EventDateTime) == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Tanggal dan jam acara wajib diisi",
-		})
-	}
-	if strings.TrimSpace(req.PackageID) == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Paket dekorasi wajib dipilih",
-		})
+
+	backdropTitle := strings.TrimSpace(req.BackdropTitle)
+	if backdropTitle == "" {
+		backdropTitle = fmt.Sprintf("Acara %s", strings.TrimSpace(req.ClientName))
 	}
 
-	// Parsing tanggal dan waktu acara
+	// Parsing tanggal dan waktu acara (jika ada)
 	var eventTime time.Time
-	var parseErr error
-
-	timeFormats := []string{
-		time.RFC3339,
-		"2006-01-02T15:04:05",
-		"2006-01-02 15:04:05",
-		"2006-01-02 15:04",
-		"2006-01-02T15:04",
-	}
-
-	for _, format := range timeFormats {
-		eventTime, parseErr = time.Parse(format, req.EventDateTime)
-		if parseErr == nil {
-			break
+	if strings.TrimSpace(req.EventDateTime) != "" {
+		timeFormats := []string{
+			time.RFC3339,
+			"2006-01-02T15:04:05",
+			"2006-01-02 15:04:05",
+			"2006-01-02 15:04",
+			"2006-01-02T15:04",
+		}
+		for _, format := range timeFormats {
+			if t, err := time.Parse(format, req.EventDateTime); err == nil {
+				eventTime = t
+				break
+			}
 		}
 	}
-
-	if parseErr != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Format tanggal dan waktu tidak valid. Gunakan format ISO8601 atau YYYY-MM-DD HH:mm",
-		})
+	if eventTime.IsZero() {
+		eventTime = time.Now().Add(24 * time.Hour) // Default besok jika tidak diisi
 	}
 
-	// Ambil nama paket dari master Paket
-	var pkg models.Package
-	packageName := ""
-	if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
-		packageName = pkg.Name
-	} else {
-		packageName = "Paket Khusus"
+	// Ambil nama paket dari master Paket (jika ada)
+	packageName := "Belum Dipilih"
+	if strings.TrimSpace(req.PackageID) != "" {
+		var pkg models.Package
+		if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
+			packageName = pkg.Name
+		} else {
+			packageName = "Paket Khusus"
+		}
 	}
 
 	// Buat Agenda ID & Form Token baru
@@ -141,7 +129,7 @@ func CreateAgenda(c *fiber.Ctx) error {
 		ID:            agendaID,
 		ClientName:    strings.TrimSpace(req.ClientName),
 		ClientPhone:   strings.TrimSpace(req.ClientPhone),
-		BackdropTitle: strings.TrimSpace(req.BackdropTitle),
+		BackdropTitle: backdropTitle,
 		EventDateTime: eventTime,
 		MapsURL:       strings.TrimSpace(req.MapsURL),
 		PackageID:     req.PackageID,

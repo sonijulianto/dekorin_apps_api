@@ -29,7 +29,7 @@ func ConnectDB() {
 	DB = db
 
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
-	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{})
+	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{})
 	if err != nil {
 		log.Fatal("Gagal melakukan auto migrate: ", err)
 	}
@@ -37,6 +37,51 @@ func ConnectDB() {
 	// Menjalankan Seeding otomatis
 	SeedAdmin(db)
 	SeedPackagesAndAgendas(db)
+	SeedAddons(db)
+}
+
+// SeedAddons mengisi data awal master item tambahan jika kosong
+func SeedAddons(db *gorm.DB) {
+	var addonCount int64
+	db.Model(&models.Addon{}).Count(&addonCount)
+
+	if addonCount == 0 {
+		addons := []models.Addon{
+			{
+				ID:          "adn_01",
+				Name:        "Lighting Ambient & Spotlight Warm",
+				ImageURL:    "https://images.unsplash.com/photo-1519741497674-611481863552?w=500&q=80",
+				Price:       350000,
+				Description: "Set lighting sorot dekorasi warm white untuk suasana hangat",
+			},
+			{
+				ID:          "adn_02",
+				Name:        "Photobooth Thematic + Properti",
+				ImageURL:    "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=500&q=80",
+				Price:       850000,
+				Description: "Backdrop foto tamu 2x2m fleksibel sesuai tema acara",
+			},
+			{
+				ID:          "adn_03",
+				Name:        "Standing Flower Fresh Premium (2 Pcs)",
+				ImageURL:    "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=500&q=80",
+				Price:       500000,
+				Description: "Sepasang standing flower bunga segar pilihan di jalur pelaminan",
+			},
+			{
+				ID:          "adn_04",
+				Name:        "Welcome Sign Akrilik Custom Text",
+				ImageURL:    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=500&q=80",
+				Price:       250000,
+				Description: "Papan ucapan selamat datang dari akrilik bening dengan ukiran nama",
+			},
+		}
+
+		for _, a := range addons {
+			db.Create(&a)
+		}
+		fmt.Println("🌱 Seeding selesai: Master item tambahan (Addons) berhasil ditambahkan!")
+	}
 }
 
 // SeedPackagesAndAgendas mengisi data awal master paket dan agenda contoh jika kosong

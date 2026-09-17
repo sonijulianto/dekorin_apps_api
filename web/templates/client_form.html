@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .package-card.selected { border-color: #f59e0b; background-color: #fffbeb; ring: 2px; ring-color: #f59e0b; }
   </style>
 </head>
 <body class="bg-amber-50/40 min-h-screen pb-12">
@@ -41,10 +42,6 @@
           <span>📅</span>
           <span>{{.EventDateTimeFormatted}}</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span>✨</span>
-          <span>{{.PackageName}}</span>
-        </div>
       </div>
     </div>
 
@@ -60,7 +57,7 @@
     {{end}}
 
     <!-- Form Pengisian -->
-    <form id="clientForm" class="bg-white rounded-2xl p-6 shadow-sm border border-amber-100/80 space-y-5 {{if eq .FormStatus "filled"}}hidden{{end}}">
+    <form id="clientForm" class="bg-white rounded-2xl p-6 shadow-sm border border-amber-100/80 space-y-6 {{if eq .FormStatus "filled"}}hidden{{end}}">
       
       <div>
         <h3 class="font-bold text-gray-900 text-base mb-1">Lengkapi Detail Acara</h3>
@@ -75,6 +72,77 @@
         <textarea id="eventAddress" name="event_address" rows="3" required
           class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800 placeholder-gray-400 transition"
           placeholder="Contoh: Jl. Mawar No. 12, RT 02/05, Kedunya, Gedung/Rumah..."></textarea>
+      </div>
+
+      <!-- Pilihan Paket Dekorasi -->
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-2">
+          Pilih Paket Dekorasi
+        </label>
+        <div class="space-y-3" id="packageList">
+          {{range .Packages}}
+          <div class="package-card border border-gray-200 rounded-xl p-3.5 cursor-pointer transition flex gap-3 items-center" data-id="{{.ID}}" data-price="{{.BasePrice}}" data-name="{{.Name}}">
+            {{if .ImageURL}}
+            <img src="{{.ImageURL}}" alt="{{.Name}}" class="w-16 h-16 object-cover rounded-lg flex-shrink-0 bg-gray-100 border">
+            {{else}}
+            <div class="w-16 h-16 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-lg flex-shrink-0">📦</div>
+            {{end}}
+            <div class="flex-grow">
+              <div class="flex justify-between items-start">
+                <h4 class="font-bold text-gray-900 text-xs">{{.Name}}</h4>
+                <span class="text-xs font-semibold text-amber-600">Rp {{printf "%.0f" .BasePrice}}</span>
+              </div>
+              <p class="text-[11px] text-gray-500 mt-1 line-clamp-2">{{.Description}}</p>
+            </div>
+          </div>
+          {{end}}
+        </div>
+      </div>
+
+      <!-- Pilihan Addon (Tambahan) -->
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-2">
+          Item Tambahan (Addon - Opsional)
+        </label>
+        <div class="space-y-2.5" id="addonList">
+          {{range .Addons}}
+          <label class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-amber-400 transition">
+            <input type="checkbox" class="addon-checkbox w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500" value="{{.ID}}" data-price="{{.Price}}" data-name="{{.Name}}">
+            {{if .ImageURL}}
+            <img src="{{.ImageURL}}" alt="{{.Name}}" class="w-10 h-10 object-cover rounded-md flex-shrink-0 bg-gray-100">
+            {{else}}
+            <div class="w-10 h-10 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs flex-shrink-0">✨</div>
+            {{end}}
+            <div class="flex-grow">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-gray-800">{{.Name}}</span>
+                <span class="text-xs text-amber-600 font-semibold">+Rp {{printf "%.0f" .Price}}</span>
+              </div>
+              {{if .Description}}<p class="text-[10px] text-gray-400 mt-0.5">{{.Description}}</p>{{end}}
+            </div>
+          </label>
+          {{end}}
+        </div>
+      </div>
+
+      <!-- Live Total Invoice Summary Box -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+        <div class="text-xs font-bold text-amber-900 border-b border-amber-200 pb-1.5 flex justify-between">
+          <span>Ringkasan Estimasi Biaya</span>
+          <span>Estimasi Total</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-600">
+          <span>Paket Dekorasi:</span>
+          <span id="summaryPackageText" class="font-medium text-gray-800">Belum dipilih</span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-600">
+          <span>Tambahan (Addon):</span>
+          <span id="summaryAddonText" class="font-medium text-gray-800">Rp 0</span>
+        </div>
+        <div class="pt-2 border-t border-amber-200 flex justify-between items-center text-sm font-bold text-amber-900">
+          <span>Total Invoice:</span>
+          <span id="summaryTotalPrice" class="text-base text-amber-700">Rp 0</span>
+        </div>
       </div>
 
       <!-- Tema Dekorasi -->
@@ -156,14 +224,69 @@
     const successState = document.getElementById('successState');
     const token = '{{.FormToken}}';
 
+    let selectedPackageId = '';
+    let selectedPackagePrice = 0;
+    let selectedPackageName = '';
+
+    const formatRupiah = (number) => {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+    };
+
+    // Handle package selection
+    const packageCards = document.querySelectorAll('.package-card');
+    packageCards.forEach(card => {
+      card.addEventListener('click', () => {
+        packageCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        
+        selectedPackageId = card.dataset.id;
+        selectedPackagePrice = parseFloat(card.dataset.price) || 0;
+        selectedPackageName = card.dataset.name;
+
+        updateTotalSummary();
+      });
+    });
+
+    // Handle addon selection
+    const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
+    addonCheckboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        updateTotalSummary();
+      });
+    });
+
+    function updateTotalSummary() {
+      let addonTotal = 0;
+      addonCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          addonTotal += parseFloat(cb.dataset.price) || 0;
+        }
+      });
+
+      const summaryPackageText = document.getElementById('summaryPackageText');
+      const summaryAddonText = document.getElementById('summaryAddonText');
+      const summaryTotalPrice = document.getElementById('summaryTotalPrice');
+
+      summaryPackageText.textContent = selectedPackageId ? `${selectedPackageName} (${formatRupiah(selectedPackagePrice)})` : 'Belum dipilih';
+      summaryAddonText.textContent = formatRupiah(addonTotal);
+      summaryTotalPrice.textContent = formatRupiah(selectedPackagePrice + addonTotal);
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorAlert.classList.add('hidden');
+
+      const selectedAddonIds = Array.from(addonCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
       btnSubmit.disabled = true;
       btnSubmit.innerHTML = '<span>Sending...</span>';
 
       const payload = {
         event_address: document.getElementById('eventAddress').value.trim(),
+        package_id: selectedPackageId,
+        addon_ids: selectedAddonIds,
         decoration_theme: document.getElementById('decorationTheme').value,
         color_preference: document.getElementById('colorPreference').value.trim(),
         reference_photo_url: document.getElementById('referencePhotoUrl').value.trim(),

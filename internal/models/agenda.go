@@ -6,6 +6,7 @@ import "time"
 type Package struct {
 	ID          string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
 	Name        string    `gorm:"type:varchar(150);not null" json:"name"`
+	ImageURL    string    `gorm:"type:text" json:"image_url"`
 	Description string    `gorm:"type:text" json:"description"`
 	BasePrice   float64   `gorm:"type:decimal(15,2);not null;default:0" json:"base_price"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -17,10 +18,10 @@ type Agenda struct {
 	ID            string      `gorm:"primaryKey;type:varchar(50)" json:"id"`
 	ClientName    string      `gorm:"type:varchar(150);not null" json:"client_name"`
 	ClientPhone   string      `gorm:"type:varchar(50)" json:"client_phone"`
-	BackdropTitle string      `gorm:"type:varchar(150);not null" json:"backdrop_title"`
-	EventDateTime time.Time   `gorm:"not null" json:"event_date_time"`
+	BackdropTitle string      `gorm:"type:varchar(150)" json:"backdrop_title"`
+	EventDateTime time.Time   `json:"event_date_time"`
 	MapsURL       string      `gorm:"type:text" json:"maps_url"`
-	PackageID     string      `gorm:"type:varchar(50);not null" json:"package_id"`
+	PackageID     string      `gorm:"type:varchar(50)" json:"package_id"`
 	PackageName   string      `gorm:"type:varchar(150)" json:"package_name"`
 	Status        string      `gorm:"type:varchar(50);default:'upcoming'" json:"status"` // upcoming, completed, cancelled
 	FormToken     string      `gorm:"type:varchar(50);uniqueIndex" json:"form_token"`

@@ -25,6 +25,13 @@ func ShowClientForm(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString("Form tidak ditemukan atau tautan sudah kadaluarsa.")
 	}
 
+	// Fetch semua paket & addons master dari DB
+	var packages []models.Package
+	config.DB.Order("base_price ASC").Find(&packages)
+
+	var addons []models.Addon
+	config.DB.Order("price ASC").Find(&addons)
+
 	// Format tanggal untuk tampilan
 	formattedDate := agenda.EventDateTime.Format("02 January 2006, 15:04 WIB")
 
@@ -35,6 +42,8 @@ func ShowClientForm(c *fiber.Ctx) error {
 		PackageName            string
 		FormStatus             string
 		FormToken              string
+		Packages               []models.Package
+		Addons                 []models.Addon
 	}{
 		ClientName:             agenda.ClientName,
 		BackdropTitle:          agenda.BackdropTitle,
@@ -42,6 +51,8 @@ func ShowClientForm(c *fiber.Ctx) error {
 		PackageName:            agenda.PackageName,
 		FormStatus:             agenda.FormStatus,
 		FormToken:              agenda.FormToken,
+		Packages:               packages,
+		Addons:                 addons,
 	}
 
 	tmpl, err := template.ParseFiles("web/templates/client_form.html")
@@ -82,12 +93,49 @@ func SubmitClientForm(c *fiber.Ctx) error {
 		})
 	}
 
+	// Hitung harga paket pilihan client
+	var selectedPkg models.Package
+	packagePrice := 0.0
+	packageName := agenda.PackageName
+	packageID := req.PackageID
+	if packageID == "" {
+		packageID = agenda.PackageID
+	}
+
+	if packageID != "" {
+		if err := config.DB.Where("id = ?", packageID).First(&selectedPkg).Error; err == nil {
+			packagePrice = selectedPkg.BasePrice
+			packageName = selectedPkg.Name
+		}
+	}
+
+	// Hitung harga item tambahan (Addons)
+	addonsPrice := 0.0
+	var selectedAddonNames []string
+	if len(req.AddonIDs) > 0 {
+		var addons []models.Addon
+		config.DB.Where("id IN ?", req.AddonIDs).Find(&addons)
+		for _, a := range addons {
+			addonsPrice += a.Price
+			selectedAddonNames = append(selectedAddonNames, fmt.Sprintf("%s (Rp %.0f)", a.Name, a.Price))
+		}
+	}
+
+	totalPrice := packagePrice + addonsPrice
+	selectedAddonsStr := strings.Join(selectedAddonNames, ", ")
+
 	// Cek apakah sudah ada ClientForm untuk Agenda ini
 	var existingForm models.ClientForm
 	err := config.DB.Where("agenda_id = ?", agenda.ID).First(&existingForm).Error
 
 	if err == nil {
 		// Update data form yang sudah ada
+		existingForm.PackageID = packageID
+		existingForm.PackageName = packageName
+		existingForm.PackagePrice = packagePrice
+		existingForm.SelectedAddons = selectedAddonsStr
+		existingForm.AddonsPrice = addonsPrice
+		existingForm.TotalPrice = totalPrice
 		existingForm.EventAddress = strings.TrimSpace(req.EventAddress)
 		existingForm.DecorationTheme = strings.TrimSpace(req.DecorationTheme)
 		existingForm.ColorPreference = strings.TrimSpace(req.ColorPreference)
@@ -105,6 +153,12 @@ func SubmitClientForm(c *fiber.Ctx) error {
 		newForm := models.ClientForm{
 			ID:                fmt.Sprintf("frm_%s", uuid.New().String()[:8]),
 			AgendaID:          agenda.ID,
+			PackageID:         packageID,
+			PackageName:       packageName,
+			PackagePrice:      packagePrice,
+			SelectedAddons:    selectedAddonsStr,
+			AddonsPrice:       addonsPrice,
+			TotalPrice:        totalPrice,
 			EventAddress:      strings.TrimSpace(req.EventAddress),
 			DecorationTheme:   strings.TrimSpace(req.DecorationTheme),
 			ColorPreference:   strings.TrimSpace(req.ColorPreference),
@@ -120,12 +174,17 @@ func SubmitClientForm(c *fiber.Ctx) error {
 		}
 	}
 
-	// Update status form di Agenda
+	// Update status form & paket di Agenda
 	agenda.FormStatus = "filled"
+	if packageID != "" {
+		agenda.PackageID = packageID
+		agenda.PackageName = packageName
+	}
 	config.DB.Save(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Form berhasil disimpan",
+		"message":     "Form berhasil disimpan",
+		"total_price": totalPrice,
 	})
 }
 
