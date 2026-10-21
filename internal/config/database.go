@@ -28,15 +28,16 @@ func ConnectDB() {
 	DB = db
 
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
-	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{})
+	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{}, &models.Invitation{}, &models.InvitationWish{}, &models.Expense{})
 	if err != nil {
 		log.Fatal("Gagal melakukan auto migrate: ", err)
 	}
 
 	// Menjalankan Seeding otomatis
-	SeedAdmin(db)
+	SeedUsers(db)
 	SeedPackagesAndAgendas(db)
 	SeedAddons(db)
+	SeedExpenses(db)
 }
 
 // SeedAddons mengisi data awal master item tambahan jika kosong
@@ -169,22 +170,108 @@ func SeedPackagesAndAgendas(db *gorm.DB) {
 	}
 }
 
-// SeedAdmin memeriksa apakah tabel user kosong, jika ya buatkan admin default
-func SeedAdmin(db *gorm.DB) {
-	var count int64
-	db.Model(&models.User{}).Count(&count)
-
-	if count == 0 {
-		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-
-		admin := models.User{
-			ID:       "usr_001",
+// SeedUsers memastikan akun default untuk setiap role (owner, admin, crew) tersedia di database
+func SeedUsers(db *gorm.DB) {
+	defaultUsers := []models.User{
+		{
+			ID:       "usr_owner",
+			FullName: "Owner Dekorin",
+			Email:    "owner@dekorin.com",
+			Password: "owner123",
+			Role:     "owner",
+		},
+		{
+			ID:       "usr_admin",
 			FullName: "Admin Dekorin",
 			Email:    "admin@dekorin.com",
-			Password: string(hashedPassword),
-		}
+			Password: "admin123",
+			Role:     "admin",
+		},
+		{
+			ID:       "usr_crew",
+			FullName: "Crew Lapangan",
+			Email:    "crew@dekorin.com",
+			Password: "crew123",
+			Role:     "crew",
+		},
+	}
 
-		db.Create(&admin)
-		fmt.Println("🌱 Seeding selesai: Default admin (admin@dekorin.com) berhasil dibuat ke dalam database!")
+	for _, u := range defaultUsers {
+		var existing models.User
+		if err := db.Where("email = ?", u.Email).First(&existing).Error; err != nil {
+			// User belum ada, buat user baru
+			hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+			u.Password = string(hashedPassword)
+			db.Create(&u)
+			fmt.Printf("🌱 Seeding: Akun %s (%s) berhasil dibuat!\n", u.FullName, u.Email)
+		} else {
+			// User sudah ada, pastikan rolenya sinkron
+			if existing.Role != u.Role {
+				db.Model(&existing).Update("role", u.Role)
+			}
+		}
 	}
 }
+
+// SeedExpenses mengisi sample pengeluaran operasional dekorasi jika tabel masih kosong
+func SeedExpenses(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Expense{}).Count(&count)
+	if count == 0 {
+		now := time.Now()
+		sampleExpenses := []models.Expense{
+			{
+				ID:        "exp_001",
+				Title:     "Pembelian Bunga Mawar & Baby Breath Fresh",
+				Amount:    1250000,
+				Category:  "Bunga",
+				Date:      now.Add(-24 * time.Hour),
+				Notes:     "Pasar Rawa Belong, 15 ikat mawar dan 5 ikat baby breath",
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+			{
+				ID:        "exp_002",
+				Title:     "Kain Backdrop & Lampu Sorot Warm",
+				Amount:    850000,
+				Category:  "Properti Dekor",
+				Date:      now.Add(-48 * time.Hour),
+				Notes:     "Bahan kain velvet broken white 20m dan 2 spotlight",
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+			{
+				ID:        "exp_003",
+				Title:     "Transport Pick-up & Bongkar Muat",
+				Amount:    450000,
+				Category:  "Operasional",
+				Date:      now.Add(-72 * time.Hour),
+				Notes:     "Sewa mobil pick up operasional round-trip",
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+		}
+		for _, exp := range sampleExpenses {
+			db.Create(&exp)
+		}
+		fmt.Println("🌱 Seeding selesai: Data sample pengeluaran dekorasi berhasil ditambahkan!")
+	}
+
+	// Pastikan agenda yang sudah ada memiliki payment_status terisi
+	db.Model(&models.Agenda{}).Where("payment_status IS NULL OR payment_status = ''").Updates(map[string]interface{}{
+		"payment_status": "unpaid",
+	})
+	// Jika ada agenda dengan ID agd_001, jadikan sample yang sudah lunas dan selesai agar dashboard menampilkan omset
+	var firstAgenda models.Agenda
+	if err := db.Where("id = ?", "agd_001").First(&firstAgenda).Error; err == nil {
+		if firstAgenda.PaymentStatus == "unpaid" || firstAgenda.PaymentStatus == "" {
+			db.Model(&firstAgenda).Updates(map[string]interface{}{
+				"payment_status": "paid",
+				"package_price":  4000000,
+				"transport_fee":  250000,
+				"dp_amount":      4250000,
+			})
+		}
+	}
+}
+

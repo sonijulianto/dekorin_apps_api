@@ -8,6 +8,7 @@ type User struct {
 	FullName  string    `gorm:"type:varchar(100);not null" json:"full_name"`
 	Email     string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`
 	Password  string    `gorm:"type:varchar(255);not null" json:"-"` // JSON di-ignore agar password tidak bocor
+	Role      string    `gorm:"type:varchar(20);default:'admin';not null" json:"role"` // 'owner', 'admin', 'crew'
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -17,4 +18,5 @@ type UserResponse struct {
 	ID       string `json:"id"`
 	FullName string `json:"full_name"`
 	Email    string `json:"email"`
+	Role     string `json:"role"`
 }

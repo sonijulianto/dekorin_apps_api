@@ -9,8 +9,14 @@ type Addon struct {
 	ImageURL    string    `gorm:"type:text" json:"image_url"`
 	Price       float64   `gorm:"type:decimal(15,2);not null;default:0" json:"price"`
 	Description string    `gorm:"type:text" json:"description"`
+	SortOrder   int       `gorm:"type:int;default:0" json:"sort_order"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// ReorderAddonsRequest adalah payload request untuk mengubah urutan item tambahan
+type ReorderAddonsRequest struct {
+	AddonIDs []string `json:"addon_ids"`
 }
 
 // CreateOrUpdateAddonRequest adalah payload request untuk membuat atau mengubah item tambahan

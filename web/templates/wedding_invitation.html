@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ .Title }}</title>
+
+  <!-- Google Fonts & Custom Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- AOS (Animate On Scroll) -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+  <style>
+    @font-face {
+      font-family: 'javassoul';
+      src: url('/assets/owlink/javassoul.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'montserrat_custom';
+      src: url('/assets/owlink/montserrat.ttf') format('truetype');
+    }
+
+    :root {
+      --primary-gold: #afa083;
+      --primary-sage: #79a6af;
+      --bg-cream: #fafeff;
+      --bg-dark: #1e1e1e;
+      --text-gold: #afa083;
+      --text-sage: #79a6af;
+      --card-bg: #ffffff;
+      --radius-lg: 24px;
+      --radius-sm: 12px;
+      --shadow: 0 10px 30px rgba(121, 166, 175, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Montserrat', 'montserrat_custom', sans-serif;
+      background-color: #121516;
+      color: var(--text-sage);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Falling Leaves / Petals Canvas */
+    #petalsCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 990;
+    }
+
+    /* Outer Wrapper for Mobile-First Frame */
+    .app-wrapper {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--bg-cream);
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 60px rgba(0,0,0,0.5);
+      overflow-x: hidden;
+      padding-bottom: 90px;
+    }
+
+    /* Audio Toggle Button */
+    .audio-control {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary-gold);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+      z-index: 998;
+      cursor: pointer;
+      border: 2px solid #FFF;
+      transition: all 0.3s;
+    }
+    .audio-control.spinning {
+      animation: rotateVinyl 3.5s linear infinite;
+    }
+    @keyframes rotateVinyl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .music-note {
+      position: fixed;
+      color: var(--primary-gold);
+      font-size: 16px;
+      pointer-events: none;
+      z-index: 997;
+      animation: floatNote 2s ease-out forwards;
+    }
+    @keyframes floatNote {
+      0% { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-70px) scale(1.4) rotate(35deg); }
+    }
+
+    /* Bottom Glassmorphism Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      background: rgba(250, 254, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(175, 160, 131, 0.35);
+      border-radius: 35px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      z-index: 995;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .bottom-nav.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary-gold);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: all 0.25s;
+    }
+    .nav-item i {
+      font-size: 16px;
+      margin-bottom: 2px;
+      color: var(--primary-gold);
+    }
+    .nav-item.active, .nav-item:hover {
+      background: var(--primary-gold);
+      color: #fafeff;
+    }
+    .nav-item.active i, .nav-item:hover i {
+      color: #fafeff;
+    }
+
+    /* FULLSCREEN COVER OVERLAY (Luxurious Javanese with Gate & Ornaments) */
+    #coverOverlay {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      background: url('{{ if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}') center/cover no-repeat;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 24px;
+      color: #FFF;
+      text-align: center;
+      transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+      overflow: hidden;
+    }
+    #coverOverlay.hidden {
+      transform: translate(-50%, -100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .cover-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(2px);
+      z-index: 1;
+    }
+
+    /* Gate & Ornaments in Welcome Cover */
+    .c-gate {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .c-gate img {
+      width: 100%;
+      display: block;
+    }
+
+    .c-wayangleft {
+      position: absolute;
+      width: 32%;
+      left: -8%;
+      bottom: 6%;
+      z-index: 3;
+      pointer-events: none;
+      animation: wayangSway 6s ease-in-out infinite alternate;
+    }
+    .c-wayangleft img {
+      width: 100%;
+      transform: scaleX(-1);
+    }
+
+    .c-wayangright {
+      position: absolute;
+      width: 32%;
+      right: -8%;
+      bottom: 6%;
+      z-index: 3;
+      pointer-events: none;
+      animation: wayangSway 6s ease-in-out infinite alternate-reverse;
+    }
+    .c-wayangright img {
+      width: 100%;
+    }
+    @keyframes wayangSway {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-8px) rotate(4deg); }
+    }
+
+    .c-batik {
+      position: absolute;
+      height: 48px;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      z-index: 4;
+      background: url('/assets/owlink/istockphoto-186835568-612x612.jpg') repeat-x;
+      background-size: contain;
+    }
+
+    .cover-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      gap: 24px;
+    }
+
+    .cover-top {
+      padding-top: 0;
+    }
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 30px;
+      background: rgba(175, 160, 131, 0.2);
+      border: 1px solid var(--primary-gold);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primary-gold);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .cover-title {
+      font-family: 'javassoul', cursive;
+      font-size: 52px;
+      color: var(--primary-gold);
+      line-height: 1.1;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 10px;
+    }
+    .cover-subtitle {
+      font-size: 13px;
+      color: var(--primary-sage);
+      font-weight: 500;
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    .cover-guest-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--primary-gold);
+      padding: 18px 24px;
+      border-radius: 20px;
+      margin: 0 auto 16px;
+      max-width: 320px;
+      box-shadow: 0 8px 30px rgba(121, 166, 175, 0.2);
+    }
+    .cover-guest-card p {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primary-sage);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .cover-guest-card h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary-gold);
+    }
+
+    /* Pulse Glow Buka Undangan Button */
+    .btn-buka-undangan {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--primary-gold);
+      color: #FFF;
+      padding: 15px 36px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 700;
+      border: 2px solid #FFF;
+      cursor: pointer;
+      box-shadow: 0 0 0 0 rgba(175, 160, 131, 0.7);
+      animation: pulseGlowGold 2s infinite;
+      transition: transform 0.2s;
+    }
+    .btn-buka-undangan:active {
+      transform: scale(0.96);
+    }
+    @keyframes pulseGlowGold {
+      0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(175, 160, 131, 0.8); }
+      70% { transform: scale(1.02); box-shadow: 0 0 0 16px rgba(175, 160, 131, 0); }
+      100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(175, 160, 131, 0); }
+    }
+
+    /* SECTION 1: HERO SEPARATOR */
+    .separator-hero {
+      position: relative;
+      background: url('/assets/owlink/3005d740-e3aa-11f0-a9de-b37562d0916b.jpg') center/cover no-repeat;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+      overflow: hidden;
+    }
+    .separator-hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(20, 25, 27, 0.55);
+      z-index: 1;
+    }
+    .separator-content {
+      position: relative;
+      z-index: 2;
+      color: #fafeff;
+    }
+    .separator-title {
+      font-family: 'javassoul', cursive;
+      font-size: 46px;
+      color: #f7e6c4;
+      line-height: 1.2;
+      text-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    }
+    .scroll-gif {
+      width: 100%;
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      text-align: center;
+      z-index: 3;
+    }
+    .scroll-gif img {
+      width: 90px;
+      opacity: 0.9;
+    }
+
+    /* QUOTES SECTION */
+    #quoteSection {
+      background: var(--primary-sage);
+      padding: 45px 24px;
+      text-align: center;
+      position: relative;
+      background-image: url('/assets/owlink/31d69739a58036196f4d111395c77794.png');
+      background-size: 50%;
+    }
+    .quotes-text {
+      color: #fafeff !important;
+      font-size: 14px;
+      line-height: 1.8;
+      font-style: italic;
+      position: relative;
+      z-index: 2;
+    }
+    .quotes-icon {
+      color: #f7e6c4;
+      font-size: 24px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* COUPLE PROFILE SECTION (Exact Owlink Luxurious Javanese Theme) */
+    #coupleProfile {
+      background-image: url('/assets/owlink/batik-seamless-pattern-art-illustration-vector__1___1___1_.png');
+      background-size: 100%;
+      background-color: #fafeff;
+      padding: 50px 15px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .section-heading {
+      font-family: 'javassoul', cursive;
+      font-size: 38px;
+      color: var(--primary-gold);
+      margin-bottom: 25px;
+    }
+    .couple-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .male, .female {
+      width: 100%;
+      max-width: 380px;
+      padding: 0 !important;
+      position: relative;
+      margin: 0 auto;
+    }
+    .box, .box-female {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .couple-wrapper {
+      position: relative;
+      width: 82%;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .frame-profile {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+    .frame-profile img {
+      width: 100%;
+      display: block;
+    }
+    .couple-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 16%;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .couple-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 0 !important;
+      -webkit-mask-image: url('/assets/owlink/masked__1_.png');
+      mask-image: url('/assets/owlink/masked__1_.png');
+      -webkit-mask-size: 100%;
+      mask-size: 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .couple-wrapper .couple-img-decor {
+      display: none;
+    }
+
+    /* Floating Ornaments around couple frame */
+    .dec1-profile {
+      position: absolute;
+      bottom: -23%;
+      right: 0%;
+      width: 100%;
+      z-index: 3;
+      display: none;
+    }
+    .dec1-profile img {
+      width: 75%;
+      margin: 0 auto;
+    }
+
+    .wayangleft-profile {
+      position: absolute;
+      bottom: -20%;
+      left: -30%;
+      width: 40%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .wayangleft-profile img {
+      width: 100%;
+      transform: rotate(30deg);
+    }
+
+    .wayangright-profile {
+      position: absolute;
+      bottom: -20%;
+      right: -30%;
+      width: 40%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .wayangright-profile img {
+      width: 100%;
+      transform: rotate(-30deg);
+    }
+
+    .treeleft-profile {
+      position: absolute;
+      bottom: -35%;
+      left: -90%;
+      width: 120%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .treeleft-profile img {
+      width: 100%;
+    }
+
+    .treeright-profile {
+      position: absolute;
+      bottom: -35%;
+      right: -90%;
+      width: 120%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .treeright-profile img {
+      width: 100%;
+      transform: scaleX(-1);
+    }
+
+    /* Flowers & swaying animations */
+    .flow1-profile {
+      position: absolute;
+      top: -5%;
+      right: -20%;
+      width: 69%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .flow1-profile img {
+      width: 100%;
+      transform: scaleX(-1);
+    }
+
+    .flow2-profile {
+      position: absolute;
+      bottom: -5%;
+      right: -15%;
+      width: 53%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .flow2-profile img {
+      width: 100%;
+      transform: rotate(35deg);
+    }
+
+    .flow3-profile {
+      position: absolute;
+      top: -5%;
+      left: -20%;
+      width: 69%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .flow3-profile img {
+      width: 100%;
+    }
+
+    .flow4-profile {
+      position: absolute;
+      bottom: -5%;
+      left: -15%;
+      width: 53%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .flow4-profile img {
+      width: 100%;
+      transform: scaleX(-1) rotate(35deg);
+    }
+
+    @keyframes flower {
+      0% { transform: translate(0%, 0%) rotate(0deg); }
+      25% { transform: translate(0%, 0%) rotate(3deg); }
+      75% { transform: translate(0%, 0%) rotate(-3deg); }
+      100% { transform: translate(0%, 0%) rotate(0deg); }
+    }
+    @keyframes flowerreverse {
+      0% { transform: translate(0%, 0%) rotate(0deg); }
+      25% { transform: translate(0%, 0%) rotate(-3deg); }
+      75% { transform: translate(0%, 0%) rotate(3deg); }
+      100% { transform: translate(0%, 0%) rotate(0deg); }
+    }
+    .anim_flower {
+      animation-name: flower !important;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transform-origin: bottom center;
+    }
+    .anim_flowerreverse {
+      animation-name: flowerreverse !important;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transform-origin: bottom center;
+    }
+
+    /* Couple Typography & Texts */
+    .couple-text-wrap {
+      position: relative;
+      z-index: 9;
+      margin-top: -35px;
+      text-align: center;
+    }
+    .instagram-profil {
+      margin-bottom: 6px;
+    }
+    .instagram-profil a {
+      color: #79a6af !important;
+      text-decoration: none;
+      font-size: 13px;
+      text-transform: uppercase;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .instagram-profil a:hover {
+      color: #afa083 !important;
+    }
+    #coupleProfile h4 {
+      font-size: 1.7rem !important;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    #coupleProfile h4 b {
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: #afa083;
+    }
+    #coupleProfile p {
+      color: #afa083;
+      margin-bottom: 3px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    #coupleProfile p.child-number b {
+      font-weight: 700;
+      color: #79a6af;
+    }
+    .couple-and {
+      color: #afa083;
+      font-weight: 700;
+    }
+    .couple-separator-and {
+      text-align: center;
+      margin: 15px 0 25px;
+    }
+    .font-morning {
+      font-family: 'javassoul', cursive;
+      font-size: 5rem;
+      color: #afa083;
+      line-height: 1;
+      margin: 0;
+    }
+
+    /* COUNTDOWN & ACARA SECTION (Exact Owlink Luxurious Javanese Theme) */
+    #weddingDetail {
+      position: relative;
+    }
+    .separator-batik {
+      width: 100%;
+      height: 48px;
+      background: url('/assets/owlink/batik-seamless-pattern-art-illustration-vector__1___1_.jpg') repeat-x;
+      background-size: contain;
+      position: relative;
+      z-index: 5;
+    }
+    .separator-batik img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #countdown {
+      padding-top: 5rem !important;
+      padding-bottom: 7rem;
+      background: #79a6af;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      text-align: center;
+      color: #fafeff;
+    }
+    #countdown .treetopleft {
+      position: absolute;
+      left: -10%;
+      width: 120%;
+      bottom: -50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    #countdown .treetopleft img {
+      width: 100%;
+      transform: rotate(0deg);
+    }
+    #countdown .flow1-cd {
+      position: absolute;
+      right: 8%;
+      width: 50%;
+      bottom: -40%;
+      z-index: 2;
+      pointer-events: none;
+    }
+    #countdown .flow1-cd img {
+      width: 100%;
+      transform: scaleX(-1) rotate(65deg);
+    }
+    #countdown .flow2-cd {
+      position: absolute;
+      right: -10%;
+      width: 40%;
+      bottom: -20%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    #countdown .flow2-cd img {
+      width: 100%;
+      transform: scaleX(-1) scaleY(1) rotate(40deg);
+    }
+    #countdown .flow3-cd {
+      position: absolute;
+      right: -30%;
+      width: 70%;
+      bottom: -25%;
+      z-index: 4;
+      pointer-events: none;
+    }
+    #countdown .flow3-cd img {
+      width: 100%;
+    }
+    #countdown .flow4-cd {
+      position: absolute;
+      left: -5%;
+      width: 40%;
+      bottom: -55%;
+      pointer-events: none;
+      z-index: 2;
+    }
+    #countdown .flow4-cd img {
+      width: 100%;
+      transform: scaleX(-1) rotate(-90deg);
+    }
+    #countdown .flow5-cd {
+      position: absolute;
+      left: -25%;
+      width: 43%;
+      bottom: -10%;
+      z-index: 2;
+      pointer-events: none;
+    }
+    #countdown .flow5-cd img {
+      width: 100%;
+      transform: rotate(50deg);
+    }
+
+    .countdown-active-wrap {
+      position: relative;
+      z-index: 5;
+    }
+    .countdown-title {
+      color: #fafeff;
+      font-family: 'javassoul', cursive;
+      font-size: 38px;
+      margin-bottom: 25px;
+    }
+    .countdown-timer-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .cd-tile {
+      background: #fafeff;
+      color: var(--primary-sage);
+      border-radius: 14px;
+      padding: 12px 14px;
+      min-width: 68px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .cd-tile .num {
+      font-size: 24px;
+      font-weight: 700;
+      display: block;
+      line-height: 1;
+      color: var(--primary-gold);
+    }
+    .cd-tile .lbl {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--primary-sage);
+      margin-top: 4px;
+      display: block;
+    }
+
+    #countdown .event-end {
+      position: relative;
+      z-index: 5;
+      padding: 20px 15px;
+    }
+    #countdown .event-end h1 {
+      font-family: 'javassoul', cursive;
+      font-size: 42px;
+      color: #fafeff;
+      margin: 0;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .anim_flowerright {
+      animation-name: flowerright !important;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transform-origin: bottom right;
+    }
+    .anim_flowerleft {
+      animation-name: flowerleft !important;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transform-origin: bottom left;
+    }
+    .anim_cloud {
+      animation-name: cloud !important;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transform-origin: center;
+    }
+    @keyframes cloud {
+      0% { transform: translate(0%, 0%); }
+      25% { transform: translate(2%, 2%); }
+      75% { transform: translate(-2%, -2%); }
+      100% { transform: translate(0%, 0%); }
+    }
+    @keyframes flowerright {
+      0% { transform: translate(0%, 0%) rotate(0deg); }
+      50% { transform: translate(0%, 0%) rotate(-6deg); }
+      100% { transform: translate(0%, 0%) rotate(0deg); }
+    }
+    @keyframes flowerleft {
+      0% { transform: translate(0%, 0%) rotate(0deg); }
+      50% { transform: translate(0%, 0%) rotate(6deg); }
+      100% { transform: translate(0%, 0%) rotate(0deg); }
+    }
+
+    /* RUNDOWN & ACARA SECTION */
+    .rundown {
+      position: relative;
+    }
+    #list-rundown {
+      padding: 0 1.5rem 3rem;
+      background-image: url('/assets/owlink/batik-seamless-pattern-art-illustration-vector__1___1___1_.png');
+      background-size: 100%;
+      background-color: #fafeff;
+      padding-top: 5rem;
+      position: relative;
+    }
+    #list-rundown .treetopright {
+      position: absolute;
+      right: -20%;
+      width: 65%;
+      top: -8%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    #list-rundown .treetopright img {
+      width: 100%;
+      transform: rotate(-50deg);
+    }
+    .item-rundown {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--primary-gold);
+      border-radius: 20px;
+      padding: 28px 20px;
+      margin: 0 auto 24px;
+      max-width: 420px;
+      box-shadow: var(--shadow);
+      position: relative;
+      text-align: center;
+    }
+    .item-rundown h1.schedule_title {
+      font-family: 'javassoul', cursive;
+      font-size: 32px;
+      color: var(--primary-gold);
+      margin-bottom: 8px;
+      text-transform: capitalize;
+    }
+    .item-rundown p.schedule_date {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary-sage);
+      margin-bottom: 8px;
+    }
+    .item-rundown p.schedule_time {
+      font-size: 13px;
+      color: var(--primary-gold);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .item-rundown p.schedule_location {
+      font-size: 13px;
+      color: var(--text-sage);
+      line-height: 1.5;
+    }
+    .has_been_held {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 20px;
+      background: rgba(121, 166, 175, 0.15);
+      border: 1px solid var(--primary-sage);
+      color: var(--primary-sage);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .has_been_held b {
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ADDRESS & MAPS WRAPPER */
+    .maps-section {
+      background: var(--primary-sage);
+      padding: 45px 20px;
+      text-align: center;
+      color: #fafeff;
+    }
+    .maps-section h3 {
+      font-family: 'javassoul', cursive;
+      font-size: 32px;
+      color: #f7e6c4;
+      margin-bottom: 16px;
+    }
+    .maps-frame {
+      border: 8px solid var(--primary-gold);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .maps-frame iframe {
+      width: 100%;
+      height: 240px;
+      display: block;
+      border: 0;
+    }
+    .btn-maps {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fafeff;
+      color: var(--primary-sage);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 24px;
+      border-radius: 30px;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+    }
+    .btn-maps:active {
+      transform: scale(0.96);
+    }
+
+    /* GALLERIES SECTION */
+    #galleries {
+      background: #fafeff url('/assets/owlink/31d69739a58036196f4d111395c77794.png') repeat;
+      background-size: 50%;
+      padding: 60px 20px;
+      text-align: center;
+      position: relative;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 25px;
+    }
+    .gallery-item {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      border: 2px solid rgba(175, 160, 131, 0.4);
+      cursor: pointer;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+
+    /* DIGITAL ENVELOPE / PAY-STICK SECTION */
+    .pay-stick {
+      background: var(--primary-sage) !important;
+      padding: 50px 24px !important;
+      color: #fafeff !important;
+      text-align: center;
+      position: relative;
+    }
+    .pay-stick h2 {
+      font-family: 'javassoul', cursive;
+      font-size: 36px;
+      color: #f7e6c4;
+      margin-bottom: 8px;
+    }
+    .pay-stick p {
+      color: #fafeff;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    .bank-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      padding: 22px;
+      color: var(--primary-sage);
+      margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      border: 1px solid var(--primary-gold);
+    }
+    .bank-card .bank-name {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--primary-gold);
+      margin-bottom: 6px;
+    }
+    .bank-card .account-num {
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      letter-spacing: 1.5px;
+      margin: 8px 0;
+    }
+    .bank-card .holder {
+      font-size: 12px;
+      color: var(--text-sage);
+      margin-bottom: 12px;
+    }
+    .btn-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-gold);
+      color: #FFF;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-copy:hover {
+      background: #96886e;
+    }
+
+    /* WISHES & RSVP SECTION */
+    #wishesSection {
+      background: #fafeff;
+      padding: 55px 20px 40px;
+      text-align: center;
+      position: relative;
+    }
+    .rsvp-form-card {
+      background: #fafeff;
+      border-radius: 20px;
+      padding: 26px 20px;
+      border: 1px solid rgba(175, 160, 131, 0.4);
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary-gold);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(121, 166, 175, 0.35);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      color: #333;
+      background: #FFF;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--primary-gold);
+    }
+    .btn-submit-wish {
+      width: 100%;
+      background: var(--primary-gold);
+      color: #FFF;
+      border: none;
+      padding: 14px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(175, 160, 131, 0.4);
+      transition: transform 0.2s;
+    }
+    .btn-submit-wish:active {
+      transform: scale(0.98);
+    }
+
+    /* Wishes Feed */
+    .wishes-feed {
+      text-align: left;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .wish-item {
+      background: #FFF;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--primary-gold);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    .wish-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .wish-author {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--primary-gold);
+    }
+    .wish-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .badge-hadir { background: #E8F5E9; color: #2E7D32; }
+    .badge-tidak { background: #FFEBEE; color: #C62828; }
+    .badge-ragu { background: #FFF8E1; color: #F57F17; }
+    .wish-msg {
+      font-size: 12px;
+      color: var(--text-sage);
+      line-height: 1.5;
+    }
+
+    /* THANK YOU & FOOTER (Exact Match Owlink Javanese) */
+    .thank-you {
+      text-align: center;
+      padding: 6rem 20px 9rem;
+      position: relative;
+      background: #fafeff url('/assets/owlink/31d69739a58036196f4d111395c77794.png') repeat;
+      background-size: 50%;
+      overflow: hidden;
+    }
+    .thank-you h5 {
+      color: var(--primary-sage);
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .thank-you .calling-name {
+      font-size: 42px;
+      font-family: 'javassoul', cursive;
+      color: var(--primary-gold);
+      line-height: 1.1;
+      margin-bottom: 25px;
+    }
+    .thank-you .footer-note {
+      font-size: 12px;
+      color: var(--primary-sage);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    /* Thank-you side wayang & coconut tree ornaments */
+    .thank-wayang {
+      position: absolute;
+      width: 32%;
+      right: -8%;
+      bottom: 5%;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .thank-wayang img {
+      width: 100%;
+      transform: scaleX(-1) rotate(18deg);
+    }
+    .thank-tree {
+      position: absolute;
+      width: 45%;
+      left: -18%;
+      bottom: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .thank-tree img {
+      width: 100%;
+    }
+
+    /* Lightbox Modal */
+    #lightboxModal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.88);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #lightboxModal.show {
+      display: flex;
+    }
+    #lightboxModal img {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      color: #FFF;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: rgba(30, 35, 38, 0.94);
+      color: #FFF;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 999;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Background Player (Owlink MP3) -->
+  <audio id="bgMusic" loop src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/owlink/45fd8f10-e568-11f0-9566-cd08157352d1.mp3{{ end }}"></audio>
+
+  <!-- Canvas Falling Petals -->
+  <canvas id="petalsCanvas"></canvas>
+
+  <!-- Toast Notification -->
+  <div id="toast">Teks disalin!</div>
+
+  <!-- Audio Floating Button -->
+  <div class="audio-control" id="audioToggle" onclick="toggleAudio()">
+    <i class="fa-solid fa-music"></i>
+  </div>
+
+  <!-- Lightbox Preview Modal -->
+  <div id="lightboxModal" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightboxImg" src="" alt="Preview">
+  </div>
+
+  <!-- Glassmorphism Bottom Navigation Bar -->
+  <nav class="bottom-nav" id="bottomNav">
+    <a href="#coupleProfile" class="nav-item">
+      <i class="fa-solid fa-heart"></i>
+      <span>Couple</span>
+    </a>
+    <a href="#weddingDetail" class="nav-item">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Date</span>
+    </a>
+    <a href="#mapsSection" class="nav-item">
+      <i class="fa-solid fa-map-location-dot"></i>
+      <span>Location</span>
+    </a>
+    <a href="#galleries" class="nav-item">
+      <i class="fa-solid fa-images"></i>
+      <span>Gallery</span>
+    </a>
+    <a href="#paySection" class="nav-item">
+      <i class="fa-solid fa-gift"></i>
+      <span>Hadiah</span>
+    </a>
+    <a href="#wishesSection" class="nav-item">
+      <i class="fa-solid fa-envelope-open-text"></i>
+      <span>Wishes</span>
+    </a>
+  </nav>
+
+  <!-- FULLSCREEN COVER OVERLAY (Luxurious Javanese Theme from Owlink) -->
+  <div id="coverOverlay">
+    <div class="cover-backdrop"></div>
+    <div class="c-gate">
+      <img src="/assets/owlink/Color_Fill_13__2_.png" alt="Candi Gate">
+    </div>
+    <div class="c-wayangleft">
+      <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang">
+    </div>
+    <div class="c-wayangright">
+      <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang">
+    </div>
+    <div class="c-batik"></div>
+
+    <div class="cover-content">
+      <div class="cover-top" data-aos="fade-down" data-aos-duration="1000">
+        <span class="cover-badge">Undangan Pernikahan</span>
+        <h1 class="cover-title">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h1>
+        <p class="cover-subtitle">{{ .Title }}</p>
+      </div>
+
+      <div class="cover-bottom" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+        <div class="cover-guest-card">
+          <p>Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+          <h3>{{ .GuestTo }}</h3>
+        </div>
+        <button class="btn-buka-undangan" onclick="openInvitation()">
+          <i class="fa-solid fa-envelope-open"></i>
+          <span>Buka Undangan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN WRAPPER CONTAINER -->
+  <div class="app-wrapper">
+
+    <!-- HERO SEPARATOR SECTION -->
+    <section class="separator-hero">
+      <div class="separator-content" data-aos="zoom-in" data-aos-duration="1200">
+        <h1 class="separator-title">{{ .GroomNickname }}<br>&amp;<br>{{ .BrideNickname }}</h1>
+      </div>
+      <div class="scroll-gif">
+        <img src="/assets/owlink/5fpDLWGm0KOb3iJAkC23o9__Minimalist_Luxury_Vibes.gif" alt="Scroll Down">
+      </div>
+    </section>
+
+    <!-- QUOTES SECTION -->
+    <section id="quoteSection">
+      <div data-aos="fade-up" data-aos-duration="1000">
+        <i class="fa-solid fa-quote-left quotes-icon"></i>
+        <p class="quotes-text">
+          {{ if .Quotes }}
+            {{ .Quotes }}
+          {{ else }}
+            "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berfikir."<br><br><b>Q.S Ar-Rum Ayat 21</b>
+          {{ end }}
+        </p>
+      </div>
+    </section>
+
+    <!-- COUPLE PROFILE SECTION -->
+    <section id="coupleProfile" class="default">
+      <h2 class="section-heading" data-aos="fade-up">Mempelai</h2>
+      <div class="couple-row">
+
+        <!-- Groom (Mempelai Pria) -->
+        <div class="male" data-aos="fade-left" data-aos-duration="1000">
+          <div class="box">
+            <div class="couple-wrapper" data-aos="fade-up" data-aos-delay="200">
+              <div class="frame-profile">
+                <img src="/assets/owlink/frame-gold.png" alt="Frame Gold">
+              </div>
+              <div class="couple-img">
+                <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg{{ end }}" alt="{{ .GroomName }}" onerror="this.src='/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg';">
+              </div>
+              <img src="/assets/owlink/couple_decor_13.png" alt="" class="couple-img-decor">
+              <div class="dec1-profile">
+                <img src="/assets/owlink/Levels_1.png" alt="Decor">
+              </div>
+              <div class="wayangleft-profile">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang Left">
+              </div>
+              <div class="treeleft-profile">
+                <img src="/assets/owlink/Color_Fill_2_copy_6.png" alt="Tree Left">
+              </div>
+              <div class="treeright-profile">
+                <img src="/assets/owlink/Color_Fill_2_copy_6.png" alt="Tree Right">
+              </div>
+              <div class="wayangright-profile">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang Right">
+              </div>
+              <div class="flow1-profile anim_flower" style="animation-duration: 6s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_11.png" alt="Flower 1">
+              </div>
+              <div class="flow2-profile anim_flower" style="animation-duration: 4s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_10.png" alt="Flower 2">
+              </div>
+              <div class="flow3-profile anim_flower anim_flowerreverse" style="animation-duration: 6s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_11.png" alt="Flower 3">
+              </div>
+              <div class="flow4-profile anim_flower anim_flowerreverse" style="animation-duration: 4s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_10.png" alt="Flower 4">
+              </div>
+            </div>
+          </div>
+          <div class="couple-text-wrap">
+            {{ if .GroomInstagram }}
+            <p class="instagram-profil">
+              <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/></svg>
+                <b>{{ .GroomInstagram }}</b>
+              </a>
+            </p>
+            {{ end }}
+            <h4><b>{{ .GroomName }}</b></h4>
+            <p class="child-number"><b>Putra dari</b></p>
+            <p>{{ .GroomParents }}</p>
+          </div>
+        </div>
+
+        <!-- Separator Ampersand -->
+        <div class="couple-separator-and" data-aos="zoom-in">
+          <h1 class="font-morning">&amp;</h1>
+        </div>
+
+        <!-- Bride (Mempelai Wanita) -->
+        <div class="female" data-aos="fade-left" data-aos-duration="1000">
+          <div class="box-female">
+            <div class="couple-wrapper" data-aos="fade-up" data-aos-delay="200">
+              <div class="frame-profile">
+                <img src="/assets/owlink/frame-gold.png" alt="Frame Gold">
+              </div>
+              <div class="couple-img">
+                <img src="{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/owlink/52f979d0-dbaa-11f0-a7ae-e7cdc56de3c7.jpg{{ end }}" alt="{{ .BrideName }}" onerror="this.src='/assets/owlink/52f979d0-dbaa-11f0-a7ae-e7cdc56de3c7.jpg';">
+              </div>
+              <img src="/assets/owlink/couple_decor_13.png" alt="" class="couple-img-decor">
+              <div class="dec1-profile">
+                <img src="/assets/owlink/Levels_1.png" alt="Decor">
+              </div>
+              <div class="wayangleft-profile">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang Left">
+              </div>
+              <div class="treeleft-profile">
+                <img src="/assets/owlink/Color_Fill_2_copy_6.png" alt="Tree Left">
+              </div>
+              <div class="treeright-profile">
+                <img src="/assets/owlink/Color_Fill_2_copy_6.png" alt="Tree Right">
+              </div>
+              <div class="wayangright-profile">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang Right">
+              </div>
+              <div class="flow1-profile anim_flower" style="animation-duration: 6s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_11.png" alt="Flower 1">
+              </div>
+              <div class="flow2-profile anim_flower" style="animation-duration: 4s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_10.png" alt="Flower 2">
+              </div>
+              <div class="flow3-profile anim_flower anim_flowerreverse" style="animation-duration: 6s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_11.png" alt="Flower 3">
+              </div>
+              <div class="flow4-profile anim_flower anim_flowerreverse" style="animation-duration: 4s;">
+                <img src="/assets/owlink/istockphoto-186835568-612x612_copy_10.png" alt="Flower 4">
+              </div>
+            </div>
+          </div>
+          <div class="couple-text-wrap">
+            {{ if .BrideInstagram }}
+            <p class="instagram-profil">
+              <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/></svg>
+                <b>{{ .BrideInstagram }}</b>
+              </a>
+            </p>
+            {{ end }}
+            <h4><b>{{ .BrideName }}</b></h4>
+            <p class="child-number"><b>Putri dari</b></p>
+            <p>{{ .BrideParents }}</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- WEDDING DETAIL & COUNTDOWN SECTION (Exact Owlink Luxurious Javanese Theme) -->
+    <section id="weddingDetail">
+      <div class="separator-batik">
+        <img src="/assets/owlink/batik-seamless-pattern-art-illustration-vector__1___1_.jpg" alt="Batik Separator">
+      </div>
+
+      <!-- COUNTDOWN / EVENT END -->
+      <div id="countdown">
+        <div class="treetopleft">
+          <img src="/assets/owlink/Levels_1.png" alt="Decor Tree Left">
+        </div>
+
+        <div id="countdownActive" class="countdown-active-wrap">
+          <h2 class="countdown-title" data-aos="fade-down">Menghitung Hari</h2>
+          <div class="countdown-timer-wrap" data-aos="zoom-in">
+            <div class="cd-tile"><span class="num" id="cdDays">00</span><span class="lbl">Hari</span></div>
+            <div class="cd-tile"><span class="num" id="cdHours">00</span><span class="lbl">Jam</span></div>
+            <div class="cd-tile"><span class="num" id="cdMins">00</span><span class="lbl">Menit</span></div>
+            <div class="cd-tile"><span class="num" id="cdSecs">00</span><span class="lbl">Detik</span></div>
+          </div>
+        </div>
+
+        <div id="countdownFinished" class="event-end" style="display: none;">
+          <h1 class="padding-balance text-center" data-aos="zoom-in">Acara telah selesai</h1>
+        </div>
+
+        <!-- Swaying Flow & Ornaments around countdown -->
+        <div class="flow1-cd anim_flowerright" style="animation-duration: 6s;">
+          <img src="/assets/owlink/istockphoto-186835568-612x612_copy_11.png" alt="Floral 1">
+        </div>
+        <div class="flow2-cd anim_flowerright" style="animation-duration: 5s;">
+          <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Floral 2">
+        </div>
+        <div class="flow3-cd anim_cloud" style="animation-duration: 5s;">
+          <img src="/assets/owlink/Gold-Element-59_copy.png" alt="Gold Element">
+        </div>
+        <div class="flow4-cd anim_flowerleft" style="animation-duration: 8s;">
+          <img src="/assets/owlink/istockphoto-186835568-612x612_copy_10.png" alt="Floral 4">
+        </div>
+        <div class="flow5-cd anim_flowerleft" style="animation-duration: 8s;">
+          <img src="/assets/owlink/6BebQasfPF7ugHWqLBxLak__Golden-Floral-Elements-25.png" alt="Floral 5">
+        </div>
+      </div>
+
+      <!-- RUNDOWN / ACARA LIST (Exact Owlink Structure) -->
+      <div class="cover rundown">
+        <div id="list-rundown">
+          <div class="treetopright">
+            <img src="/assets/owlink/Color_Fill_5_copy_2.png" alt="Tree Right">
+          </div>
+          <div class="container" style="position:relative;z-index:2;">
+            <div class="top-acara"></div>
+            <div class="row justify-content-md-center">
+
+              {{ if .AkadDate }}
+              <div class="item-rundown wow animate__animated animate__fadeInUp col-12" data-aos="fade-up" data-aos-duration="1000">
+                <h1 class="title_akad schedule_title">Akad Nikah</h1>
+                <p class="akad_date schedule_date">{{ .AkadDate }}</p>
+                {{ if .AkadTime }}
+                <p class="akad_time schedule_time">
+                  <svg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="clock" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-clock b-icon bi"><g><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></g></svg>
+                  <span>{{ .AkadTime }}</span>
+                </p>
+                {{ end }}
+                <p id="akadHeldBadge" class="has_been_held" style="display: none;">
+                  <b>Telah dilaksanakan</b>
+                </p>
+                {{ if .AkadVenue }}
+                <p class="akad_location schedule_location"><b>{{ .AkadVenue }}</b></p>
+                {{ end }}
+                {{ if .AkadAddress }}
+                <p class="akad_location schedule_location">{{ .AkadAddress }}</p>
+                {{ end }}
+              </div>
+              {{ end }}
+
+              {{ if .ResepsiDate }}
+              <div class="item-rundown wow animate__animated animate__fadeInUp col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="150">
+                <h1 class="title_resepsi schedule_title">Resepsi Pernikahan</h1>
+                <p class="resepsi_date schedule_date">{{ .ResepsiDate }}</p>
+                {{ if .ResepsiTime }}
+                <p class="resepsi_time schedule_time">
+                  <svg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="clock" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-clock b-icon bi"><g><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></g></svg>
+                  <span>{{ .ResepsiTime }}</span>
+                </p>
+                {{ end }}
+                <p id="resepsiHeldBadge" class="has_been_held" style="display: none;">
+                  <b>Telah dilaksanakan</b>
+                </p>
+                {{ if .ResepsiVenue }}
+                <p class="resepsi_location schedule_location"><b>{{ .ResepsiVenue }}</b></p>
+                {{ end }}
+                {{ if .ResepsiAddress }}
+                <p class="resepsi_location schedule_location">{{ .ResepsiAddress }}</p>
+                {{ end }}
+              </div>
+              {{ end }}
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAPS & LOCATION SECTION -->
+    <section class="maps-section" id="mapsSection">
+      <div data-aos="fade-up">
+        <h3>Lokasi Acara</h3>
+        <div class="maps-frame">
+          <iframe src="https://maps.google.com/maps?q={{ if .ResepsiAddress }}{{ .ResepsiAddress }}{{ else if .AkadAddress }}{{ .AkadAddress }}{{ else }}Bogor{{ end }}&t=&z=14&ie=UTF8&iwloc=&output=embed" loading="lazy"></iframe>
+        </div>
+        {{ if or .ResepsiMapsURL .AkadMapsURL }}
+        <a class="btn-maps" href="{{ if .ResepsiMapsURL }}{{ .ResepsiMapsURL }}{{ else }}{{ .AkadMapsURL }}{{ end }}" target="_blank">
+          <i class="fa-solid fa-diamond-turn-right"></i>
+          <span>Buka di Google Maps</span>
+        </a>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- GALLERIES SECTION -->
+    <section id="galleries">
+      <h2 class="section-heading" data-aos="fade-up">Galeri Foto</h2>
+      <div class="gallery-grid">
+        {{ if .GalleryList }}
+          {{ range .GalleryList }}
+          <div class="gallery-item" data-aos="zoom-in" onclick="openLightbox('{{ . }}')">
+            <img src="{{ . }}" alt="Galeri">
+          </div>
+          {{ end }}
+        {{ else }}
+          <div class="gallery-item" data-aos="zoom-in" onclick="openLightbox('/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg')">
+            <img src="/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg" alt="Galeri 1">
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100" onclick="openLightbox('/assets/owlink/3005d740-e3aa-11f0-a9de-b37562d0916b.jpg')">
+            <img src="/assets/owlink/3005d740-e3aa-11f0-a9de-b37562d0916b.jpg" alt="Galeri 2">
+          </div>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- DIGITAL ENVELOPE / REKENING HADIAH SECTION -->
+    <section class="pay-stick" id="paySection">
+      <div data-aos="fade-up">
+        <h2>Kirim Hadiah</h2>
+        <p>Doa restu Anda merupakan karunia terindah bagi kami. Namun jika ingin memberi tanda kasih, dapat melalui rekening berikut:</p>
+
+        {{ if .BankAccount1 }}
+        <div class="bank-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="bank-name">{{ .BankName1 }}</div>
+          <div class="account-num" id="acc1">{{ .BankAccount1 }}</div>
+          <div class="holder">a.n {{ .BankHolder1 }}</div>
+          <button class="btn-copy" onclick="copyText('acc1')">
+            <i class="fa-regular fa-copy"></i>
+            <span>Salin Nomor</span>
+          </button>
+        </div>
+        {{ end }}
+
+        {{ if .BankAccount2 }}
+        <div class="bank-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="bank-name">{{ .BankName2 }}</div>
+          <div class="account-num" id="acc2">{{ .BankAccount2 }}</div>
+          <div class="holder">a.n {{ .BankHolder2 }}</div>
+          <button class="btn-copy" onclick="copyText('acc2')">
+            <i class="fa-regular fa-copy"></i>
+            <span>Salin Nomor</span>
+          </button>
+        </div>
+        {{ end }}
+
+        {{ if .GiftAddress }}
+        <div class="bank-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="bank-name"><i class="fa-solid fa-gift"></i> Kirim Kado Fisik</div>
+          <div class="holder" id="giftAddr" style="margin-top:8px;font-size:13px;line-height:1.5;">{{ .GiftAddress }}</div>
+          <button class="btn-copy" style="margin-top:8px;" onclick="copyText('giftAddr')">
+            <i class="fa-regular fa-copy"></i>
+            <span>Salin Alamat</span>
+          </button>
+        </div>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- RSVP & WISHES SECTION -->
+    <section id="wishesSection">
+      <h2 class="section-heading" data-aos="fade-up">Ucapan &amp; Doa</h2>
+
+      <div class="rsvp-form-card" data-aos="fade-up">
+        <form onsubmit="submitWish(event)">
+          <div class="form-group">
+            <label>Nama Anda</label>
+            <input type="text" id="guestName" class="form-control" value="{{ .GuestTo }}" required>
+          </div>
+          <div class="form-group">
+            <label>Konfirmasi Kehadiran</label>
+            <select id="attendance" class="form-control">
+              <option value="hadir">Hadir</option>
+              <option value="ragu">Masih Ragu</option>
+              <option value="tidak_hadir">Tidak Hadir</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Jumlah Tamu</label>
+            <input type="number" id="guestCount" class="form-control" value="1" min="1" max="5">
+          </div>
+          <div class="form-group">
+            <label>Ucapan / Doa Restu</label>
+            <textarea id="message" class="form-control" rows="3" placeholder="Tuliskan ucapan dan doa Anda..." required></textarea>
+          </div>
+          <button type="submit" id="btnSubmitWish" class="btn-submit-wish">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Kirim Ucapan</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Feed Ucapan -->
+      <div class="wishes-feed" id="wishesList">
+        {{ range .Wishes }}
+        <div class="wish-item">
+          <div class="wish-header">
+            <span class="wish-author">{{ .GuestName }}</span>
+            <span class="wish-badge {{ if eq .Attendance "hadir" }}badge-hadir{{ else if eq .Attendance "tidak_hadir" }}badge-tidak{{ else }}badge-ragu{{ end }}">
+              {{ if eq .Attendance "hadir" }}Hadir{{ else if eq .Attendance "tidak_hadir" }}Tidak Hadir{{ else }}Ragu{{ end }}
+            </span>
+          </div>
+          <div class="wish-msg">{{ .Message }}</div>
+        </div>
+        {{ else }}
+        <p id="emptyWish" style="font-size:13px;color:var(--text-sage);">Belum ada ucapan. Jadilah yang pertama memberikan ucapan!</p>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- THANK YOU FOOTER (Exact Match Owlink Javanese) -->
+    <footer class="thank-you">
+      <div class="thank-tree">
+        <img src="/assets/owlink/istockphoto-186835568-612x612_copy_2.png" alt="Tree">
+      </div>
+      <div class="thank-wayang">
+        <img src="/assets/owlink/istockphoto-186835568-612x612_copy_3.png" alt="Wayang">
+      </div>
+
+      <div data-aos="zoom-in" data-aos-duration="1000">
+        <h5>Thank You</h5>
+        <div class="calling-name">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</div>
+        <p class="footer-note">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // Inisialisasi AOS (Animate On Scroll)
+    AOS.init({
+      duration: 900,
+      easing: 'ease-out-cubic',
+      once: false,
+      offset: 30
+    });
+
+    const music = document.getElementById('bgMusic');
+    const audioBtn = document.getElementById('audioToggle');
+    let isPlaying = false;
+    let noteInterval;
+
+    function openInvitation() {
+      const cover = document.getElementById('coverOverlay');
+      cover.classList.add('hidden');
+      document.getElementById('bottomNav').classList.add('active');
+      playAudio();
+      setTimeout(() => {
+        AOS.refresh();
+      }, 600);
+    }
+
+    function playAudio() {
+      music.play().then(() => {
+        isPlaying = true;
+        audioBtn.classList.add('spinning');
+        startMusicNotes();
+      }).catch(() => {
+        isPlaying = false;
+        audioBtn.classList.remove('spinning');
+      });
+    }
+
+    function toggleAudio() {
+      if (isPlaying) {
+        music.pause();
+        isPlaying = false;
+        audioBtn.classList.remove('spinning');
+        clearInterval(noteInterval);
+      } else {
+        music.play();
+        isPlaying = true;
+        audioBtn.classList.add('spinning');
+        startMusicNotes();
+      }
+    }
+
+    function startMusicNotes() {
+      clearInterval(noteInterval);
+      const notes = ['🎵', '🎶', '♩', '♪'];
+      noteInterval = setInterval(() => {
+        if (!isPlaying) return;
+        const note = document.createElement('div');
+        note.className = 'music-note';
+        note.innerText = notes[Math.floor(Math.random() * notes.length)];
+        note.style.right = (15 + Math.random() * 20) + 'px';
+        note.style.top = (45 + Math.random() * 20) + 'px';
+        document.body.appendChild(note);
+        setTimeout(() => note.remove(), 2000);
+      }, 800);
+    }
+
+    function copyText(elemId) {
+      const text = document.getElementById(elemId).innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Berhasil disalin: ' + text);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function openLightbox(url) {
+      document.getElementById('lightboxImg').src = url;
+      document.getElementById('lightboxModal').classList.add('show');
+    }
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.remove('show');
+    }
+
+    // Countdown & Event Status Logic (Robust parsing for various date formats)
+    function parseCustomDate(str) {
+      if (!str || typeof str !== 'string') return null;
+      let clean = str.trim();
+      if (!clean) return null;
+
+      // Check standard ISO or new Date directly
+      let d = new Date(clean);
+      if (!isNaN(d.getTime())) return d;
+
+      // If text like "Rabu, 24 Desember 2025" or "24 Desember 2025"
+      const indoMonths = {
+        'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
+        'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11
+      };
+      const match = clean.match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/);
+      if (match) {
+        const day = parseInt(match[1], 10);
+        const monthName = match[2].toLowerCase();
+        const year = parseInt(match[3], 10);
+        if (indoMonths[monthName] !== undefined) {
+          return new Date(year, indoMonths[monthName], day, 23, 59, 59);
+        }
+      }
+
+      // Check YYYY-MM-DD or DD-MM-YYYY
+      const dmy = clean.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
+      if (dmy) {
+        return new Date(parseInt(dmy[3], 10), parseInt(dmy[2], 10) - 1, parseInt(dmy[1], 10), 23, 59, 59);
+      }
+      return null;
+    }
+
+    const akadDateObj = parseCustomDate("{{ .AkadDate }}");
+    const resepsiDateObj = parseCustomDate("{{ .ResepsiDate }}");
+
+    // Target for countdown: Use Akad if future, else Resepsi, else whichever is latest
+    let mainTargetDate = null;
+    const nowTime = new Date().getTime();
+
+    if (akadDateObj && akadDateObj.getTime() > nowTime) {
+      mainTargetDate = akadDateObj;
+    } else if (resepsiDateObj && resepsiDateObj.getTime() > nowTime) {
+      mainTargetDate = resepsiDateObj;
+    } else {
+      mainTargetDate = resepsiDateObj || akadDateObj;
+    }
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+
+      // Update "Telah Dilaksanakan" badges on individual rundown items
+      if (akadDateObj) {
+        const akadBadge = document.getElementById('akadHeldBadge');
+        if (akadBadge) {
+          if (now > akadDateObj.getTime()) {
+            akadBadge.style.display = 'inline-block';
+          } else {
+            akadBadge.style.display = 'none';
+          }
+        }
+      }
+      if (resepsiDateObj) {
+        const resepsiBadge = document.getElementById('resepsiHeldBadge');
+        if (resepsiBadge) {
+          if (now > resepsiDateObj.getTime()) {
+            resepsiBadge.style.display = 'inline-block';
+          } else {
+            resepsiBadge.style.display = 'none';
+          }
+        }
+      }
+
+      const activeEl = document.getElementById('countdownActive');
+      const finishedEl = document.getElementById('countdownFinished');
+      const cdSection = document.getElementById('countdown');
+
+      if (!mainTargetDate) return;
+
+      const diff = mainTargetDate.getTime() - now;
+
+      if (diff <= 0) {
+        // Event has passed -> Show "Acara telah selesai"
+        if (activeEl) activeEl.style.display = 'none';
+        if (finishedEl) finishedEl.style.display = 'block';
+        if (cdSection) cdSection.classList.add('finish');
+        return;
+      }
+
+      // Event is in the future -> Show countdown numbers
+      if (activeEl) activeEl.style.display = 'block';
+      if (finishedEl) finishedEl.style.display = 'none';
+      if (cdSection) cdSection.classList.remove('finish');
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const elDays = document.getElementById('cdDays');
+      const elHours = document.getElementById('cdHours');
+      const elMins = document.getElementById('cdMins');
+      const elSecs = document.getElementById('cdSecs');
+
+      if (elDays) elDays.innerText = String(days).padStart(2, '0');
+      if (elHours) elHours.innerText = String(hours).padStart(2, '0');
+      if (elMins) elMins.innerText = String(minutes).padStart(2, '0');
+      if (elSecs) elSecs.innerText = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // 60FPS Falling Petals Canvas
+    (function initPetals() {
+      const canvas = document.getElementById('petalsCanvas');
+      const ctx = canvas.getContext('2d');
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const petals = [];
+      const petalCount = 26;
+
+      for (let i = 0; i < petalCount; i++) {
+        petals.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: 7 + Math.random() * 8,
+          speedY: 0.8 + Math.random() * 1.4,
+          speedX: (Math.random() - 0.5) * 1.2,
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 2,
+          opacity: 0.35 + Math.random() * 0.45,
+          color: Math.random() > 0.4 ? 'rgba(175, 160, 131, ' : 'rgba(121, 166, 175, ' // Javanese Gold & Sage
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let p of petals) {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color + p.opacity + ')';
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(p.size, p.size / 2, 0, p.size);
+          ctx.quadraticCurveTo(-p.size, p.size / 2, 0, 0);
+          ctx.fill();
+          ctx.restore();
+
+          p.y += p.speedY;
+          p.x += p.speedX + Math.sin(p.y * 0.01) * 0.5;
+          p.rotation += p.rotSpeed;
+
+          if (p.y > height + 20) {
+            p.y = -20;
+            p.x = Math.random() * width;
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // AJAX RSVP & Wishes Submission
+    async function submitWish(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitWish');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...';
+
+      const payload = {
+        guest_name: document.getElementById('guestName').value,
+        attendance: document.getElementById('attendance').value,
+        guest_count: parseInt(document.getElementById('guestCount').value) || 1,
+        message: document.getElementById('message').value
+      };
+
+      try {
+        const res = await fetch('/api/invitations/{{ .Slug }}/wishes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          showToast('Terima kasih! Ucapan & doa berhasil dikirim.');
+          document.getElementById('message').value = '';
+
+          const feed = document.getElementById('wishesList');
+          const empty = document.getElementById('emptyWish');
+          if (empty) empty.remove();
+
+          const badgeClass = payload.attendance === 'hadir' ? 'badge-hadir' : (payload.attendance === 'tidak_hadir' ? 'badge-tidak' : 'badge-ragu');
+          const badgeText = payload.attendance === 'hadir' ? 'Hadir' : (payload.attendance === 'tidak_hadir' ? 'Tidak Hadir' : 'Ragu');
+
+          const newDiv = document.createElement('div');
+          newDiv.className = 'wish-item';
+          newDiv.innerHTML = `
+            <div class="wish-header">
+              <span class="wish-author">${payload.guest_name}</span>
+              <span class="wish-badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="wish-msg">${payload.message}</div>
+          `;
+          feed.prepend(newDiv);
+        } else {
+          showToast('Gagal mengirim ucapan, silakan coba lagi.');
+        }
+      } catch (err) {
+        showToast('Koneksi bermasalah: ' + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Ucapan';
+      }
+    }
+  </script>
+</body>
+</html>

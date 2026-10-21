@@ -48,8 +48,16 @@ func GetAgendas(c *fiber.Ctx) error {
 		})
 	}
 
-	// Pastikan semua agenda punya FormToken & FormStatus default
+	// Pastikan semua agenda punya FormToken & FormStatus default, serta backfill package_price jika 0
 	for i := range agendas {
+		if agendas[i].PackagePrice == 0 && agendas[i].PackageID != "" {
+			var pkg models.Package
+			if err := config.DB.Where("id = ?", agendas[i].PackageID).First(&pkg).Error; err == nil {
+				agendas[i].PackagePrice = pkg.BasePrice
+				config.DB.Model(&models.Agenda{}).Where("id = ?", agendas[i].ID).Update("package_price", pkg.BasePrice)
+			}
+		}
+
 		if agendas[i].FormToken == "" {
 			agendas[i].FormToken = uuid.New().String()[:8]
 			if agendas[i].FormStatus == "" {
@@ -110,12 +118,16 @@ func CreateAgenda(c *fiber.Ctx) error {
 		eventTime = time.Now().Add(24 * time.Hour) // Default besok jika tidak diisi
 	}
 
-	// Ambil nama paket dari master Paket (jika ada)
+	// Ambil nama & harga paket dari master Paket (jika ada)
 	packageName := "Belum Dipilih"
+	packagePrice := req.PackagePrice
 	if strings.TrimSpace(req.PackageID) != "" {
 		var pkg models.Package
 		if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
 			packageName = pkg.Name
+			if packagePrice == 0 {
+				packagePrice = pkg.BasePrice
+			}
 		} else {
 			packageName = "Paket Khusus"
 		}
@@ -134,6 +146,8 @@ func CreateAgenda(c *fiber.Ctx) error {
 		MapsURL:       strings.TrimSpace(req.MapsURL),
 		PackageID:     req.PackageID,
 		PackageName:   packageName,
+		PackagePrice:  packagePrice,
+		TransportFee:  req.TransportFee,
 		Status:        "upcoming",
 		FormToken:     formToken,
 		FormStatus:    "pending",
@@ -157,7 +171,7 @@ func CreateAgenda(c *fiber.Ctx) error {
 // GetPackages handles GET /api/packages
 func GetPackages(c *fiber.Ctx) error {
 	var packages []models.Package
-	if err := config.DB.Order("base_price ASC").Find(&packages).Error; err != nil {
+	if err := config.DB.Order("sort_order ASC, created_at ASC").Find(&packages).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil data paket",
 		})
@@ -168,3 +182,199 @@ func GetPackages(c *fiber.Ctx) error {
 		"data":    packages,
 	})
 }
+
+// ReorderPackages handles PUT /api/packages/reorder
+func ReorderPackages(c *fiber.Ctx) error {
+	var req models.ReorderPackagesRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	for idx, id := range req.PackageIDs {
+		config.DB.Model(&models.Package{}).Where("id = ?", id).Update("sort_order", idx)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Urutan paket dekorasi berhasil diperbarui",
+	})
+}
+
+// UpdateAgendaDp handles PUT /api/agendas/:id/dp
+func UpdateAgendaDp(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdateDpRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	if req.DpAmount < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nominal DP tidak boleh negatif",
+		})
+	}
+
+	var agenda models.Agenda
+	if err := config.DB.Preload("ClientForm").Where("id = ?", id).First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	agenda.DpAmount = req.DpAmount
+	totalBiaya := agenda.CalculateTotalBiaya()
+	if totalBiaya > 0 && agenda.DpAmount >= totalBiaya {
+		agenda.PaymentStatus = "paid"
+	} else if agenda.DpAmount > 0 {
+		agenda.PaymentStatus = "dp"
+	}
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate DP agenda: " + err.Error(),
+		})
+	}
+
+	// Reload with ClientForm
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Pembayaran DP berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaPaymentStatus handles PUT /api/agendas/:id/payment-status
+func UpdateAgendaPaymentStatus(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdatePaymentStatusRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	validStatuses := map[string]bool{
+		"unpaid": true,
+		"dp":     true,
+		"paid":   true,
+	}
+	req.PaymentStatus = strings.ToLower(strings.TrimSpace(req.PaymentStatus))
+	if !validStatuses[req.PaymentStatus] {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Status pembayaran tidak valid. Pilihan: unpaid, dp, paid",
+		})
+	}
+
+	var agenda models.Agenda
+	if err := config.DB.Preload("ClientForm").Where("id = ?", id).First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	agenda.PaymentStatus = req.PaymentStatus
+	// Jika status diubah menjadi paid dan dp_amount belum menyamai total, opsional update dp_amount
+	if req.PaymentStatus == "paid" {
+		totalBiaya := agenda.CalculateTotalBiaya()
+		if totalBiaya > 0 && agenda.DpAmount < totalBiaya {
+			agenda.DpAmount = totalBiaya
+		}
+	}
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui status pembayaran: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Status pembayaran berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaStatus handles PUT /api/agendas/:id/status
+func UpdateAgendaStatus(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdateEventStatusRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	validStatuses := map[string]bool{
+		"upcoming":  true,
+		"completed": true,
+		"cancelled": true,
+	}
+	req.Status = strings.ToLower(strings.TrimSpace(req.Status))
+	if !validStatuses[req.Status] {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Status acara tidak valid. Pilihan: upcoming, completed, cancelled",
+		})
+	}
+
+	var agenda models.Agenda
+	if err := config.DB.Preload("ClientForm").Where("id = ?", id).First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	agenda.Status = req.Status
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui status acara: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Status acara berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaTransport handles PUT /api/agendas/:id/transport
+func UpdateAgendaTransport(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdateTransportRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	if req.TransportFee < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nominal uang transport tidak boleh negatif",
+		})
+	}
+
+	var agenda models.Agenda
+	if err := config.DB.Where("id = ?", id).First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	agenda.TransportFee = req.TransportFee
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate uang transport agenda: " + err.Error(),
+		})
+	}
+
+	// Reload with ClientForm
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Uang transport berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+

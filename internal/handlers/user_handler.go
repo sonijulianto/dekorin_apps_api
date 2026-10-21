@@ -16,18 +16,20 @@ func GetAllUsers(c *fiber.Ctx) error {
 
     // Convert to response struct without password field
     type userResp struct {
-        ID       string `json:"id"`
-        FullName string `json:"full_name"`
-        Email    string `json:"email"`
+        ID        string `json:"id"`
+        FullName  string `json:"full_name"`
+        Email     string `json:"email"`
+        Role      string `json:"role"`
         CreatedAt string `json:"created_at"`
         UpdatedAt string `json:"updated_at"`
     }
     var resp []userResp
     for _, u := range users {
         resp = append(resp, userResp{
-            ID:       u.ID,
-            FullName: u.FullName,
-            Email:    u.Email,
+            ID:        u.ID,
+            FullName:  u.FullName,
+            Email:     u.Email,
+            Role:      u.Role,
             CreatedAt: u.CreatedAt.Format("2006-01-02 15:04:05"),
             UpdatedAt: u.UpdatedAt.Format("2006-01-02 15:04:05"),
         })

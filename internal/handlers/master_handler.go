@@ -88,13 +88,29 @@ func DeletePackage(c *fiber.Ctx) error {
 // GetAddons menangani GET /api/addons
 func GetAddons(c *fiber.Ctx) error {
 	var addons []models.Addon
-	if err := config.DB.Order("price ASC").Find(&addons).Error; err != nil {
+	if err := config.DB.Order("sort_order ASC, created_at ASC").Find(&addons).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data addon"})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil data tambahan (addon)",
 		"data":    addons,
+	})
+}
+
+// ReorderAddons menangani PUT /api/addons/reorder
+func ReorderAddons(c *fiber.Ctx) error {
+	var req models.ReorderAddonsRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
+	}
+
+	for idx, id := range req.AddonIDs {
+		config.DB.Model(&models.Addon{}).Where("id = ?", id).Update("sort_order", idx)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Urutan item tambahan berhasil diperbarui",
 	})
 }
 
