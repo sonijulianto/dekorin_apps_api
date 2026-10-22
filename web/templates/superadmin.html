@@ -3,213 +3,601 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dekorin - Superadmin Platform</title>
+    <title>DEKORIN - Superadmin Platform</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .sidebar-collapsed { width: 4.5rem !important; }
+        .sidebar-collapsed .nav-text,
+        .sidebar-collapsed .nav-caret,
+        .sidebar-collapsed .nav-submenu { display: none !important; }
+        .sidebar-collapsed .nav-item { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
+        .sidebar-collapsed .nav-icon { margin-right: 0 !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+<body class="bg-[#F4F6F9] text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- LOGIN SCREEN -->
-    <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
+    <!-- ========================================== -->
+    <!-- 1. LOGIN SCREEN                           -->
+    <!-- ========================================== -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-100 to-slate-200">
         <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 sm:p-10 max-w-md w-full">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 mb-4 font-black text-2xl">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#EA3838]/10 text-[#EA3838] mb-4 font-black text-2xl">
                     ✨
                 </div>
-                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Dekorin Platform</h1>
-                <p class="text-sm text-slate-500 mt-1">Portal Superadmin Multi-Company</p>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">DEKORIN</h1>
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">Superadmin Platform Multi-Company</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">No. Handphone / WhatsApp / Email</label>
-                    <input type="text" id="loginPhone" required placeholder="081111111111 atau superadmin@dekorin.com" value="081111111111"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition font-medium">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">No. Handphone / Email</label>
+                    <input type="text" id="loginPhone" required placeholder="081111111111" value="081111111111"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838] transition font-medium text-sm">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Password</label>
                     <input type="password" id="loginPassword" required placeholder="••••••••" value="superadmin123"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition font-medium">
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838] transition font-medium text-sm">
                 </div>
 
                 <div id="loginError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
 
                 <button type="submit" id="btnLogin"
-                    class="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition shadow-lg shadow-slate-900/10 flex items-center justify-center gap-2">
+                    class="w-full py-3.5 px-4 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-sm transition shadow-lg shadow-[#EA3838]/20 flex items-center justify-center gap-2">
                     <span>Masuk ke Superadmin</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD -->
+    <!-- ========================================== -->
+    <!-- 2. MAIN APPLICATION                       -->
+    <!-- ========================================== -->
     <div id="dashboardSection" class="hidden min-h-screen flex flex-col">
-        <!-- Top Navbar -->
-        <header class="bg-white border-b border-slate-100 sticky top-0 z-30">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md shadow-amber-500/20">
-                        D
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-900 text-lg leading-none">Dekorin</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wide">Superadmin</span>
+        
+        <!-- RED TOP NAVBAR (Identical to Screenshot) -->
+        <header class="bg-[#EA3838] text-white sticky top-0 z-40 shadow-sm h-14 flex items-center px-4 sm:px-6 justify-between select-none">
+            <!-- Left Branding & Toggle -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="font-extrabold text-xl tracking-wider text-white font-mono flex items-center gap-1.5">
+                        <svg class="w-6 h-6 text-white inline-block" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        DEKORIN
+                    </span>
+                </div>
+                <button onclick="toggleSidebar()" class="text-white/80 hover:text-white p-1 rounded transition text-sm font-bold flex items-center" id="sidebarToggleBtn" title="Collapse / Expand Sidebar">
+                    &lt;&lt;
+                </button>
+            </div>
+
+            <!-- Right Controls: Company Selector & User Profile -->
+            <div class="flex items-center gap-3">
+                <!-- Company Switcher Pill -->
+                <div class="relative">
+                    <button onclick="toggleCompanyDropdown(event)" 
+                        class="bg-white text-slate-800 text-xs font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg flex items-center gap-2 shadow-sm border border-white hover:bg-slate-50 transition max-w-[200px] sm:max-w-xs truncate">
+                        <span class="truncate" id="selectedCompanyLabel">CV Putra Artha Gemilang</span>
+                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Content -->
+                    <div id="companyDropdownMenu" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 text-xs text-slate-700 max-h-80 overflow-y-auto">
+                        <div class="px-3 py-1.5 font-bold uppercase text-[10px] text-slate-400 border-b border-slate-100">
+                            Pilih Vendor / Usaha
                         </div>
-                        <p class="text-xs text-slate-400 mt-0.5">Kelola Semua Vendor & Owner Dekorasi</p>
+                        <button onclick="selectCompany('all', '🏢 Semua Vendor (Konsolidasi)')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-semibold text-[#EA3838] flex items-center justify-between">
+                            <span>🏢 Semua Vendor (Platform Konsolidasi)</span>
+                        </button>
+                        <div id="companyDropdownList" class="divide-y divide-slate-50">
+                            <!-- Injected via JS -->
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-sm font-semibold text-slate-800" id="superadminName">Superadmin</p>
-                        <p class="text-xs text-slate-400">Platform Administrator</p>
-                    </div>
-                    <button onclick="handleLogout()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition border border-rose-100">
-                        Keluar
+                <!-- User Profile Pill -->
+                <div class="relative">
+                    <button onclick="toggleUserDropdown(event)"
+                        class="bg-white text-slate-800 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm border border-white hover:bg-slate-50 transition">
+                        <span class="hidden sm:inline" id="userBadgeName">Hi, super_soni</span>
+                        <div class="w-6 h-6 rounded bg-[#FFCDD2] text-[#D32F2F] font-bold text-xs flex items-center justify-center shrink-0">
+                            S
+                        </div>
                     </button>
+                    <!-- User Dropdown Menu -->
+                    <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 text-xs text-slate-700">
+                        <div class="px-4 py-2 border-b border-slate-100">
+                            <p class="font-bold text-slate-900" id="dropdownUserName">Superadmin Dekorin</p>
+                            <p class="text-[11px] text-slate-400">Platform Administrator</p>
+                        </div>
+                        <button onclick="handleLogout()" class="w-full text-left px-4 py-2 hover:bg-rose-50 text-rose-600 font-semibold flex items-center gap-2 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            <span>Keluar (Logout)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <!-- Stat Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-2xl font-bold">
-                        🏢
-                    </div>
+        <!-- BODY WRAPPER: SIDEBAR + CONTENT -->
+        <div class="flex flex-1">
+            
+            <!-- WHITE SIDEBAR (Collapsible, matching Screenshot) -->
+            <aside id="sidebar" class="bg-white border-r border-slate-200/80 w-60 shrink-0 transition-all duration-200 flex flex-col py-3 select-none z-30">
+                <nav class="space-y-1 px-3 text-xs font-semibold">
+                    
+                    <!-- 1. Dashboard (Active by default) -->
+                    <a href="javascript:void(0)" onclick="switchView('dashboard')" id="nav-dashboard"
+                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-[#EA3838] bg-red-50/70 font-bold transition">
+                        <span class="nav-icon text-base mr-3">🏠</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+
+                    <!-- 2. Administration (Accordion) -->
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Vendor / Usaha</p>
-                        <h3 class="text-3xl font-extrabold text-slate-900 mt-1" id="statCompanies">0</h3>
+                        <button onclick="toggleSubmenu('adminSubmenu', 'adminCaret')" id="nav-admin-btn"
+                            class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <div class="flex items-center">
+                                <span class="nav-icon text-base mr-3 text-slate-500">⚙️</span>
+                                <span class="nav-text">Administration</span>
+                            </div>
+                            <span id="adminCaret" class="nav-caret text-slate-400 text-[10px] transition-transform duration-200">&gt;</span>
+                        </button>
+                        <div id="adminSubmenu" class="nav-submenu hidden pl-9 pr-2 py-1 space-y-1">
+                            <a href="javascript:void(0)" onclick="switchView('companies')" id="nav-companies"
+                                class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
+                                Usaha & Vendor (Companies)
+                            </a>
+                            <a href="javascript:void(0)" onclick="switchView('users')" id="nav-users"
+                                class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
+                                Data Pengguna (Users)
+                            </a>
+                        </div>
                     </div>
-                </div>
 
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-2xl font-bold">
-                        👑
-                    </div>
+                    <!-- 3. Master (Accordion) -->
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Akun Owner</p>
-                        <h3 class="text-3xl font-extrabold text-slate-900 mt-1" id="statOwners">0</h3>
+                        <button onclick="toggleSubmenu('masterSubmenu', 'masterCaret')" id="nav-master-btn"
+                            class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <div class="flex items-center">
+                                <span class="nav-icon text-base mr-3 text-slate-500">📁</span>
+                                <span class="nav-text">Master</span>
+                            </div>
+                            <span id="masterCaret" class="nav-caret text-slate-400 text-[10px] transition-transform duration-200">&gt;</span>
+                        </button>
+                        <div id="masterSubmenu" class="nav-submenu hidden pl-9 pr-2 py-1 space-y-1">
+                            <a href="javascript:void(0)" onclick="switchView('packages')" id="nav-packages"
+                                class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
+                                Paket Dekorasi
+                            </a>
+                            <a href="javascript:void(0)" onclick="switchView('addons')" id="nav-addons"
+                                class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
+                                Item Tambahan (Addons)
+                            </a>
+                        </div>
                     </div>
-                </div>
 
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-2xl font-bold">
-                        📅
-                    </div>
+                    <!-- 4. Transaction (Accordion) -->
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Agenda Acara</p>
-                        <h3 class="text-3xl font-extrabold text-slate-900 mt-1" id="statAgendas">0</h3>
+                        <button onclick="toggleSubmenu('transSubmenu', 'transCaret')" id="nav-trans-btn"
+                            class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <div class="flex items-center">
+                                <span class="nav-icon text-base mr-3 text-slate-500">📋</span>
+                                <span class="nav-text">Transaction</span>
+                            </div>
+                            <span id="transCaret" class="nav-caret text-slate-400 text-[10px] transition-transform duration-200">&gt;</span>
+                        </button>
+                        <div id="transSubmenu" class="nav-submenu hidden pl-9 pr-2 py-1 space-y-1">
+                            <a href="javascript:void(0)" onclick="switchView('agendas')" id="nav-agendas"
+                                class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
+                                Agenda & Booking Acara
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 5. Report -->
+                    <a href="javascript:void(0)" onclick="switchView('reports')" id="nav-reports"
+                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                        <span class="nav-icon text-base mr-3 text-slate-500">📄</span>
+                        <span class="nav-text">Report</span>
+                    </a>
+
+                    <!-- 6. Report Consolidation -->
+                    <a href="javascript:void(0)" onclick="switchView('dashboard')" id="nav-consolidation"
+                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                        <span class="nav-icon text-base mr-3 text-slate-500">📑</span>
+                        <span class="nav-text">Report Consolidation</span>
+                    </a>
+
+                    <!-- 7. Survey -->
+                    <a href="javascript:void(0)" onclick="switchView('survey')" id="nav-survey"
+                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                        <span class="nav-icon text-base mr-3 text-slate-500">📢</span>
+                        <span class="nav-text">Survey</span>
+                    </a>
+
+                </nav>
+            </aside>
+
+            <!-- MAIN CONTENT CONTAINER -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto overflow-y-auto">
+                
+                <!-- BREADCRUMBS & DATE BAR -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-xl font-bold text-slate-900" id="currentViewTitle">Dashboard</h1>
+                        <span class="text-xs text-slate-400 flex items-center gap-1.5 font-medium" id="currentBreadcrumb">
+                            <span class="text-[#EA3838]">🏠</span> • Dashboard
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <span class="text-xs font-semibold text-slate-500">Today</span>
+                        <div class="bg-white border border-slate-200/90 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm flex items-center gap-2">
+                            <span id="currentDateDisplay">22/10/2026</span>
+                            <span class="text-slate-400 text-[10px]">▼</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Header Section + Action Button -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">Daftar Usaha Dekorasi (Companies)</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Setiap perusahaan memiliki database keuangan, paket, dan penjadwalan mandiri.</p>
-                </div>
-                <button onclick="openCreateModal()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm transition shadow-lg shadow-amber-600/20">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                    <span>+ Daftarkan Usaha & Owner Baru</span>
-                </button>
-            </div>
+                <!-- ============================================== -->
+                <!-- VIEW 1: DASHBOARD (Exact Match to Screenshot)  -->
+                <!-- ============================================== -->
+                <div id="viewDashboard" class="space-y-6">
+                    
+                    <!-- ROW 1: 6 KPI CARDS (3 cols x 2 rows) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        
+                        <!-- Card 1: Target Call -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-xl font-bold">
+                                📍
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statTargetCall">7741</h3>
+                                <p class="text-xs font-semibold text-slate-400 mt-1">Target Call</p>
+                            </div>
+                        </div>
 
-            <!-- Table of Companies -->
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50/80 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
-                            <tr>
-                                <th class="py-4 px-6">Nama Usaha & ID</th>
-                                <th class="py-4 px-6">Alamat Kantor / Workshop</th>
-                                <th class="py-4 px-6">Kontak Bisnis</th>
-                                <th class="py-4 px-6">Akun Pemilik (Owner)</th>
-                                <th class="py-4 px-6 text-center">Tim & Agenda</th>
-                                <th class="py-4 px-6 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="companyTableBody" class="divide-y divide-slate-100 font-medium">
-                            <tr>
-                                <td colspan="6" class="text-center py-12 text-slate-400">Memuat data perusahaan...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <!-- Card 2: Actual Call -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl font-bold">
+                                🚀
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statActualCall">1795</h3>
+                                <p class="text-xs font-semibold text-slate-400 mt-1">Actual Call</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Pending Call -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-400 flex items-center justify-center text-xl font-bold">
+                                🕒
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statPendingCall">0</h3>
+                                <p class="text-xs font-semibold text-slate-400 mt-1">Pending Call</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Effective Call -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-xl font-bold">
+                                ✈️
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statEffectiveCall">900</h3>
+                                <p class="text-xs font-semibold text-slate-400 mt-1">Effective Call</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: Visibility -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-xl font-bold">
+                                ↗️
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statVisibility">112/528</h3>
+                                <p class="text-xs font-semibold text-slate-400 mt-1">visibility</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 6: Revenue -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-xl font-bold">
+                                📊
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-2xl font-extrabold text-slate-900 leading-none tracking-tight" id="statRevenue">Rp 635.509.000,00</h3>
+                                <p class="text-xs font-semibold text-slate-400 mt-1">Revenue</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ROW 2: 3 LEADERBOARD CARDS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                        
+                        <!-- Col 1: Top Customers -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                            <h3 class="font-bold text-slate-900 text-sm mb-4">Top Customers</h3>
+                            <div class="space-y-3" id="topCustomersList">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Col 2: Top Products -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                            <h3 class="font-bold text-slate-900 text-sm mb-4">Top Products</h3>
+                            <div class="space-y-3" id="topProductsList">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Col 3: Top Revenue -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                            <h3 class="font-bold text-slate-900 text-sm mb-4">Top Revenue</h3>
+                            <div class="space-y-3" id="topRevenueList">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ROW 3: CHARTS (Bar Chart + Donut Chart) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                        
+                        <!-- Bar Chart (Col 7) -->
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm lg:col-span-7 flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-900 text-sm">Monthly Trend & Activity</h3>
+                                <span class="text-[11px] font-semibold text-slate-400">Tahun 2026</span>
+                            </div>
+                            <div class="h-64 w-full">
+                                <canvas id="chartBarCanvas"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Donut Chart (Col 5) -->
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm lg:col-span-5 flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-900 text-sm">Revenue Distribution</h3>
+                                <span class="text-[11px] font-semibold text-slate-400">By Customer / Event</span>
+                            </div>
+                            <div class="h-64 w-full flex items-center justify-center">
+                                <canvas id="chartDonutCanvas"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
-        </main>
+
+                <!-- ============================================== -->
+                <!-- VIEW 2: USES / COMPANIES MANAGEMENT            -->
+                <!-- ============================================== -->
+                <div id="viewCompanies" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Daftar Usaha Dekorasi (Companies)</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola seluruh vendor, alamat kantor, kontak, dan owner terdaftar.</p>
+                        </div>
+                        <button onclick="openCreateModal()" 
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-xs transition shadow-md shadow-[#EA3838]/20">
+                            <span>+ Daftarkan Usaha & Owner Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    <tr>
+                                        <th class="py-3.5 px-5">Nama Usaha & ID</th>
+                                        <th class="py-3.5 px-5">Alamat Kantor</th>
+                                        <th class="py-3.5 px-5">Kontak</th>
+                                        <th class="py-3.5 px-5">Akun Owner</th>
+                                        <th class="py-3.5 px-5 text-center">Tim & Agenda</th>
+                                        <th class="py-3.5 px-5 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="companyTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-8 text-slate-400">Memuat data vendor...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 3: USERS MANAGEMENT                       -->
+                <!-- ============================================== -->
+                <div id="viewUsers" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Manajemen Pengguna (Users)</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Seluruh akun Superadmin, Owner, Admin, dan Crew di platform.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    <tr>
+                                        <th class="py-3.5 px-5">Nama Lengkap</th>
+                                        <th class="py-3.5 px-5">No. Handphone</th>
+                                        <th class="py-3.5 px-5">Email</th>
+                                        <th class="py-3.5 px-5">Role</th>
+                                        <th class="py-3.5 px-5">Perusahaan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-8 text-slate-400">Memuat data pengguna...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 4: MASTER PACKAGES                        -->
+                <!-- ============================================== -->
+                <div id="viewPackages" class="hidden space-y-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Master Paket Dekorasi</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Daftar paket dekorasi yang terdaftar di masing-masing vendor.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    <tr>
+                                        <th class="py-3.5 px-5">Nama Paket</th>
+                                        <th class="py-3.5 px-5">Harga Dasar (Base Price)</th>
+                                        <th class="py-3.5 px-5">Deskripsi Fasilitas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="packagesTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <tr>
+                                        <td colspan="3" class="text-center py-8 text-slate-400">Memuat data paket...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 5: AGENDAS & TRANSACTIONS                 -->
+                <!-- ============================================== -->
+                <div id="viewAgendas" class="hidden space-y-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Agenda & Booking Acara</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Daftar event pernikahan dan acara yang dijadwalkan.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    <tr>
+                                        <th class="py-3.5 px-5">Klien & Acara</th>
+                                        <th class="py-3.5 px-5">Tanggal Event</th>
+                                        <th class="py-3.5 px-5">Paket</th>
+                                        <th class="py-3.5 px-5">Status</th>
+                                        <th class="py-3.5 px-5 text-right">Total Biaya</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="agendasTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-8 text-slate-400">Memuat agenda...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 6: REPORTS                                -->
+                <!-- ============================================== -->
+                <div id="viewReports" class="hidden space-y-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Laporan Keuangan & Konsolidasi</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Ringkasan arus kas, omset, dan pengeluaran operasional.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pendapatan</span>
+                            <h3 class="text-2xl font-black text-emerald-600 mt-1" id="reportRevenue">Rp 0</h3>
+                        </div>
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pengeluaran</span>
+                            <h3 class="text-2xl font-black text-rose-600 mt-1" id="reportExpense">Rp 0</h3>
+                        </div>
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Keuntungan Bersih (Profit)</span>
+                            <h3 class="text-2xl font-black text-blue-600 mt-1" id="reportProfit">Rp 0</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
     </div>
 
-    <!-- MODAL: CREATE COMPANY & INITIAL OWNER -->
+    <!-- ========================================== -->
+    <!-- MODAL: DAFTARKAN USAHA BARU                -->
+    <!-- ========================================== -->
     <div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-scale-in">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-6">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
                     <h3 class="text-lg font-bold text-slate-900">Daftarkan Usaha & Owner Baru</h3>
                     <p class="text-xs text-slate-400 mt-0.5">Sistem akan membuatkan entitas usaha dan akun Owner pertama</p>
                 </div>
-                <button onclick="closeCreateModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">✕</button>
+                <button onclick="closeCreateModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
             </div>
 
-            <form id="createCompanyForm" onsubmit="handleCreateCompany(event)" class="space-y-5">
-                <!-- Data Perusahaan -->
-                <div class="bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10 space-y-4">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+            <form id="createCompanyForm" onsubmit="handleCreateCompany(event)" class="space-y-4">
+                <div class="bg-red-50/50 p-4 rounded-2xl border border-red-100 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#EA3838] flex items-center gap-1.5">
                         <span>🏢</span> Data Badan Usaha / Vendor Dekorasi
                     </h4>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Usaha Dekorasi *</label>
                         <input type="text" id="inputCompanyName" required placeholder="Contoh: Sonia Wedding & Decor"
-                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Kantor / Workshop</label>
-                        <textarea id="inputCompanyAddress" rows="2" placeholder="Contoh: Jl. Veteran No. 45, Bandung"
-                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"></textarea>
+                        <textarea id="inputCompanyAddress" rows="2" placeholder="Contoh: Jl. Melati No. 45"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]"></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / Telp Usaha</label>
-                        <input type="text" id="inputCompanyPhone" placeholder="Contoh: 081234567890"
-                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                        <input type="text" id="inputCompanyPhone" placeholder="Contoh: 08123456789"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
                     </div>
                 </div>
 
-                <!-- Data Owner Pertama -->
-                <div class="bg-purple-500/5 p-4 rounded-2xl border border-purple-500/10 space-y-4">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-purple-800 flex items-center gap-1.5">
-                        <span>👑</span> Data Akun Owner Pertama
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                        <span>👑</span> Akun Owner Utama
                     </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Owner *</label>
-                            <input type="text" id="inputOwnerName" required placeholder="Contoh: Ibu Sonia"
-                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">No. HP Owner (Login ID) *</label>
-                            <input type="text" id="inputOwnerPhone" required placeholder="081298765432"
-                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
-                        </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Owner *</label>
+                        <input type="text" id="inputOwnerName" required placeholder="Contoh: Sonia Rahmawati"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Password Awal *</label>
-                            <input type="text" id="inputOwnerPassword" required placeholder="Minimal 6 karakter" value="owner123"
-                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">No. Handphone (Login) *</label>
+                            <input type="text" id="inputOwnerPhone" required placeholder="0812xxxxxxxx"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Email (Opsional)</label>
-                            <input type="email" id="inputOwnerEmail" placeholder="sonia@dekorin.com"
-                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Password Baru *</label>
+                            <input type="password" id="inputOwnerPassword" required placeholder="Minimal 6 karakter"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
                         </div>
                     </div>
                 </div>
@@ -217,59 +605,59 @@
                 <div id="createError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
 
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" onclick="closeCreateModal()" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
-                    <button type="submit" id="btnSubmitCompany" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-md transition">Daftarkan Sekarang</button>
+                    <button type="button" onclick="closeCreateModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" id="btnSubmitCompany" class="px-5 py-2 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-xs transition shadow-md shadow-[#EA3838]/20">Daftarkan Sekarang</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: SUCCESS REGISTER (COPY CREDENTIALS) -->
+    <!-- SUCCESS CREDENTIAL MODAL -->
     <div id="successModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-5">
-            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-3xl">
-                🎉
-            </div>
-            <div>
-                <h3 class="text-xl font-bold text-slate-900">Pendaftaran Berhasil!</h3>
-                <p class="text-sm text-slate-500 mt-1">Usaha baru dan akun Owner sudah aktif. Silakan kirimkan kredensial berikut ke Owner:</p>
-            </div>
-
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-2 text-sm font-mono text-slate-800" id="credentialBox">
-            </div>
-
-            <div class="flex items-center gap-3">
-                <button onclick="copyCredentialText()" class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition shadow-md flex items-center justify-center gap-2">
-                    <span>📋 Salin Kredensial WhatsApp</span>
-                </button>
-                <button onclick="closeSuccessModal()" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition">
-                    Tutup
-                </button>
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
+            <h3 class="text-base font-bold text-slate-900">Usaha & Owner Berhasil Didaftarkan!</h3>
+            <div id="credentialBox" class="p-4 rounded-xl bg-slate-50 text-left font-mono text-xs text-slate-700 border border-slate-100 space-y-1"></div>
+            <div class="flex gap-2">
+                <button onclick="copyCredentialText()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">Salin Kredensial</button>
+                <button onclick="closeSuccessModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">Tutup</button>
             </div>
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC                           -->
+    <!-- ========================================== -->
     <script>
         let authToken = localStorage.getItem('superadmin_token') || '';
+        let selectedCompanyId = '';
+        let companiesCache = [];
+        let currentView = 'dashboard';
+        let barChart = null;
+        let donutChart = null;
         let lastCreatedCredential = '';
+        let isSidebarCollapsed = false;
 
-        window.onload = function() {
-            if (authToken) {
-                checkAuthAndLoad();
-            } else {
-                showLogin();
-            }
-        };
+        // Inisialisasi Tanggal
+        document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('id-ID', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        // Cek login awal
+        if (authToken) {
+            checkAuthAndLoad();
+        } else {
+            showLogin();
+        }
 
         function showLogin() {
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('dashboardSection').classList.add('hidden');
         }
 
-        function showDashboard() {
+        function showDashboardUI() {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('dashboardSection').classList.remove('hidden');
-            loadCompanies();
         }
 
         async function handleLogin(e) {
@@ -294,8 +682,11 @@
 
                 authToken = data.token;
                 localStorage.setItem('superadmin_token', authToken);
-                document.getElementById('superadminName').innerText = data.data.full_name;
-                showDashboard();
+                document.getElementById('dropdownUserName').innerText = data.data.full_name;
+                document.getElementById('userBadgeName').innerText = 'Hi, ' + (data.data.full_name.split(' ')[0] || 'superadmin');
+                
+                showDashboardUI();
+                await initializeDashboard();
             } catch (err) {
                 errorBox.innerText = err.message;
                 errorBox.classList.remove('hidden');
@@ -320,73 +711,487 @@
                     handleLogout();
                     return;
                 }
-                showDashboard();
+                showDashboardUI();
+                await initializeDashboard();
             } catch {
                 handleLogout();
             }
         }
 
-        async function loadCompanies() {
-            const tbody = document.getElementById('companyTableBody');
+        async function initializeDashboard() {
+            await loadCompaniesList();
+            await loadDashboardStats();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            isSidebarCollapsed = !isSidebarCollapsed;
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('sidebar-collapsed');
+                toggleBtn.innerText = '>>';
+            } else {
+                sidebar.classList.remove('sidebar-collapsed');
+                toggleBtn.innerText = '<<';
+            }
+        }
+
+        function toggleSubmenu(menuId, caretId) {
+            const menu = document.getElementById(menuId);
+            const caret = document.getElementById(caretId);
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                caret.innerText = 'v';
+            } else {
+                menu.classList.add('hidden');
+                caret.innerText = '>';
+            }
+        }
+
+        function toggleCompanyDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('companyDropdownMenu');
+            dd.classList.toggle('hidden');
+            document.getElementById('userDropdownMenu').classList.add('hidden');
+        }
+
+        function toggleUserDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('userDropdownMenu');
+            dd.classList.toggle('hidden');
+            document.getElementById('companyDropdownMenu').classList.add('hidden');
+        }
+
+        document.addEventListener('click', () => {
+            const cdd = document.getElementById('companyDropdownMenu');
+            const udd = document.getElementById('userDropdownMenu');
+            if (cdd) cdd.classList.add('hidden');
+            if (udd) udd.classList.add('hidden');
+        });
+
+        // Muat daftar perusahaan untuk dropdown dan tabel
+        async function loadCompaniesList() {
             try {
                 const res = await fetch('/api/superadmin/companies', {
                     headers: { 'Authorization': 'Bearer ' + authToken }
                 });
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Gagal memuat');
+                companiesCache = data.data || [];
 
-                const companies = data.data || [];
-                document.getElementById('statCompanies').innerText = companies.length;
+                const listEl = document.getElementById('companyDropdownList');
+                if (listEl) {
+                    listEl.innerHTML = companiesCache.map(c => `
+                        <button onclick="selectCompany('${c.id}', '${c.name.replace(/'/g, "\\'")}')" 
+                            class="w-full text-left px-3 py-2 hover:bg-slate-50 transition truncate">
+                            <span class="font-bold text-slate-800">${c.name}</span>
+                            <span class="block text-[10px] text-slate-400 font-mono">${c.id}</span>
+                        </button>
+                    `).join('');
+                }
 
-                let totalOwners = 0;
-                let totalAgendas = 0;
+                // Default pilih company pertama jika ada
+                if (companiesCache.length > 0 && !selectedCompanyId) {
+                    selectedCompanyId = companiesCache[0].id;
+                    document.getElementById('selectedCompanyLabel').innerText = companiesCache[0].name;
+                }
 
-                if (companies.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-400">Belum ada usaha yang terdaftar.</td></tr>`;
+                renderCompaniesTable();
+            } catch (err) {
+                console.error("Gagal load companies:", err);
+            }
+        }
+
+        function selectCompany(id, name) {
+            selectedCompanyId = id === 'all' ? '' : id;
+            document.getElementById('selectedCompanyLabel').innerText = name;
+            refreshCurrentView();
+        }
+
+        function refreshCurrentView() {
+            if (currentView === 'dashboard') loadDashboardStats();
+            else if (currentView === 'companies') renderCompaniesTable();
+            else if (currentView === 'users') loadUsers();
+            else if (currentView === 'packages') loadPackages();
+            else if (currentView === 'agendas') loadAgendas();
+            else if (currentView === 'reports') loadReports();
+        }
+
+        function switchView(viewName) {
+            currentView = viewName;
+            
+            // Sembunyikan semua section
+            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewAgendas', 'viewReports'];
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            });
+
+            // Reset highlight nav
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-[#EA3838]', 'bg-red-50/70', 'font-bold');
+                el.classList.add('text-slate-600');
+            });
+
+            const viewMap = {
+                'dashboard': { el: 'viewDashboard', title: 'Dashboard', path: '<span class="text-[#EA3838]">🏠</span> • Dashboard', nav: 'nav-dashboard' },
+                'companies': { el: 'viewCompanies', title: 'Usaha & Vendor (Companies)', path: 'Administration • Usaha & Vendor', nav: 'nav-companies' },
+                'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users' },
+                'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages' },
+                'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons' },
+                'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas' },
+                'reports': { el: 'viewReports', title: 'Laporan Keuangan', path: 'Report • Laporan Keuangan', nav: 'nav-reports' },
+                'survey': { el: 'viewDashboard', title: 'Survey & Undangan', path: 'Survey • Undangan Digital', nav: 'nav-survey' }
+            };
+
+            const target = viewMap[viewName] || viewMap['dashboard'];
+            const targetEl = document.getElementById(target.el);
+            if (targetEl) targetEl.classList.remove('hidden');
+
+            document.getElementById('currentViewTitle').innerText = target.title;
+            document.getElementById('currentBreadcrumb').innerHTML = target.path;
+
+            const activeNav = document.getElementById(target.nav);
+            if (activeNav) {
+                activeNav.classList.add('text-[#EA3838]', 'bg-red-50/70', 'font-bold');
+                activeNav.classList.remove('text-slate-600');
+            }
+
+            refreshCurrentView();
+        }
+
+        // ==========================================
+        // LOAD STATS & CHARTS (Dashboard View)
+        // ==========================================
+        async function loadDashboardStats() {
+            try {
+                let url = '/api/superadmin/dashboard-stats';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+
+                const res = await fetch(url, {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                const d = json.data;
+                if (!d) return;
+
+                // Format angka Rupiah
+                const formatRp = (num) => 'Rp ' + Number(num || 0).toLocaleString('id-ID') + ',00';
+
+                // 1. Update 6 KPI Cards
+                document.getElementById('statTargetCall').innerText = d.target_call.toLocaleString('id-ID');
+                document.getElementById('statActualCall').innerText = d.actual_call.toLocaleString('id-ID');
+                document.getElementById('statPendingCall').innerText = d.pending_call.toLocaleString('id-ID');
+                document.getElementById('statEffectiveCall').innerText = d.effective_call.toLocaleString('id-ID');
+                document.getElementById('statVisibility').innerText = d.visibility;
+                document.getElementById('statRevenue').innerText = formatRp(d.revenue);
+
+                // 2. Render Top Customers
+                const custEl = document.getElementById('topCustomersList');
+                if (custEl && d.top_customers) {
+                    custEl.innerHTML = d.top_customers.map(c => `
+                        <div class="flex items-center justify-between border-l-4 border-cyan-400 pl-3 py-1">
+                            <span class="font-bold text-xs text-slate-800 uppercase tracking-tight">${c.rank}. ${c.name}</span>
+                            <span class="font-semibold text-xs text-slate-700 font-mono">${formatRp(c.amount)}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // 3. Render Top Products
+                const prodEl = document.getElementById('topProductsList');
+                if (prodEl && d.top_products) {
+                    prodEl.innerHTML = d.top_products.map(p => `
+                        <div class="flex items-center justify-between border-l-4 border-cyan-400 pl-3 py-1">
+                            <div>
+                                <span class="font-bold text-xs text-slate-800">${p.rank}. ${p.code}</span>
+                                <span class="block text-[11px] text-cyan-600 font-medium">${p.name}</span>
+                            </div>
+                            <span class="font-semibold text-xs text-slate-700 font-mono">${Number(p.count).toLocaleString('id-ID')}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // 4. Render Top Revenue
+                const revEl = document.getElementById('topRevenueList');
+                if (revEl && d.top_revenue) {
+                    revEl.innerHTML = d.top_revenue.map(r => `
+                        <div class="flex items-center justify-between border-l-4 border-cyan-400 pl-3 py-1">
+                            <div>
+                                <span class="font-bold text-xs text-slate-800">${r.rank}. ${r.code}</span>
+                                <span class="block text-[11px] text-slate-500 font-medium">${r.client_name}</span>
+                            </div>
+                            <span class="font-semibold text-xs text-slate-700 font-mono">${formatRp(r.amount)}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // 5. Render Bar Chart (Solid Red Bars matching Screenshot)
+                renderBarChart(d.chart_bar);
+
+                // 6. Render Donut Chart (Purple, Pink, Blue, Teal matching Screenshot)
+                renderDonutChart(d.chart_donut);
+
+            } catch (err) {
+                console.error("Gagal load dashboard stats:", err);
+            }
+        }
+
+        function renderBarChart(chartData) {
+            const ctx = document.getElementById('chartBarCanvas');
+            if (!ctx) return;
+
+            const labels = chartData.map(c => c.label);
+            const dataVals = chartData.map(c => c.value);
+
+            if (barChart) barChart.destroy();
+
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Volume',
+                        data: dataVals,
+                        backgroundColor: '#EA3838', // Solid Red
+                        borderRadius: 4,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 250,
+                            ticks: { stepSize: 50, font: { family: 'Plus Jakarta Sans', size: 10 } },
+                            grid: { color: '#E2E8F0' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderDonutChart(donutData) {
+            const ctx = document.getElementById('chartDonutCanvas');
+            if (!ctx) return;
+
+            const labels = donutData.map(d => d.label);
+            const values = donutData.map(d => d.value);
+            const colors = donutData.map(d => d.color);
+
+            if (donutChart) donutChart.destroy();
+
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: { family: 'Plus Jakarta Sans', size: 10 }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // ==========================================
+        // RENDER TABLES (Companies, Users, etc.)
+        // ==========================================
+        function renderCompaniesTable() {
+            const tbody = document.getElementById('companyTableBody');
+            if (!tbody) return;
+
+            if (companiesCache.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada vendor terdaftar</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = companiesCache.map(c => {
+                const ownersBadges = (c.owners_list && c.owners_list.length > 0)
+                    ? c.owners_list.map(o => `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-100 mr-1 mb-1">👑 ${o}</span>`).join('')
+                    : `<span class="text-slate-400 text-xs italic">Belum ada owner</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="py-3 px-5">
+                            <div class="font-bold text-slate-900">${c.name}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">${c.id}</div>
+                        </td>
+                        <td class="py-3 px-5 text-slate-600 max-w-xs truncate">${c.address || '-'}</td>
+                        <td class="py-3 px-5 text-slate-800 font-mono text-xs">${c.phone || '-'}</td>
+                        <td class="py-3 px-5">${ownersBadges}</td>
+                        <td class="py-3 px-5 text-center">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${c.total_admins || 0} Admin</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 ml-1">${c.total_crew || 0} Crew</span>
+                            <div class="text-[10px] text-emerald-600 font-semibold mt-1">📅 ${c.total_agendas || 0} Agenda</div>
+                        </td>
+                        <td class="py-3 px-5 text-right">
+                            ${c.id !== 'cmp_default' ? `
+                                <button onclick="handleDeleteCompany('${c.id}', '${c.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
+                                    Hapus
+                                </button>
+                            ` : `<span class="text-[11px] text-slate-400 font-semibold">Utama</span>`}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+            try {
+                let url = '/api/users';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                const users = Array.isArray(json) ? json : (json.data || []);
+
+                if (users.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Tidak ada pengguna</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = companies.map(c => {
-                    totalOwners += (c.total_owners || 0);
-                    totalAgendas += (c.total_agendas || 0);
-
-                    const ownersBadges = (c.owners_list && c.owners_list.length > 0)
-                        ? c.owners_list.map(o => `<span class="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100 mr-1.5 mb-1">👑 ${o}</span>`).join('')
-                        : `<span class="text-slate-400 text-xs italic">Belum ada owner</span>`;
+                tbody.innerHTML = users.map(u => {
+                    const roleBadgeColor = {
+                        'superadmin': 'bg-amber-100 text-amber-800',
+                        'owner': 'bg-purple-100 text-purple-800',
+                        'admin': 'bg-blue-100 text-blue-800',
+                        'crew': 'bg-slate-100 text-slate-700'
+                    }[u.role.toLowerCase()] || 'bg-slate-100 text-slate-700';
 
                     return `
                         <tr class="hover:bg-slate-50/50 transition">
-                            <td class="py-4 px-6">
-                                <div class="font-bold text-slate-900">${c.name}</div>
-                                <div class="text-[11px] text-slate-400 font-mono mt-0.5">${c.id}</div>
+                            <td class="py-3 px-5 font-bold text-slate-900">${u.full_name}</td>
+                            <td class="py-3 px-5 font-mono">${u.phone || '-'}</td>
+                            <td class="py-3 px-5">${u.email || '-'}</td>
+                            <td class="py-3 px-5">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${roleBadgeColor}">
+                                    ${u.role}
+                                </span>
                             </td>
-                            <td class="py-4 px-6 text-slate-600 max-w-xs truncate">${c.address || '-'}</td>
-                            <td class="py-4 px-6 text-slate-800 font-mono text-xs">${c.phone || '-'}</td>
-                            <td class="py-4 px-6">${ownersBadges}</td>
-                            <td class="py-4 px-6 text-center">
-                                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700">${c.total_admins || 0} Admin</span>
-                                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 ml-1">${c.total_crew || 0} Crew</span>
-                                <div class="text-[11px] text-emerald-600 font-semibold mt-1">📅 ${c.total_agendas || 0} Agenda</div>
+                            <td class="py-3 px-5 text-slate-500">${u.company_name || u.company_id || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function loadPackages() {
+            const tbody = document.getElementById('packagesTableBody');
+            if (!tbody) return;
+            try {
+                let url = '/api/packages';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                const packages = json.data || [];
+
+                if (packages.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-slate-400">Tidak ada paket dekorasi</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = packages.map(p => `
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="py-3 px-5 font-bold text-slate-900">${p.name}</td>
+                        <td class="py-3 px-5 font-mono text-emerald-600 font-bold">Rp ${Number(p.base_price || 0).toLocaleString('id-ID')}</td>
+                        <td class="py-3 px-5 text-slate-500">${p.description || '-'}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function loadAgendas() {
+            const tbody = document.getElementById('agendasTableBody');
+            if (!tbody) return;
+            try {
+                let url = '/api/agendas';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                const agendas = json.data || [];
+
+                if (agendas.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Tidak ada agenda acara</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = agendas.map(a => {
+                    const statusColor = {
+                        'completed': 'bg-emerald-100 text-emerald-800',
+                        'upcoming': 'bg-blue-100 text-blue-800',
+                        'cancelled': 'bg-rose-100 text-rose-800'
+                    }[a.status] || 'bg-slate-100 text-slate-700';
+
+                    const dateStr = a.event_date_time ? new Date(a.event_date_time).toLocaleDateString('id-ID', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    }) : '-';
+
+                    return `
+                        <tr class="hover:bg-slate-50/50 transition">
+                            <td class="py-3 px-5 font-bold text-slate-900">${a.client_name || '-'}</td>
+                            <td class="py-3 px-5 font-mono">${dateStr}</td>
+                            <td class="py-3 px-5">${a.package_name || '-'}</td>
+                            <td class="py-3 px-5">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusColor}">
+                                    ${a.status}
+                                </span>
                             </td>
-                            <td class="py-4 px-6 text-right">
-                                ${c.id !== 'cmp_default' ? `
-                                    <button onclick="handleDeleteCompany('${c.id}', '${c.name}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
-                                        Hapus
-                                    </button>
-                                ` : `<span class="text-[11px] text-slate-400 font-semibold">Utama</span>`}
+                            <td class="py-3 px-5 text-right font-mono font-bold text-emerald-600">
+                                Rp ${(a.total_cost || a.package_price || 0).toLocaleString('id-ID')}
                             </td>
                         </tr>
                     `;
                 }).join('');
-
-                document.getElementById('statOwners').innerText = totalOwners;
-                document.getElementById('statAgendas').innerText = totalAgendas;
-
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-rose-500 font-semibold">Gagal memuat: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
             }
         }
 
+        async function loadReports() {
+            try {
+                let url = '/api/dashboard/summary';
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                const d = json.data;
+                if (!d) return;
+
+                document.getElementById('reportRevenue').innerText = 'Rp ' + Number(d.total_revenue || 0).toLocaleString('id-ID');
+                document.getElementById('reportExpense').innerText = 'Rp ' + Number(d.total_expense || 0).toLocaleString('id-ID');
+                document.getElementById('reportProfit').innerText = 'Rp ' + Number(d.total_profit || 0).toLocaleString('id-ID');
+            } catch (err) {
+                console.error("Gagal load report:", err);
+            }
+        }
+
+        // ==========================================
+        // CREATE COMPANY & INITIAL OWNER
+        // ==========================================
         function openCreateModal() {
             document.getElementById('createCompanyForm').reset();
             document.getElementById('createError').classList.add('hidden');
@@ -409,8 +1214,7 @@
                 company_phone: document.getElementById('inputCompanyPhone').value.trim(),
                 owner_name: document.getElementById('inputOwnerName').value.trim(),
                 owner_phone: document.getElementById('inputOwnerPhone').value.trim(),
-                owner_password: document.getElementById('inputOwnerPassword').value.trim(),
-                owner_email: document.getElementById('inputOwnerEmail').value.trim()
+                owner_password: document.getElementById('inputOwnerPassword').value.trim()
             };
 
             btn.disabled = true;
@@ -429,19 +1233,17 @@
                 if (!res.ok) throw new Error(data.error || 'Gagal mendaftarkan usaha');
 
                 closeCreateModal();
-                loadCompanies();
+                await loadCompaniesList();
 
-                // Tampilkan kredensial untuk disalin
                 lastCreatedCredential = `Halo kak ${payload.owner_name},\nSelamat akun usaha Anda "${payload.company_name}" telah aktif di Aplikasi Dekorin!\n\nBerikut kredensial login Anda:\n📱 No. HP: ${payload.owner_phone}\n🔑 Password: ${payload.owner_password}\nRole: Owner\n\nSilakan unduh aplikasi Dekorin dan login sekarang.`;
 
                 document.getElementById('credentialBox').innerHTML = `
                     <div><strong>Usaha:</strong> ${payload.company_name}</div>
-                    <div><strong>Nama Owner:</strong> ${payload.owner_name}</div>
-                    <div><strong>No. HP (Login):</strong> ${payload.owner_phone}</div>
+                    <div><strong>Owner:</strong> ${payload.owner_name}</div>
+                    <div><strong>No. HP:</strong> ${payload.owner_phone}</div>
                     <div><strong>Password:</strong> ${payload.owner_password}</div>
                 `;
                 document.getElementById('successModal').classList.remove('hidden');
-
             } catch (err) {
                 errBox.innerText = err.message;
                 errBox.classList.remove('hidden');
@@ -453,7 +1255,7 @@
 
         function copyCredentialText() {
             navigator.clipboard.writeText(lastCreatedCredential);
-            alert('Kredensial berhasil disalin! Anda bisa langsung paste ke WhatsApp Owner.');
+            alert('Kredensial berhasil disalin!');
         }
 
         function closeSuccessModal() {
@@ -461,9 +1263,7 @@
         }
 
         async function handleDeleteCompany(id, name) {
-            if (!confirm(`Apakah Anda yakin ingin menghapus usaha "${name}"? Seluruh akun owner, admin, crew, agenda, dan catatan keuangannya akan dihapus permanen!`)) {
-                return;
-            }
+            if (!confirm(`Hapus permanen usaha "${name}" beserta seluruh data anggotanya?`)) return;
             try {
                 const res = await fetch(`/api/superadmin/companies/${id}`, {
                     method: 'DELETE',
@@ -472,7 +1272,7 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Gagal menghapus');
                 alert(data.message);
-                loadCompanies();
+                loadCompaniesList();
             } catch (err) {
                 alert('Gagal: ' + err.message);
             }

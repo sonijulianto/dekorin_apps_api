@@ -16,10 +16,15 @@ import (
 // GetAgendas handles GET /api/agendas
 func GetAgendas(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	var agendas []models.Agenda
 	query := config.DB.Model(&models.Agenda{}).Preload("ClientForm")
 
-	if companyID != "" {
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			query = query.Where("company_id = ?", qComp)
+		}
+	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
@@ -182,9 +187,14 @@ func CreateAgenda(c *fiber.Ctx) error {
 // GetPackages handles GET /api/packages
 func GetPackages(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	var packages []models.Package
 	query := config.DB.Model(&models.Package{})
-	if companyID != "" {
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			query = query.Where("company_id = ?", qComp)
+		}
+	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 	if err := query.Order("sort_order ASC, created_at ASC").Find(&packages).Error; err != nil {
