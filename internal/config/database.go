@@ -47,7 +47,20 @@ func ConnectDB() {
 	DB = db
 
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
-	err = DB.AutoMigrate(&models.Company{}, &models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{}, &models.Invitation{}, &models.InvitationWish{}, &models.Expense{})
+	err = DB.AutoMigrate(
+		&models.Company{},
+		&models.User{},
+		&models.Package{},
+		&models.Agenda{},
+		&models.ClientForm{},
+		&models.Addon{},
+		&models.DecorationModel{},
+		&models.PackageDecorationModel{},
+		&models.Invitation{},
+		&models.InvitationWish{},
+		&models.Expense{},
+		&models.ApiLog{},
+	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
 	}
@@ -56,8 +69,10 @@ func ConnectDB() {
 	SeedCompany(db)
 	SeedUsers(db)
 	SeedPackagesAndAgendas(db)
+	SeedDecorationModels(db)
 	SeedAddons(db)
 	SeedExpenses(db)
+	SeedApiLogs(db)
 }
 
 // SeedAddons mengisi data awal master item tambahan jika kosong
@@ -209,8 +224,129 @@ func SeedCompany(db *gorm.DB) {
 	db.Model(&models.Package{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
 	db.Model(&models.Agenda{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
 	db.Model(&models.Addon{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.DecorationModel{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.PackageDecorationModel{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
 	db.Model(&models.Expense{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
 	db.Model(&models.Invitation{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.ApiLog{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+}
+
+// SeedDecorationModels mengisi data awal master model dekorasi jika kosong dan menautkannya ke paket
+func SeedDecorationModels(db *gorm.DB) {
+	var modelCount int64
+	db.Model(&models.DecorationModel{}).Count(&modelCount)
+
+	if modelCount == 0 {
+		modelsList := []models.DecorationModel{
+			{
+				ID:          "mdl_01",
+				CompanyID:   "cmp_default",
+				Name:        "Model Rustic Arch Wood",
+				ImageURL:    "https://images.unsplash.com/photo-1519741497674-611481863552?w=500&q=80",
+				Price:       1500000,
+				Width:       "3 Meter",
+				Description: "Backdrop arch kayu natural dengan sentuhan bunga pampas kering & eucalyptus",
+				SortOrder:   1,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				ID:          "mdl_02",
+				CompanyID:   "cmp_default",
+				Name:        "Model Modern Hexagon Gold",
+				ImageURL:    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=500&q=80",
+				Price:       2500000,
+				Width:       "4 Meter",
+				Description: "Frame geometri heksagonal finishing gold metallic dengan rangkaian bunga kombinasi",
+				SortOrder:   2,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				ID:          "mdl_03",
+				CompanyID:   "cmp_default",
+				Name:        "Model Classic White Floral Panel",
+				ImageURL:    "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=500&q=80",
+				Price:       4000000,
+				Width:       "6 Meter",
+				Description: "Pelaminan panel ukir broken white elegan dengan lighting sorot & karpet jalan",
+				SortOrder:   3,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				ID:          "mdl_04",
+				CompanyID:   "cmp_default",
+				Name:        "Model Grand Luxury Botanical Arch",
+				ImageURL:    "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=500&q=80",
+				Price:       7500000,
+				Width:       "10 Meter",
+				Description: "Pelaminan ballroom megah full bunga segar pilihan, chandelier gantung & panggung pelaminan",
+				SortOrder:   4,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		for _, m := range modelsList {
+			db.Create(&m)
+		}
+		fmt.Println("🌱 Seeding selesai: Master Model Dekorasi berhasil ditambahkan!")
+	}
+
+	// Hubungkan contoh model ke paket jika belum ada
+	var packageModelCount int64
+	db.Model(&models.PackageDecorationModel{}).Count(&packageModelCount)
+	if packageModelCount == 0 {
+		samplePackageModels := []models.PackageDecorationModel{
+			// Paket Lamaran Rustic (pkg_02): Model Rustic Arch Wood (0) dan Model Modern Hexagon (+200rb)
+			{
+				ID:                "pm_01",
+				CompanyID:         "cmp_default",
+				PackageID:         "pkg_02",
+				DecorationModelID: "mdl_01",
+				AdditionalPrice:   0,
+				SortOrder:         1,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "pm_02",
+				CompanyID:         "cmp_default",
+				PackageID:         "pkg_02",
+				DecorationModelID: "mdl_02",
+				AdditionalPrice:   200000,
+				SortOrder:         2,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			// Paket Pernikahan Elegan Gold (pkg_03): Model Modern Hexagon (0) dan Model Classic Panel (+500rb)
+			{
+				ID:                "pm_03",
+				CompanyID:         "cmp_default",
+				PackageID:         "pkg_03",
+				DecorationModelID: "mdl_02",
+				AdditionalPrice:   0,
+				SortOrder:         1,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "pm_04",
+				CompanyID:         "cmp_default",
+				PackageID:         "pkg_03",
+				DecorationModelID: "mdl_03",
+				AdditionalPrice:   500000,
+				SortOrder:         2,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+		}
+		for _, pm := range samplePackageModels {
+			db.Create(&pm)
+		}
+		fmt.Println("🌱 Seeding selesai: Hubungan Paket Dekorasi & Model Dekorasi berhasil ditambahkan!")
+	}
 }
 
 // SeedUsers memastikan akun default untuk setiap role (superadmin, owner, admin, crew) tersedia di database
@@ -344,6 +480,226 @@ func SeedExpenses(db *gorm.DB) {
 				"dp_amount":      4250000,
 			})
 		}
+	}
+}
+
+// SeedApiLogs mengisi sample data log API awal sesuai screenshot
+func SeedApiLogs(db *gorm.DB) {
+	var count int64
+	db.Model(&models.ApiLog{}).Count(&count)
+	if count == 0 {
+		now := time.Now()
+		// Format sample response data sesuai Screenshot 2
+		sampleSyncResp := `{
+  "status_code": 200,
+  "success": true,
+  "message": "Successfully",
+  "data": {
+    "id": "eb005e2a-697b-473e-af55-83101121883a",
+    "url": "/api/sync/upload",
+    "method": "POST",
+    "ip_addr": "111.94.110.66",
+    "username": "pagsls001",
+    "log_time": "2026-10-22 18:57:23",
+    "req_data": "{\"STOCKS\":[],\"ADJUSTMENTS\":[]}",
+    "response_data": "{\"status_code\":200,\"success\":true}",
+    "status": "SUCCESS",
+    "status_code": "200",
+    "remark": "Synchronization has been successfully.",
+    "apk_version": "25.11.17148",
+    "device_model": "onc",
+    "build_date": null,
+    "name": "M Refli Devano A",
+    "branch_code": "JT",
+    "branch_name": "JAKARTA TIMUR"
+  }
+}`
+
+		sampleSyncReq := `{
+  "id": "eb005e2a-697b-473e-af55-83101121883a"
+}`
+
+		sampleLogs := []models.ApiLog{
+			{
+				ID:           "log_01",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apilog/get",
+				IPAddr:       "111.94.110.66",
+				Username:     "super_soni",
+				LogTime:      now,
+				ReqData:      "{\n  \"date\": \"22/10/2026\",\n  \"page\": 1,\n  \"limit\": 10\n}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true,\n  \"message\": \"Successfully\",\n  \"total\": 275695\n}",
+				CreatedAt:    now,
+			},
+			{
+				ID:           "log_02",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apk/check-version",
+				IPAddr:       "180.252.164.21",
+				Username:     "",
+				LogTime:      now.Add(-2 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true,\n  \"data\": {\n    \"version\": \"25.11.17148\",\n    \"force_update\": false\n  }\n}",
+				CreatedAt:    now.Add(-2 * time.Minute),
+			},
+			{
+				ID:           "eb005e2a-697b-473e-af55-83101121883a",
+				CompanyID:    "cmp_default",
+				Method:       "POST",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/sync/upload",
+				IPAddr:       "111.94.110.66",
+				Username:     "pagsls001",
+				LogTime:      now.Add(-4 * time.Minute),
+				ReqData:      sampleSyncReq,
+				ResponseData: sampleSyncResp,
+				Remark:       "Synchronization has been successfully.",
+				ApkVersion:   "25.11.17148",
+				DeviceModel:  "onc",
+				Name:         "M Refli Devano A",
+				BranchCode:   "JT",
+				BranchName:   "JAKARTA TIMUR",
+				CreatedAt:    now.Add(-4 * time.Minute),
+			},
+			{
+				ID:           "log_04",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/visit/get-visit-status",
+				IPAddr:       "111.94.110.66",
+				Username:     "pagsls001",
+				LogTime:      now.Add(-4 * time.Minute - 30*time.Second),
+				ReqData:      "{\n  \"user_id\": \"pagsls001\"\n}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true,\n  \"message\": \"Successfully\"\n}",
+				CreatedAt:    now.Add(-4 * time.Minute - 30*time.Second),
+			},
+			{
+				ID:           "log_05",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apk/check-version",
+				IPAddr:       "36.72.215.11",
+				Username:     "",
+				LogTime:      now.Add(-5 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true\n}",
+				CreatedAt:    now.Add(-5 * time.Minute),
+			},
+			{
+				ID:           "log_06",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apk/check-version",
+				IPAddr:       "36.72.215.11",
+				Username:     "",
+				LogTime:      now.Add(-11 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true\n}",
+				CreatedAt:    now.Add(-11 * time.Minute),
+			},
+			{
+				ID:           "log_07",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apk/check-version",
+				IPAddr:       "180.252.164.21",
+				Username:     "",
+				LogTime:      now.Add(-13 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true\n}",
+				CreatedAt:    now.Add(-13 * time.Minute),
+			},
+			{
+				ID:           "log_08",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/dashboard",
+				IPAddr:       "114.124.238.10",
+				Username:     "pagadm04",
+				LogTime:      now.Add(-14 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true,\n  \"data\": {\n    \"total_agendas\": 18,\n    \"revenue\": 145000000\n  }\n}",
+				CreatedAt:    now.Add(-14 * time.Minute),
+			},
+			{
+				ID:           "log_09",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apk/check-version",
+				IPAddr:       "36.72.215.11",
+				Username:     "",
+				LogTime:      now.Add(-23 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true\n}",
+				CreatedAt:    now.Add(-23 * time.Minute),
+			},
+			{
+				ID:           "log_10",
+				CompanyID:    "cmp_default",
+				Method:       "GET",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/apk/check-version",
+				IPAddr:       "180.252.164.21",
+				Username:     "",
+				LogTime:      now.Add(-24 * time.Minute),
+				ReqData:      "{}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"success\": true\n}",
+				CreatedAt:    now.Add(-24 * time.Minute),
+			},
+			{
+				ID:           "log_11",
+				CompanyID:    "cmp_default",
+				Method:       "POST",
+				Status:       "SUCCESS",
+				StatusCode:   200,
+				URL:          "/api/packages",
+				IPAddr:       "111.94.110.66",
+				Username:     "super_soni",
+				LogTime:      now.Add(-30 * time.Minute),
+				ReqData:      "{\n  \"name\": \"Paket Platinum VIP\",\n  \"base_price\": 12000000\n}",
+				ResponseData: "{\n  \"status_code\": 200,\n  \"message\": \"Paket dekorasi berhasil dibuat\"\n}",
+				CreatedAt:    now.Add(-30 * time.Minute),
+			},
+			{
+				ID:           "log_12",
+				CompanyID:    "cmp_default",
+				Method:       "POST",
+				Status:       "FAILED",
+				StatusCode:   400,
+				URL:          "/api/agendas",
+				IPAddr:       "111.94.110.66",
+				Username:     "pagadm04",
+				LogTime:      now.Add(-35 * time.Minute),
+				ReqData:      "{\n  \"client_name\": \"\"\n}",
+				ResponseData: "{\n  \"status_code\": 400,\n  \"error\": \"Nama client wajib diisi\"\n}",
+				CreatedAt:    now.Add(-35 * time.Minute),
+			},
+		}
+
+		for _, l := range sampleLogs {
+			db.Create(&l)
+		}
+		fmt.Println("🌱 Seeding selesai: Data sample API logs berhasil ditambahkan!")
 	}
 }
 

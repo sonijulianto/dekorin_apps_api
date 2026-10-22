@@ -25,6 +25,7 @@ func main() {
 	// Middleware
 	app.Use(logger.New()) // Log every request
 	app.Use(cors.New())   // Enable CORS for all origins
+	app.Use(middleware.ApiLogger()) // Automatic API Request & Response Logger
 
 	// Group routes
 	api := app.Group("/api")
@@ -78,6 +79,18 @@ func main() {
 	api.Put("/addons/reorder", middleware.Protected(), handlers.ReorderAddons)
 	api.Put("/addons/:id", middleware.Protected(), handlers.UpdateAddon)
 	api.Delete("/addons/:id", middleware.Protected(), handlers.DeleteAddon)
+
+	// Master Decoration Model routes
+	api.Get("/decoration-models", middleware.Protected(), handlers.GetDecorationModels)
+	api.Post("/decoration-models", middleware.Protected(), handlers.CreateDecorationModel)
+	api.Put("/decoration-models/reorder", middleware.Protected(), handlers.ReorderDecorationModels)
+	api.Put("/decoration-models/:id", middleware.Protected(), handlers.UpdateDecorationModel)
+	api.Delete("/decoration-models/:id", middleware.Protected(), handlers.DeleteDecorationModel)
+
+	// API Logs routes (sesuai Screenshot)
+	api.Get("/apilog/get", middleware.OptionalProtected(), handlers.GetApiLogs)
+	api.Get("/apilog/:id", middleware.OptionalProtected(), handlers.GetApiLogByID)
+	api.Get("/apilogs", middleware.OptionalProtected(), handlers.GetApiLogs)
 
 	// Serve static upload directory
 	app.Static("/uploads", "./uploads")

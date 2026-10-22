@@ -66,6 +66,44 @@ func Protected() fiber.Handler {
 	}
 }
 
+// OptionalProtected mencoba membaca token JWT jika ada, tanpa memblokir request jika tidak ada
+func OptionalProtected() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
+		if authHeader == "" {
+			cookieToken := c.Cookies("superadmin_token")
+			if cookieToken != "" {
+				authHeader = "Bearer " + cookieToken
+			}
+		}
+
+		if authHeader != "" {
+			parts := strings.Split(authHeader, " ")
+			if len(parts) == 2 && parts[0] == "Bearer" {
+				tokenString := parts[1]
+				token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+					if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+						return nil, fiber.ErrUnauthorized
+					}
+					return JwtSecret, nil
+				})
+
+				if err == nil && token.Valid {
+					if claims, ok := token.Claims.(jwt.MapClaims); ok {
+						c.Locals("user_id", claims["id"])
+						c.Locals("company_id", claims["company_id"])
+						c.Locals("user_role", claims["role"])
+						c.Locals("user_phone", claims["phone"])
+						c.Locals("user_email", claims["email"])
+					}
+				}
+			}
+		}
+
+		return c.Next()
+	}
+}
+
 // RequireRole memeriksa apakah user yang login memiliki salah satu role yang diizinkan
 func RequireRole(allowedRoles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {

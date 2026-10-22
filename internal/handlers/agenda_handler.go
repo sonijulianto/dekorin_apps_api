@@ -144,6 +144,28 @@ func CreateAgenda(c *fiber.Ctx) error {
 		}
 	}
 
+	// Cek Model Dekorasi jika dipilih
+	modelID := strings.TrimSpace(req.ModelID)
+	modelName := strings.TrimSpace(req.ModelName)
+	modelWidth := strings.TrimSpace(req.ModelWidth)
+	modelImageURL := strings.TrimSpace(req.ModelImageURL)
+	modelAdditionalPrice := req.ModelAdditionalPrice
+
+	if modelID != "" && (modelName == "" || modelWidth == "" || modelImageURL == "") {
+		var decorModel models.DecorationModel
+		if err := config.DB.Where("id = ?", modelID).First(&decorModel).Error; err == nil {
+			if modelName == "" {
+				modelName = decorModel.Name
+			}
+			if modelWidth == "" {
+				modelWidth = decorModel.Width
+			}
+			if modelImageURL == "" {
+				modelImageURL = decorModel.ImageURL
+			}
+		}
+	}
+
 	// Buat Agenda ID & Form Token baru
 	agendaID := fmt.Sprintf("agd_%s", uuid.New().String()[:8])
 	formToken := uuid.New().String()[:8]
@@ -153,23 +175,28 @@ func CreateAgenda(c *fiber.Ctx) error {
 	}
 
 	agenda := models.Agenda{
-		ID:            agendaID,
-		CompanyID:     companyID,
-		ClientName:    strings.TrimSpace(req.ClientName),
-		ClientPhone:   strings.TrimSpace(req.ClientPhone),
-		BackdropTitle: backdropTitle,
-		EventDateTime: eventTime,
-		MapsURL:       strings.TrimSpace(req.MapsURL),
-		PackageID:     req.PackageID,
-		PackageName:   packageName,
-		PackagePrice:  packagePrice,
-		TransportFee:  req.TransportFee,
-		Status:        "upcoming",
-		FormToken:     formToken,
-		FormStatus:    "pending",
-		Notes:         strings.TrimSpace(req.Notes),
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		ID:                   agendaID,
+		CompanyID:            companyID,
+		ClientName:           strings.TrimSpace(req.ClientName),
+		ClientPhone:          strings.TrimSpace(req.ClientPhone),
+		BackdropTitle:        backdropTitle,
+		EventDateTime:        eventTime,
+		MapsURL:              strings.TrimSpace(req.MapsURL),
+		PackageID:            req.PackageID,
+		PackageName:          packageName,
+		PackagePrice:         packagePrice,
+		ModelID:              modelID,
+		ModelName:            modelName,
+		ModelWidth:           modelWidth,
+		ModelImageURL:        modelImageURL,
+		ModelAdditionalPrice: modelAdditionalPrice,
+		TransportFee:         req.TransportFee,
+		Status:               "upcoming",
+		FormToken:            formToken,
+		FormStatus:           "pending",
+		Notes:                strings.TrimSpace(req.Notes),
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
 	}
 
 	if err := config.DB.Create(&agenda).Error; err != nil {
@@ -189,7 +216,9 @@ func GetPackages(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
 	userRole, _ := c.Locals("user_role").(string)
 	var packages []models.Package
-	query := config.DB.Model(&models.Package{})
+	query := config.DB.Model(&models.Package{}).
+		Preload("PackageModels").
+		Preload("PackageModels.DecorationModel")
 	if strings.EqualFold(userRole, "superadmin") {
 		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
 			query = query.Where("company_id = ?", qComp)
@@ -449,6 +478,30 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 	agenda.PackageID = req.PackageID
 	agenda.PackageName = packageName
 	agenda.PackagePrice = packagePrice
+
+	// Update model info jika disediakan
+	if req.ModelID != "" {
+		agenda.ModelID = req.ModelID
+		agenda.ModelName = req.ModelName
+		agenda.ModelWidth = req.ModelWidth
+		agenda.ModelImageURL = req.ModelImageURL
+		agenda.ModelAdditionalPrice = req.ModelAdditionalPrice
+
+		if (agenda.ModelName == "" || agenda.ModelWidth == "" || agenda.ModelImageURL == "") && agenda.ModelID != "" {
+			var decorModel models.DecorationModel
+			if err := config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error; err == nil {
+				if agenda.ModelName == "" {
+					agenda.ModelName = decorModel.Name
+				}
+				if agenda.ModelWidth == "" {
+					agenda.ModelWidth = decorModel.Width
+				}
+				if agenda.ModelImageURL == "" {
+					agenda.ModelImageURL = decorModel.ImageURL
+				}
+			}
+		}
+	}
 
 	if err := config.DB.Save(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
