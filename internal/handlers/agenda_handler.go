@@ -378,3 +378,74 @@ func UpdateAgendaTransport(c *fiber.Ctx) error {
 	})
 }
 
+// UpdateAgendaPackage handles PUT /api/agendas/:id/package
+func UpdateAgendaPackage(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdatePackageRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	if req.PackagePrice < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Harga paket tidak boleh negatif",
+		})
+	}
+
+	var agenda models.Agenda
+	if err := config.DB.Where("id = ?", id).First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	packageName := strings.TrimSpace(req.PackageName)
+	packagePrice := req.PackagePrice
+
+	if strings.TrimSpace(req.PackageID) != "" {
+		var pkg models.Package
+		if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
+			if packageName == "" {
+				packageName = pkg.Name
+			}
+			if packagePrice <= 0 {
+				packagePrice = pkg.BasePrice
+			}
+		}
+	}
+
+	if packageName == "" {
+		packageName = "Belum Dipilih"
+	}
+
+	agenda.PackageID = req.PackageID
+	agenda.PackageName = packageName
+	agenda.PackagePrice = packagePrice
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate paket agenda: " + err.Error(),
+		})
+	}
+
+	// Update ClientForm jika ada agar sinkron
+	var existingForm models.ClientForm
+	if err := config.DB.Where("agenda_id = ?", id).First(&existingForm).Error; err == nil {
+		existingForm.PackageID = req.PackageID
+		existingForm.PackageName = packageName
+		existingForm.PackagePrice = packagePrice
+		existingForm.TotalPrice = packagePrice + existingForm.AddonsPrice
+		config.DB.Save(&existingForm)
+	}
+
+	// Reload with ClientForm
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Paket agenda berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+

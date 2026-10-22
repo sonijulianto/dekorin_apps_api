@@ -43,6 +43,7 @@ func main() {
 	api.Post("/agendas", handlers.CreateAgenda)
 	api.Put("/agendas/:id/dp", handlers.UpdateAgendaDp)
 	api.Put("/agendas/:id/transport", handlers.UpdateAgendaTransport)
+	api.Put("/agendas/:id/package", handlers.UpdateAgendaPackage)
 	api.Put("/agendas/:id/payment-status", handlers.UpdateAgendaPaymentStatus)
 	api.Put("/agendas/:id/status", handlers.UpdateAgendaStatus)
 

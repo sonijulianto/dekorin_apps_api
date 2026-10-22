@@ -86,4 +86,11 @@ type ReorderPackagesRequest struct {
 	PackageIDs []string `json:"package_ids"`
 }
 
+// UpdatePackageRequest adalah payload untuk mengubah paket dekorasi dan harga paket
+type UpdatePackageRequest struct {
+	PackageID    string  `json:"package_id"`
+	PackageName  string  `json:"package_name"`
+	PackagePrice float64 `json:"package_price"`
+}
+
 
