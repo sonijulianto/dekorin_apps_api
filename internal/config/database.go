@@ -218,7 +218,7 @@ func SeedUsers(db *gorm.DB) {
 	defaultUsers := []models.User{
 		{
 			ID:        "usr_superadmin",
-			CompanyID: "",
+			CompanyID: "cmp_default",
 			FullName:  "Superadmin Dekorin",
 			Phone:     "081111111111",
 			Email:     "superadmin@dekorin.com",
@@ -260,8 +260,11 @@ func SeedUsers(db *gorm.DB) {
 			// User belum ada, buat user baru
 			hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 			u.Password = string(hashedPassword)
-			db.Create(&u)
-			fmt.Printf("🌱 Seeding: Akun %s (No HP: %s - Role: %s) berhasil dibuat!\n", u.FullName, u.Phone, u.Role)
+			if createErr := db.Create(&u).Error; createErr != nil {
+				fmt.Printf("⚠️ Gagal membuat user %s: %v\n", u.FullName, createErr)
+			} else {
+				fmt.Printf("🌱 Seeding: Akun %s (No HP: %s - Role: %s) berhasil dibuat!\n", u.FullName, u.Phone, u.Role)
+			}
 		} else {
 			// User sudah ada, pastikan phone, role, dan company_id sinkron jika masih kosong/berbeda
 			updates := map[string]interface{}{}
@@ -271,7 +274,7 @@ func SeedUsers(db *gorm.DB) {
 			if existing.Role != u.Role {
 				updates["role"] = u.Role
 			}
-			if existing.CompanyID == "" && u.Role != "superadmin" {
+			if existing.CompanyID == "" {
 				updates["company_id"] = u.CompanyID
 			}
 			if len(updates) > 0 {
