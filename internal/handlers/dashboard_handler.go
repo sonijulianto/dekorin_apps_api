@@ -1,9 +1,10 @@
-﻿package handlers
+package handlers
 
 import (
 	"time"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,10 +21,18 @@ type DashboardSummaryResponse struct {
 }
 
 // GetDashboardSummary handles GET /api/dashboard/summary
+// Otomatis terisolasi hanya untuk company_id user yang sedang login
 func GetDashboardSummary(c *fiber.Ctx) error {
-	// 1. Total Pendapatan: Diambil dari semua agenda yang payment_status = 'paid'
+	companyID := middleware.GetCompanyID(c)
+
+	// 1. Total Pendapatan: Diambil dari semua agenda perusahaan yang payment_status = 'paid'
+	agendaQuery := config.DB.Preload("ClientForm").Where("payment_status = ?", "paid")
+	if companyID != "" {
+		agendaQuery = agendaQuery.Where("company_id = ?", companyID)
+	}
+
 	var paidAgendas []models.Agenda
-	if err := config.DB.Preload("ClientForm").Where("payment_status = ?", "paid").Find(&paidAgendas).Error; err != nil {
+	if err := agendaQuery.Find(&paidAgendas).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal menghitung pendapatan: " + err.Error(),
 		})
@@ -34,9 +43,13 @@ func GetDashboardSummary(c *fiber.Ctx) error {
 		totalRevenue += a.CalculateTotalBiaya()
 	}
 
-	// 2. Total Pengeluaran: SUM(amount) dari tabel expenses
+	// 2. Total Pengeluaran: SUM(amount) dari tabel expenses perusahaan
 	var totalExpense float64 = 0
-	row := config.DB.Model(&models.Expense{}).Select("COALESCE(SUM(amount), 0)").Row()
+	expenseModel := config.DB.Model(&models.Expense{})
+	if companyID != "" {
+		expenseModel = expenseModel.Where("company_id = ?", companyID)
+	}
+	row := expenseModel.Select("COALESCE(SUM(amount), 0)").Row()
 	_ = row.Scan(&totalExpense)
 
 	// 3. Keuntungan = Pendapatan - Pengeluaran
@@ -47,21 +60,29 @@ func GetDashboardSummary(c *fiber.Ctx) error {
 	startOfToday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 
 	var upcomingCount int64 = 0
-	config.DB.Model(&models.Agenda{}).
-		Where("event_date_time >= ? AND status != ?", startOfToday, "cancelled").
-		Count(&upcomingCount)
+	countQuery := config.DB.Model(&models.Agenda{}).
+		Where("event_date_time >= ? AND status != ?", startOfToday, "cancelled")
+	if companyID != "" {
+		countQuery = countQuery.Where("company_id = ?", companyID)
+	}
+	countQuery.Count(&upcomingCount)
 
 	// Ambil daftar booking mendatang terdekat (maks 10)
 	var upcomingAgendas []models.Agenda
-	config.DB.Preload("ClientForm").
-		Where("event_date_time >= ? AND status != ?", startOfToday, "cancelled").
-		Order("event_date_time ASC").
-		Limit(10).
-		Find(&upcomingAgendas)
+	upcomingListQuery := config.DB.Preload("ClientForm").
+		Where("event_date_time >= ? AND status != ?", startOfToday, "cancelled")
+	if companyID != "" {
+		upcomingListQuery = upcomingListQuery.Where("company_id = ?", companyID)
+	}
+	upcomingListQuery.Order("event_date_time ASC").Limit(10).Find(&upcomingAgendas)
 
 	// 5. Ambil 5 pengeluaran terbaru
 	var recentExpenses []models.Expense
-	config.DB.Order("date DESC, created_at DESC").Limit(5).Find(&recentExpenses)
+	recentExpenseQuery := config.DB.Order("date DESC, created_at DESC").Limit(5)
+	if companyID != "" {
+		recentExpenseQuery = recentExpenseQuery.Where("company_id = ?", companyID)
+	}
+	recentExpenseQuery.Find(&recentExpenses)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil ringkasan dashboard",

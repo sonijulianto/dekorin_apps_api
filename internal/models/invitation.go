@@ -5,6 +5,7 @@ import "time"
 // Invitation mewakili data website undangan pernikahan digital mandiri
 type Invitation struct {
 	ID             string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID      string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	Slug           string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"slug"` // URL slug, misal: bagas-zulia
 	Title          string    `gorm:"type:varchar(200);not null" json:"title"`           // misal: The Wedding of Bagas & Zulia
 	CoverImage     string    `gorm:"type:text" json:"cover_image"`

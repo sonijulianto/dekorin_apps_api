@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,8 +16,14 @@ import (
 
 // GetInvitations menangani GET /api/invitations (daftar undangan untuk admin)
 func GetInvitations(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	var invitations []models.Invitation
-	if err := config.DB.Order("created_at DESC").Find(&invitations).Error; err != nil {
+	query := config.DB.Model(&models.Invitation{})
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.Order("created_at DESC").Find(&invitations).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil daftar undangan: " + err.Error(),
 		})
@@ -87,8 +94,14 @@ func CreateInvitation(c *fiber.Ctx) error {
 		coverImage = "/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg"
 	}
 
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
+
 	invitation := models.Invitation{
 		ID:             invID,
+		CompanyID:      companyID,
 		Slug:           slug,
 		Title:          title,
 		CoverImage:     coverImage,

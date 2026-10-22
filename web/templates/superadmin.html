@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dekorin - Superadmin Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 sm:p-10 max-w-md w-full">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 mb-4 font-black text-2xl">
+                    ✨
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Dekorin Platform</h1>
+                <p class="text-sm text-slate-500 mt-1">Portal Superadmin Multi-Company</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">No. Handphone / WhatsApp</label>
+                    <input type="text" id="loginPhone" required placeholder="081111111111" value="081111111111"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" value="superadmin123"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition font-medium">
+                </div>
+
+                <div id="loginError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+
+                <button type="submit" id="btnLogin"
+                    class="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition shadow-lg shadow-slate-900/10 flex items-center justify-center gap-2">
+                    <span>Masuk ke Superadmin</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardSection" class="hidden min-h-screen flex flex-col">
+        <!-- Top Navbar -->
+        <header class="bg-white border-b border-slate-100 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md shadow-amber-500/20">
+                        D
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-900 text-lg leading-none">Dekorin</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wide">Superadmin</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Kelola Semua Vendor & Owner Dekorasi</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-semibold text-slate-800" id="superadminName">Superadmin</p>
+                        <p class="text-xs text-slate-400">Platform Administrator</p>
+                    </div>
+                    <button onclick="handleLogout()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition border border-rose-100">
+                        Keluar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-2xl font-bold">
+                        🏢
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Vendor / Usaha</p>
+                        <h3 class="text-3xl font-extrabold text-slate-900 mt-1" id="statCompanies">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center text-2xl font-bold">
+                        👑
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Akun Owner</p>
+                        <h3 class="text-3xl font-extrabold text-slate-900 mt-1" id="statOwners">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+                        📅
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Agenda Acara</p>
+                        <h3 class="text-3xl font-extrabold text-slate-900 mt-1" id="statAgendas">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Section + Action Button -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">Daftar Usaha Dekorasi (Companies)</h2>
+                    <p class="text-sm text-slate-500 mt-0.5">Setiap perusahaan memiliki database keuangan, paket, dan penjadwalan mandiri.</p>
+                </div>
+                <button onclick="openCreateModal()" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm transition shadow-lg shadow-amber-600/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    <span>+ Daftarkan Usaha & Owner Baru</span>
+                </button>
+            </div>
+
+            <!-- Table of Companies -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50/80 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
+                            <tr>
+                                <th class="py-4 px-6">Nama Usaha & ID</th>
+                                <th class="py-4 px-6">Alamat Kantor / Workshop</th>
+                                <th class="py-4 px-6">Kontak Bisnis</th>
+                                <th class="py-4 px-6">Akun Pemilik (Owner)</th>
+                                <th class="py-4 px-6 text-center">Tim & Agenda</th>
+                                <th class="py-4 px-6 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="companyTableBody" class="divide-y divide-slate-100 font-medium">
+                            <tr>
+                                <td colspan="6" class="text-center py-12 text-slate-400">Memuat data perusahaan...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: CREATE COMPANY & INITIAL OWNER -->
+    <div id="createModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-scale-in">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Daftarkan Usaha & Owner Baru</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Sistem akan membuatkan entitas usaha dan akun Owner pertama</p>
+                </div>
+                <button onclick="closeCreateModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">✕</button>
+            </div>
+
+            <form id="createCompanyForm" onsubmit="handleCreateCompany(event)" class="space-y-5">
+                <!-- Data Perusahaan -->
+                <div class="bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                        <span>🏢</span> Data Badan Usaha / Vendor Dekorasi
+                    </h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Usaha Dekorasi *</label>
+                        <input type="text" id="inputCompanyName" required placeholder="Contoh: Sonia Wedding & Decor"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Kantor / Workshop</label>
+                        <textarea id="inputCompanyAddress" rows="2" placeholder="Contoh: Jl. Veteran No. 45, Bandung"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / Telp Usaha</label>
+                        <input type="text" id="inputCompanyPhone" placeholder="Contoh: 081234567890"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                    </div>
+                </div>
+
+                <!-- Data Owner Pertama -->
+                <div class="bg-purple-500/5 p-4 rounded-2xl border border-purple-500/10 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-purple-800 flex items-center gap-1.5">
+                        <span>👑</span> Data Akun Owner Pertama
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Owner *</label>
+                            <input type="text" id="inputOwnerName" required placeholder="Contoh: Ibu Sonia"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">No. HP Owner (Login ID) *</label>
+                            <input type="text" id="inputOwnerPhone" required placeholder="081298765432"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Password Awal *</label>
+                            <input type="text" id="inputOwnerPassword" required placeholder="Minimal 6 karakter" value="owner123"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Email (Opsional)</label>
+                            <input type="email" id="inputOwnerEmail" placeholder="sonia@dekorin.com"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="createError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeCreateModal()" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
+                    <button type="submit" id="btnSubmitCompany" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-md transition">Daftarkan Sekarang</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SUCCESS REGISTER (COPY CREDENTIALS) -->
+    <div id="successModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-5">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-3xl">
+                🎉
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-slate-900">Pendaftaran Berhasil!</h3>
+                <p class="text-sm text-slate-500 mt-1">Usaha baru dan akun Owner sudah aktif. Silakan kirimkan kredensial berikut ke Owner:</p>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-2 text-sm font-mono text-slate-800" id="credentialBox">
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="copyCredentialText()" class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition shadow-md flex items-center justify-center gap-2">
+                    <span>📋 Salin Kredensial WhatsApp</span>
+                </button>
+                <button onclick="closeSuccessModal()" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('superadmin_token') || '';
+        let lastCreatedCredential = '';
+
+        window.onload = function() {
+            if (authToken) {
+                checkAuthAndLoad();
+            } else {
+                showLogin();
+            }
+        };
+
+        function showLogin() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            loadCompanies();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorBox = document.getElementById('loginError');
+            const btn = document.getElementById('btnLogin');
+
+            errorBox.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerText = 'Memverifikasi...';
+
+            try {
+                const res = await fetch('/api/superadmin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Login gagal');
+
+                authToken = data.token;
+                localStorage.setItem('superadmin_token', authToken);
+                document.getElementById('superadminName').innerText = data.data.full_name;
+                showDashboard();
+            } catch (err) {
+                errorBox.innerText = err.message;
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Masuk ke Superadmin';
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('superadmin_token');
+            authToken = '';
+            showLogin();
+        }
+
+        async function checkAuthAndLoad() {
+            try {
+                const res = await fetch('/api/superadmin/companies', {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                if (res.status === 401 || res.status === 403) {
+                    handleLogout();
+                    return;
+                }
+                showDashboard();
+            } catch {
+                handleLogout();
+            }
+        }
+
+        async function loadCompanies() {
+            const tbody = document.getElementById('companyTableBody');
+            try {
+                const res = await fetch('/api/superadmin/companies', {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal memuat');
+
+                const companies = data.data || [];
+                document.getElementById('statCompanies').innerText = companies.length;
+
+                let totalOwners = 0;
+                let totalAgendas = 0;
+
+                if (companies.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-400">Belum ada usaha yang terdaftar.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = companies.map(c => {
+                    totalOwners += (c.total_owners || 0);
+                    totalAgendas += (c.total_agendas || 0);
+
+                    const ownersBadges = (c.owners_list && c.owners_list.length > 0)
+                        ? c.owners_list.map(o => `<span class="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100 mr-1.5 mb-1">👑 ${o}</span>`).join('')
+                        : `<span class="text-slate-400 text-xs italic">Belum ada owner</span>`;
+
+                    return `
+                        <tr class="hover:bg-slate-50/50 transition">
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-slate-900">${c.name}</div>
+                                <div class="text-[11px] text-slate-400 font-mono mt-0.5">${c.id}</div>
+                            </td>
+                            <td class="py-4 px-6 text-slate-600 max-w-xs truncate">${c.address || '-'}</td>
+                            <td class="py-4 px-6 text-slate-800 font-mono text-xs">${c.phone || '-'}</td>
+                            <td class="py-4 px-6">${ownersBadges}</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700">${c.total_admins || 0} Admin</span>
+                                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 ml-1">${c.total_crew || 0} Crew</span>
+                                <div class="text-[11px] text-emerald-600 font-semibold mt-1">📅 ${c.total_agendas || 0} Agenda</div>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                ${c.id !== 'cmp_default' ? `
+                                    <button onclick="handleDeleteCompany('${c.id}', '${c.name}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
+                                        Hapus
+                                    </button>
+                                ` : `<span class="text-[11px] text-slate-400 font-semibold">Utama</span>`}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                document.getElementById('statOwners').innerText = totalOwners;
+                document.getElementById('statAgendas').innerText = totalAgendas;
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-rose-500 font-semibold">Gagal memuat: ${err.message}</td></tr>`;
+            }
+        }
+
+        function openCreateModal() {
+            document.getElementById('createCompanyForm').reset();
+            document.getElementById('createError').classList.add('hidden');
+            document.getElementById('createModal').classList.remove('hidden');
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+        }
+
+        async function handleCreateCompany(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitCompany');
+            const errBox = document.getElementById('createError');
+            errBox.classList.add('hidden');
+
+            const payload = {
+                company_name: document.getElementById('inputCompanyName').value.trim(),
+                company_address: document.getElementById('inputCompanyAddress').value.trim(),
+                company_phone: document.getElementById('inputCompanyPhone').value.trim(),
+                owner_name: document.getElementById('inputOwnerName').value.trim(),
+                owner_phone: document.getElementById('inputOwnerPhone').value.trim(),
+                owner_password: document.getElementById('inputOwnerPassword').value.trim(),
+                owner_email: document.getElementById('inputOwnerEmail').value.trim()
+            };
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const res = await fetch('/api/superadmin/companies', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal mendaftarkan usaha');
+
+                closeCreateModal();
+                loadCompanies();
+
+                // Tampilkan kredensial untuk disalin
+                lastCreatedCredential = `Halo kak ${payload.owner_name},\nSelamat akun usaha Anda "${payload.company_name}" telah aktif di Aplikasi Dekorin!\n\nBerikut kredensial login Anda:\n📱 No. HP: ${payload.owner_phone}\n🔑 Password: ${payload.owner_password}\nRole: Owner\n\nSilakan unduh aplikasi Dekorin dan login sekarang.`;
+
+                document.getElementById('credentialBox').innerHTML = `
+                    <div><strong>Usaha:</strong> ${payload.company_name}</div>
+                    <div><strong>Nama Owner:</strong> ${payload.owner_name}</div>
+                    <div><strong>No. HP (Login):</strong> ${payload.owner_phone}</div>
+                    <div><strong>Password:</strong> ${payload.owner_password}</div>
+                `;
+                document.getElementById('successModal').classList.remove('hidden');
+
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Daftarkan Sekarang';
+            }
+        }
+
+        function copyCredentialText() {
+            navigator.clipboard.writeText(lastCreatedCredential);
+            alert('Kredensial berhasil disalin! Anda bisa langsung paste ke WhatsApp Owner.');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        async function handleDeleteCompany(id, name) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus usaha "${name}"? Seluruh akun owner, admin, crew, agenda, dan catatan keuangannya akan dihapus permanen!`)) {
+                return;
+            }
+            try {
+                const res = await fetch(`/api/superadmin/companies/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal menghapus');
+                alert(data.message);
+                loadCompanies();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

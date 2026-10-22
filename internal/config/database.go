@@ -47,12 +47,13 @@ func ConnectDB() {
 	DB = db
 
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
-	err = DB.AutoMigrate(&models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{}, &models.Invitation{}, &models.InvitationWish{}, &models.Expense{})
+	err = DB.AutoMigrate(&models.Company{}, &models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{}, &models.Invitation{}, &models.InvitationWish{}, &models.Expense{})
 	if err != nil {
 		log.Fatal("Gagal melakukan auto migrate: ", err)
 	}
 
 	// Menjalankan Seeding otomatis
+	SeedCompany(db)
 	SeedUsers(db)
 	SeedPackagesAndAgendas(db)
 	SeedAddons(db)
@@ -189,44 +190,93 @@ func SeedPackagesAndAgendas(db *gorm.DB) {
 	}
 }
 
-// SeedUsers memastikan akun default untuk setiap role (owner, admin, crew) tersedia di database
+// SeedCompany memastikan perusahaan default ada dan melakukan backfill data lama
+func SeedCompany(db *gorm.DB) {
+	var comp models.Company
+	if err := db.Where("id = ?", "cmp_default").First(&comp).Error; err != nil {
+		defaultCompany := models.Company{
+			ID:      "cmp_default",
+			Name:    "Dekorin Wedding & Event Decoration",
+			Address: "Jl. Melati Raya No. 123, Jakarta Selatan",
+			Phone:   "081234567890",
+		}
+		db.Create(&defaultCompany)
+		fmt.Println("🌱 Seeding: Perusahaan default berhasil dibuat!")
+	}
+
+	// Backfill company_id untuk entitas yang masih kosong
+	db.Model(&models.User{}).Where("company_id = '' OR company_id IS NULL").Where("role != ?", "superadmin").Update("company_id", "cmp_default")
+	db.Model(&models.Package{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.Agenda{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.Addon{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.Expense{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+	db.Model(&models.Invitation{}).Where("company_id = '' OR company_id IS NULL").Update("company_id", "cmp_default")
+}
+
+// SeedUsers memastikan akun default untuk setiap role (superadmin, owner, admin, crew) tersedia di database
 func SeedUsers(db *gorm.DB) {
 	defaultUsers := []models.User{
 		{
-			ID:       "usr_owner",
-			FullName: "Owner Dekorin",
-			Email:    "owner@dekorin.com",
-			Password: "owner123",
-			Role:     "owner",
+			ID:        "usr_superadmin",
+			CompanyID: "",
+			FullName:  "Superadmin Dekorin",
+			Phone:     "081111111111",
+			Email:     "superadmin@dekorin.com",
+			Password:  "superadmin123",
+			Role:      "superadmin",
 		},
 		{
-			ID:       "usr_admin",
-			FullName: "Admin Dekorin",
-			Email:    "admin@dekorin.com",
-			Password: "admin123",
-			Role:     "admin",
+			ID:        "usr_owner",
+			CompanyID: "cmp_default",
+			FullName:  "Owner Dekorin",
+			Phone:     "081234567890",
+			Email:     "owner@dekorin.com",
+			Password:  "owner123",
+			Role:      "owner",
 		},
 		{
-			ID:       "usr_crew",
-			FullName: "Crew Lapangan",
-			Email:    "crew@dekorin.com",
-			Password: "crew123",
-			Role:     "crew",
+			ID:        "usr_admin",
+			CompanyID: "cmp_default",
+			FullName:  "Admin Dekorin",
+			Phone:     "081234567891",
+			Email:     "admin@dekorin.com",
+			Password:  "admin123",
+			Role:      "admin",
+		},
+		{
+			ID:        "usr_crew",
+			CompanyID: "cmp_default",
+			FullName:  "Crew Lapangan",
+			Phone:     "081234567892",
+			Email:     "crew@dekorin.com",
+			Password:  "crew123",
+			Role:      "crew",
 		},
 	}
 
 	for _, u := range defaultUsers {
 		var existing models.User
-		if err := db.Where("email = ?", u.Email).First(&existing).Error; err != nil {
+		if err := db.Where("phone = ? OR email = ? OR id = ?", u.Phone, u.Email, u.ID).First(&existing).Error; err != nil {
 			// User belum ada, buat user baru
 			hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 			u.Password = string(hashedPassword)
 			db.Create(&u)
-			fmt.Printf("🌱 Seeding: Akun %s (%s) berhasil dibuat!\n", u.FullName, u.Email)
+			fmt.Printf("🌱 Seeding: Akun %s (No HP: %s - Role: %s) berhasil dibuat!\n", u.FullName, u.Phone, u.Role)
 		} else {
-			// User sudah ada, pastikan rolenya sinkron
+			// User sudah ada, pastikan phone, role, dan company_id sinkron jika masih kosong/berbeda
+			updates := map[string]interface{}{}
+			if existing.Phone == "" {
+				updates["phone"] = u.Phone
+			}
 			if existing.Role != u.Role {
-				db.Model(&existing).Update("role", u.Role)
+				updates["role"] = u.Role
+			}
+			if existing.CompanyID == "" && u.Role != "superadmin" {
+				updates["company_id"] = u.CompanyID
+			}
+			if len(updates) > 0 {
+				db.Model(&existing).Updates(updates)
+				fmt.Printf("🌱 Seeding: Sinkronisasi akun %s (No HP: %s) berhasil diperbarui!\n", u.FullName, u.Phone)
 			}
 		}
 	}

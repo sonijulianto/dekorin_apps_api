@@ -1,20 +1,20 @@
 package handlers
 
 import (
+	"strings"
 	"time"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
+	"dekorin_apps_api/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Secret key untuk sign JWT.
-var jwtSecret = []byte("super-secret-key-dekorin-123")
-
-// Login handles the authentication endpoint
+// Login handles the authentication endpoint using Phone or Email and Password
 func Login(c *fiber.Ctx) error {
 	req := new(models.LoginRequest)
 
@@ -25,36 +25,74 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
+	cleanPhone := utils.NormalizePhone(req.Phone)
+	identifier := cleanPhone
+	isPhone := true
+
+	if identifier == "" && req.Email != "" {
+		identifier = strings.TrimSpace(req.Email)
+		isPhone = false
+	}
+
+	if identifier == "" || strings.TrimSpace(req.Password) == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nomor Handphone dan password wajib diisi",
+		})
+	}
+
 	var user models.User
-	// Cari user di database berdasarkan email
-	if err := config.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+	var err error
+
+	// Cari user di database berdasarkan No HP atau Email beserta data Company
+	if isPhone {
+		err = config.DB.Preload("Company").Where("phone = ?", cleanPhone).First(&user).Error
+		// Fallback: Jika tidak ketemu, coba cari jika user menginputkan email di field phone
+		if err != nil && strings.Contains(req.Phone, "@") {
+			err = config.DB.Preload("Company").Where("email = ?", strings.TrimSpace(req.Phone)).First(&user).Error
+		}
+	} else {
+		err = config.DB.Preload("Company").Where("email = ?", identifier).First(&user).Error
+	}
+
+	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Email atau password salah",
+			"error": "Nomor Handphone atau password salah",
 		})
 	}
 
 	// Validasi Password menggunakan Bcrypt
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Email atau password salah",
+			"error": "Nomor Handphone atau password salah",
 		})
 	}
 
-	// Jika sukses, Create JWT token
+	// Jika sukses, buat JWT token (masa berlaku 7 hari)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    user.ID,
-		"email": user.Email,
-		"role":  user.Role,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(), // Expired 24 jam
+		"id":         user.ID,
+		"company_id": user.CompanyID,
+		"phone":      user.Phone,
+		"email":      user.Email,
+		"role":       user.Role,
+		"exp":        time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
 
 	// Sign the token with secret
-	tokenString, err := token.SignedString(jwtSecret)
+	tokenString, err := token.SignedString(middleware.JwtSecret)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal membuat token autentikasi",
 		})
+	}
+
+	companyName := ""
+	companyAddress := ""
+	companyPhone := ""
+	if user.Company != nil {
+		companyName = user.Company.Name
+		companyAddress = user.Company.Address
+		companyPhone = user.Company.Phone
 	}
 
 	// Return data user beserta token-nya
@@ -62,10 +100,15 @@ func Login(c *fiber.Ctx) error {
 		"message": "Login berhasil",
 		"token":   tokenString,
 		"data": models.UserResponse{
-			ID:       user.ID,
-			FullName: user.FullName,
-			Email:    user.Email,
-			Role:     user.Role,
+			ID:             user.ID,
+			CompanyID:      user.CompanyID,
+			CompanyName:    companyName,
+			CompanyAddress: companyAddress,
+			CompanyPhone:   companyPhone,
+			FullName:       user.FullName,
+			Phone:          user.Phone,
+			Email:          user.Email,
+			Role:           user.Role,
 		},
 	})
 }

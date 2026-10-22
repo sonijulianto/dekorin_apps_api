@@ -1,10 +1,11 @@
-﻿package handlers
+package handlers
 
 import (
 	"strings"
 	"time"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,8 +14,13 @@ import (
 
 // GetExpenses handles GET /api/expenses
 func GetExpenses(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	var expenses []models.Expense
 	query := config.DB.Model(&models.Expense{})
+
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
 
 	// Filter opsional bulan/tahun atau tanggal jika diperlukan
 	startDateStr := c.Query("start_date")
@@ -46,6 +52,11 @@ func GetExpenses(c *fiber.Ctx) error {
 
 // CreateExpense handles POST /api/expenses
 func CreateExpense(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
+
 	var req models.CreateExpenseRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -82,6 +93,7 @@ func CreateExpense(c *fiber.Ctx) error {
 
 	expense := models.Expense{
 		ID:        "exp_" + uuid.New().String()[:8],
+		CompanyID: companyID,
 		Title:     req.Title,
 		Amount:    req.Amount,
 		Category:  category,
@@ -105,6 +117,7 @@ func CreateExpense(c *fiber.Ctx) error {
 
 // DeleteExpense handles DELETE /api/expenses/:id
 func DeleteExpense(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	id := c.Params("id")
 	if id == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -112,7 +125,12 @@ func DeleteExpense(c *fiber.Ctx) error {
 		})
 	}
 
-	result := config.DB.Delete(&models.Expense{}, "id = ?", id)
+	query := config.DB.Where("id = ?", id)
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	result := query.Delete(&models.Expense{})
 	if result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal menghapus pengeluaran: " + result.Error.Error(),

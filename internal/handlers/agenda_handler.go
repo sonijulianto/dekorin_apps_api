@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,8 +15,13 @@ import (
 
 // GetAgendas handles GET /api/agendas
 func GetAgendas(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	var agendas []models.Agenda
 	query := config.DB.Model(&models.Agenda{}).Preload("ClientForm")
+
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
 
 	// Filter rentang tanggal
 	startDateStr := c.Query("start_date")
@@ -136,9 +142,14 @@ func CreateAgenda(c *fiber.Ctx) error {
 	// Buat Agenda ID & Form Token baru
 	agendaID := fmt.Sprintf("agd_%s", uuid.New().String()[:8])
 	formToken := uuid.New().String()[:8]
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
 
 	agenda := models.Agenda{
 		ID:            agendaID,
+		CompanyID:     companyID,
 		ClientName:    strings.TrimSpace(req.ClientName),
 		ClientPhone:   strings.TrimSpace(req.ClientPhone),
 		BackdropTitle: backdropTitle,
@@ -170,8 +181,13 @@ func CreateAgenda(c *fiber.Ctx) error {
 
 // GetPackages handles GET /api/packages
 func GetPackages(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	var packages []models.Package
-	if err := config.DB.Order("sort_order ASC, created_at ASC").Find(&packages).Error; err != nil {
+	query := config.DB.Model(&models.Package{})
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.Order("sort_order ASC, created_at ASC").Find(&packages).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil data paket",
 		})

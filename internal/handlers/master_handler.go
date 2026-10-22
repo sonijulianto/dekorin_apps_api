@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,6 +16,11 @@ import (
 
 // CreatePackage menangani POST /api/packages
 func CreatePackage(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
+
 	var req models.CreateOrUpdatePackageRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
@@ -26,6 +32,7 @@ func CreatePackage(c *fiber.Ctx) error {
 
 	pkg := models.Package{
 		ID:          fmt.Sprintf("pkg_%s", uuid.New().String()[:8]),
+		CompanyID:   companyID,
 		Name:        strings.TrimSpace(req.Name),
 		ImageURL:    strings.TrimSpace(req.ImageURL),
 		BasePrice:   req.BasePrice,
@@ -44,10 +51,16 @@ func CreatePackage(c *fiber.Ctx) error {
 
 // UpdatePackage menangani PUT /api/packages/:id
 func UpdatePackage(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	id := c.Params("id")
 	var pkg models.Package
 
-	if err := config.DB.Where("id = ?", id).First(&pkg).Error; err != nil {
+	query := config.DB.Where("id = ?", id)
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&pkg).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Paket tidak ditemukan"})
 	}
 
@@ -75,8 +88,15 @@ func UpdatePackage(c *fiber.Ctx) error {
 
 // DeletePackage menangani DELETE /api/packages/:id
 func DeletePackage(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	id := c.Params("id")
-	if err := config.DB.Where("id = ?", id).Delete(&models.Package{}).Error; err != nil {
+
+	query := config.DB.Where("id = ?", id)
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.Delete(&models.Package{}).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghapus paket"})
 	}
 
@@ -87,8 +107,15 @@ func DeletePackage(c *fiber.Ctx) error {
 
 // GetAddons menangani GET /api/addons
 func GetAddons(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	var addons []models.Addon
-	if err := config.DB.Order("sort_order ASC, created_at ASC").Find(&addons).Error; err != nil {
+
+	query := config.DB.Model(&models.Addon{})
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.Order("sort_order ASC, created_at ASC").Find(&addons).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data addon"})
 	}
 
@@ -116,6 +143,11 @@ func ReorderAddons(c *fiber.Ctx) error {
 
 // CreateAddon menangani POST /api/addons
 func CreateAddon(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
+
 	var req models.CreateOrUpdateAddonRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
@@ -127,6 +159,7 @@ func CreateAddon(c *fiber.Ctx) error {
 
 	addon := models.Addon{
 		ID:          fmt.Sprintf("adn_%s", uuid.New().String()[:8]),
+		CompanyID:   companyID,
 		Name:        strings.TrimSpace(req.Name),
 		ImageURL:    strings.TrimSpace(req.ImageURL),
 		Price:       req.Price,
@@ -145,10 +178,16 @@ func CreateAddon(c *fiber.Ctx) error {
 
 // UpdateAddon menangani PUT /api/addons/:id
 func UpdateAddon(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	id := c.Params("id")
 	var addon models.Addon
 
-	if err := config.DB.Where("id = ?", id).First(&addon).Error; err != nil {
+	query := config.DB.Where("id = ?", id)
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&addon).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Item tambahan tidak ditemukan"})
 	}
 
@@ -176,8 +215,15 @@ func UpdateAddon(c *fiber.Ctx) error {
 
 // DeleteAddon menangani DELETE /api/addons/:id
 func DeleteAddon(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
 	id := c.Params("id")
-	if err := config.DB.Where("id = ?", id).Delete(&models.Addon{}).Error; err != nil {
+
+	query := config.DB.Where("id = ?", id)
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.Delete(&models.Addon{}).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghapus item tambahan"})
 	}
 

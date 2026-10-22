@@ -1,10 +1,11 @@
-﻿package models
+package models
 
 import "time"
 
 // Expense mewakili pencatatan pengeluaran operasional dekorasi
 type Expense struct {
 	ID        string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	Title     string    `gorm:"type:varchar(200);not null" json:"title"`
 	Amount    float64   `gorm:"type:decimal(15,2);not null;default:0" json:"amount"`
 	Category  string    `gorm:"type:varchar(100);default:'Lainnya'" json:"category"`

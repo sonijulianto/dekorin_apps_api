@@ -5,6 +5,7 @@ import "time"
 // Addon mewakili master data item tambahan dekorasi
 type Addon struct {
 	ID          string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID   string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	Name        string    `gorm:"type:varchar(150);not null" json:"name"`
 	ImageURL    string    `gorm:"type:text" json:"image_url"`
 	Price       float64   `gorm:"type:decimal(15,2);not null;default:0" json:"price"`

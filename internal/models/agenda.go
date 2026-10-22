@@ -5,6 +5,7 @@ import "time"
 // Package mewakili master data paket dekorasi
 type Package struct {
 	ID          string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID   string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	Name        string    `gorm:"type:varchar(150);not null" json:"name"`
 	ImageURL    string    `gorm:"type:text" json:"image_url"`
 	Description string    `gorm:"type:text" json:"description"`
@@ -17,6 +18,7 @@ type Package struct {
 // Agenda mewakili item booking/jadwal acara
 type Agenda struct {
 	ID            string      `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID     string      `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	ClientName    string      `gorm:"type:varchar(150);not null" json:"client_name"`
 	ClientPhone   string      `gorm:"type:varchar(50)" json:"client_phone"`
 	BackdropTitle string      `gorm:"type:varchar(150)" json:"backdrop_title"`
