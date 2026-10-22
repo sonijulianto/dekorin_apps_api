@@ -49,7 +49,7 @@ func ConnectDB() {
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
 	err = DB.AutoMigrate(&models.Company{}, &models.User{}, &models.Package{}, &models.Agenda{}, &models.ClientForm{}, &models.Addon{}, &models.Invitation{}, &models.InvitationWish{}, &models.Expense{})
 	if err != nil {
-		log.Fatal("Gagal melakukan auto migrate: ", err)
+		log.Println("⚠️ Peringatan saat auto migrate: ", err)
 	}
 
 	// Menjalankan Seeding otomatis
