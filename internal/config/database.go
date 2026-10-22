@@ -3,10 +3,12 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"dekorin_apps_api/internal/models"
 
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -14,10 +16,27 @@ import (
 
 var DB *gorm.DB
 
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
+}
+
 // ConnectDB membuka koneksi ke PostgreSQL
 func ConnectDB() {
-	// Credentials sesuai dengan input user
-	dsn := "host=localhost user=postgres password=postgres dbname=dekorin port=5432 sslmode=disable TimeZone=Asia/Jakarta client_encoding=UTF8"
+	// Muat file .env jika ada (misal di local development)
+	_ = godotenv.Load()
+
+	host := getEnv("DB_HOST", "localhost")
+	port := getEnv("DB_PORT", "5432")
+	user := getEnv("DB_USER", "postgres")
+	password := getEnv("DB_PASSWORD", "postgres")
+	dbname := getEnv("DB_NAME", "dekorin")
+	sslmode := getEnv("DB_SSLMODE", "disable")
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Jakarta client_encoding=UTF8",
+		host, user, password, dbname, port, sslmode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

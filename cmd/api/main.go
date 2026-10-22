@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"dekorin_apps_api/internal/config"
 	"dekorin_apps_api/internal/handlers"
@@ -71,6 +72,11 @@ func main() {
 	// Upload route
 	api.Post("/upload", handlers.UploadFile)
 
+	// Landing Page route
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendFile("./web/templates/landing.html")
+	})
+
 	// Client Web Form routes
 	app.Get("/form/:token", handlers.ShowClientForm)             // Public HTML form view
 	api.Post("/client-form/:token", handlers.SubmitClientForm)   // Submit form API
@@ -86,7 +92,11 @@ func main() {
 	api.Get("/invitations/:id/wishes", handlers.GetInvitationWishes)
 	api.Post("/invitations/:slug/wishes", handlers.SubmitInvitationWish)
 
-	// Start server on port 3000
-	log.Println("Server started at http://localhost:3000")
-	log.Fatal(app.Listen(":3000"))
+	// Start server (default port 3000 or from environment variable)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	log.Printf("Server started at http://localhost:%s\n", port)
+	log.Fatal(app.Listen(":" + port))
 }
