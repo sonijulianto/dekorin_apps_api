@@ -170,6 +170,12 @@ func CreateAgenda(c *fiber.Ctx) error {
 	agendaID := fmt.Sprintf("agd_%s", uuid.New().String()[:8])
 	formToken := uuid.New().String()[:8]
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			companyID = qComp
+		}
+	}
 	if companyID == "" {
 		companyID = "cmp_default"
 	}
@@ -527,4 +533,37 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 		"data":    agenda,
 	})
 }
+
+// DeleteAgenda handles DELETE /api/agendas/:id
+func DeleteAgenda(c *fiber.Ctx) error {
+	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	var agenda models.Agenda
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	// Hapus client_form terkait jika ada
+	config.DB.Where("agenda_id = ?", id).Delete(&models.ClientForm{})
+
+	if err := config.DB.Delete(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal menghapus agenda: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Agenda berhasil dihapus",
+	})
+}
+
 

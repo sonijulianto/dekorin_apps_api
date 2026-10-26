@@ -61,6 +61,7 @@ func main() {
 	api.Put("/agendas/:id/package", middleware.Protected(), handlers.UpdateAgendaPackage)
 	api.Put("/agendas/:id/payment-status", middleware.Protected(), handlers.UpdateAgendaPaymentStatus)
 	api.Put("/agendas/:id/status", middleware.Protected(), handlers.UpdateAgendaStatus)
+	api.Delete("/agendas/:id", middleware.Protected(), handlers.DeleteAgenda)
 
 	// Expense routes
 	api.Get("/expenses", middleware.Protected(), handlers.GetExpenses)

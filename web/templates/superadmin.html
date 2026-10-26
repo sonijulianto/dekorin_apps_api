@@ -557,26 +557,55 @@
                 <!-- VIEW 5: AGENDAS & TRANSACTIONS                 -->
                 <!-- ============================================== -->
                 <div id="viewAgendas" class="hidden space-y-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">Agenda & Booking Acara</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Daftar event pernikahan dan acara yang dijadwalkan.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Agenda & Booking Acara</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Daftar jadwal acara pernikahan, client booking, dan status dekorasi.</p>
+                        </div>
+                        <button onclick="openAgendaModal()" 
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                            <span>+ Tambah Agenda Baru</span>
+                        </button>
                     </div>
 
+                    <!-- Search & Filter Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
+                        <div class="flex flex-wrap items-center gap-2.5 flex-1 max-w-xl">
+                            <div class="relative flex-1 min-w-[200px]">
+                                <input type="text" id="searchAgendaInput" oninput="filterAgendas()" placeholder="Cari nama klien, telp, backdrop, paket, model..."
+                                    class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <select id="filterAgendaStatus" onchange="filterAgendas()"
+                                class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                                <option value="all">Semua Status Acara</option>
+                                <option value="upcoming">Mendatang (Upcoming)</option>
+                                <option value="completed">Selesai (Completed)</option>
+                                <option value="cancelled">Dibatalkan (Cancelled)</option>
+                            </select>
+                        </div>
+                        <span class="text-xs text-slate-500 font-medium" id="agendaCountInfo">Memuat agenda...</span>
+                    </div>
+
+                    <!-- Table Container -->
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs text-slate-600">
-                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 select-none">
                                     <tr>
-                                        <th class="py-3.5 px-5">Klien & Acara</th>
-                                        <th class="py-3.5 px-5">Tanggal Event</th>
-                                        <th class="py-3.5 px-5">Paket</th>
-                                        <th class="py-3.5 px-5">Status</th>
+                                        <th class="py-3.5 px-5">Klien & Kontak</th>
+                                        <th class="py-3.5 px-5">Tanggal & Lokasi</th>
+                                        <th class="py-3.5 px-5">Paket & Model Dekorasi</th>
+                                        <th class="py-3.5 px-5">Status Acara & Bayar</th>
                                         <th class="py-3.5 px-5 text-right">Total Biaya</th>
+                                        <th class="py-3.5 px-5 text-right w-28">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="agendasTableBody" class="divide-y divide-slate-100 font-medium">
                                     <tr>
-                                        <td colspan="5" class="text-center py-8 text-slate-400">Memuat agenda...</td>
+                                        <td colspan="6" class="text-center py-8 text-slate-400">Memuat agenda...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -772,6 +801,143 @@
                 <button onclick="copyCredentialText()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">Salin Kredensial</button>
                 <button onclick="closeSuccessModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">Tutup</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: TAMBAH AGENDA ACARA                               -->
+    <!-- ======================================================== -->
+    <div id="modalAgenda" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4 sticky -top-6 sm:-top-8 bg-white z-10 pt-2">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="modalAgendaTitle">Tambah Agenda Acara Baru</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Jadwalkan booking event, tentukan paket dekorasi, model, dan lokasi acara</p>
+                </div>
+                <button type="button" onclick="closeAgendaModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formAgenda" onsubmit="handleSaveAgenda(event)" class="space-y-4">
+                <!-- Data Klien & Acara -->
+                <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#C59563] flex items-center gap-1.5">
+                        <span>👤</span> Informasi Klien & Acara
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Klien / Pengantin *</label>
+                            <input type="text" id="inputAgendaClientName" required placeholder="Contoh: Sarah & Dimas"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP</label>
+                            <input type="tel" id="inputAgendaClientPhone" placeholder="0812xxxxxxxx"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Judul / Tulisan Backdrop</label>
+                        <input type="text" id="inputAgendaBackdropTitle" placeholder="Contoh: The Wedding of Sarah & Dimas"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                </div>
+
+                <!-- Waktu & Tempat Acara -->
+                <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#C59563] flex items-center gap-1.5">
+                        <span>📅</span> Waktu & Lokasi Acara
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal & Jam Acara *</label>
+                            <input type="datetime-local" id="inputAgendaEventDateTime" required
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Link Google Maps / Lokasi</label>
+                            <input type="url" id="inputAgendaMapsUrl" placeholder="https://maps.app.goo.gl/..."
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paket & Model Dekorasi -->
+                <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#C59563] flex items-center gap-1.5">
+                        <span>💐</span> Pilihan Paket & Model Dekorasi
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Paket Dekorasi</label>
+                            <select id="inputAgendaPackageId" onchange="handleAgendaPackageChanged(this.value)"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] bg-white">
+                                <option value="">-- Pilih Paket Dekorasi --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Dasar Paket (Rp)</label>
+                            <input type="number" id="inputAgendaPackagePrice" min="0" value="0" oninput="calculateAgendaTotal()"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Model Dekorasi</label>
+                            <select id="inputAgendaModelId" onchange="handleAgendaModelChanged(this.value)"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] bg-white">
+                                <option value="">-- Pilih Model Dekorasi --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Biaya Tambahan Model (Rp)</label>
+                            <input type="number" id="inputAgendaModelAdditionalPrice" min="0" value="0" oninput="calculateAgendaTotal()"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                    </div>
+
+                    <!-- Model Preview Box -->
+                    <div id="agendaModelPreviewBox" class="hidden items-center gap-3 p-3 bg-white rounded-xl border border-slate-200">
+                        <img id="agendaModelPreviewImg" src="" class="w-16 h-16 rounded-lg object-cover border border-slate-100 shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-bold text-slate-800" id="agendaModelPreviewName"></div>
+                            <div class="text-[11px] text-slate-500" id="agendaModelPreviewWidth"></div>
+                            <div class="text-[11px] text-[#C59563] font-semibold" id="agendaModelPreviewExtra"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Biaya Transport / Luar Kota (Rp)</label>
+                        <input type="number" id="inputAgendaTransportFee" min="0" value="0" oninput="calculateAgendaTotal()"
+                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                </div>
+
+                <!-- Total Estimasi Biaya Box -->
+                <div class="p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC] to-[#F5EBE1] border border-[#D4A574]/20 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold text-[#C59563] uppercase tracking-wider block">Estimasi Total Biaya</span>
+                        <span class="text-xs text-slate-500">Paket + Tambahan Model + Transport</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xl sm:text-2xl font-black text-slate-900 font-mono" id="agendaTotalEstimatedDisplay">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Catatan Tambahan -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Tambahan</label>
+                    <textarea id="inputAgendaNotes" rows="2" placeholder="Catatan preferensi warna bunga, request lighting, jam loading..."
+                        class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
+                </div>
+
+                <div id="agendaErrorBox" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeAgendaModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" id="btnSubmitAgenda" class="px-5 py-2 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">Buat Agenda</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -990,6 +1156,7 @@
         let companiesCache = [];
         let packagesCache = [];
         let decorationModelsCache = [];
+        let agendasCache = [];
         let currentView = 'dashboard';
         let barChart = null;
         let donutChart = null;
@@ -2281,51 +2448,549 @@
             }
         }
 
+        // ==========================================
+        // AGENDAS & BOOKINGS MANAGEMENT
+        // ==========================================
         async function loadAgendas() {
             const tbody = document.getElementById('agendasTableBody');
+            const countInfo = document.getElementById('agendaCountInfo');
             if (!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Memuat agenda acara...</td></tr>`;
+            if (countInfo) countInfo.innerText = 'Memuat agenda acara...';
+
             try {
                 let url = '/api/agendas';
                 if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
                 const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
                 const json = await res.json();
-                const agendas = json.data || [];
+                agendasCache = json.data || [];
+                renderAgendasTable(agendasCache);
 
-                if (agendas.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Tidak ada agenda acara</td></tr>`;
-                    return;
+                // Pastikan master data paket & model juga ter-cache di background
+                if (packagesCache.length === 0) {
+                    let pkgUrl = '/api/packages';
+                    if (selectedCompanyId) pkgUrl += '?company_id=' + selectedCompanyId;
+                    fetch(pkgUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
+                        .then(r => r.json())
+                        .then(d => { if (d.data) packagesCache = d.data; })
+                        .catch(() => {});
+                }
+                if (decorationModelsCache.length === 0) {
+                    let dmUrl = '/api/decoration-models';
+                    if (selectedCompanyId) dmUrl += '?company_id=' + selectedCompanyId;
+                    fetch(dmUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
+                        .then(r => r.json())
+                        .then(d => { if (d.data) decorationModelsCache = d.data; })
+                        .catch(() => {});
+                }
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-rose-500">Gagal memuat agenda: ${err.message}</td></tr>`;
+                if (countInfo) countInfo.innerText = 'Gagal memuat';
+            }
+        }
+
+        function filterAgendas() {
+            const query = (document.getElementById('searchAgendaInput')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('filterAgendaStatus')?.value || 'all';
+
+            let filtered = agendasCache;
+
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(a => (a.status || 'upcoming').toLowerCase() === statusFilter);
+            }
+
+            if (query) {
+                filtered = filtered.filter(a =>
+                    (a.client_name && a.client_name.toLowerCase().includes(query)) ||
+                    (a.client_phone && a.client_phone.toLowerCase().includes(query)) ||
+                    (a.backdrop_title && a.backdrop_title.toLowerCase().includes(query)) ||
+                    (a.package_name && a.package_name.toLowerCase().includes(query)) ||
+                    (a.model_name && a.model_name.toLowerCase().includes(query)) ||
+                    (a.notes && a.notes.toLowerCase().includes(query))
+                );
+            }
+
+            renderAgendasTable(filtered);
+        }
+
+        function renderAgendasTable(agendas) {
+            const tbody = document.getElementById('agendasTableBody');
+            const countInfo = document.getElementById('agendaCountInfo');
+            if (!tbody) return;
+
+            if (countInfo) {
+                countInfo.innerText = `Menampilkan ${agendas.length} dari ${agendasCache.length} agenda acara`;
+            }
+
+            if (!agendas || agendas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-12 text-slate-400">
+                            <div class="flex flex-col items-center justify-center space-y-2">
+                                <span class="text-3xl text-slate-300">📅</span>
+                                <span class="font-medium">Belum ada agenda acara ditemukan</span>
+                                <button onclick="openAgendaModal()" class="text-xs font-bold text-[#C59563] hover:underline pt-1">
+                                    + Buat Agenda Pertama
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = agendas.map(a => {
+                const statusConfig = {
+                    'upcoming': { label: 'Mendatang', bg: 'bg-blue-50 text-blue-700 border-blue-200/60' },
+                    'completed': { label: 'Selesai', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/60' },
+                    'cancelled': { label: 'Dibatalkan', bg: 'bg-rose-50 text-rose-700 border-rose-200/60' }
+                }[a.status] || { label: a.status || 'Upcoming', bg: 'bg-slate-100 text-slate-700 border-slate-200' };
+
+                const paymentConfig = {
+                    'paid': { label: 'Lunas', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/60' },
+                    'dp': { label: 'DP Terbayar', bg: 'bg-amber-50 text-amber-700 border-amber-200/60' },
+                    'unpaid': { label: 'Belum Bayar', bg: 'bg-slate-100 text-slate-600 border-slate-200' }
+                }[a.payment_status] || { label: 'Belum Bayar', bg: 'bg-slate-100 text-slate-600 border-slate-200' };
+
+                const formBadge = (a.form_status === 'filled') 
+                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">✓ Form Terisi</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60">⏳ Form Pending</span>`;
+
+                let dateDisplay = '-';
+                let timeDisplay = '';
+                if (a.event_date_time) {
+                    const d = new Date(a.event_date_time);
+                    dateDisplay = d.toLocaleDateString('id-ID', {
+                        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+                    });
+                    timeDisplay = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
                 }
 
-                tbody.innerHTML = agendas.map(a => {
-                    const statusColor = {
-                        'completed': 'bg-emerald-100 text-emerald-800',
-                        'upcoming': 'bg-blue-100 text-blue-800',
-                        'cancelled': 'bg-rose-100 text-rose-800'
-                    }[a.status] || 'bg-slate-100 text-slate-700';
+                let cleanPhone = (a.client_phone || '').replace(/[^0-9]/g, '');
+                if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.substring(1);
 
-                    const dateStr = a.event_date_time ? new Date(a.event_date_time).toLocaleDateString('id-ID', {
-                        day: '2-digit', month: 'short', year: 'numeric'
-                    }) : '-';
+                const pkgPrice = Number(a.package_price || 0);
+                const modelPrice = Number(a.model_additional_price || 0);
+                const transport = Number(a.transport_fee || 0);
+                const formPrice = a.client_form && a.client_form.total_price > 0 ? Number(a.client_form.total_price) : 0;
+                const totalCost = formPrice > 0 ? (formPrice + transport) : (pkgPrice + modelPrice + transport);
 
-                    return `
-                        <tr class="hover:bg-slate-50/50 transition">
-                            <td class="py-3 px-5 font-bold text-slate-900">${a.client_name || '-'}</td>
-                            <td class="py-3 px-5 font-mono">${dateStr}</td>
-                            <td class="py-3 px-5">${a.package_name || '-'}</td>
-                            <td class="py-3 px-5">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusColor}">
-                                    ${a.status}
+                const escapeName = (a.client_name || '').replace(/'/g, "\\'");
+
+                return `
+                    <tr class="hover:bg-slate-50/60 transition group">
+                        <!-- Klien & Kontak -->
+                        <td class="py-3.5 px-5">
+                            <div class="font-bold text-slate-900 text-xs sm:text-sm">${a.client_name || '-'}</div>
+                            ${a.backdrop_title ? `<div class="text-[11px] text-slate-500 font-medium">${a.backdrop_title}</div>` : ''}
+                            <div class="flex items-center gap-2 mt-1">
+                                ${a.client_phone ? `
+                                    <a href="https://wa.me/${cleanPhone}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">
+                                        <span>💬</span> ${a.client_phone}
+                                    </a>
+                                ` : '<span class="text-[11px] text-slate-400">Tidak ada no. telp</span>'}
+                            </div>
+                            ${a.notes ? `
+                                <div class="mt-1 text-[10px] text-slate-400 bg-slate-50 p-1.5 rounded-lg border border-slate-100 max-w-xs truncate" title="${a.notes}">
+                                    📝 ${a.notes}
+                                </div>
+                            ` : ''}
+                        </td>
+
+                        <!-- Tanggal & Lokasi -->
+                        <td class="py-3.5 px-5">
+                            <div class="font-bold text-slate-800 text-xs">${dateDisplay}</div>
+                            <div class="text-[11px] text-slate-500 font-mono">${timeDisplay}</div>
+                            ${a.maps_url ? `
+                                <a href="${a.maps_url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-[#C59563] hover:text-[#B38352] font-semibold hover:underline mt-1">
+                                    <span>📍</span> Google Maps
+                                </a>
+                            ` : '<span class="text-[10px] text-slate-400 block mt-1">Lokasi belum diisi</span>'}
+                        </td>
+
+                        <!-- Paket & Model Dekorasi -->
+                        <td class="py-3.5 px-5">
+                            <div class="font-bold text-slate-900 text-xs">${a.package_name || 'Tanpa Paket'}</div>
+                            <div class="text-[11px] text-slate-400 font-mono">Rp ${pkgPrice.toLocaleString('id-ID')}</div>
+
+                            ${a.model_name ? `
+                                <div class="flex items-center gap-2 mt-2 p-1.5 rounded-xl bg-slate-50 border border-slate-100 max-w-xs">
+                                    ${a.model_image_url ? `<img src="${a.model_image_url}" class="w-8 h-8 rounded-lg object-cover border border-slate-200 shrink-0">` : `<div class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-[10px]">🖼️</div>`}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[11px] font-semibold text-slate-800 truncate">${a.model_name}</div>
+                                        <div class="text-[10px] text-slate-400">${a.model_width ? a.model_width : ''} ${modelPrice > 0 ? `(+Rp ${modelPrice.toLocaleString('id-ID')})` : ''}</div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </td>
+
+                        <!-- Status Acara & Bayar -->
+                        <td class="py-3.5 px-5 space-y-1.5">
+                            <div>
+                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusConfig.bg}">
+                                    ${statusConfig.label}
                                 </span>
-                            </td>
-                            <td class="py-3 px-5 text-right font-mono font-bold text-emerald-600">
-                                Rp ${(a.total_cost || a.package_price || 0).toLocaleString('id-ID')}
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+                            </div>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border ${paymentConfig.bg}">
+                                    ${paymentConfig.label}
+                                </span>
+                                ${formBadge}
+                            </div>
+                            ${a.dp_amount > 0 ? `<div class="text-[10px] font-mono text-emerald-600">DP: Rp ${Number(a.dp_amount).toLocaleString('id-ID')}</div>` : ''}
+                        </td>
+
+                        <!-- Total Biaya -->
+                        <td class="py-3.5 px-5 text-right font-mono">
+                            <div class="font-bold text-slate-900 text-sm">
+                                Rp ${totalCost.toLocaleString('id-ID')}
+                            </div>
+                            ${transport > 0 ? `
+                                <div class="text-[10px] text-slate-400 font-normal">
+                                    + Transport Rp ${transport.toLocaleString('id-ID')}
+                                </div>
+                            ` : ''}
+                        </td>
+
+                        <!-- Aksi -->
+                        <td class="py-3.5 px-5 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="copyClientFormLink('${a.form_token}')" title="Salin Link Form Kustom Klien"
+                                    class="p-2 rounded-xl bg-[#F9F3EC] text-[#C59563] hover:bg-[#F4ECE2] hover:text-[#B38352] transition font-bold text-xs">
+                                    🔗
+                                </button>
+                                <button onclick="handleDeleteAgenda('${a.id}', '${escapeName}')" title="Hapus Agenda Acara"
+                                    class="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition font-bold text-xs">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function openAgendaModal() {
+            const modal = document.getElementById('modalAgenda');
+            const errBox = document.getElementById('agendaErrorBox');
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
+
+            document.getElementById('formAgenda').reset();
+            const previewBox = document.getElementById('agendaModelPreviewBox');
+            previewBox.classList.add('hidden');
+            previewBox.classList.remove('flex');
+
+            // Default datetime ke besok jam 10:00
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(10, 0, 0, 0);
+            const tzOffset = tomorrow.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(tomorrow - tzOffset)).toISOString().slice(0, 16);
+            document.getElementById('inputAgendaEventDateTime').value = localISOTime;
+
+            // Pastikan master data paket & model sudah ter-cache
+            if (packagesCache.length === 0) {
+                try {
+                    let url = '/api/packages';
+                    if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                    const json = await res.json();
+                    packagesCache = json.data || [];
+                } catch (e) {
+                    console.error('Error fetching packages for agenda modal', e);
+                }
             }
+
+            if (decorationModelsCache.length === 0) {
+                try {
+                    let url = '/api/decoration-models';
+                    if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                    const json = await res.json();
+                    decorationModelsCache = json.data || [];
+                } catch (e) {
+                    console.error('Error fetching decoration models for agenda modal', e);
+                }
+            }
+
+            // Populate Packages dropdown
+            const pkgSelect = document.getElementById('inputAgendaPackageId');
+            pkgSelect.innerHTML = '<option value="">-- Pilih Paket Dekorasi --</option>' +
+                packagesCache.map(p => `<option value="${p.id}">${p.name} (Rp ${Number(p.base_price || 0).toLocaleString('id-ID')})</option>`).join('');
+
+            // Populate Models dropdown
+            populateAgendaModelSelect();
+
+            calculateAgendaTotal();
+            modal.classList.remove('hidden');
+        }
+
+        function closeAgendaModal() {
+            document.getElementById('modalAgenda').classList.add('hidden');
+        }
+
+        function populateAgendaModelSelect(packageId = '') {
+            const modelSelect = document.getElementById('inputAgendaModelId');
+            if (!modelSelect) return;
+
+            if (decorationModelsCache.length === 0) {
+                modelSelect.innerHTML = '<option value="">-- Belum ada master model dekorasi --</option>';
+                return;
+            }
+
+            let selectedPkg = packageId ? packagesCache.find(p => String(p.id) === String(packageId)) : null;
+            let includedModelIds = new Set();
+            let modelExtraPriceMap = {};
+
+            if (selectedPkg && selectedPkg.package_models && Array.isArray(selectedPkg.package_models)) {
+                selectedPkg.package_models.forEach(pm => {
+                    includedModelIds.add(String(pm.decoration_model_id));
+                    modelExtraPriceMap[String(pm.decoration_model_id)] = pm.additional_price || 0;
+                });
+            }
+
+            let html = '<option value="">-- Pilih Model Dekorasi --</option>';
+
+            if (selectedPkg && includedModelIds.size > 0) {
+                const pkgModels = decorationModelsCache.filter(m => includedModelIds.has(String(m.id)));
+                const otherModels = decorationModelsCache.filter(m => !includedModelIds.has(String(m.id)));
+
+                if (pkgModels.length > 0) {
+                    html += `<optgroup label="⭐ Model Termasuk dalam Paket (${selectedPkg.name})">`;
+                    pkgModels.forEach(m => {
+                        const extra = modelExtraPriceMap[String(m.id)] || 0;
+                        const extraLabel = extra > 0 ? ` (+ Rp ${extra.toLocaleString('id-ID')})` : ' (Gratis / Standar)';
+                        const widthLabel = m.width ? ` [${m.width}]` : '';
+                        html += `<option value="${m.id}">${m.name}${widthLabel}${extraLabel}</option>`;
+                    });
+                    html += `</optgroup>`;
+                }
+
+                if (otherModels.length > 0) {
+                    html += `<optgroup label="Model Lainnya">`;
+                    otherModels.forEach(m => {
+                        const widthLabel = m.width ? ` [${m.width}]` : '';
+                        html += `<option value="${m.id}">${m.name}${widthLabel}</option>`;
+                    });
+                    html += `</optgroup>`;
+                }
+            } else {
+                html += decorationModelsCache.map(m => {
+                    const widthLabel = m.width ? ` [${m.width}]` : '';
+                    return `<option value="${m.id}">${m.name}${widthLabel}</option>`;
+                }).join('');
+            }
+
+            modelSelect.innerHTML = html;
+        }
+
+        function handleAgendaPackageChanged(pkgId) {
+            const pkg = packagesCache.find(p => String(p.id) === String(pkgId));
+            if (pkg) {
+                document.getElementById('inputAgendaPackagePrice').value = pkg.base_price || 0;
+            } else {
+                document.getElementById('inputAgendaPackagePrice').value = 0;
+            }
+
+            const currentModelId = document.getElementById('inputAgendaModelId').value;
+            populateAgendaModelSelect(pkgId);
+            if (currentModelId) {
+                document.getElementById('inputAgendaModelId').value = currentModelId;
+            }
+            handleAgendaModelChanged(document.getElementById('inputAgendaModelId').value);
+        }
+
+        function handleAgendaModelChanged(modelId) {
+            const previewBox = document.getElementById('agendaModelPreviewBox');
+            const previewImg = document.getElementById('agendaModelPreviewImg');
+            const previewName = document.getElementById('agendaModelPreviewName');
+            const previewWidth = document.getElementById('agendaModelPreviewWidth');
+            const previewExtra = document.getElementById('agendaModelPreviewExtra');
+            const extraPriceInput = document.getElementById('inputAgendaModelAdditionalPrice');
+
+            if (!modelId) {
+                previewBox.classList.add('hidden');
+                previewBox.classList.remove('flex');
+                extraPriceInput.value = 0;
+                calculateAgendaTotal();
+                return;
+            }
+
+            const m = decorationModelsCache.find(x => String(x.id) === String(modelId));
+            if (!m) {
+                previewBox.classList.add('hidden');
+                previewBox.classList.remove('flex');
+                extraPriceInput.value = 0;
+                calculateAgendaTotal();
+                return;
+            }
+
+            previewBox.classList.remove('hidden');
+            previewBox.classList.add('flex');
+            previewImg.src = m.image_url || 'https://via.placeholder.com/100?text=Decor';
+            previewName.innerText = m.name || 'Model Dekorasi';
+            previewWidth.innerText = m.width ? ('Lebar backdrop: ' + m.width) : 'Lebar standar';
+
+            const pkgId = document.getElementById('inputAgendaPackageId').value;
+            const pkg = packagesCache.find(p => String(p.id) === String(pkgId));
+            let additionalPrice = 0;
+            if (pkg && pkg.package_models && Array.isArray(pkg.package_models)) {
+                const pm = pkg.package_models.find(x => String(x.decoration_model_id) === String(modelId));
+                if (pm) {
+                    additionalPrice = pm.additional_price || 0;
+                }
+            }
+            extraPriceInput.value = additionalPrice;
+            if (additionalPrice > 0) {
+                previewExtra.innerText = '+ Biaya Tambahan: Rp ' + additionalPrice.toLocaleString('id-ID');
+            } else {
+                previewExtra.innerText = 'Termasuk dalam paket (Tanpa biaya tambahan)';
+            }
+
+            calculateAgendaTotal();
+        }
+
+        function calculateAgendaTotal() {
+            const pkgPrice = Number(document.getElementById('inputAgendaPackagePrice').value) || 0;
+            const modelPrice = Number(document.getElementById('inputAgendaModelAdditionalPrice').value) || 0;
+            const transport = Number(document.getElementById('inputAgendaTransportFee').value) || 0;
+            const total = pkgPrice + modelPrice + transport;
+            const display = document.getElementById('agendaTotalEstimatedDisplay');
+            if (display) {
+                display.innerText = 'Rp ' + total.toLocaleString('id-ID');
+            }
+            return total;
+        }
+
+        async function handleSaveAgenda(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSubmitAgenda');
+            const errBox = document.getElementById('agendaErrorBox');
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
+
+            const clientName = document.getElementById('inputAgendaClientName').value.trim();
+            const clientPhone = document.getElementById('inputAgendaClientPhone').value.trim();
+            const backdropTitle = document.getElementById('inputAgendaBackdropTitle').value.trim();
+            const eventDateTime = document.getElementById('inputAgendaEventDateTime').value;
+            const mapsUrl = document.getElementById('inputAgendaMapsUrl').value.trim();
+            const packageId = document.getElementById('inputAgendaPackageId').value;
+            const packagePrice = Number(document.getElementById('inputAgendaPackagePrice').value) || 0;
+            const modelId = document.getElementById('inputAgendaModelId').value;
+            const modelAdditionalPrice = Number(document.getElementById('inputAgendaModelAdditionalPrice').value) || 0;
+            const transportFee = Number(document.getElementById('inputAgendaTransportFee').value) || 0;
+            const notes = document.getElementById('inputAgendaNotes').value.trim();
+
+            if (!clientName) {
+                errBox.innerText = 'Nama klien wajib diisi.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+            if (!eventDateTime) {
+                errBox.innerText = 'Tanggal dan jam acara wajib diisi.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            let modelName = '';
+            let modelWidth = '';
+            let modelImageUrl = '';
+            if (modelId) {
+                const m = decorationModelsCache.find(x => String(x.id) === String(modelId));
+                if (m) {
+                    modelName = m.name || '';
+                    modelWidth = m.width || '';
+                    modelImageUrl = m.image_url || '';
+                }
+            }
+
+            const payload = {
+                client_name: clientName,
+                client_phone: clientPhone,
+                backdrop_title: backdropTitle,
+                event_date_time: eventDateTime,
+                maps_url: mapsUrl,
+                package_id: packageId,
+                package_price: packagePrice,
+                model_id: modelId,
+                model_name: modelName,
+                model_width: modelWidth,
+                model_image_url: modelImageUrl,
+                model_additional_price: modelAdditionalPrice,
+                transport_fee: transportFee,
+                notes: notes
+            };
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                let url = '/api/agendas';
+                if (currentUserRole === 'superadmin' && selectedCompanyId) {
+                    url += '?company_id=' + selectedCompanyId;
+                }
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || 'Gagal menyimpan agenda');
+                }
+
+                closeAgendaModal();
+                await loadAgendas();
+                alert('Agenda acara untuk "' + clientName + '" berhasil dibuat!');
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Buat Agenda';
+            }
+        }
+
+        async function handleDeleteAgenda(id, clientName) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus agenda acara untuk "${clientName}"?\n\nSemua data form kustom klien terkait juga akan terhapus. Tindakan ini tidak dapat dibatalkan.`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/agendas/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    }
+                });
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || 'Gagal menghapus agenda');
+                }
+                await loadAgendas();
+            } catch (err) {
+                alert('Gagal menghapus: ' + err.message);
+            }
+        }
+
+        function copyClientFormLink(formToken) {
+            if (!formToken) {
+                alert('Form token tidak ditemukan.');
+                return;
+            }
+            const formUrl = window.location.origin + '/form/' + formToken;
+            navigator.clipboard.writeText(formUrl).then(() => {
+                alert('Link Form Kustom Klien berhasil disalin ke clipboard:\n' + formUrl + '\n\nAnda dapat mengirimkan link ini langsung ke WhatsApp klien.');
+            }).catch(err => {
+                prompt('Salin link form klien berikut:', formUrl);
+            });
         }
 
         async function loadReports() {
@@ -2679,6 +3344,7 @@
                 closeLogDataModal();
                 closePackageModal();
                 closeDecorationModelModal();
+                closeAgendaModal();
             }
         });
     </script>
