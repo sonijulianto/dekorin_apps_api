@@ -1280,21 +1280,25 @@
                 if (el) el.classList.add('hidden');
             });
 
-            // Reset highlight nav
-            document.querySelectorAll('.nav-item').forEach(el => {
+            // Reset highlight nav (semua nav-item utama dan submenu link)
+            document.querySelectorAll('.nav-item, .nav-submenu a').forEach(el => {
                 el.classList.remove('text-[#C59563]', 'bg-[#F9F3EC]', 'font-bold');
-                el.classList.add('text-slate-600');
+                if (el.classList.contains('nav-item')) {
+                    el.classList.add('text-stone-600');
+                } else {
+                    el.classList.add('text-stone-500');
+                }
             });
 
             const viewMap = {
                 'dashboard': { el: 'viewDashboard', title: 'Dashboard', path: '<span class="text-[#C59563]">🏠</span> • Dashboard', nav: 'nav-dashboard' },
-                'companies': { el: 'viewCompanies', title: (currentUserRole === 'superadmin' ? 'Usaha & Vendor (Companies)' : 'Profil Usaha Saya'), path: 'Administration • Usaha & Vendor', nav: 'nav-companies' },
-                'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users' },
-                'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: 'Administration • API Log', nav: 'nav-apilogs', navDirect: 'nav-apilogs-direct' },
-                'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages' },
-                'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models' },
-                'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons' },
-                'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas' },
+                'companies': { el: 'viewCompanies', title: (currentUserRole === 'superadmin' ? 'Usaha & Vendor (Companies)' : 'Profil Usaha Saya'), path: 'Administration • Usaha & Vendor', nav: 'nav-companies', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: 'Administration • API Log', nav: 'nav-apilogs', navDirect: 'nav-apilogs-direct', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
+                'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
+                'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
+                'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas', parentSubmenu: 'transSubmenu', parentCaret: 'transCaret' },
                 'reports': { el: 'viewReports', title: 'Laporan Keuangan', path: 'Report • Laporan Keuangan', nav: 'nav-reports' },
                 'survey': { el: 'viewDashboard', title: 'Survey & Undangan', path: 'Survey • Undangan Digital', nav: 'nav-survey' }
             };
@@ -1309,13 +1313,23 @@
             const activeNav = document.getElementById(target.nav);
             if (activeNav) {
                 activeNav.classList.add('text-[#C59563]', 'bg-[#F9F3EC]', 'font-bold');
-                activeNav.classList.remove('text-slate-600');
+                activeNav.classList.remove('text-stone-500', 'text-stone-600', 'text-slate-600');
             }
             if (target.navDirect) {
                 const directNav = document.getElementById(target.navDirect);
                 if (directNav) {
                     directNav.classList.add('text-[#C59563]', 'bg-[#F9F3EC]', 'font-bold');
-                    directNav.classList.remove('text-slate-600');
+                    directNav.classList.remove('text-stone-500', 'text-stone-600', 'text-slate-600');
+                }
+            }
+
+            // Buka submenu parent jika ada agar menu aktif terlihat
+            if (target.parentSubmenu) {
+                const pSub = document.getElementById(target.parentSubmenu);
+                const pCaret = document.getElementById(target.parentCaret);
+                if (pSub && pSub.classList.contains('hidden')) {
+                    pSub.classList.remove('hidden');
+                    if (pCaret) pCaret.innerText = 'v';
                 }
             }
 
