@@ -18,6 +18,12 @@ import (
 // CreatePackage menangani POST /api/packages
 func CreatePackage(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" {
+			companyID = qComp
+		}
+	}
 	if companyID == "" {
 		companyID = "cmp_default"
 	}
@@ -77,11 +83,12 @@ func CreatePackage(c *fiber.Ctx) error {
 // UpdatePackage menangani PUT /api/packages/:id
 func UpdatePackage(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	id := c.Params("id")
 	var pkg models.Package
 
 	query := config.DB.Where("id = ?", id)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
@@ -138,10 +145,11 @@ func UpdatePackage(c *fiber.Ctx) error {
 // DeletePackage menangani DELETE /api/packages/:id
 func DeletePackage(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	id := c.Params("id")
 
 	query := config.DB.Where("id = ?", id)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 

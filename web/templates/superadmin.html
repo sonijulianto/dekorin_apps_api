@@ -474,24 +474,45 @@
                 <!-- VIEW 4: MASTER PACKAGES                        -->
                 <!-- ============================================== -->
                 <div id="viewPackages" class="hidden space-y-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">Master Paket Dekorasi</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Daftar paket dekorasi yang terdaftar di masing-masing vendor.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Master Paket Dekorasi</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola paket pernikahan/acara, harga dasar, kelengkapan fasilitas, dan model dekorasi yang tersedia di dalam paket.</p>
+                        </div>
+                        <button onclick="openPackageModal()" 
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                            <span>+ Tambah Paket Dekorasi</span>
+                        </button>
                     </div>
 
+                    <!-- Search & Counter Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
+                        <div class="relative flex-1 max-w-sm">
+                            <input type="text" id="searchPackageInput" oninput="filterPackages(this.value)" placeholder="Cari nama paket atau fasilitas..."
+                                class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-slate-500 font-medium" id="packageCountInfo">Memuat data paket...</span>
+                    </div>
+
+                    <!-- Table Container -->
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs text-slate-600">
-                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 select-none">
                                     <tr>
-                                        <th class="py-3.5 px-5">Nama Paket</th>
-                                        <th class="py-3.5 px-5">Harga Dasar (Base Price)</th>
-                                        <th class="py-3.5 px-5">Deskripsi Fasilitas</th>
+                                        <th class="py-3.5 px-5 w-24">Foto</th>
+                                        <th class="py-3.5 px-5">Nama Paket & Fasilitas</th>
+                                        <th class="py-3.5 px-5 w-36">Harga Dasar</th>
+                                        <th class="py-3.5 px-5">Pilihan Model Dekorasi</th>
+                                        <th class="py-3.5 px-5 text-right w-28">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="packagesTableBody" class="divide-y divide-slate-100 font-medium">
                                     <tr>
-                                        <td colspan="3" class="text-center py-8 text-slate-400">Memuat data paket...</td>
+                                        <td colspan="5" class="text-center py-8 text-slate-400">Memuat data paket...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -769,6 +790,79 @@
                 <button onclick="copyCredentialText()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">Salin Kredensial</button>
                 <button onclick="closeSuccessModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">Tutup</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: TAMBAH / EDIT PAKET DEKORASI                      -->
+    <!-- ======================================================== -->
+    <div id="modalPackage" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="modalPackageTitle">Tambah Paket Dekorasi</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Atur nama paket, harga dasar, deskripsi fasilitas, dan model dekorasi yang tersedia</p>
+                </div>
+                <button type="button" onclick="closePackageModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formPackage" onsubmit="handleSavePackage(event)" class="space-y-4">
+                <input type="hidden" id="inputPackageId" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Paket Dekorasi *</label>
+                    <input type="text" id="inputPackageName" required placeholder="Contoh: Paket Platinum Wedding"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Dasar Paket (Rp) *</label>
+                    <input type="number" id="inputPackagePrice" required min="0" placeholder="15000000"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <!-- Gambar Paket -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-slate-700">Foto / Banner Paket</label>
+                    <div class="flex items-center gap-3">
+                        <div id="packageImagePreviewBox" class="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="text-2xl text-slate-300">📦</span>
+                        </div>
+                        <div class="flex-1 space-y-1.5">
+                            <input type="file" id="inputPackageImageFile" accept="image/*" onchange="handlePackageImageFileSelected(this)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#F9F3EC] file:text-[#C59563] hover:file:bg-[#F4ECE2] cursor-pointer">
+                            <input type="text" id="inputPackageImageUrl" placeholder="Atau tempel URL gambar (https://...)" oninput="updatePackageImagePreview(this.value)"
+                                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Fasilitas & Kelengkapan Paket</label>
+                    <textarea id="inputPackageDescription" rows="3" placeholder="Contoh: Pelaminan 6 meter, Panggung, Karpet Jalan, Lighting Spotlight 4 unit, Mini Garden segar, Standing Flowers..."
+                        class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
+                </div>
+
+                <!-- Pilihan Model Dekorasi dalam Paket -->
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-semibold text-slate-700">Pilihan Model Dekorasi dalam Paket</label>
+                        <span class="text-[10px] text-slate-400">Centang model & tentukan biaya tambahan</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        Centang model dekorasi yang boleh dipilih pada paket ini. Biaya tambahan bisa diisi <b class="text-emerald-600 font-mono">0</b> jika gratis (termasuk paket), atau diisi nominal jika ada upgrade biaya.
+                    </p>
+                    <div id="packageDecorationModelsContainer" class="space-y-2 max-h-48 overflow-y-auto border border-slate-100 rounded-xl p-2.5 bg-slate-50/50">
+                        <p class="text-xs text-slate-400 text-center py-2">Memuat daftar model dekorasi...</p>
+                    </div>
+                </div>
+
+                <div id="packageErrorBox" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closePackageModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" id="btnSubmitPackage" class="px-5 py-2 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">Simpan Paket</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1470,9 +1564,17 @@
             }
         }
 
+        // ==========================================
+        // MASTER PAKET DEKORASI
+        // ==========================================
         async function loadPackages() {
             const tbody = document.getElementById('packagesTableBody');
+            const countInfo = document.getElementById('packageCountInfo');
             if (!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Memuat data paket...</td></tr>`;
+            if (countInfo) countInfo.innerText = 'Memuat data paket...';
+
             try {
                 let url = '/api/packages';
                 if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
@@ -1480,21 +1582,338 @@
                 const json = await res.json();
                 const packages = json.data || [];
                 packagesCache = packages;
+                renderPackagesTable(packagesCache);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+                if (countInfo) countInfo.innerText = 'Gagal memuat';
+            }
+        }
 
-                if (packages.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-slate-400">Tidak ada paket dekorasi</td></tr>`;
-                    return;
+        function filterPackages(query) {
+            const q = (query || '').toLowerCase().trim();
+            if (!q) {
+                renderPackagesTable(packagesCache);
+                return;
+            }
+            const filtered = packagesCache.filter(p =>
+                (p.name && p.name.toLowerCase().includes(q)) ||
+                (p.description && p.description.toLowerCase().includes(q))
+            );
+            renderPackagesTable(filtered);
+        }
+
+        function renderPackagesTable(packages) {
+            const tbody = document.getElementById('packagesTableBody');
+            const countInfo = document.getElementById('packageCountInfo');
+            if (!tbody) return;
+
+            if (countInfo) {
+                countInfo.innerText = `${packages.length} paket dekorasi ditemukan`;
+            }
+
+            if (!packages || packages.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Belum ada paket dekorasi. Silakan klik "+ Tambah Paket Dekorasi"</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = packages.map(p => {
+                const photoHtml = p.image_url ? `
+                    <div class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-200 shadow-2xs">
+                        <img src="${p.image_url}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\\'text-xl text-slate-300\\'>📦</span>'">
+                        <a href="${p.image_url}" target="_blank" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition">🔍</a>
+                    </div>
+                ` : `
+                    <div class="w-14 h-14 rounded-xl border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-xl text-slate-300 select-none">
+                        📦
+                    </div>
+                `;
+
+                let modelsBadges = `<span class="text-slate-400 text-xs italic">Semua model / Belum dikonfigurasi</span>`;
+                if (p.package_models && p.package_models.length > 0) {
+                    modelsBadges = p.package_models.map(pm => {
+                        const mName = pm.decoration_model ? pm.decoration_model.name : (pm.decoration_model_id || 'Model');
+                        const extraBadge = pm.additional_price > 0 ?
+                            `<span class="text-emerald-700 font-mono text-[10px] font-bold bg-emerald-100/60 px-1.5 py-0.5 rounded ml-1">+Rp ${Number(pm.additional_price).toLocaleString('id-ID')}</span>` :
+                            `<span class="text-slate-400 text-[10px] ml-1">(+Rp 0)</span>`;
+                        return `
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#F9F3EC] text-slate-700 mr-1 mb-1 border border-[#EAE4DC]">
+                                🖼️ <b class="ml-1 text-slate-800">${mName}</b> ${extraBadge}
+                            </span>
+                        `;
+                    }).join('');
                 }
 
-                tbody.innerHTML = packages.map(p => `
+                const priceDisplay = `Rp ${Number(p.base_price || 0).toLocaleString('id-ID')}`;
+                const safeName = (p.name || '').replace(/'/g, "\\'");
+
+                return `
                     <tr class="hover:bg-slate-50/50 transition">
-                        <td class="py-3 px-5 font-bold text-slate-900">${p.name}</td>
-                        <td class="py-3 px-5 font-mono text-emerald-600 font-bold">Rp ${Number(p.base_price || 0).toLocaleString('id-ID')}</td>
-                        <td class="py-3 px-5 text-slate-500">${p.description || '-'}</td>
+                        <td class="py-3 px-5">${photoHtml}</td>
+                        <td class="py-3 px-5">
+                            <div class="font-bold text-slate-900">${p.name}</div>
+                            ${p.description ? `<div class="text-[11px] text-slate-500 mt-0.5 line-clamp-2">${p.description}</div>` : ''}
+                        </td>
+                        <td class="py-3 px-5 font-mono text-emerald-600 font-bold">${priceDisplay}</td>
+                        <td class="py-3 px-5 max-w-sm">${modelsBadges}</td>
+                        <td class="py-3 px-5 text-right">
+                            <div class="inline-flex items-center gap-1.5">
+                                <button onclick="openPackageModal('${p.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-sky-600 hover:bg-sky-50 border border-sky-100 transition">
+                                    Edit
+                                </button>
+                                <button onclick="handleDeletePackage('${p.id}', '${safeName}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
                     </tr>
-                `).join('');
+                `;
+            }).join('');
+        }
+
+        async function fetchModelsForPackageModal() {
+            try {
+                let url = '/api/decoration-models';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                decorationModelsCache = json.data || [];
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+                console.error('Failed to load models for package modal', err);
+            }
+        }
+
+        async function openPackageModal(id = null) {
+            const modal = document.getElementById('modalPackage');
+            const errBox = document.getElementById('packageErrorBox');
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
+
+            document.getElementById('inputPackageId').value = id || '';
+            document.getElementById('inputPackageName').value = '';
+            document.getElementById('inputPackagePrice').value = '';
+            document.getElementById('inputPackageDescription').value = '';
+            document.getElementById('inputPackageImageUrl').value = '';
+            document.getElementById('inputPackageImageFile').value = '';
+            updatePackageImagePreview('');
+
+            const title = document.getElementById('modalPackageTitle');
+            title.innerText = id ? 'Edit Paket Dekorasi' : 'Tambah Paket Dekorasi';
+
+            const container = document.getElementById('packageDecorationModelsContainer');
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Memuat daftar model dekorasi...</p>';
+
+            modal.classList.remove('hidden');
+
+            // Load models if needed
+            await fetchModelsForPackageModal();
+
+            // Render model checkboxes
+            if (decorationModelsCache.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Belum ada model dekorasi. Tambahkan model dekorasi di menu Master Model Dekorasi terlebih dahulu jika ingin menautkan model.</p>';
+            } else {
+                container.innerHTML = decorationModelsCache.map(m => `
+                    <div class="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-200">
+                        <label class="flex items-center gap-2.5 cursor-pointer flex-1">
+                            <input type="checkbox" id="pkg_model_cb_${m.id}" value="${m.id}" onchange="togglePackageModelPriceInput('${m.id}')"
+                                class="rounded border-slate-300 text-[#D4A574] focus:ring-[#D4A574]">
+                            ${m.image_url ? `<img src="${m.image_url}" class="w-8 h-8 rounded-lg object-cover border border-slate-200">` : `<div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs">🖼️</div>`}
+                            <div>
+                                <div class="text-xs font-semibold text-slate-800">${m.name}</div>
+                                <div class="text-[10px] text-slate-400">${m.width ? 'Lebar: ' + m.width : ''}</div>
+                            </div>
+                        </label>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="text-[10px] text-slate-500 font-medium">+ Biaya (Rp):</span>
+                            <input type="number" id="pkg_model_price_${m.id}" value="0" min="0" disabled
+                                class="w-28 px-2 py-1 text-xs rounded-lg border border-slate-200 text-right font-mono focus:outline-none focus:ring-1 focus:ring-[#D4A574] disabled:bg-slate-100 disabled:text-slate-400">
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // If edit mode, populate data
+            if (id) {
+                const p = packagesCache.find(x => String(x.id) === String(id));
+                if (p) {
+                    document.getElementById('inputPackageName').value = p.name || '';
+                    document.getElementById('inputPackagePrice').value = p.base_price || 0;
+                    document.getElementById('inputPackageDescription').value = p.description || '';
+                    document.getElementById('inputPackageImageUrl').value = p.image_url || '';
+                    updatePackageImagePreview(p.image_url || '');
+
+                    // Pre-check models
+                    if (p.package_models && Array.isArray(p.package_models)) {
+                        p.package_models.forEach(pm => {
+                            const cb = document.getElementById('pkg_model_cb_' + pm.decoration_model_id);
+                            const priceInput = document.getElementById('pkg_model_price_' + pm.decoration_model_id);
+                            if (cb) {
+                                cb.checked = true;
+                                if (priceInput) {
+                                    priceInput.disabled = false;
+                                    priceInput.value = pm.additional_price || 0;
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        function closePackageModal() {
+            document.getElementById('modalPackage').classList.add('hidden');
+        }
+
+        function togglePackageModelPriceInput(modelId) {
+            const cb = document.getElementById('pkg_model_cb_' + modelId);
+            const input = document.getElementById('pkg_model_price_' + modelId);
+            if (!cb || !input) return;
+            if (cb.checked) {
+                input.disabled = false;
+                input.focus();
+            } else {
+                input.disabled = true;
+                input.value = 0;
+            }
+        }
+
+        function updatePackageImagePreview(url) {
+            const box = document.getElementById('packageImagePreviewBox');
+            if (!box) return;
+            if (url && url.trim() !== '') {
+                box.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+            } else {
+                box.innerHTML = `<span class="text-2xl text-slate-300">📦</span>`;
+            }
+        }
+
+        async function handlePackageImageFileSelected(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                updatePackageImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const btn = document.getElementById('btnSubmitPackage');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Mengunggah banner...';
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    body: formData
+                });
+                const json = await res.json();
+                if (res.ok && json.url) {
+                    document.getElementById('inputPackageImageUrl').value = json.url;
+                } else {
+                    alert('Gagal mengunggah banner: ' + (json.error || 'Terjadi kesalahan'));
+                }
+            } catch (err) {
+                alert('Gagal mengunggah banner: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        async function handleSavePackage(e) {
+            e.preventDefault();
+            const errBox = document.getElementById('packageErrorBox');
+            errBox.classList.add('hidden');
+
+            const id = document.getElementById('inputPackageId').value;
+            const name = document.getElementById('inputPackageName').value.trim();
+            const basePrice = parseFloat(document.getElementById('inputPackagePrice').value) || 0;
+            const imageUrl = document.getElementById('inputPackageImageUrl').value.trim();
+            const description = document.getElementById('inputPackageDescription').value.trim();
+
+            if (!name) {
+                errBox.innerText = 'Nama paket dekorasi wajib diisi';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            // Collect package models
+            const packageModels = [];
+            decorationModelsCache.forEach(m => {
+                const cb = document.getElementById('pkg_model_cb_' + m.id);
+                if (cb && cb.checked) {
+                    const priceInput = document.getElementById('pkg_model_price_' + m.id);
+                    const addPrice = priceInput ? (parseFloat(priceInput.value) || 0) : 0;
+                    packageModels.push({
+                        model_id: m.id,
+                        additional_price: addPrice
+                    });
+                }
+            });
+
+            const payload = {
+                name: name,
+                image_url: imageUrl,
+                base_price: basePrice,
+                description: description,
+                package_models: packageModels
+            };
+
+            const btn = document.getElementById('btnSubmitPackage');
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                let url = id ? `/api/packages/${id}` : '/api/packages';
+                if (!id && selectedCompanyId) {
+                    url += '?company_id=' + selectedCompanyId;
+                }
+                const method = id ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || json.message || 'Gagal menyimpan paket');
+                }
+
+                closePackageModal();
+                loadPackages();
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Paket';
+            }
+        }
+
+        async function handleDeletePackage(id, name) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus paket dekorasi "${name}"?`)) return;
+
+            try {
+                const res = await fetch(`/api/packages/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || json.message || 'Gagal menghapus paket');
+                }
+                loadPackages();
+            } catch (err) {
+                alert('Gagal menghapus paket: ' + err.message);
             }
         }
 
@@ -2257,6 +2676,7 @@
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeLogDataModal();
+                closePackageModal();
                 closeDecorationModelModal();
             }
         });
