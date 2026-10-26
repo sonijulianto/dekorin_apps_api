@@ -157,6 +157,11 @@ func CreateInvitation(c *fiber.Ctx) error {
 		YoutubeURL:      req.YoutubeURL,
 		LoveStory:       req.LoveStory,
 		TurutMengundang: req.TurutMengundang,
+		Sec1Photo:       req.Sec1Photo,
+		AkadPhoto:       req.AkadPhoto,
+		ResepsiPhoto:    req.ResepsiPhoto,
+		EventPhoto:      req.EventPhoto,
+		ClosingPhoto:    req.ClosingPhoto,
 		IsActive:        isActive,
 	}
 
@@ -241,6 +246,11 @@ func UpdateInvitation(c *fiber.Ctx) error {
 	invitation.YoutubeURL = req.YoutubeURL
 	invitation.LoveStory = req.LoveStory
 	invitation.TurutMengundang = req.TurutMengundang
+	invitation.Sec1Photo = req.Sec1Photo
+	invitation.AkadPhoto = req.AkadPhoto
+	invitation.ResepsiPhoto = req.ResepsiPhoto
+	invitation.EventPhoto = req.EventPhoto
+	invitation.ClosingPhoto = req.ClosingPhoto
 	if req.IsActive != nil {
 		invitation.IsActive = *req.IsActive
 	}

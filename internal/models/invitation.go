@@ -67,6 +67,13 @@ type Invitation struct {
 	LoveStory      string `gorm:"type:text" json:"love_story"`       // Rangkuman kisah cinta / milestone
 	TurutMengundang string `gorm:"type:text" json:"turut_mengundang"` // Daftar keluarga besar yang mengundang
 
+	// Foto Spesifik Sesuai Desain Template Asli
+	Sec1Photo    string `gorm:"type:text" json:"sec1_photo"`    // sec1.jpeg (Foto background pembuka / quote)
+	AkadPhoto    string `gorm:"type:text" json:"akad_photo"`    // akad.jpeg (Foto banner kartu Akad Nikah)
+	ResepsiPhoto string `gorm:"type:text" json:"resepsi_photo"` // reception.jpeg (Foto banner kartu Resepsi)
+	EventPhoto   string `gorm:"type:text" json:"event_photo"`   // event.jpeg (Foto kartu countdown event)
+	ClosingPhoto string `gorm:"type:text" json:"closing_photo"` // closing.jpeg (Foto penutup / thank you)
+
 	IsActive  bool      `gorm:"default:true" json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -131,6 +138,11 @@ type CreateOrUpdateInvitationRequest struct {
 	YoutubeURL      string `json:"youtube_url"`
 	LoveStory       string `json:"love_story"`
 	TurutMengundang string `json:"turut_mengundang"`
+	Sec1Photo       string `json:"sec1_photo"`
+	AkadPhoto       string `json:"akad_photo"`
+	ResepsiPhoto    string `json:"resepsi_photo"`
+	EventPhoto      string `json:"event_photo"`
+	ClosingPhoto    string `json:"closing_photo"`
 	IsActive        *bool  `json:"is_active"`
 }
 

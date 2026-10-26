@@ -277,6 +277,36 @@
       margin-bottom: 16px;
       text-align: center;
     }
+    .event-banner-img {
+      height: 200px;
+      width: 100%;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .countdown-arch-img {
+      height: 220px;
+      width: 100%;
+      background-position: center;
+      background-size: cover;
+      border-radius: 100px 100px 16px 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .closing-banner-img {
+      height: 180px;
+      max-width: 320px;
+      margin: 0 auto 20px;
+      background-position: center;
+      background-size: cover;
+      border-radius: 18px;
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    }
     .event-type {
       font-family: 'Cinzel', serif;
       font-size: 13px;
@@ -559,6 +589,9 @@
 
     <!-- QUOTE SECTION -->
     <section class="section-wrap">
+      {{ if .Sec1Photo }}
+      <div style="height: 240px; width: 100%; max-width: 380px; margin: 0 auto 20px; background: url('{{ .Sec1Photo }}') center/cover no-repeat; border-radius: 20px; border: 1px solid rgba(212,165,116,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5);" data-aos="zoom-in"></div>
+      {{ end }}
       <div class="glass-card" data-aos="fade-up">
         <div class="luxury-ornament">
           <div class="line"></div>
@@ -626,7 +659,10 @@
           <i class="fa-solid fa-hourglass-half"></i>
           <div class="line rev"></div>
         </div>
-        <h3 style="font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 2px; color: var(--text-white);">COUNTDOWN EVENT</h3>
+        <h3 style="font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 2px; color: var(--text-white); margin-bottom: 14px;">COUNTDOWN EVENT</h3>
+        {{ if .EventPhoto }}
+        <div class="countdown-arch-img" style="background-image: url('{{ .EventPhoto }}');" data-aos="zoom-in"></div>
+        {{ end }}
         <div class="cd-grid" data-aos="zoom-in">
           <div class="cd-tile"><div class="cd-num" id="cdDays">00</div><div class="cd-label">Hari</div></div>
           <div class="cd-tile"><div class="cd-num" id="cdHours">00</div><div class="cd-label">Jam</div></div>
@@ -650,6 +686,9 @@
 
       <!-- Akad -->
       <div class="event-card" data-aos="fade-up">
+        {{ if .AkadPhoto }}
+        <div class="event-banner-img" style="background-image: url('{{ .AkadPhoto }}');"></div>
+        {{ end }}
         <div class="event-type">AKAD NIKAH</div>
         <div class="event-date">{{ .AkadDate }}</div>
         <div class="event-time"><i class="fa-regular fa-clock"></i> {{ .AkadTime }}</div>
@@ -665,6 +704,9 @@
 
       <!-- Resepsi -->
       <div class="event-card" data-aos="fade-up">
+        {{ if .ResepsiPhoto }}
+        <div class="event-banner-img" style="background-image: url('{{ .ResepsiPhoto }}');"></div>
+        {{ end }}
         <div class="event-type">RESEPSI</div>
         <div class="event-date">{{ .ResepsiDate }}</div>
         <div class="event-time"><i class="fa-regular fa-clock"></i> {{ .ResepsiTime }}</div>
@@ -886,6 +928,9 @@
 
     <!-- FOOTER -->
     <footer style="padding: 40px 20px 90px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
+      {{ if .ClosingPhoto }}
+      <div class="closing-banner-img" style="background-image: url('{{ .ClosingPhoto }}');" data-aos="zoom-in"></div>
+      {{ end }}
       <h2 style="font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--text-gold); margin-bottom: 8px;">Thank You</h2>
       <p style="font-size: 12px; line-height: 1.6; color: #94a3b8; max-width: 320px; margin: 0 auto;">Atas kehadiran dan doa restunya kami ucapkan terima kasih.</p>
       <h4 style="font-family: 'Playfair Display', serif; font-size: 17px; margin-top: 16px; color: var(--text-white); letter-spacing: 1px;">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h4>

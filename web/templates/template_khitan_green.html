@@ -350,6 +350,9 @@
 
     <!-- SECTION 1: BASMALAH & SALAM -->
     <section class="section-wrap" style="padding-top: 60px;">
+      {{ if .Sec1Photo }}
+      <div style="height: 220px; width: 100%; max-width: 380px; margin: 0 auto 20px; background: url('{{ .Sec1Photo }}') center/cover no-repeat; border-radius: 20px; border: 1px solid rgba(255,203,88,0.3); box-shadow: 0 10px 25px rgba(0,0,0,0.3);" data-aos="zoom-in"></div>
+      {{ end }}
       <div data-aos="fade-up">
         <h2 class="arabic-title">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</h2>
         <h3 style="font-size: 16px; color: var(--gold-islamic); margin-bottom: 8px;">Assalamu'alaikum Wr. Wb.</h3>
@@ -374,6 +377,9 @@
       <h2 style="font-size: 26px; color: var(--gold-islamic); margin-bottom: 16px;" data-aos="fade-up">Jadwal Acara</h2>
 
       <div class="islamic-card" data-aos="zoom-in">
+        {{ if .AkadPhoto }}
+        <div style="height: 180px; width: 100%; background: url('{{ .AkadPhoto }}') center/cover no-repeat; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(255,203,88,0.2);"></div>
+        {{ end }}
         <i class="fa-regular fa-calendar-days" style="font-size: 32px; color: var(--gold-islamic); margin-bottom: 10px;"></i>
         <h3 style="font-size: 18px; color: white; font-weight: 600;">Walimatul Khitan</h3>
         
@@ -396,6 +402,9 @@
       <!-- Resepsi / Ramah Tamah jika ada -->
       {{ if .ResepsiDate }}
       <div class="islamic-card" data-aos="zoom-in">
+        {{ if .ResepsiPhoto }}
+        <div style="height: 180px; width: 100%; background: url('{{ .ResepsiPhoto }}') center/cover no-repeat; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(255,203,88,0.2);"></div>
+        {{ end }}
         <i class="fa-solid fa-utensils" style="font-size: 28px; color: var(--gold-islamic); margin-bottom: 10px;"></i>
         <h3 style="font-size: 18px; color: white; font-weight: 600;">Tasyakuran &amp; Ramah Tamah</h3>
         <div style="width: 50px; height: 1px; background: var(--gold-islamic); margin: 12px auto;"></div>
@@ -530,6 +539,9 @@
 
     <!-- SECTION 6: PENUTUP -->
     <footer style="padding: 30px 20px 80px; text-align: center; border-top: 1px solid rgba(255,203,88,0.2);">
+      {{ if .ClosingPhoto }}
+      <div style="height: 180px; max-width: 320px; margin: 0 auto 20px; background: url('{{ .ClosingPhoto }}') center/cover no-repeat; border-radius: 16px; border: 1px solid rgba(255,203,88,0.3); box-shadow: 0 8px 20px rgba(0,0,0,0.3);" data-aos="zoom-in"></div>
+      {{ end }}
       <p style="font-size: 13px; color: #f1f5f9; line-height: 1.7; max-width: 320px; margin: 0 auto;">
         Demikian undangan ini kami sampaikan. Atas perhatian, kehadiran, dan doa restu Bapak/Ibu/Saudara/i sekalian, kami sekeluarga mengucapkan terima kasih.
       </p>

@@ -391,6 +391,9 @@
 
     <!-- QUOTES -->
     <section class="section-wrap" style="padding-top: 50px;">
+      {{ if .Sec1Photo }}
+      <div style="height: 220px; width: 100%; max-width: 380px; margin: 0 auto 20px; background: url('{{ .Sec1Photo }}') center/cover no-repeat; border-radius: 20px; border: 1px solid rgba(180, 132, 108, 0.3); box-shadow: 0 10px 25px rgba(125, 90, 80, 0.1);" data-aos="zoom-in"></div>
+      {{ end }}
       <div class="latte-card" data-aos="fade-up">
         <p style="font-size: 13px; line-height: 1.8; font-style: italic; color: var(--latte-dark);">
           {{ if .Quotes }}{{ .Quotes }}{{ else }}"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21){{ end }}
@@ -435,6 +438,9 @@
     <!-- COUNTDOWN -->
     <section class="section-wrap" style="padding-top: 0;">
       <h2 class="latte-heading" data-aos="fade-up">Menghitung Hari</h2>
+      {{ if .EventPhoto }}
+      <div style="height: 200px; width: 100%; max-width: 360px; margin: 0 auto 16px; background: url('{{ .EventPhoto }}') center/cover no-repeat; border-radius: 80px 80px 16px 16px; border: 1px solid rgba(180, 132, 108, 0.3); box-shadow: 0 8px 20px rgba(125, 90, 80, 0.1);" data-aos="zoom-in"></div>
+      {{ end }}
       <div class="countdown-grid" data-aos="zoom-in">
         <div class="cd-box"><div class="cd-val" id="cdDays">00</div><div class="cd-lbl">Hari</div></div>
         <div class="cd-box"><div class="cd-val" id="cdHours">00</div><div class="cd-lbl">Jam</div></div>
@@ -449,6 +455,9 @@
       <p class="latte-sub" data-aos="fade-up">Save The Date</p>
 
       <div class="latte-card" data-aos="fade-up">
+        {{ if .AkadPhoto }}
+        <div style="height: 180px; width: 100%; background: url('{{ .AkadPhoto }}') center/cover no-repeat; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(180, 132, 108, 0.2);"></div>
+        {{ end }}
         <span style="display:inline-block; padding: 4px 14px; background: rgba(180,132,108,0.15); color: var(--latte-dark); font-size: 11px; font-weight: 600; border-radius: 20px; margin-bottom: 10px;">AKAD NIKAH</span>
         <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--latte-dark);">{{ .AkadDate }}</div>
         <div style="font-size: 13px; color: var(--latte-primary); margin: 4px 0 10px;">{{ .AkadTime }}</div>
@@ -463,6 +472,9 @@
       </div>
 
       <div class="latte-card" data-aos="fade-up">
+        {{ if .ResepsiPhoto }}
+        <div style="height: 180px; width: 100%; background: url('{{ .ResepsiPhoto }}') center/cover no-repeat; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(180, 132, 108, 0.2);"></div>
+        {{ end }}
         <span style="display:inline-block; padding: 4px 14px; background: rgba(180,132,108,0.15); color: var(--latte-dark); font-size: 11px; font-weight: 600; border-radius: 20px; margin-bottom: 10px;">RESEPSI</span>
         <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--latte-dark);">{{ .ResepsiDate }}</div>
         <div style="font-size: 13px; color: var(--latte-primary); margin: 4px 0 10px;">{{ .ResepsiTime }}</div>
@@ -614,6 +626,9 @@
 
     <!-- FOOTER -->
     <footer style="padding: 30px 20px 80px; text-align: center;">
+      {{ if .ClosingPhoto }}
+      <div style="height: 180px; max-width: 320px; margin: 0 auto 20px; background: url('{{ .ClosingPhoto }}') center/cover no-repeat; border-radius: 16px; border: 1px solid rgba(180, 132, 108, 0.3); box-shadow: 0 8px 20px rgba(125, 90, 80, 0.1);" data-aos="zoom-in"></div>
+      {{ end }}
       <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--latte-dark); margin-bottom: 6px;">Terima Kasih</h2>
       <p style="font-size: 12px; color: #777; max-width: 300px; margin: 0 auto; line-height: 1.6;">Atas kehadiran dan doa restunya kami ucapkan terima kasih.</p>
       <h4 style="font-family: 'Josefin Sans', sans-serif; font-size: 15px; margin-top: 14px; color: var(--latte-primary); letter-spacing: 1px;">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h4>

@@ -399,6 +399,9 @@
 
     <!-- QUOTES -->
     <section class="section-wrap" style="padding-top: 50px;">
+      {{ if .Sec1Photo }}
+      <div style="height: 220px; width: 100%; max-width: 380px; margin: 0 auto 20px; background: url('{{ .Sec1Photo }}') center/cover no-repeat; border-radius: 20px; border: 1px solid rgba(88,129,87,0.3); box-shadow: 0 10px 25px rgba(0,0,0,0.15);" data-aos="zoom-in"></div>
+      {{ end }}
       <div class="rustic-card" data-aos="fade-up">
         <p style="font-size: 13px; line-height: 1.8; font-style: italic; color: var(--green-dark);">
           {{ if .Quotes }}{{ .Quotes }}{{ else }}"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21){{ end }}
@@ -443,6 +446,9 @@
     <!-- COUNTDOWN -->
     <section class="section-wrap" style="padding-top: 0;">
       <h2 class="leaves-heading" data-aos="fade-up">Menghitung Hari</h2>
+      {{ if .EventPhoto }}
+      <div style="height: 200px; width: 100%; max-width: 360px; margin: 0 auto 16px; background: url('{{ .EventPhoto }}') center/cover no-repeat; border-radius: 80px 80px 14px 14px; border: 1px solid rgba(88,129,87,0.3); box-shadow: 0 8px 20px rgba(0,0,0,0.1);" data-aos="zoom-in"></div>
+      {{ end }}
       <div class="countdown-grid" data-aos="zoom-in">
         <div class="cd-box"><div class="cd-val" id="cdDays">00</div><div class="cd-lbl">Hari</div></div>
         <div class="cd-box"><div class="cd-val" id="cdHours">00</div><div class="cd-lbl">Jam</div></div>
@@ -457,6 +463,9 @@
       <p class="leaves-sub" data-aos="fade-up">Save The Date</p>
 
       <div class="rustic-card" data-aos="fade-up">
+        {{ if .AkadPhoto }}
+        <div style="height: 180px; width: 100%; background: url('{{ .AkadPhoto }}') center/cover no-repeat; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(88,129,87,0.2);"></div>
+        {{ end }}
         <span style="display:inline-block; padding: 4px 14px; background: rgba(88,129,87,0.15); color: var(--green-dark); font-size: 11px; font-weight: 600; border-radius: 20px; margin-bottom: 10px;">AKAD NIKAH</span>
         <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--green-dark);">{{ .AkadDate }}</div>
         <div style="font-size: 13px; color: var(--green-leaf); margin: 4px 0 10px;">{{ .AkadTime }}</div>
@@ -471,6 +480,9 @@
       </div>
 
       <div class="rustic-card" data-aos="fade-up">
+        {{ if .ResepsiPhoto }}
+        <div style="height: 180px; width: 100%; background: url('{{ .ResepsiPhoto }}') center/cover no-repeat; border-radius: 14px; margin-bottom: 12px; border: 1px solid rgba(88,129,87,0.2);"></div>
+        {{ end }}
         <span style="display:inline-block; padding: 4px 14px; background: rgba(88,129,87,0.15); color: var(--green-dark); font-size: 11px; font-weight: 600; border-radius: 20px; margin-bottom: 10px;">RESEPSI</span>
         <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--green-dark);">{{ .ResepsiDate }}</div>
         <div style="font-size: 13px; color: var(--green-leaf); margin: 4px 0 10px;">{{ .ResepsiTime }}</div>
