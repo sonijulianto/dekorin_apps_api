@@ -18,9 +18,15 @@ import (
 // GetInvitations menangani GET /api/invitations (daftar undangan untuk admin)
 func GetInvitations(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	role, _ := c.Locals("role").(string)
+
 	var invitations []models.Invitation
-	query := config.DB.Model(&models.Invitation{})
-	if companyID != "" {
+	query := config.DB.Model(&models.Invitation{}).Preload("Wishes")
+	if role == "superadmin" {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			query = query.Where("company_id = ?", qComp)
+		}
+	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
@@ -61,27 +67,54 @@ func CreateInvitation(c *fiber.Ctx) error {
 		})
 	}
 
-	if strings.TrimSpace(req.GroomName) == "" || strings.TrimSpace(req.BrideName) == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Nama mempelai pria dan wanita wajib diisi",
-		})
+	if req.EventType == "khitan" {
+		if strings.TrimSpace(req.ChildName) == "" && strings.TrimSpace(req.GroomName) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Nama anak khitan wajib diisi",
+			})
+		}
+		if strings.TrimSpace(req.GroomName) == "" {
+			req.GroomName = req.ChildName
+		}
+	} else {
+		if strings.TrimSpace(req.GroomName) == "" || strings.TrimSpace(req.BrideName) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Nama mempelai pria dan wanita wajib diisi",
+			})
+		}
 	}
 
 	// Buat slug jika kosong
 	slug := strings.TrimSpace(req.Slug)
 	if slug == "" {
-		groomNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.GroomNickname), " ", "-"))
-		brideNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.BrideNickname), " ", "-"))
-		if groomNick != "" && brideNick != "" {
-			slug = fmt.Sprintf("%s-%s", groomNick, brideNick)
+		if req.EventType == "khitan" {
+			childNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.ChildNickname), " ", "-"))
+			if childNick == "" {
+				childNick = strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.ChildName), " ", "-"))
+			}
+			if childNick != "" {
+				slug = fmt.Sprintf("khitan-%s", childNick)
+			} else {
+				slug = fmt.Sprintf("khitan-%s", uuid.New().String()[:6])
+			}
 		} else {
-			slug = fmt.Sprintf("undangan-%s", uuid.New().String()[:6])
+			groomNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.GroomNickname), " ", "-"))
+			brideNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.BrideNickname), " ", "-"))
+			if groomNick != "" && brideNick != "" {
+				slug = fmt.Sprintf("%s-%s", groomNick, brideNick)
+			} else {
+				slug = fmt.Sprintf("undangan-%s", uuid.New().String()[:6])
+			}
 		}
 	}
 
 	title := strings.TrimSpace(req.Title)
 	if title == "" {
-		title = fmt.Sprintf("The Wedding of %s & %s", req.GroomNickname, req.BrideNickname)
+		if req.EventType == "khitan" {
+			title = fmt.Sprintf("Tasyakuran Khitanan %s", req.ChildName)
+		} else {
+			title = fmt.Sprintf("The Wedding of %s & %s", req.GroomNickname, req.BrideNickname)
+		}
 	}
 
 	invID := fmt.Sprintf("inv_%s", uuid.New().String()[:8])
@@ -96,6 +129,9 @@ func CreateInvitation(c *fiber.Ctx) error {
 	}
 
 	companyID := middleware.GetCompanyID(c)
+	if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+		companyID = qComp
+	}
 	if companyID == "" {
 		companyID = "cmp_default"
 	}
