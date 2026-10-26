@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -180,6 +181,11 @@ func CreateAgenda(c *fiber.Ctx) error {
 		companyID = "cmp_default"
 	}
 
+	mapsURL := strings.TrimSpace(req.MapsURL)
+	if mapsURL != "" && !strings.HasPrefix(mapsURL, "http://") && !strings.HasPrefix(mapsURL, "https://") {
+		mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
+	}
+
 	agenda := models.Agenda{
 		ID:                   agendaID,
 		CompanyID:            companyID,
@@ -187,7 +193,7 @@ func CreateAgenda(c *fiber.Ctx) error {
 		ClientPhone:          strings.TrimSpace(req.ClientPhone),
 		BackdropTitle:        backdropTitle,
 		EventDateTime:        eventTime,
-		MapsURL:              strings.TrimSpace(req.MapsURL),
+		MapsURL:              mapsURL,
 		PackageID:            req.PackageID,
 		PackageName:          packageName,
 		PackagePrice:         packagePrice,
