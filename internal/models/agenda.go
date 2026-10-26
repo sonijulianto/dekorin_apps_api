@@ -45,9 +45,9 @@ type Agenda struct {
 	UpdatedAt            time.Time   `json:"updated_at"`
 }
 
-// CalculateTotalBiaya menghitung total biaya keseluruhan agenda (paket + addon + transport)
+// CalculateTotalBiaya menghitung total biaya keseluruhan agenda (paket + model + addon + transport)
 func (a *Agenda) CalculateTotalBiaya() float64 {
-	total := a.TransportFee
+	total := a.TransportFee + a.ModelAdditionalPrice
 	if a.ClientForm != nil && a.ClientForm.TotalPrice > 0 {
 		total += a.ClientForm.TotalPrice
 	} else {
@@ -110,5 +110,21 @@ type UpdatePackageRequest struct {
 	ModelImageURL        string  `json:"model_image_url"`
 	ModelAdditionalPrice float64 `json:"model_additional_price"`
 }
+
+// UpdateModelRequest adalah payload untuk mengubah model dekorasi agenda
+type UpdateModelRequest struct {
+	ModelID              string  `json:"model_id"`
+	ModelName            string  `json:"model_name"`
+	ModelWidth           string  `json:"model_width"`
+	ModelImageURL        string  `json:"model_image_url"`
+	ModelAdditionalPrice float64 `json:"model_additional_price"`
+}
+
+// UpdateNotesRequest adalah payload untuk mengubah catatan / request tambahan agenda
+type UpdateNotesRequest struct {
+	Notes string `json:"notes"`
+}
+
+
 
 

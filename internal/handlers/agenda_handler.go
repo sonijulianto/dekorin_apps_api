@@ -429,6 +429,12 @@ func UpdateAgendaTransport(c *fiber.Ctx) error {
 		})
 	}
 
+	if strings.ToLower(agenda.Status) == "completed" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai, uang transport tidak dapat diubah",
+		})
+	}
+
 	agenda.TransportFee = req.TransportFee
 	if err := config.DB.Save(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -465,6 +471,12 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 	if err := config.DB.Where("id = ?", id).First(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	if strings.ToLower(agenda.Status) == "completed" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai, paket dekorasi tidak dapat diubah",
 		})
 	}
 
@@ -536,6 +548,153 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Paket agenda berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaModel handles PUT /api/agendas/:id/model
+func UpdateAgendaModel(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdateModelRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var agenda models.Agenda
+	query := config.DB.Where("id = ?", id)
+	if userRole != "superadmin" && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	// Cek apakah agenda sudah selesai atau dibatalkan
+	if strings.ToLower(agenda.Status) == "completed" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai, model dekorasi tidak dapat diubah",
+		})
+	}
+
+	modelID := strings.TrimSpace(req.ModelID)
+	modelName := strings.TrimSpace(req.ModelName)
+	modelWidth := strings.TrimSpace(req.ModelWidth)
+	modelImageURL := strings.TrimSpace(req.ModelImageURL)
+	modelAdditionalPrice := req.ModelAdditionalPrice
+
+	if modelID != "" {
+		var decorModel models.DecorationModel
+		if err := config.DB.Where("id = ?", modelID).First(&decorModel).Error; err == nil {
+			if modelName == "" {
+				modelName = decorModel.Name
+			}
+			if modelWidth == "" {
+				modelWidth = decorModel.Width
+			}
+			if modelImageURL == "" {
+				modelImageURL = decorModel.ImageURL
+			}
+		}
+
+		// Jika ada paket terkait, cek harga tambahan dari relasi package_models
+		if agenda.PackageID != "" && modelAdditionalPrice <= 0 {
+			var pkgModel models.PackageDecorationModel
+			if err := config.DB.Where("package_id = ? AND decoration_model_id = ?", agenda.PackageID, modelID).First(&pkgModel).Error; err == nil {
+				modelAdditionalPrice = pkgModel.AdditionalPrice
+			}
+		}
+	} else {
+		// Kosongkan model jika tidak ada modelID
+		modelName = ""
+		modelWidth = ""
+		modelImageURL = ""
+		modelAdditionalPrice = 0
+	}
+
+	agenda.ModelID = modelID
+	agenda.ModelName = modelName
+	agenda.ModelWidth = modelWidth
+	agenda.ModelImageURL = modelImageURL
+	agenda.ModelAdditionalPrice = modelAdditionalPrice
+	agenda.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate model dekorasi agenda: " + err.Error(),
+		})
+	}
+
+	// Reload with ClientForm
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Model dekorasi berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaNotes handles PUT /api/agendas/:id/notes
+func UpdateAgendaNotes(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdateNotesRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var agenda models.Agenda
+	query := config.DB.Where("id = ?", id)
+	if userRole != "superadmin" && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	// Cek apakah agenda sudah selesai
+	if strings.ToLower(agenda.Status) == "completed" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai, catatan / request tambahan tidak dapat diubah",
+		})
+	}
+
+	newNotes := strings.TrimSpace(req.Notes)
+	agenda.Notes = newNotes
+	agenda.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate catatan agenda: " + err.Error(),
+		})
+	}
+
+	// Update ClientForm jika ada agar tetap sinkron
+	var clientForm models.ClientForm
+	if err := config.DB.Where("agenda_id = ?", id).First(&clientForm).Error; err == nil {
+		clientForm.SpecialRequests = newNotes
+		config.DB.Save(&clientForm)
+	}
+
+	// Reload with ClientForm
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Catatan agenda berhasil diperbarui",
 		"data":    agenda,
 	})
 }

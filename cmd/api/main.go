@@ -59,6 +59,8 @@ func main() {
 	api.Put("/agendas/:id/dp", middleware.Protected(), handlers.UpdateAgendaDp)
 	api.Put("/agendas/:id/transport", middleware.Protected(), handlers.UpdateAgendaTransport)
 	api.Put("/agendas/:id/package", middleware.Protected(), handlers.UpdateAgendaPackage)
+	api.Put("/agendas/:id/model", middleware.Protected(), handlers.UpdateAgendaModel)
+	api.Put("/agendas/:id/notes", middleware.Protected(), handlers.UpdateAgendaNotes)
 	api.Put("/agendas/:id/payment-status", middleware.Protected(), handlers.UpdateAgendaPaymentStatus)
 	api.Put("/agendas/:id/status", middleware.Protected(), handlers.UpdateAgendaStatus)
 	api.Delete("/agendas/:id", middleware.Protected(), handlers.DeleteAgenda)
