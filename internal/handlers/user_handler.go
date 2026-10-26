@@ -165,6 +165,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	if err := config.DB.Create(&newUser).Error; err != nil {
+		fmt.Println("❌ CreateUser DB error:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal menyimpan akun baru ke database",
 		})

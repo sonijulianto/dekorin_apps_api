@@ -65,6 +65,17 @@ func ConnectDB() {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
 	}
 
+	// Hapus unique index lama pada kolom email (sisa skema awal: `email uniqueIndex`).
+	// AutoMigrate tidak menghapus index lama, sehingga anggota tim tanpa email
+	// (email = '') bentrok satu sama lain dan gagal disimpan.
+	if DB.Migrator().HasIndex(&models.User{}, "idx_users_email") {
+		if err := DB.Migrator().DropIndex(&models.User{}, "idx_users_email"); err != nil {
+			log.Println("⚠️ Gagal menghapus unique index idx_users_email: ", err)
+		} else {
+			log.Println("✅ Unique index lama idx_users_email berhasil dihapus")
+		}
+	}
+
 	// Menjalankan Seeding otomatis
 	SeedCompany(db)
 	SeedUsers(db)
