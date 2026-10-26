@@ -3,318 +3,379 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Detail Acara — Dekorin</title>
+  <title>Detail Booking & Konfirmasi Acara — {{.ClientName}}</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .package-card.selected { border-color: #f59e0b; background-color: #fffbeb; ring: 2px; ring-color: #f59e0b; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FAF7F2;
+      color: #2C2C2C;
+    }
+    .font-serif-title {
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+    @media print {
+      body {
+        background-color: #ffffff;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-shadow-none {
+        box-shadow: none !important;
+      }
+      .print-break-inside-avoid {
+        break-inside: avoid;
+      }
+    }
   </style>
 </head>
-<body class="bg-amber-50/40 min-h-screen pb-12">
+<body class="min-h-screen pb-14 antialiased">
 
-  <!-- Header Branding -->
-  <header class="bg-white border-b border-amber-100 shadow-sm py-4 px-6 sticky top-0 z-10">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center shadow-sm">
-          D
-        </div>
+  <!-- ============================================== -->
+  <!-- TOP BAR / BRANDING                             -->
+  <!-- ============================================== -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-[#D4A574]/20 py-3.5 px-4 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-lg mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        {{if .CompanyLogo}}
+          <img src="{{.CompanyLogo}}" alt="{{.CompanyName}}" class="w-10 h-10 rounded-xl object-cover border border-[#D4A574]/30">
+        {{else}}
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4A574] to-[#C59563] text-white font-bold flex items-center justify-center text-base shadow-sm">
+            ✨
+          </div>
+        {{end}}
         <div>
-          <h1 class="font-bold text-gray-900 text-lg leading-tight">Dekorin</h1>
-          <p class="text-xs text-amber-600 font-medium">Form Konfirmasi Acara</p>
+          <h1 class="font-bold text-slate-900 text-sm leading-tight">{{.CompanyName}}</h1>
+          <p class="text-[11px] text-[#C59563] font-semibold tracking-wide">Detail & Konfirmasi Booking</p>
         </div>
       </div>
-      <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full">Client Web Form</span>
+      <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 bg-[#F9F3EC] text-[#C59563] rounded-full border border-[#D4A574]/30">
+        <span>✓</span> Terverifikasi
+      </span>
     </div>
   </header>
 
-  <main class="max-w-md mx-auto px-4 mt-6">
+  <main class="max-w-lg mx-auto px-4 mt-5 space-y-4">
 
-    <!-- Card Ringkasan Acara -->
-    <div class="bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl p-5 shadow-md mb-6">
-      <p class="text-amber-100 text-xs font-medium uppercase tracking-wider mb-1">Acara Anda</p>
-      <h2 class="text-xl font-bold mb-1">{{.ClientName}}</h2>
-      <p class="text-amber-100 text-sm font-semibold mb-3">{{.BackdropTitle}}</p>
-      
-      <div class="border-t border-amber-400/50 pt-3 flex flex-col gap-1 text-xs text-amber-50">
-        <div class="flex items-center gap-2">
-          <span>📅</span>
-          <span>{{.EventDateTimeFormatted}}</span>
+    <!-- ============================================== -->
+    <!-- HERO CARD: JUDUL BACKDROP & PEMESAN            -->
+    <!-- ============================================== -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#C59563] via-[#D4A574] to-[#B88755] text-white p-6 shadow-xl shadow-[#D4A574]/20">
+      <!-- Decorative floral subtle background circles -->
+      <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+      <div class="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-white/10 blur-lg pointer-events-none"></div>
+
+      <div class="relative z-10 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-white/80 bg-black/15 px-2.5 py-1 rounded-full backdrop-blur-xs">
+            Konfirmasi Pesanan Dekorasi
+          </span>
+          <span class="text-[11px] font-mono text-white/90">
+            ID: {{.FormToken}}
+          </span>
         </div>
-      </div>
-    </div>
 
-    <!-- Status jika sudah pernah diisi -->
-    {{if eq .FormStatus "filled"}}
-    <div id="alreadyFilledState" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center mb-6 shadow-sm">
-      <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
-        ✓
-      </div>
-      <h3 class="font-bold text-emerald-900 text-lg mb-1">Form Sudah Terisi</h3>
-      <p class="text-xs text-emerald-700">Terima kasih! Detail acara Anda sudah kami terima. Tim Dekorin sedang menyiapkan dekorasi terbaik untuk Anda.</p>
-    </div>
-    {{end}}
+        <div>
+          <span class="text-[11px] text-white/80 font-medium block">Nama di Backdrop / Tulisan:</span>
+          <h2 class="font-serif-title text-2xl sm:text-3xl font-bold leading-tight mt-0.5 text-white tracking-wide">
+            {{if .BackdropTitle}}{{.BackdropTitle}}{{else}}{{.ClientName}}{{end}}
+          </h2>
+        </div>
 
-    <!-- Form Pengisian -->
-    <form id="clientForm" class="bg-white rounded-2xl p-6 shadow-sm border border-amber-100/80 space-y-6 {{if eq .FormStatus "filled"}}hidden{{end}}">
-      
-      <div>
-        <h3 class="font-bold text-gray-900 text-base mb-1">Lengkapi Detail Acara</h3>
-        <p class="text-xs text-gray-500">Mohon isi data di bawah ini agar tim kami dapat mempersiapkan dekorasi dengan maksimal.</p>
-      </div>
-
-      <!-- Alamat Acara -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-1.5" for="eventAddress">
-          Alamat Lengkap / Lokasi Acara <span class="text-red-500">*</span>
-        </label>
-        <textarea id="eventAddress" name="event_address" rows="3" required
-          class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800 placeholder-gray-400 transition"
-          placeholder="Contoh: Jl. Mawar No. 12, RT 02/05, Kedunya, Gedung/Rumah..."></textarea>
-      </div>
-
-      <!-- Pilihan Paket Dekorasi -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-2">
-          Pilih Paket Dekorasi
-        </label>
-        <div class="space-y-3" id="packageList">
-          {{range .Packages}}
-          <div class="package-card border border-gray-200 rounded-xl p-3.5 cursor-pointer transition flex gap-3 items-center" data-id="{{.ID}}" data-price="{{.BasePrice}}" data-name="{{.Name}}">
-            {{if .ImageURL}}
-            <img src="{{.ImageURL}}" alt="{{.Name}}" class="w-16 h-16 object-cover rounded-lg flex-shrink-0 bg-gray-100 border">
-            {{else}}
-            <div class="w-16 h-16 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-lg flex-shrink-0">📦</div>
-            {{end}}
-            <div class="flex-grow">
-              <div class="flex justify-between items-start">
-                <h4 class="font-bold text-gray-900 text-xs">{{.Name}}</h4>
-                <span class="text-xs font-semibold text-amber-600">Rp {{printf "%.0f" .BasePrice}}</span>
-              </div>
-              <p class="text-[11px] text-gray-500 mt-1 line-clamp-2">{{.Description}}</p>
+        <div class="pt-3 border-t border-white/20 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-white/95">
+          <div class="flex items-center gap-2">
+            <span class="text-base">👤</span>
+            <div>
+              <span class="text-[10px] text-white/70 block">Atas Nama Pemesan:</span>
+              <span class="font-bold text-white text-xs">{{.ClientName}}</span>
+            </div>
+          </div>
+          {{if .ClientPhone}}
+          <div class="flex items-center gap-2">
+            <span class="text-base">📞</span>
+            <div>
+              <span class="text-[10px] text-white/70 block">Kontak WhatsApp:</span>
+              <span class="font-bold text-white text-xs font-mono">{{.ClientPhone}}</span>
             </div>
           </div>
           {{end}}
         </div>
-      </div>
 
-      <!-- Pilihan Addon (Tambahan) -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-2">
-          Item Tambahan (Addon - Opsional)
-        </label>
-        <div class="space-y-2.5" id="addonList">
-          {{range .Addons}}
-          <label class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-amber-400 transition">
-            <input type="checkbox" class="addon-checkbox w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500" value="{{.ID}}" data-price="{{.Price}}" data-name="{{.Name}}">
-            {{if .ImageURL}}
-            <img src="{{.ImageURL}}" alt="{{.Name}}" class="w-10 h-10 object-cover rounded-md flex-shrink-0 bg-gray-100">
-            {{else}}
-            <div class="w-10 h-10 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs flex-shrink-0">✨</div>
-            {{end}}
-            <div class="flex-grow">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-semibold text-gray-800">{{.Name}}</span>
-                <span class="text-xs text-amber-600 font-semibold">+Rp {{printf "%.0f" .Price}}</span>
-              </div>
-              {{if .Description}}<p class="text-[10px] text-gray-400 mt-0.5">{{.Description}}</p>{{end}}
+        <div class="p-3 rounded-2xl bg-black/15 backdrop-blur-xs flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">📅</span>
+            <div>
+              <span class="text-[10px] text-white/70 block font-medium">Waktu & Tanggal Acara:</span>
+              <span class="font-bold text-white text-xs sm:text-sm">{{.EventDateFormatted}}</span>
             </div>
-          </label>
-          {{end}}
+          </div>
+          <div class="text-right border-l border-white/20 pl-3">
+            <span class="text-[10px] text-white/70 block font-medium">Jam:</span>
+            <span class="font-bold text-white text-xs font-mono">{{.EventTimeFormatted}}</span>
+          </div>
         </div>
-      </div>
-
-      <!-- Live Total Invoice Summary Box -->
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
-        <div class="text-xs font-bold text-amber-900 border-b border-amber-200 pb-1.5 flex justify-between">
-          <span>Ringkasan Estimasi Biaya</span>
-          <span>Estimasi Total</span>
-        </div>
-        <div class="flex justify-between text-xs text-gray-600">
-          <span>Paket Dekorasi:</span>
-          <span id="summaryPackageText" class="font-medium text-gray-800">Belum dipilih</span>
-        </div>
-        <div class="flex justify-between text-xs text-gray-600">
-          <span>Tambahan (Addon):</span>
-          <span id="summaryAddonText" class="font-medium text-gray-800">Rp 0</span>
-        </div>
-        <div class="pt-2 border-t border-amber-200 flex justify-between items-center text-sm font-bold text-amber-900">
-          <span>Total Invoice:</span>
-          <span id="summaryTotalPrice" class="text-base text-amber-700">Rp 0</span>
-        </div>
-      </div>
-
-      <!-- Tema Dekorasi -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-1.5" for="decorationTheme">
-          Tema / Gaya Dekorasi yang Diinginkan
-        </label>
-        <select id="decorationTheme" name="decoration_theme"
-          class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800 transition">
-          <option value="Modern Rustic">Modern Rustic (Kayu & Bunga Kering)</option>
-          <option value="Minimalis Elegant">Minimalis Elegant (Putih & Gold)</option>
-          <option value="Glamour Classic">Glamour Classic (Kemewahan Penuh Bunga)</option>
-          <option value="Garden / Floral">Garden / Outdoor Floral</option>
-          <option value="Custom Theme">Custom (Sesuai Diskusi)</option>
-        </select>
-      </div>
-
-      <!-- Preferensi Warna -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-1.5" for="colorPreference">
-          Preferensi / Kombinasi Warna Favorit
-        </label>
-        <input type="text" id="colorPreference" name="color_preference"
-          class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800 placeholder-gray-400 transition"
-          placeholder="Contoh: Sage Green & White Cream, Rose Gold, Pastel">
-      </div>
-
-      <!-- Link Foto Inspirasi / Referensi -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-1.5" for="referencePhotoUrl">
-          Link Foto Inspirasi / Pinterest (Opsional)
-        </label>
-        <input type="url" id="referencePhotoUrl" name="reference_photo_url"
-          class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800 placeholder-gray-400 transition"
-          placeholder="https://pinterest.com/pin/...">
-      </div>
-
-      <!-- Catatan Khusus -->
-      <div>
-        <label class="block text-xs font-bold text-gray-700 mb-1.5" for="specialRequests">
-          Catatan & Permintaan Khusus
-        </label>
-        <textarea id="specialRequests" name="special_requests" rows="3"
-          class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800 placeholder-gray-400 transition"
-          placeholder="Contoh: Minta tempat foto tambahan, butuh standing flower lebih dekat pintu, dll..."></textarea>
-      </div>
-
-      <!-- Error Alert -->
-      <div id="errorAlert" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-medium"></div>
-
-      <!-- Submit Button -->
-      <button type="submit" id="btnSubmit"
-        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition transform active:scale-[0.99] text-sm flex items-center justify-center gap-2">
-        <span>Kirim Detail Acara</span>
-      </button>
-
-    </form>
-
-    <!-- State Sukses -->
-    <div id="successState" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-emerald-100 text-center space-y-4">
-      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
-        ✓
-      </div>
-      <div>
-        <h3 class="font-bold text-gray-900 text-lg">Berhasil Dikirim!</h3>
-        <p class="text-xs text-gray-500 mt-1">Data acara Anda telah tersimpan. Tim Dekorin akan segera menghubungi Anda jika ada hal yang perlu dikonfirmasi kembali.</p>
-      </div>
-      <div class="pt-2 border-t border-gray-100">
-        <p class="text-xs text-amber-600 font-semibold">Salam hangat dari Tim Dekorin ✨</p>
       </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- STATUS PEMBAYARAN CARD                         -->
+    <!-- ============================================== -->
+    {{if .IsPaidOff}}
+    <div class="bg-white rounded-2xl p-4 border border-emerald-200 shadow-sm flex items-center gap-3.5">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-black text-2xl flex items-center justify-center shrink-0">
+        ✓
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-600 block">Status Pembayaran</span>
+        <h3 class="text-sm font-bold text-emerald-900">LUNAS (Terverifikasi)</h3>
+        <p class="text-[11px] text-emerald-700 mt-0.5">Seluruh pembayaran acara Anda telah lunas. Terima kasih atas kepercayaan Anda!</p>
+      </div>
+    </div>
+    {{else if .HasDP}}
+    <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💳</span>
+          <div>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-700 block">Status Pembayaran</span>
+            <h3 class="text-xs font-bold text-slate-900">UANG MUKA (DP) DITERIMA</h3>
+          </div>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+          DP Terbayar
+        </span>
+      </div>
+      <div class="p-3 bg-[#F9F3EC]/70 rounded-xl grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <span class="text-[10px] text-slate-500 block">DP yang Sudah Masuk:</span>
+          <span class="font-bold text-emerald-600 font-mono text-sm">{{.DpAmountFormatted}}</span>
+        </div>
+        <div class="text-right border-l border-amber-200/50 pl-2">
+          <span class="text-[10px] text-slate-500 block">Sisa Tagihan:</span>
+          <span class="font-bold text-rose-600 font-mono text-sm">{{.RemainingFormatted}}</span>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-3.5">
+      <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 font-bold text-xl flex items-center justify-center shrink-0">
+        ⏳
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">Status Pembayaran</span>
+        <h3 class="text-xs font-bold text-slate-900">Menunggu Pembayaran Uang Muka (DP)</h3>
+        <p class="text-[11px] text-slate-500 mt-0.5">Silakan hubungi vendor kami untuk pembayaran DP agar tanggal Anda terkunci secara resmi.</p>
+      </div>
+    </div>
+    {{end}}
+
+    <!-- ============================================== -->
+    <!-- TEMPAT / LOKASI ACARA                          -->
+    <!-- ============================================== -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3 print-break-inside-avoid">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span>📍</span> Tempat & Lokasi Acara
+        </h3>
+      </div>
+
+      {{if .MapsURL}}
+      <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex-1 min-w-0">
+          <span class="text-[11px] text-slate-500 block">Link Google Maps / Alamat Venue:</span>
+          <span class="text-xs font-semibold text-slate-800 break-all">{{.MapsURL}}</span>
+        </div>
+        <a href="{{.MapsURL}}" target="_blank" rel="noopener noreferrer"
+          class="no-print inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-sm shrink-0">
+          <span>🗺️</span> Buka Petunjuk Arah
+        </a>
+      </div>
+      {{else}}
+      <p class="text-xs text-slate-500 italic bg-slate-50 p-3 rounded-xl border border-slate-100">
+        Lokasi venue belum diisi di sistem / koordinasikan langsung dengan vendor dekorasi.
+      </p>
+      {{end}}
+    </div>
+
+    <!-- ============================================== -->
+    <!-- PAKET DEKORASI YANG DIPILIH                    -->
+    <!-- ============================================== -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3.5 print-break-inside-avoid">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span>💐</span> Paket Dekorasi yang Dipilih
+        </h3>
+        <span class="text-xs font-bold text-[#C59563] font-mono">{{.PackagePriceFormatted}}</span>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC]/80 to-[#F5EBE1]/40 border border-[#D4A574]/20 space-y-2">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h4 class="text-sm font-bold text-slate-900">{{if .PackageName}}{{.PackageName}}{{else}}Paket Khusus/Custom{{end}}</h4>
+            <span class="text-[11px] text-[#C59563] font-medium">Harga Dasar: {{.PackagePriceFormatted}}</span>
+          </div>
+          {{if .PackageImage}}
+          <img src="{{.PackageImage}}" alt="{{.PackageName}}" class="w-14 h-14 rounded-xl object-cover border border-[#D4A574]/20 shrink-0">
+          {{end}}
+        </div>
+
+        {{if .PackageDesc}}
+        <div class="pt-2 border-t border-[#D4A574]/20 text-xs text-slate-600 leading-relaxed">
+          <span class="font-semibold text-[11px] text-slate-700 block mb-0.5">Kelengkapan & Fasilitas Paket:</span>
+          <p class="whitespace-pre-line">{{.PackageDesc}}</p>
+        </div>
+        {{end}}
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODEL PELAMINAN / BACKDROP YANG DIPILIH        -->
+    <!-- ============================================== -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3.5 print-break-inside-avoid">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span>🖼️</span> Model Pelaminan / Backdrop
+        </h3>
+        {{if .ModelWidth}}
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30">
+          Lebar: {{.ModelWidth}}
+        </span>
+        {{end}}
+      </div>
+
+      {{if .ModelName}}
+      <div class="space-y-3">
+        {{if .ModelImageURL}}
+        <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative group">
+          <img src="{{.ModelImageURL}}" alt="{{.ModelName}}" class="w-full h-56 sm:h-72 object-cover transition duration-300 group-hover:scale-[1.02]">
+        </div>
+        {{end}}
+
+        <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+          <div>
+            <div class="text-xs font-bold text-slate-900">{{.ModelName}}</div>
+            <div class="text-[11px] text-slate-500">
+              {{if .ModelWidth}}Ukuran Backdrop: {{.ModelWidth}}{{else}}Ukuran standar pelaminan{{end}}
+            </div>
+          </div>
+          {{if gt .ModelAddPrice 0.0}}
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 block font-medium">Biaya Tambahan:</span>
+            <span class="text-xs font-bold text-amber-700 font-mono">+{{.ModelAddPriceFormatted}}</span>
+          </div>
+          {{else}}
+          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            Termasuk dalam paket
+          </span>
+          {{end}}
+        </div>
+      </div>
+      {{else}}
+      <div class="p-4 rounded-xl bg-slate-50 text-center text-xs text-slate-400 border border-slate-100">
+        Model dekorasi akan dipilih langsung saat konsultasi bersama tim desainer kami.
+      </div>
+      {{end}}
+    </div>
+
+    <!-- ============================================== -->
+    <!-- RINCIAN BIAYA & REKAP PEMBAYARAN (INVOICE)     -->
+    <!-- ============================================== -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-4 print-break-inside-avoid">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span>💳</span> Rincian Biaya & Pembayaran
+        </h3>
+        <span class="text-[10px] font-mono text-slate-400">Invoice ID: {{.FormToken}}</span>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between py-1 text-slate-600">
+          <span>Paket Dekorasi ({{if .PackageName}}{{.PackageName}}{{else}}Dasar{{end}}):</span>
+          <span class="font-mono font-semibold text-slate-800">{{.PackagePriceFormatted}}</span>
+        </div>
+
+        {{if gt .ModelAddPrice 0.0}}
+        <div class="flex justify-between py-1 text-slate-600">
+          <span>Upgrade Model ({{.ModelName}}):</span>
+          <span class="font-mono font-semibold text-amber-700">+ {{.ModelAddPriceFormatted}}</span>
+        </div>
+        {{end}}
+
+        {{if gt .TransportFee 0.0}}
+        <div class="flex justify-between py-1 text-slate-600">
+          <span>Biaya Transport / Luar Kota:</span>
+          <span class="font-mono font-semibold text-slate-800">+ {{.TransportFeeFormatted}}</span>
+        </div>
+        {{end}}
+
+        <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-sm font-bold text-slate-900">
+          <span>Total Biaya Keseluruhan:</span>
+          <span class="text-base font-mono font-black text-slate-900">{{.TotalCostFormatted}}</span>
+        </div>
+
+        <div class="p-3 rounded-xl bg-[#F9F3EC]/70 border border-[#D4A574]/20 space-y-1.5 mt-2">
+          <div class="flex justify-between text-xs text-slate-700">
+            <span>Uang Muka (DP) yang Telah Masuk:</span>
+            <span class="font-mono font-bold text-emerald-700">{{.DpAmountFormatted}}</span>
+          </div>
+          <div class="flex justify-between text-xs font-bold pt-1 border-t border-[#D4A574]/20">
+            <span class="{{if .IsPaidOff}}text-emerald-700{{else}}text-rose-700{{end}}">Sisa Pembayaran / Kekurangan:</span>
+            <span class="font-mono text-sm {{if .IsPaidOff}}text-emerald-700{{else}}text-rose-700{{end}}">
+              {{if .IsPaidOff}}Rp 0 (LUNAS){{else}}{{.RemainingFormatted}}{{end}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- CATATAN KHUSUS ACARA                           -->
+    <!-- ============================================== -->
+    {{if .Notes}}
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-2 print-break-inside-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+        <span>📝</span> Catatan & Preferensi Khusus
+      </h3>
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed whitespace-pre-line">
+        {{.Notes}}
+      </div>
+    </div>
+    {{end}}
+
+    <!-- ============================================== -->
+    <!-- AKSI: HUBUNGI WA & PRINT                       -->
+    <!-- ============================================== -->
+    <div class="no-print space-y-2.5 pt-2">
+      {{if .CompanyPhoneClean}}
+      <a href="https://wa.me/{{.CompanyPhoneClean}}?text=Halo%20{{.CompanyName}},%20saya%20atas%20nama%20{{.ClientName}}%20ingin%20konfirmasi%20mengenai%20booking%20dekorasi%20acara%20kami%20(ID:%20{{.FormToken}})."
+        target="_blank" rel="noopener noreferrer"
+        class="w-full py-3.5 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/20 transition transform active:scale-[0.99]">
+        <span class="text-base">💬</span>
+        <span>Hubungi Vendor via WhatsApp</span>
+      </a>
+      {{end}}
+
+      <button type="button" onclick="window.print()"
+        class="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 border border-slate-200 shadow-xs transition">
+        <span>🖨️</span>
+        <span>Simpan / Cetak Bukti Booking (PDF)</span>
+      </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- FOOTER                                         -->
+    <!-- ============================================== -->
+    <footer class="pt-6 pb-4 text-center text-xs text-slate-400 space-y-1">
+      <p class="font-semibold text-slate-600">{{.CompanyName}}</p>
+      {{if .CompanyAddress}}<p class="text-[11px] text-slate-400">{{.CompanyAddress}}</p>{{end}}
+      <p class="text-[10px] text-slate-400 pt-1">Dokumen ini merupakan konfirmasi pemesanan resmi yang tercatat di sistem Dekorin.</p>
+    </footer>
+
   </main>
 
-  <script>
-    const form = document.getElementById('clientForm');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const errorAlert = document.getElementById('errorAlert');
-    const successState = document.getElementById('successState');
-    const token = '{{.FormToken}}';
-
-    let selectedPackageId = '';
-    let selectedPackagePrice = 0;
-    let selectedPackageName = '';
-
-    const formatRupiah = (number) => {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
-    };
-
-    // Handle package selection
-    const packageCards = document.querySelectorAll('.package-card');
-    packageCards.forEach(card => {
-      card.addEventListener('click', () => {
-        packageCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        
-        selectedPackageId = card.dataset.id;
-        selectedPackagePrice = parseFloat(card.dataset.price) || 0;
-        selectedPackageName = card.dataset.name;
-
-        updateTotalSummary();
-      });
-    });
-
-    // Handle addon selection
-    const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
-    addonCheckboxes.forEach(cb => {
-      cb.addEventListener('change', () => {
-        updateTotalSummary();
-      });
-    });
-
-    function updateTotalSummary() {
-      let addonTotal = 0;
-      addonCheckboxes.forEach(cb => {
-        if (cb.checked) {
-          addonTotal += parseFloat(cb.dataset.price) || 0;
-        }
-      });
-
-      const summaryPackageText = document.getElementById('summaryPackageText');
-      const summaryAddonText = document.getElementById('summaryAddonText');
-      const summaryTotalPrice = document.getElementById('summaryTotalPrice');
-
-      summaryPackageText.textContent = selectedPackageId ? `${selectedPackageName} (${formatRupiah(selectedPackagePrice)})` : 'Belum dipilih';
-      summaryAddonText.textContent = formatRupiah(addonTotal);
-      summaryTotalPrice.textContent = formatRupiah(selectedPackagePrice + addonTotal);
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorAlert.classList.add('hidden');
-
-      const selectedAddonIds = Array.from(addonCheckboxes)
-        .filter(cb => cb.checked)
-        .map(cb => cb.value);
-
-      btnSubmit.disabled = true;
-      btnSubmit.innerHTML = '<span>Sending...</span>';
-
-      const payload = {
-        event_address: document.getElementById('eventAddress').value.trim(),
-        package_id: selectedPackageId,
-        addon_ids: selectedAddonIds,
-        decoration_theme: document.getElementById('decorationTheme').value,
-        color_preference: document.getElementById('colorPreference').value.trim(),
-        reference_photo_url: document.getElementById('referencePhotoUrl').value.trim(),
-        special_requests: document.getElementById('specialRequests').value.trim()
-      };
-
-      try {
-        const response = await fetch('/api/client-form/' + token, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          form.classList.add('hidden');
-          successState.classList.remove('hidden');
-        } else {
-          throw new Error(data.error || 'Gagal menyimpan form');
-        }
-      } catch (err) {
-        errorAlert.textContent = err.message;
-        errorAlert.classList.remove('hidden');
-        btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<span>Kirim Detail Acara</span>';
-      }
-    });
-  </script>
 </body>
 </html>

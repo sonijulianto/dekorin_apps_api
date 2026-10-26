@@ -2553,10 +2553,6 @@
                     'unpaid': { label: 'Belum Bayar', bg: 'bg-slate-100 text-slate-600 border-slate-200' }
                 }[a.payment_status] || { label: 'Belum Bayar', bg: 'bg-slate-100 text-slate-600 border-slate-200' };
 
-                const formBadge = (a.form_status === 'filled') 
-                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">✓ Form Terisi</span>`
-                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60">⏳ Form Pending</span>`;
-
                 let dateDisplay = '-';
                 let timeDisplay = '';
                 if (a.event_date_time) {
@@ -2636,7 +2632,6 @@
                                 <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border ${paymentConfig.bg}">
                                     ${paymentConfig.label}
                                 </span>
-                                ${formBadge}
                             </div>
                             ${a.dp_amount > 0 ? `<div class="text-[10px] font-mono text-emerald-600">DP: Rp ${Number(a.dp_amount).toLocaleString('id-ID')}</div>` : ''}
                         </td>
@@ -2656,7 +2651,7 @@
                         <!-- Aksi -->
                         <td class="py-3.5 px-5 text-right">
                             <div class="flex items-center justify-end gap-1.5">
-                                <button onclick="copyClientFormLink('${a.form_token}')" title="Salin Link Form Kustom Klien"
+                                <button onclick="copyClientFormLink('${a.form_token}')" title="Salin Link Detail Booking Klien"
                                     class="p-2 rounded-xl bg-[#F9F3EC] text-[#C59563] hover:bg-[#F4ECE2] hover:text-[#B38352] transition font-bold text-xs">
                                     🔗
                                 </button>
@@ -2987,9 +2982,9 @@
             }
             const formUrl = window.location.origin + '/form/' + formToken;
             navigator.clipboard.writeText(formUrl).then(() => {
-                alert('Link Form Kustom Klien berhasil disalin ke clipboard:\n' + formUrl + '\n\nAnda dapat mengirimkan link ini langsung ke WhatsApp klien.');
+                alert('Link Detail Booking Klien berhasil disalin ke clipboard:\n' + formUrl + '\n\nAnda dapat mengirimkan link ini langsung ke WhatsApp klien agar klien dapat melihat rincian pesanan dan status pembayarannya.');
             }).catch(err => {
-                prompt('Salin link form klien berikut:', formUrl);
+                prompt('Salin link detail booking berikut:', formUrl);
             });
         }
 

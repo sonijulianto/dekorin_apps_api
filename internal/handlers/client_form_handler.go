@@ -13,7 +13,47 @@ import (
 	"github.com/google/uuid"
 )
 
-// ShowClientForm menangani GET /form/:token (menampilkan Halaman HTML Form Publik)
+// BookingDetailViewData adalah data yang dipassing ke halaman web invoice/detail pesanan klien
+type BookingDetailViewData struct {
+	CompanyName            string
+	CompanyPhone           string
+	CompanyPhoneClean      string
+	CompanyAddress         string
+	CompanyLogo            string
+	ClientName             string
+	ClientPhone            string
+	BackdropTitle          string
+	EventDateFormatted     string
+	EventTimeFormatted     string
+	MapsURL                string
+	PackageName            string
+	PackageDesc            string
+	PackageImage           string
+	PackagePrice           float64
+	PackagePriceFormatted  string
+	ModelName              string
+	ModelWidth             string
+	ModelImageURL          string
+	ModelAddPrice          float64
+	ModelAddPriceFormatted string
+	TransportFee           float64
+	TransportFeeFormatted  string
+	TotalCost              float64
+	TotalCostFormatted     string
+	DpAmount               float64
+	DpAmountFormatted      string
+	RemainingPayment       float64
+	RemainingFormatted     string
+	PaymentStatus          string
+	PaymentStatusLabel     string
+	IsPaidOff              bool
+	HasDP                  bool
+	Status                 string
+	Notes                  string
+	FormToken              string
+}
+
+// ShowClientForm menangani GET /form/:token (menampilkan Halaman Detail & Konfirmasi Booking Klien)
 func ShowClientForm(c *fiber.Ctx) error {
 	token := c.Params("token")
 	if strings.TrimSpace(token) == "" {
@@ -22,37 +62,139 @@ func ShowClientForm(c *fiber.Ctx) error {
 
 	var agenda models.Agenda
 	if err := config.DB.Where("form_token = ?", token).First(&agenda).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).SendString("Form tidak ditemukan atau tautan sudah kadaluarsa.")
+		return c.Status(fiber.StatusNotFound).SendString("Data pesanan / booking tidak ditemukan atau tautan sudah tidak aktif.")
 	}
 
-	// Fetch semua paket & addons master dari DB
-	var packages []models.Package
-	config.DB.Order("base_price ASC").Find(&packages)
+	// Ambil data Vendor / Perusahaan
+	var company models.Company
+	if agenda.CompanyID != "" {
+		config.DB.Where("id = ?", agenda.CompanyID).First(&company)
+	}
+	if company.Name == "" {
+		company.Name = "Dekorin Organizer"
+	}
 
-	var addons []models.Addon
-	config.DB.Order("price ASC").Find(&addons)
+	// Bersihkan nomor WhatsApp vendor
+	companyPhoneClean := strings.Map(func(r rune) rune {
+		if r >= '0' && r <= '9' {
+			return r
+		}
+		return -1
+	}, company.Phone)
+	if strings.HasPrefix(companyPhoneClean, "0") {
+		companyPhoneClean = "62" + companyPhoneClean[1:]
+	}
 
-	// Format tanggal untuk tampilan
-	formattedDate := agenda.EventDateTime.Format("02 January 2006, 15:04 WIB")
+	// Ambil deskripsi & banner paket jika ada
+	packageDesc := ""
+	packageImage := ""
+	if agenda.PackageID != "" {
+		var pkg models.Package
+		if err := config.DB.Where("id = ?", agenda.PackageID).First(&pkg).Error; err == nil {
+			packageDesc = pkg.Description
+			packageImage = pkg.ImageURL
+		}
+	}
 
-	data := struct {
-		ClientName             string
-		BackdropTitle          string
-		EventDateTimeFormatted string
-		PackageName            string
-		FormStatus             string
-		FormToken              string
-		Packages               []models.Package
-		Addons                 []models.Addon
-	}{
+	// Ambil foto & lebar model dekorasi jika ada
+	modelImg := agenda.ModelImageURL
+	modelWidth := agenda.ModelWidth
+	modelName := agenda.ModelName
+	if agenda.ModelID != "" {
+		var decorModel models.DecorationModel
+		if err := config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error; err == nil {
+			if modelImg == "" {
+				modelImg = decorModel.ImageURL
+			}
+			if modelWidth == "" {
+				modelWidth = decorModel.Width
+			}
+			if modelName == "" {
+				modelName = decorModel.Name
+			}
+		}
+	}
+
+	// Helper format Rupiah
+	formatRupiah := func(val float64) string {
+		s := fmt.Sprintf("%.0f", val)
+		n := len(s)
+		if n <= 3 {
+			return "Rp " + s
+		}
+		var res []string
+		remainder := n % 3
+		if remainder > 0 {
+			res = append(res, s[:remainder])
+		}
+		for i := remainder; i < n; i += 3 {
+			res = append(res, s[i:i+3])
+		}
+		return "Rp " + strings.Join(res, ".")
+	}
+
+	// Format tanggal Indonesia
+	days := []string{"Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"}
+	months := []string{"", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"}
+	t := agenda.EventDateTime
+	dateFormatted := fmt.Sprintf("%s, %02d %s %d", days[t.Weekday()], t.Day(), months[t.Month()], t.Year())
+	timeFormatted := fmt.Sprintf("%02d:%02d WIB", t.Hour(), t.Minute())
+
+	// Hitung total dan sisa pembayaran
+	totalCost := agenda.PackagePrice + agenda.ModelAdditionalPrice + agenda.TransportFee
+	dpAmount := agenda.DpAmount
+	remainingPayment := totalCost - dpAmount
+	if remainingPayment < 0 {
+		remainingPayment = 0
+	}
+
+	isPaidOff := strings.EqualFold(agenda.PaymentStatus, "paid") || (totalCost > 0 && dpAmount >= totalCost)
+	hasDP := dpAmount > 0 && !isPaidOff
+
+	paymentStatusLabel := "Belum Bayar"
+	if isPaidOff {
+		paymentStatusLabel = "LUNAS"
+	} else if hasDP {
+		paymentStatusLabel = "DP TERBAYAR"
+	}
+
+	data := BookingDetailViewData{
+		CompanyName:            company.Name,
+		CompanyPhone:           company.Phone,
+		CompanyPhoneClean:      companyPhoneClean,
+		CompanyAddress:         company.Address,
+		CompanyLogo:            company.LogoURL,
 		ClientName:             agenda.ClientName,
+		ClientPhone:            agenda.ClientPhone,
 		BackdropTitle:          agenda.BackdropTitle,
-		EventDateTimeFormatted: formattedDate,
+		EventDateFormatted:     dateFormatted,
+		EventTimeFormatted:     timeFormatted,
+		MapsURL:                agenda.MapsURL,
 		PackageName:            agenda.PackageName,
-		FormStatus:             agenda.FormStatus,
+		PackageDesc:            packageDesc,
+		PackageImage:           packageImage,
+		PackagePrice:           agenda.PackagePrice,
+		PackagePriceFormatted:  formatRupiah(agenda.PackagePrice),
+		ModelName:              modelName,
+		ModelWidth:             modelWidth,
+		ModelImageURL:          modelImg,
+		ModelAddPrice:          agenda.ModelAdditionalPrice,
+		ModelAddPriceFormatted: formatRupiah(agenda.ModelAdditionalPrice),
+		TransportFee:           agenda.TransportFee,
+		TransportFeeFormatted:  formatRupiah(agenda.TransportFee),
+		TotalCost:              totalCost,
+		TotalCostFormatted:     formatRupiah(totalCost),
+		DpAmount:               dpAmount,
+		DpAmountFormatted:      formatRupiah(dpAmount),
+		RemainingPayment:       remainingPayment,
+		RemainingFormatted:     formatRupiah(remainingPayment),
+		PaymentStatus:          agenda.PaymentStatus,
+		PaymentStatusLabel:     paymentStatusLabel,
+		IsPaidOff:              isPaidOff,
+		HasDP:                  hasDP,
+		Status:                 agenda.Status,
+		Notes:                  agenda.Notes,
 		FormToken:              agenda.FormToken,
-		Packages:               packages,
-		Addons:                 addons,
 	}
 
 	tmpl, err := template.ParseFiles("web/templates/client_form.html")

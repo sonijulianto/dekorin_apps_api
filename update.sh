@@ -18,9 +18,10 @@ curl -f -L -o dekorin-api.new "https://raw.githubusercontent.com/sonijulianto/de
 chmod +x dekorin-api.new
 mv -f dekorin-api.new dekorin-api
 
-echo "⬇️  Mengunduh web superadmin.html terbaru..."
+echo "⬇️  Mengunduh web template terbaru..."
 mkdir -p web/templates
 curl -f -L -o web/templates/superadmin.html "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/superadmin.html?v=$TIMESTAMP"
+curl -f -L -o web/templates/client_form.html "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/client_form.html?v=$TIMESTAMP"
 
 echo "🔄 Me-restart service dekorin..."
 sudo systemctl restart dekorin
