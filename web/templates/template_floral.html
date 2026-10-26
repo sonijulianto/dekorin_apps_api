@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ .Title }}</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- AOS -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+  <style>
+    :root {
+      --terracotta: #C4855F;
+      --terracotta-dark: #B87A54;
+      --brown-text: #39251A;
+      --body-text: #2C2C2C;
+      --bg-floral: #FDF8F5;
+      --card-bg: #FFFFFF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #2D1A16;
+      color: var(--body-text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-frame {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--bg-floral);
+      background-image: url('/assets/templates/floral/bg-floral-template.png');
+      background-repeat: repeat;
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+      overflow-x: hidden;
+    }
+
+    /* Floating Audio Button */
+    .audio-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--terracotta);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(196, 133, 95, 0.4);
+      z-index: 999;
+      cursor: pointer;
+      border: 2px solid white;
+      transition: all 0.3s;
+    }
+    .audio-btn.spinning {
+      animation: spinAudio 4s linear infinite;
+    }
+    @keyframes spinAudio {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Opening Overlay */
+    #openingOverlay {
+      position: fixed;
+      inset: 0;
+      background-color: var(--bg-floral);
+      background-image: url('/assets/templates/floral/bg-floral-template.png');
+      background-repeat: repeat;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      transition: opacity 0.8s ease, visibility 0.8s;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    #openingOverlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .floral-corner-tr {
+      position: absolute;
+      top: -30px;
+      right: -20px;
+      width: 180px;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+    .floral-corner-bl {
+      position: absolute;
+      bottom: -30px;
+      left: -20px;
+      width: 180px;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .monogram-box {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .monogram-frame {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .monogram-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      color: var(--terracotta-dark);
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .opening-subtitle {
+      font-size: 13px;
+      letter-spacing: 4px;
+      font-weight: 600;
+      color: var(--brown-text);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .opening-couple {
+      font-family: 'Dancing Script', cursive;
+      font-size: 38px;
+      color: var(--terracotta-dark);
+      line-height: 1.2;
+      margin: 10px 0;
+    }
+    .guest-tag {
+      font-size: 12px;
+      color: var(--brown-text);
+      margin-top: 14px;
+    }
+    .guest-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--terracotta);
+      margin: 6px 0 20px;
+    }
+    .btn-open {
+      background: var(--terracotta);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(196, 133, 95, 0.35);
+      transition: transform 0.2s;
+    }
+    .btn-open:hover {
+      transform: scale(1.04);
+    }
+
+    /* Wave Separator */
+    .wave-divider {
+      width: 100%;
+      line-height: 0;
+      overflow: hidden;
+    }
+    .wave-divider svg {
+      width: 100%;
+      height: 25px;
+    }
+
+    /* Content Sections */
+    .section-wrap {
+      padding: 40px 20px;
+      position: relative;
+      text-align: center;
+    }
+    .heading-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 34px;
+      color: var(--terracotta);
+      margin-bottom: 6px;
+    }
+    .heading-sub {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brown-text);
+      margin-bottom: 24px;
+    }
+
+    /* Quotes Box */
+    .quote-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 24px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(196, 133, 95, 0.25);
+      box-shadow: 0 8px 25px rgba(196, 133, 95, 0.08);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--brown-text);
+      font-style: italic;
+    }
+
+    /* Couple Profile */
+    .couple-card {
+      margin-bottom: 28px;
+    }
+    .avatar-wrapper {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 12px;
+    }
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--terracotta);
+      box-shadow: 0 6px 18px rgba(196, 133, 95, 0.25);
+    }
+    .person-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: var(--terracotta);
+      margin-bottom: 4px;
+    }
+    .person-order {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--brown-text);
+    }
+    .person-parents {
+      font-size: 13px;
+      color: #666;
+      margin-top: 2px;
+    }
+    .person-ig {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--terracotta);
+      margin-top: 6px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* Schedule Cards */
+    .schedule-card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 25px rgba(196, 133, 95, 0.1);
+      border: 1px solid rgba(196, 133, 95, 0.2);
+      text-align: center;
+    }
+    .schedule-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      background: rgba(196, 133, 95, 0.15);
+      color: var(--terracotta-dark);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .schedule-date {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--brown-text);
+      margin-bottom: 6px;
+    }
+    .schedule-time {
+      font-size: 13px;
+      color: var(--terracotta);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .schedule-venue {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brown-text);
+      margin-bottom: 4px;
+    }
+    .schedule-address {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .btn-maps {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--terracotta);
+      color: white;
+      text-decoration: none;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(196, 133, 95, 0.3);
+    }
+
+    /* Countdown */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0 30px;
+    }
+    .cd-box {
+      background: white;
+      border: 1px solid rgba(196, 133, 95, 0.3);
+      border-radius: 14px;
+      padding: 12px 6px;
+      box-shadow: 0 4px 15px rgba(196, 133, 95, 0.08);
+    }
+    .cd-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--terracotta);
+      font-family: 'Playfair Display', serif;
+    }
+    .cd-lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .gallery-item {
+      aspect-ratio: 1;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Gift & Bank */
+    .bank-box {
+      background: white;
+      border: 1px solid rgba(196, 133, 95, 0.25);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 18px rgba(196, 133, 95, 0.08);
+    }
+    .bank-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brown-text);
+      margin-bottom: 6px;
+    }
+    .bank-acc {
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--terracotta);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .bank-holder {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .btn-copy {
+      background: rgba(196, 133, 95, 0.12);
+      color: var(--terracotta-dark);
+      border: 1px solid var(--terracotta);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Wishes Section */
+    .wish-form {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid rgba(196, 133, 95, 0.2);
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .form-ctrl {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: inherit;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .form-ctrl:focus {
+      border-color: var(--terracotta);
+    }
+    .btn-submit {
+      width: 100%;
+      background: var(--terracotta);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .wish-list {
+      max-height: 400px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .wish-item {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid rgba(196, 133, 95, 0.15);
+      margin-bottom: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .wish-sender {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--brown-text);
+      display: flex;
+      justify-content: space-between;
+    }
+    .wish-msg {
+      font-size: 12.5px;
+      color: #555;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(44, 44, 44, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 9999;
+    }
+    #toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Player -->
+  <audio id="bgMusic" loop src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/owlink/45fd8f10-e568-11f0-9566-cd08157352d1.mp3{{ end }}"></audio>
+  <div class="audio-btn" id="audioToggle" onclick="toggleAudio()">
+    <i class="fa-solid fa-music"></i>
+  </div>
+
+  <div id="toast">Teks berhasil disalin!</div>
+
+  <!-- OPENING COVER FLORAL -->
+  <div id="openingOverlay">
+    <img src="/assets/templates/floral/asset-7.png" alt="" class="floral-corner-tr" data-aos="fade-down-left">
+    <img src="/assets/templates/floral/asset-6.png" alt="" class="floral-corner-bl" data-aos="fade-up-right">
+
+    <div class="monogram-box" data-aos="zoom-in">
+      <img src="/assets/templates/floral/frame.png" alt="" class="monogram-frame">
+      <div class="monogram-text">
+        {{ if .GroomNickname }}{{ slice .GroomNickname 0 1 }}&{{ slice .BrideNickname 0 1 }}{{ else }}W{{ end }}
+      </div>
+    </div>
+
+    <p class="opening-subtitle" data-aos="fade-up">The Wedding Of</p>
+    <h1 class="opening-couple" data-aos="zoom-in">
+      {{ .GroomNickname }}<br>&amp;<br>{{ .BrideNickname }}
+    </h1>
+
+    <div style="margin: 10px 0;" data-aos="fade-up">
+      <img src="/assets/templates/floral/wedding.png" alt="" style="width: 40px; opacity: 0.8;">
+    </div>
+
+    <p class="guest-tag" data-aos="fade-up">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+    <h3 class="guest-name" data-aos="fade-up">{{ .GuestTo }}</h3>
+
+    <button class="btn-open" onclick="openInvitation()" data-aos="zoom-in">
+      <i class="fa-regular fa-envelope-open"></i>
+      <span>Buka Undangan</span>
+    </button>
+  </div>
+
+  <!-- MAIN FLORAL FRAME -->
+  <div class="app-frame" id="content">
+
+    <!-- Top Wave Divider -->
+    <div class="wave-divider">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path opacity="0.33" fill="#C4855F" d="M473,67.3c-203.9,88.3-263.1-34-320.3,0C66,119.1,0,59.7,0,59.7V0h1000v59.7 c0,0-62.1,26.1-94.9,29.3c-32.8,3.3-62.8-12.3-75.8-22.1C806,49.6,745.3,8.7,694.9,4.7S492.4,59,473,67.3z"></path>
+        <path opacity="0.66" fill="#C4855F" d="M734,67.3c-45.5,0-77.2-23.2-129.1-39.1c-28.6-8.7-150.3-10.1-254,39.1 s-91.7-34.4-149.2,0C115.7,118.3,0,39.8,0,39.8V0h1000v36.5c0,0-28.2-18.5-92.1-18.5C810.2,18.1,775.7,67.3,734,67.3z"></path>
+        <path fill="#C4855F" d="M766.1,28.9c-200-57.5-266,65.5-395.1,19.5C242,1.8,242,5.4,184.8,20.6C128,35.8,132.3,44.9,89.9,52.5C28.6,63.7,0,0,0,0 h1000c0,0-9.9,40.9-83.6,48.1S829.6,47,766.1,28.9z"></path>
+      </svg>
+    </div>
+
+    <!-- QUOTES -->
+    <section class="section-wrap">
+      <div class="quote-card" data-aos="fade-up">
+        <p>{{ if .Quotes }}{{ .Quotes }}{{ else }}"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21){{ end }}</p>
+      </div>
+    </section>
+
+    <!-- COUPLE PROFILE -->
+    <section class="section-wrap" style="padding-top: 10px;">
+      <h2 class="heading-title" data-aos="fade-up">Kedua Mempelai</h2>
+      <p class="heading-sub" data-aos="fade-up">Dengan memohon ridho Allah SWT</p>
+
+      <!-- Groom -->
+      <div class="couple-card" data-aos="fade-up">
+        <div class="avatar-wrapper">
+          <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/floral/avatar.png{{ end }}" alt="{{ .GroomName }}" class="avatar-img" onerror="this.src='/assets/templates/floral/avatar.png'">
+        </div>
+        <h3 class="person-name">{{ .GroomName }}</h3>
+        <p class="person-order">{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</p>
+        <p class="person-parents">{{ .GroomParents }}</p>
+        {{ if .GroomInstagram }}
+        <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" class="person-ig">
+          <i class="fa-brands fa-instagram"></i>
+          <span>@{{ .GroomInstagram }}</span>
+        </a>
+        {{ end }}
+      </div>
+
+      <div style="font-family: 'Dancing Script', cursive; font-size: 32px; color: var(--terracotta); margin: 10px 0;" data-aos="zoom-in">&amp;</div>
+
+      <!-- Bride -->
+      <div class="couple-card" data-aos="fade-up">
+        <div class="avatar-wrapper">
+          <img src="{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/templates/floral/avatar.png{{ end }}" alt="{{ .BrideName }}" class="avatar-img" onerror="this.src='/assets/templates/floral/avatar.png'">
+        </div>
+        <h3 class="person-name">{{ .BrideName }}</h3>
+        <p class="person-order">{{ if .BrideChildOrder }}{{ .BrideChildOrder }}{{ else }}Putri dari{{ end }}</p>
+        <p class="person-parents">{{ .BrideParents }}</p>
+        {{ if .BrideInstagram }}
+        <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" class="person-ig">
+          <i class="fa-brands fa-instagram"></i>
+          <span>@{{ .BrideInstagram }}</span>
+        </a>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- COUNTDOWN -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Menghitung Hari</h2>
+      <div class="countdown-grid" data-aos="zoom-in">
+        <div class="cd-box"><div class="cd-val" id="cdDays">00</div><div class="cd-lbl">Hari</div></div>
+        <div class="cd-box"><div class="cd-val" id="cdHours">00</div><div class="cd-lbl">Jam</div></div>
+        <div class="cd-box"><div class="cd-val" id="cdMins">00</div><div class="cd-lbl">Menit</div></div>
+        <div class="cd-box"><div class="cd-val" id="cdSecs">00</div><div class="cd-lbl">Detik</div></div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE EVENTS -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Rangkaian Acara</h2>
+      <p class="heading-sub" data-aos="fade-up">Save The Date</p>
+
+      <!-- Akad -->
+      <div class="schedule-card" data-aos="fade-up">
+        <span class="schedule-badge">AKAD NIKAH</span>
+        <div class="schedule-date">{{ .AkadDate }}</div>
+        <div class="schedule-time"><i class="fa-regular fa-clock"></i> {{ .AkadTime }}</div>
+        <div class="schedule-venue">{{ .AkadVenue }}</div>
+        <div class="schedule-address">{{ .AkadAddress }}</div>
+        {{ if .AkadMapsURL }}
+        <a href="{{ .AkadMapsURL }}" target="_blank" class="btn-maps">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>Petunjuk Arah</span>
+        </a>
+        {{ end }}
+      </div>
+
+      <!-- Resepsi -->
+      <div class="schedule-card" data-aos="fade-up">
+        <span class="schedule-badge">RESEPSI PERNIKAHAN</span>
+        <div class="schedule-date">{{ .ResepsiDate }}</div>
+        <div class="schedule-time"><i class="fa-regular fa-clock"></i> {{ .ResepsiTime }}</div>
+        <div class="schedule-venue">{{ .ResepsiVenue }}</div>
+        <div class="schedule-address">{{ .ResepsiAddress }}</div>
+        {{ if .ResepsiMapsURL }}
+        <a href="{{ .ResepsiMapsURL }}" target="_blank" class="btn-maps">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>Petunjuk Arah</span>
+        </a>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- LOVE STORY -->
+    {{ if .LoveStory }}
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Kisah Cinta Kami</h2>
+      <div class="quote-card" style="font-style: normal; text-align: left;" data-aos="fade-up">
+        <p style="white-space: pre-line;">{{ .LoveStory }}</p>
+      </div>
+    </section>
+    {{ end }}
+
+    <!-- VIDEO MOMENT -->
+    {{ if .YoutubeEmbedURL }}
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Video Moment</h2>
+      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1);" data-aos="zoom-in">
+        <iframe src="{{ .YoutubeEmbedURL }}" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen></iframe>
+      </div>
+    </section>
+    {{ end }}
+
+    <!-- GALLERY -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Momen Bahagia</h2>
+      <div class="gallery-grid">
+        {{ if .GalleryList }}
+          {{ range .GalleryList }}
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ . }}" alt="Galeri">
+          </div>
+          {{ end }}
+        {{ else }}
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/templates/floral/bg-floral-template.png{{ end }}" alt="Galeri">
+          </div>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- GIFT & REKENING -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Tanda Kasih</h2>
+      <p style="font-size: 13px; color: #666; margin-bottom: 20px;" data-aos="fade-up">
+        Doa restu Anda merupakan karunia terindah bagi kami. Namun jika ingin memberi kado secara cashless, dapat melalui:
+      </p>
+
+      {{ if .BankAccount1 }}
+      <div class="bank-box" data-aos="fade-up">
+        <div class="bank-title">{{ .BankName1 }}</div>
+        <div class="bank-acc" id="acc1">{{ .BankAccount1 }}</div>
+        <div class="bank-holder">a.n {{ .BankHolder1 }}</div>
+        <button class="btn-copy" onclick="copyNum('acc1')">
+          <i class="fa-regular fa-copy"></i>
+          <span>Salin Rekening</span>
+        </button>
+      </div>
+      {{ end }}
+
+      {{ if .BankAccount2 }}
+      <div class="bank-box" data-aos="fade-up">
+        <div class="bank-title">{{ .BankName2 }}</div>
+        <div class="bank-acc" id="acc2">{{ .BankAccount2 }}</div>
+        <div class="bank-holder">a.n {{ .BankHolder2 }}</div>
+        <button class="btn-copy" onclick="copyNum('acc2')">
+          <i class="fa-regular fa-copy"></i>
+          <span>Salin Rekening</span>
+        </button>
+      </div>
+      {{ end }}
+
+      {{ if .GiftAddress }}
+      <div class="bank-box" data-aos="fade-up">
+        <div class="bank-title"><i class="fa-solid fa-gift"></i> Kirim Kado Fisik</div>
+        <p style="font-size: 12px; color: #555; line-height: 1.6; margin: 6px 0;">{{ .GiftAddress }}</p>
+      </div>
+      {{ end }}
+    </section>
+
+    <!-- WISHES & RSVP -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 class="heading-title" data-aos="fade-up">Ucapan &amp; Doa</h2>
+      
+      <div class="wish-form" data-aos="fade-up">
+        <form onsubmit="postWish(event)">
+          <label style="font-size: 12px; font-weight: 600;">Nama Anda</label>
+          <input type="text" id="wName" class="form-ctrl" value="{{ .GuestTo }}" required>
+
+          <label style="font-size: 12px; font-weight: 600;">Konfirmasi Kehadiran</label>
+          <select id="wAtt" class="form-ctrl">
+            <option value="hadir">Hadir</option>
+            <option value="ragu">Masih Ragu</option>
+            <option value="tidak_hadir">Tidak Hadir</option>
+          </select>
+
+          <label style="font-size: 12px; font-weight: 600;">Ucapan &amp; Doa</label>
+          <textarea id="wMsg" class="form-ctrl" rows="3" placeholder="Tulis ucapan dan doa terbaik Anda..." required></textarea>
+
+          <button type="submit" class="btn-submit" id="btnWish">
+            <i class="fa-regular fa-paper-plane"></i> Kirim Ucapan
+          </button>
+        </form>
+      </div>
+
+      <div class="wish-list" id="wList" data-aos="fade-up">
+        {{ range .Wishes }}
+        <div class="wish-item">
+          <div class="wish-sender">
+            <span>{{ .GuestName }}</span>
+            <span style="font-size: 11px; color: #888;">{{ .Attendance }}</span>
+          </div>
+          <div class="wish-msg">{{ .Message }}</div>
+        </div>
+        {{ end }}
+      </div>
+    </section>
+
+    <!-- TURUT MENGUNDANG -->
+    {{ if .TurutMengundangList }}
+    <section class="section-wrap" style="padding-top: 0;">
+      <h4 style="font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--terracotta-dark); margin-bottom: 10px;" data-aos="fade-up">Turut Mengundang</h4>
+      <div style="font-size: 12.5px; line-height: 1.8; color: #666;" data-aos="fade-up">
+        {{ range .TurutMengundangList }}
+        <p>{{ . }}</p>
+        {{ end }}
+      </div>
+    </section>
+    {{ end }}
+
+    <!-- FOOTER -->
+    <footer style="padding: 30px 20px 80px; text-align: center; color: var(--brown-text);">
+      <h2 style="font-family: 'Dancing Script', cursive; font-size: 32px; color: var(--terracotta); margin-bottom: 8px;">Terima Kasih</h2>
+      <p style="font-size: 12px; line-height: 1.6; max-width: 300px; margin: 0 auto;">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
+      <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; margin-top: 14px; color: var(--terracotta-dark);">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h4>
+    </footer>
+
+    <!-- Bottom Wave Divider -->
+    <div class="wave-divider" style="transform: rotate(180deg);">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path opacity="0.33" fill="#C4855F" d="M473,67.3c-203.9,88.3-263.1-34-320.3,0C66,119.1,0,59.7,0,59.7V0h1000v59.7 c0,0-62.1,26.1-94.9,29.3c-32.8,3.3-62.8-12.3-75.8-22.1C806,49.6,745.3,8.7,694.9,4.7S492.4,59,473,67.3z"></path>
+        <path opacity="0.66" fill="#C4855F" d="M734,67.3c-45.5,0-77.2-23.2-129.1-39.1c-28.6-8.7-150.3-10.1-254,39.1 s-91.7-34.4-149.2,0C115.7,118.3,0,39.8,0,39.8V0h1000v36.5c0,0-28.2-18.5-92.1-18.5C810.2,18.1,775.7,67.3,734,67.3z"></path>
+        <path fill="#C4855F" d="M766.1,28.9c-200-57.5-266,65.5-395.1,19.5C242,1.8,242,5.4,184.8,20.6C128,35.8,132.3,44.9,89.9,52.5C28.6,63.7,0,0,0,0 h1000c0,0-9.9,40.9-83.6,48.1S829.6,47,766.1,28.9z"></path>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 900, once: false });
+
+    const music = document.getElementById('bgMusic');
+    const audioBtn = document.getElementById('audioToggle');
+    let isPlaying = false;
+
+    function openInvitation() {
+      document.getElementById('openingOverlay').classList.add('hidden');
+      music.play().then(() => {
+        isPlaying = true;
+        audioBtn.classList.add('spinning');
+      }).catch(() => {});
+      setTimeout(() => AOS.refresh(), 400);
+    }
+
+    function toggleAudio() {
+      if (isPlaying) {
+        music.pause();
+        audioBtn.classList.remove('spinning');
+      } else {
+        music.play();
+        audioBtn.classList.add('spinning');
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function copyNum(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Countdown
+    const eventTime = new Date('{{ .AkadDate }}').getTime() || (Date.now() + 1000 * 60 * 60 * 24 * 30);
+    function updateCd() {
+      const diff = eventTime - Date.now();
+      if (diff > 0) {
+        document.getElementById('cdDays').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+        document.getElementById('cdHours').innerText = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
+        document.getElementById('cdMins').innerText = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
+        document.getElementById('cdSecs').innerText = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+      }
+    }
+    setInterval(updateCd, 1000);
+    updateCd();
+
+    // RSVP Post
+    async function postWish(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnWish');
+      btn.disabled = true;
+      btn.innerText = 'Mengirim...';
+
+      const payload = {
+        guest_name: document.getElementById('wName').value,
+        attendance: document.getElementById('wAtt').value,
+        message: document.getElementById('wMsg').value,
+        guest_count: 1
+      };
+
+      try {
+        const res = await fetch('/api/invitations/{{ .Slug }}/wishes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const item = document.createElement('div');
+          item.className = 'wish-item';
+          item.innerHTML = `<div class="wish-sender"><span>${payload.guest_name}</span><span style="font-size:11px;color:#888;">${payload.attendance}</span></div><div class="wish-msg">${payload.message}</div>`;
+          document.getElementById('wList').prepend(item);
+          document.getElementById('wMsg').value = '';
+          btn.innerText = 'Terkirim! ✅';
+        } else {
+          btn.innerText = 'Gagal Kirim';
+        }
+      } catch (err) {
+        btn.innerText = 'Gagal Kirim';
+      } finally {
+        setTimeout(() => { btn.disabled = false; btn.innerText = 'Kirim Ucapan'; }, 2500);
+      }
+    }
+  </script>
+</body>
+</html>

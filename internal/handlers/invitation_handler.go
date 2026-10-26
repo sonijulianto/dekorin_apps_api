@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"html/template"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -439,9 +440,39 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		TurutMengundangList: turutList,
 	}
 
-	tmpl, err := template.ParseFiles("web/templates/wedding_invitation.html")
+	// Tentukan file template HTML berdasarkan pilihan template undangan
+	templateName := strings.TrimSpace(invitation.Template)
+	// Memungkinkan preview template via query param: ?template=luxury-grey
+	if overrideTemplate := strings.TrimSpace(c.Query("template")); overrideTemplate != "" {
+		templateName = overrideTemplate
+	}
+
+	var templateFile string
+	switch templateName {
+	case "floral":
+		templateFile = "template_floral.html"
+	case "luxury-grey":
+		templateFile = "template_luxury_grey.html"
+	case "khitan-green":
+		templateFile = "template_khitan_green.html"
+	case "creamy-latte":
+		templateFile = "template_creamy_latte.html"
+	case "green-leaves":
+		templateFile = "template_green_leaves.html"
+	default:
+		templateFile = "template_green_leaves.html"
+	}
+
+	templatePath := filepath.Join("web", "templates", templateFile)
+	tmpl, err := template.ParseFiles(templatePath)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Gagal memuat template undangan: " + err.Error())
+		// Fallback ke template default jika file spesifik tidak ditemukan
+		fallbackPath := filepath.Join("web", "templates", "wedding_invitation.html")
+		var fallbackErr error
+		tmpl, fallbackErr = template.ParseFiles(fallbackPath)
+		if fallbackErr != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Gagal memuat template undangan: " + err.Error())
+		}
 	}
 
 	c.Set("Content-Type", "text/html; charset=utf-8")
