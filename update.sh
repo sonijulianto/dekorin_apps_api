@@ -12,14 +12,15 @@ fi
 cd "$TARGET_DIR"
 echo "📁 Direktori: $(pwd)"
 
+TIMESTAMP=$(date +%s)
 echo "⬇️  Mengunduh binary Linux terbaru..."
-curl -f -L -o dekorin-api.new https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/dekorin-api-linux
+curl -f -L -o dekorin-api.new "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/dekorin-api-linux?v=$TIMESTAMP"
 chmod +x dekorin-api.new
 mv -f dekorin-api.new dekorin-api
 
 echo "⬇️  Mengunduh web superadmin.html terbaru..."
 mkdir -p web/templates
-curl -f -L -o web/templates/superadmin.html https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/superadmin.html
+curl -f -L -o web/templates/superadmin.html "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/superadmin.html?v=$TIMESTAMP"
 
 echo "🔄 Me-restart service dekorin..."
 sudo systemctl restart dekorin
