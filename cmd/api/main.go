@@ -111,6 +111,9 @@ func main() {
 
 	// Web Superadmin Dashboard route
 	app.Get("/superadmin", func(c *fiber.Ctx) error {
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Set("Pragma", "no-cache")
+		c.Set("Expires", "0")
 		return c.SendFile("./web/templates/superadmin.html")
 	})
 

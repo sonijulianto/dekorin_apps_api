@@ -2064,6 +2064,7 @@
             else if (currentView === 'packages') loadPackages();
             else if (currentView === 'decoration-models') loadDecorationModels();
             else if (currentView === 'agendas') loadAgendas();
+            else if (currentView === 'invitations') loadInvitations();
             else if (currentView === 'reports') loadReports();
             else if (currentView === 'apilogs') loadApiLogs(1);
         }
@@ -2072,7 +2073,7 @@
             currentView = viewName;
             
             // Sembunyikan semua section
-            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewDecorationModels', 'viewAgendas', 'viewReports', 'viewApiLogs'];
+            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewDecorationModels', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs'];
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if (el) el.classList.add('hidden');
@@ -2097,6 +2098,7 @@
                 'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas', parentSubmenu: 'transSubmenu', parentCaret: 'transCaret' },
+                'invitations': { el: 'viewInvitations', title: 'Undangan Digital', path: 'Transaction • Undangan Digital', nav: 'nav-invitations', navDirect: 'nav-invitations-direct', parentSubmenu: 'transSubmenu', parentCaret: 'transCaret' },
                 'reports': { el: 'viewReports', title: 'Laporan Keuangan', path: 'Report • Laporan Keuangan', nav: 'nav-reports' },
                 'survey': { el: 'viewDashboard', title: 'Survey & Undangan', path: 'Survey • Undangan Digital', nav: 'nav-survey' }
             };
