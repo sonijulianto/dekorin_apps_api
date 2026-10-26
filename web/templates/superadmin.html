@@ -247,24 +247,6 @@
             <!-- MAIN CONTENT CONTAINER -->
             <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto overflow-y-auto">
                 
-                <!-- BREADCRUMBS & DATE BAR -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-xl font-bold text-slate-900" id="currentViewTitle">Dashboard</h1>
-                        <span class="text-xs text-slate-400 flex items-center gap-1.5 font-medium" id="currentBreadcrumb">
-                            <span class="text-[#C59563]">🏠</span> • Dashboard
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-2 self-start sm:self-auto">
-                        <span class="text-xs font-semibold text-slate-500">Today</span>
-                        <div class="bg-white border border-slate-200/90 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm flex items-center gap-2">
-                            <span id="currentDateDisplay">22/10/2026</span>
-                            <span class="text-slate-400 text-[10px]">▼</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ============================================== -->
                 <!-- VIEW 1: DASHBOARD (Exact Match to Screenshot)  -->
                 <!-- ============================================== -->
@@ -1015,9 +997,12 @@
         let isSidebarCollapsed = false;
 
         // Inisialisasi Tanggal
-        document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('id-ID', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        });
+        const dateEl = document.getElementById('currentDateDisplay');
+        if (dateEl) {
+            dateEl.innerText = new Date().toLocaleDateString('id-ID', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+        }
 
         // Cek login awal
         if (authToken) {
@@ -1307,8 +1292,10 @@
             const targetEl = document.getElementById(target.el);
             if (targetEl) targetEl.classList.remove('hidden');
 
-            document.getElementById('currentViewTitle').innerText = target.title;
-            document.getElementById('currentBreadcrumb').innerHTML = target.path;
+            const titleEl = document.getElementById('currentViewTitle');
+            if (titleEl) titleEl.innerText = target.title;
+            const breadcrumbEl = document.getElementById('currentBreadcrumb');
+            if (breadcrumbEl) breadcrumbEl.innerHTML = target.path;
 
             const activeNav = document.getElementById(target.nav);
             if (activeNav) {
