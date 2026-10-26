@@ -34,13 +34,14 @@ func main() {
 	// Routes
 	auth.Post("/login", handlers.Login)
 
-	// Superadmin routes
+	// Superadmin / Web Admin routes (dapat diakses superadmin, owner, dan admin)
 	superadmin := api.Group("/superadmin")
 	superadmin.Post("/login", handlers.SuperadminLogin)
-	superadmin.Get("/dashboard-stats", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetSuperadminDashboardStats)
-	superadmin.Get("/companies", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetAllCompanies)
+	superadmin.Get("/me", middleware.Protected(), handlers.GetCurrentUserProfile)
+	superadmin.Get("/dashboard-stats", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.GetSuperadminDashboardStats)
+	superadmin.Get("/companies", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.GetAllCompanies)
 	superadmin.Post("/companies", middleware.Protected(), middleware.RequireSuperadmin(), handlers.CreateCompanyWithInitialOwner)
-	superadmin.Put("/companies/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UpdateCompany)
+	superadmin.Put("/companies/:id", middleware.Protected(), middleware.RequireRole("superadmin", "owner"), handlers.UpdateCompany)
 	superadmin.Delete("/companies/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.DeleteCompany)
 
 	// User routes

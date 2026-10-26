@@ -35,13 +35,35 @@ type PackageModelInput struct {
 	AdditionalPrice float64 `json:"additional_price"`
 }
 
+// PackageLinkInput adalah payload saat menghubungkan model dekorasi ke paket
+type PackageLinkInput struct {
+	PackageID       string  `json:"package_id"`
+	AdditionalPrice float64 `json:"additional_price"`
+}
+
 // CreateOrUpdateDecorationModelRequest adalah payload request untuk membuat atau mengubah model dekorasi
 type CreateOrUpdateDecorationModelRequest struct {
-	Name        string  `json:"name"`
-	ImageURL    string  `json:"image_url"`
-	Price       float64 `json:"price"`
-	Width       string  `json:"width"`
-	Description string  `json:"description"`
+	Name         string             `json:"name"`
+	ImageURL     string             `json:"image_url"`
+	Price        float64            `json:"price"`
+	Width        string             `json:"width"`
+	Description  string             `json:"description"`
+	PackageLinks []PackageLinkInput `json:"package_links,omitempty"`
+}
+
+// DecorationModelResponse adalah representasi model dekorasi beserta link paketnya
+type DecorationModelResponse struct {
+	ID           string                   `json:"id"`
+	CompanyID    string                   `json:"company_id"`
+	Name         string                   `json:"name"`
+	ImageURL     string                   `json:"image_url"`
+	Price        float64                  `json:"price"`
+	Width        string                   `json:"width"`
+	Description  string                   `json:"description"`
+	SortOrder    int                      `json:"sort_order"`
+	PackageLinks []PackageDecorationModel `json:"package_links,omitempty"`
+	CreatedAt    time.Time                `json:"created_at"`
+	UpdatedAt    time.Time                `json:"updated_at"`
 }
 
 // ReorderDecorationModelsRequest adalah payload untuk mengatur urutan model dekorasi

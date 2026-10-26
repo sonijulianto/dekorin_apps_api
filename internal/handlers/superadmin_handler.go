@@ -74,10 +74,8 @@ func SuperadminLogin(c *fiber.Ctx) error {
 	var user models.User
 	var err error
 
-	// Cari user superadmin dengan fleksibel:
-	// 1. By email jika mengandung @
-	// 2. By clean phone atau raw phone
-	query := config.DB.Where("role = ?", "superadmin")
+	// Cari user yang memiliki hak akses Web Admin: superadmin, owner, admin
+	query := config.DB.Preload("Company").Where("role IN ?", []string{"superadmin", "owner", "admin"})
 	if strings.Contains(rawInput, "@") {
 		err = query.Where("email = ?", rawInput).First(&user).Error
 	} else if cleanPhone != "" {
@@ -88,7 +86,7 @@ func SuperadminLogin(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Kredensial Superadmin tidak valid",
+			"error": "Akun tidak ditemukan atau tidak memiliki hak akses Web Admin (Hanya Superadmin, Owner, dan Admin)",
 		})
 	}
 
@@ -101,7 +99,7 @@ func SuperadminLogin(c *fiber.Ctx) error {
 			user.Password = string(newHash)
 		} else {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Kredensial Superadmin tidak valid",
+				"error": "Password yang Anda masukkan salah",
 			})
 		}
 	}
@@ -111,14 +109,14 @@ func SuperadminLogin(c *fiber.Ctx) error {
 		"company_id": user.CompanyID,
 		"phone":      user.Phone,
 		"email":      user.Email,
-		"role":       "superadmin",
+		"role":       user.Role,
 		"exp":        time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
 
 	tokenString, err := token.SignedString(middleware.JwtSecret)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal membuat sesi login Superadmin",
+			"error": "Gagal membuat sesi login Web Admin",
 		})
 	}
 
@@ -131,24 +129,77 @@ func SuperadminLogin(c *fiber.Ctx) error {
 		SameSite: "Lax",
 	})
 
+	companyName := ""
+	if user.Company != nil {
+		companyName = user.Company.Name
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Login Superadmin berhasil",
+		"message": "Login berhasil",
 		"token":   tokenString,
 		"data": models.UserResponse{
-			ID:        user.ID,
-			CompanyID: user.CompanyID,
-			FullName:  user.FullName,
-			Phone:     user.Phone,
-			Email:     user.Email,
-			Role:      user.Role,
+			ID:          user.ID,
+			CompanyID:   user.CompanyID,
+			CompanyName: companyName,
+			FullName:    user.FullName,
+			Phone:       user.Phone,
+			Email:       user.Email,
+			Role:        user.Role,
+		},
+	})
+}
+
+// GetCurrentUserProfile handles GET /api/superadmin/me
+func GetCurrentUserProfile(c *fiber.Ctx) error {
+	userID, _ := c.Locals("user_id").(string)
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Sesi login tidak valid",
+		})
+	}
+
+	var user models.User
+	if err := config.DB.Preload("Company").Where("id = ?", userID).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User tidak ditemukan",
+		})
+	}
+
+	companyName := ""
+	if user.Company != nil {
+		companyName = user.Company.Name
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data": models.UserResponse{
+			ID:          user.ID,
+			CompanyID:   user.CompanyID,
+			CompanyName: companyName,
+			FullName:    user.FullName,
+			Phone:       user.Phone,
+			Email:       user.Email,
+			Role:        user.Role,
 		},
 	})
 }
 
 // GetAllCompanies handles GET /api/superadmin/companies
 func GetAllCompanies(c *fiber.Ctx) error {
+	userRole, _ := c.Locals("user_role").(string)
+	userCompanyID := middleware.GetCompanyID(c)
+
 	var companies []models.Company
-	if err := config.DB.Order("created_at desc").Find(&companies).Error; err != nil {
+	query := config.DB.Order("created_at desc")
+	if !strings.EqualFold(userRole, "superadmin") {
+		// Non-superadmin (owner / admin) hanya dapat mengakses data perusahaannya sendiri
+		if userCompanyID != "" {
+			query = query.Where("id = ?", userCompanyID)
+		} else {
+			query = query.Where("1 = 0")
+		}
+	}
+
+	if err := query.Find(&companies).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil daftar perusahaan: " + err.Error(),
 		})
@@ -469,7 +520,14 @@ type ChartDonutItem struct {
 
 // GetSuperadminDashboardStats handles GET /api/superadmin/dashboard-stats
 func GetSuperadminDashboardStats(c *fiber.Ctx) error {
+	userRole, _ := c.Locals("user_role").(string)
+	userCompanyID := middleware.GetCompanyID(c)
+
 	companyID := strings.TrimSpace(c.Query("company_id"))
+	if !strings.EqualFold(userRole, "superadmin") {
+		// Non-superadmin dipaksa hanya melihat company miliknya sendiri
+		companyID = userCompanyID
+	}
 
 	// Filter query
 	agendaQuery := config.DB.Model(&models.Agenda{})
@@ -533,28 +591,51 @@ func GetSuperadminDashboardStats(c *fiber.Ctx) error {
 		revenue = 635509000
 	}
 
-	// 2. Top Customers (Vendor / Usaha Terbesar)
-	var companies []models.Company
-	config.DB.Find(&companies)
+	// 2. Top Customers (Jika vendor tertentu: tampilkan Klien Terbesar; jika superadmin konsolidasi: tampilkan Vendor Terbesar)
 	var topCustomers []TopCustomerItem
-	if len(companies) > 0 {
-		for i, comp := range companies {
-			var compRevenue float64 = 0
-			var compAgendas []models.Agenda
-			config.DB.Where("company_id = ?", comp.ID).Find(&compAgendas)
-			for _, a := range compAgendas {
-				compRevenue += a.CalculateTotalBiaya()
+	if companyID != "" && companyID != "all" {
+		var clientAgendas []models.Agenda
+		config.DB.Where("company_id = ?", companyID).Order("event_date_time desc").Limit(20).Find(&clientAgendas)
+		clientMap := make(map[string]float64)
+		for _, a := range clientAgendas {
+			if strings.TrimSpace(a.ClientName) != "" {
+				clientMap[a.ClientName] += a.CalculateTotalBiaya()
 			}
-			if compRevenue == 0 {
-				compRevenue = float64(125640000 / (i + 1))
-			}
+		}
+		rank := 1
+		for cName, cAmt := range clientMap {
 			topCustomers = append(topCustomers, TopCustomerItem{
-				Rank:   i + 1,
-				Name:   comp.Name,
-				Amount: compRevenue,
+				Rank:   rank,
+				Name:   cName,
+				Amount: cAmt,
 			})
+			rank++
 			if len(topCustomers) >= 5 {
 				break
+			}
+		}
+	} else {
+		var companies []models.Company
+		config.DB.Find(&companies)
+		if len(companies) > 0 {
+			for i, comp := range companies {
+				var compRevenue float64 = 0
+				var compAgendas []models.Agenda
+				config.DB.Where("company_id = ?", comp.ID).Find(&compAgendas)
+				for _, a := range compAgendas {
+					compRevenue += a.CalculateTotalBiaya()
+				}
+				if compRevenue == 0 {
+					compRevenue = float64(125640000 / (i + 1))
+				}
+				topCustomers = append(topCustomers, TopCustomerItem{
+					Rank:   i + 1,
+					Name:   comp.Name,
+					Amount: compRevenue,
+				})
+				if len(topCustomers) >= 5 {
+					break
+				}
 			}
 		}
 	}

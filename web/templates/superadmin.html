@@ -32,13 +32,13 @@
                     ✨
                 </div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">DEKORIN</h1>
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">Superadmin Platform Multi-Company</p>
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">Portal Web Admin (Superadmin, Owner & Admin)</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">No. Handphone / Email</label>
-                    <input type="text" id="loginPhone" required placeholder="081111111111" value="081111111111"
+                    <input type="text" id="loginPhone" required placeholder="081111111111 atau No. HP Owner/Admin" value="081111111111"
                         class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838] transition font-medium text-sm">
                 </div>
 
@@ -52,7 +52,7 @@
 
                 <button type="submit" id="btnLogin"
                     class="w-full py-3.5 px-4 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-sm transition shadow-lg shadow-[#EA3838]/20 flex items-center justify-center gap-2">
-                    <span>Masuk ke Superadmin</span>
+                    <span>Masuk ke Dashboard</span>
                 </button>
             </form>
         </div>
@@ -83,11 +83,11 @@
             <!-- Right Controls: Company Selector & User Profile -->
             <div class="flex items-center gap-3">
                 <!-- Company Switcher Pill -->
-                <div class="relative">
-                    <button onclick="toggleCompanyDropdown(event)" 
+                <div class="relative" id="companySwitcherContainer">
+                    <button onclick="toggleCompanyDropdown(event)" id="btnCompanySwitcher"
                         class="bg-white text-slate-800 text-xs font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg flex items-center gap-2 shadow-sm border border-white hover:bg-slate-50 transition max-w-[200px] sm:max-w-xs truncate">
-                        <span class="truncate" id="selectedCompanyLabel">CV Putra Artha Gemilang</span>
-                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span class="truncate" id="selectedCompanyLabel">Dekorin Wedding & Event</span>
+                        <svg id="companySwitcherChevron" class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
@@ -96,7 +96,7 @@
                         <div class="px-3 py-1.5 font-bold uppercase text-[10px] text-slate-400 border-b border-slate-100">
                             Pilih Vendor / Usaha
                         </div>
-                        <button onclick="selectCompany('all', '🏢 Semua Vendor (Konsolidasi)')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-semibold text-[#EA3838] flex items-center justify-between">
+                        <button id="btnCompanyAll" onclick="selectCompany('all', '🏢 Semua Vendor (Konsolidasi)')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-semibold text-[#EA3838] flex items-center justify-between">
                             <span>🏢 Semua Vendor (Platform Konsolidasi)</span>
                         </button>
                         <div id="companyDropdownList" class="divide-y divide-slate-50">
@@ -110,15 +110,15 @@
                     <button onclick="toggleUserDropdown(event)"
                         class="bg-white text-slate-800 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm border border-white hover:bg-slate-50 transition">
                         <span class="hidden sm:inline" id="userBadgeName">Hi, super_soni</span>
-                        <div class="w-6 h-6 rounded bg-[#FFCDD2] text-[#D32F2F] font-bold text-xs flex items-center justify-center shrink-0">
+                        <div id="userAvatarLetter" class="w-6 h-6 rounded bg-[#FFCDD2] text-[#D32F2F] font-bold text-xs flex items-center justify-center shrink-0">
                             S
                         </div>
                     </button>
                     <!-- User Dropdown Menu -->
-                    <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 text-xs text-slate-700">
+                    <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 text-xs text-slate-700">
                         <div class="px-4 py-2 border-b border-slate-100">
-                            <p class="font-bold text-slate-900" id="dropdownUserName">Superadmin Dekorin</p>
-                            <p class="text-[11px] text-slate-400">Platform Administrator</p>
+                            <p class="font-bold text-slate-900 truncate" id="dropdownUserName">Superadmin Dekorin</p>
+                            <p class="text-[11px] text-slate-400 font-semibold" id="dropdownUserRole">Platform Administrator</p>
                         </div>
                         <button onclick="handleLogout()" class="w-full text-left px-4 py-2 hover:bg-rose-50 text-rose-600 font-semibold flex items-center gap-2 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -183,6 +183,10 @@
                             <a href="javascript:void(0)" onclick="switchView('packages')" id="nav-packages"
                                 class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
                                 Paket Dekorasi
+                            </a>
+                            <a href="javascript:void(0)" onclick="switchView('decoration-models')" id="nav-decoration-models"
+                                class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
+                                Model Dekorasi
                             </a>
                             <a href="javascript:void(0)" onclick="switchView('addons')" id="nav-addons"
                                 class="block py-1.5 px-2 rounded-md text-slate-500 hover:text-[#EA3838] hover:bg-slate-50 transition">
@@ -404,7 +408,7 @@
                             <h2 class="text-lg font-bold text-slate-900">Daftar Usaha Dekorasi (Companies)</h2>
                             <p class="text-xs text-slate-500 mt-0.5">Kelola seluruh vendor, alamat kantor, kontak, dan owner terdaftar.</p>
                         </div>
-                        <button onclick="openCreateModal()" 
+                        <button id="btnOpenCreateCompany" onclick="openCreateModal()" 
                             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-xs transition shadow-md shadow-[#EA3838]/20">
                             <span>+ Daftarkan Usaha & Owner Baru</span>
                         </button>
@@ -488,6 +492,57 @@
                                 <tbody id="packagesTableBody" class="divide-y divide-slate-100 font-medium">
                                     <tr>
                                         <td colspan="3" class="text-center py-8 text-slate-400">Memuat data paket...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 4B: MASTER DECORATION MODELS (MODEL DEKOR)-->
+                <!-- ============================================== -->
+                <div id="viewDecorationModels" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Master Model Dekorasi</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola foto model pelaminan/backdrop, lebar, harga referensi, dan paket terkait.</p>
+                        </div>
+                        <button onclick="openDecorationModelModal()" 
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-xs transition shadow-md shadow-[#EA3838]/20">
+                            <span>+ Tambah Model Dekorasi</span>
+                        </button>
+                    </div>
+
+                    <!-- Search & Counter Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
+                        <div class="relative flex-1 max-w-sm">
+                            <input type="text" id="searchDecorationModelInput" oninput="filterDecorationModels(this.value)" placeholder="Cari nama model atau lebar..."
+                                class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-slate-500 font-medium" id="decorationModelCountInfo">Memuat data model...</span>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 select-none">
+                                    <tr>
+                                        <th class="py-3.5 px-5 w-24">Foto</th>
+                                        <th class="py-3.5 px-5">Nama Model & Deskripsi</th>
+                                        <th class="py-3.5 px-5 w-32">Lebar Dekorasi</th>
+                                        <th class="py-3.5 px-5 w-36">Harga Referensi</th>
+                                        <th class="py-3.5 px-5">Paket Terhubung</th>
+                                        <th class="py-3.5 px-5 text-right w-28">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="decorationModelsTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-8 text-slate-400">Memuat model dekorasi...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -718,6 +773,83 @@
     </div>
 
     <!-- ======================================================== -->
+    <!-- MODAL: TAMBAH / EDIT MODEL DEKORASI                      -->
+    <!-- ======================================================== -->
+    <div id="modalDecorationModel" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="modalDecorationModelTitle">Tambah Model Dekorasi</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Atur nama model, foto, lebar backdrop, dan hubungkan ke paket dekorasi</p>
+                </div>
+                <button type="button" onclick="closeDecorationModelModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formDecorationModel" onsubmit="handleSaveDecorationModel(event)" class="space-y-4">
+                <input type="hidden" id="inputModelId" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Model Dekorasi *</label>
+                    <input type="text" id="inputModelName" required placeholder="Contoh: Model Pelaminan Rustic Hexagon"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Lebar Dekorasi</label>
+                        <input type="text" id="inputModelWidth" placeholder="Contoh: 6 Meter (atau 4-6m)"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Dasar / Referensi (Rp) *</label>
+                        <input type="number" id="inputModelPrice" required min="0" placeholder="0"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
+                    </div>
+                </div>
+
+                <!-- Gambar Model -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-slate-700">Foto / Gambar Model</label>
+                    <div class="flex items-center gap-3">
+                        <div id="modelImagePreviewBox" class="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="text-2xl text-slate-300">🖼️</span>
+                        </div>
+                        <div class="flex-1 space-y-1.5">
+                            <input type="file" id="inputModelImageFile" accept="image/*" onchange="handleModelImageFileSelected(this)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-[#EA3838] hover:file:bg-red-100 cursor-pointer">
+                            <input type="text" id="inputModelImageUrl" placeholder="Atau tempel URL gambar (https://...)" oninput="updateModelImagePreview(this.value)"
+                                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Model (Opsional)</label>
+                    <textarea id="inputModelDescription" rows="2" placeholder="Keterangan tambahan material, nuansa warna, atau properti pendukung..."
+                        class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#EA3838]/30 focus:border-[#EA3838]"></textarea>
+                </div>
+
+                <!-- Hubungkan ke Paket Dekorasi -->
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-semibold text-slate-700">Hubungkan ke Paket Dekorasi (Opsional)</label>
+                        <span class="text-[10px] text-slate-400">Centang paket & input biaya tambahan</span>
+                    </div>
+                    <div id="modelPackageLinksContainer" class="space-y-2 max-h-40 overflow-y-auto border border-slate-100 rounded-xl p-2.5 bg-slate-50/50">
+                        <p class="text-xs text-slate-400 text-center py-2">Memuat daftar paket...</p>
+                    </div>
+                </div>
+
+                <div id="modelErrorBox" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeDecorationModelModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" id="btnSubmitDecorationModel" class="px-5 py-2 rounded-xl bg-[#EA3838] hover:bg-[#D32F2F] text-white font-bold text-xs transition shadow-md shadow-[#EA3838]/20">Simpan Model</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
     <!-- MODAL: VIEW DATA (API LOG DETAIL MATCHING SCREENSHOT 2)  -->
     <!-- ======================================================== -->
     <div id="modalViewData" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeLogDataModal()">
@@ -774,8 +906,14 @@
     <!-- ========================================== -->
     <script>
         let authToken = localStorage.getItem('superadmin_token') || '';
+        let currentUserRole = '';
+        let currentUserCompanyId = '';
+        let currentUserCompanyName = '';
+        let currentUserName = '';
         let selectedCompanyId = '';
         let companiesCache = [];
+        let packagesCache = [];
+        let decorationModelsCache = [];
         let currentView = 'dashboard';
         let barChart = null;
         let donutChart = null;
@@ -804,6 +942,57 @@
             document.getElementById('dashboardSection').classList.remove('hidden');
         }
 
+        function applyRolePermissions() {
+            // Update User Profile Badge
+            const nameEl = document.getElementById('userBadgeName');
+            const dropName = document.getElementById('dropdownUserName');
+            const dropRole = document.getElementById('dropdownUserRole');
+            const avatarLetter = document.getElementById('userAvatarLetter');
+
+            const firstName = (currentUserName || 'User').split(' ')[0];
+            if (nameEl) nameEl.innerText = 'Hi, ' + firstName;
+            if (dropName) dropName.innerText = currentUserName;
+            if (avatarLetter) avatarLetter.innerText = firstName.charAt(0).toUpperCase();
+
+            let roleLabel = 'Superadmin Platform';
+            if (currentUserRole === 'owner') roleLabel = 'Owner (' + (currentUserCompanyName || 'Usaha') + ')';
+            else if (currentUserRole === 'admin') roleLabel = 'Admin Usaha (' + (currentUserCompanyName || 'Usaha') + ')';
+            if (dropRole) dropRole.innerText = roleLabel;
+
+            const switcherBtn = document.getElementById('btnCompanySwitcher');
+            const chevron = document.getElementById('companySwitcherChevron');
+            const btnAll = document.getElementById('btnCompanyAll');
+            const btnCreateComp = document.getElementById('btnOpenCreateCompany');
+            const navConsolidation = document.getElementById('nav-consolidation');
+            const navCompanies = document.getElementById('nav-companies');
+
+            if (currentUserRole !== 'superadmin') {
+                // Kunci ke company milik sendiri
+                selectedCompanyId = currentUserCompanyId;
+                document.getElementById('selectedCompanyLabel').innerText = currentUserCompanyName || 'Usaha Saya';
+                
+                // Matikan dropdown switcher untuk non-superadmin
+                if (switcherBtn) switcherBtn.classList.add('pointer-events-none');
+                if (chevron) chevron.classList.add('hidden');
+                if (btnAll) btnAll.classList.add('hidden');
+                
+                // Batasi pembuatan perusahaan
+                if (btnCreateComp) btnCreateComp.classList.add('hidden');
+
+                // Sesuaikan menu
+                if (navConsolidation) navConsolidation.classList.add('hidden');
+                if (navCompanies) navCompanies.innerText = 'Profil Usaha (Company)';
+            } else {
+                // Akses penuh Superadmin
+                if (switcherBtn) switcherBtn.classList.remove('pointer-events-none');
+                if (chevron) chevron.classList.remove('hidden');
+                if (btnAll) btnAll.classList.remove('hidden');
+                if (btnCreateComp) btnCreateComp.classList.remove('hidden');
+                if (navConsolidation) navConsolidation.classList.remove('hidden');
+                if (navCompanies) navCompanies.innerText = 'Usaha & Vendor (Companies)';
+            }
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
             const phone = document.getElementById('loginPhone').value.trim();
@@ -826,9 +1015,13 @@
 
                 authToken = data.token;
                 localStorage.setItem('superadmin_token', authToken);
-                document.getElementById('dropdownUserName').innerText = data.data.full_name;
-                document.getElementById('userBadgeName').innerText = 'Hi, ' + (data.data.full_name.split(' ')[0] || 'superadmin');
-                
+                const me = data.data;
+                currentUserRole = me.role;
+                currentUserCompanyId = me.company_id;
+                currentUserCompanyName = me.company_name;
+                currentUserName = me.full_name;
+
+                applyRolePermissions();
                 showDashboardUI();
                 await initializeDashboard();
             } catch (err) {
@@ -836,25 +1029,37 @@
                 errorBox.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Masuk ke Superadmin';
+                btn.innerText = 'Masuk ke Dashboard';
             }
         }
 
         function handleLogout() {
             localStorage.removeItem('superadmin_token');
             authToken = '';
+            currentUserRole = '';
+            currentUserCompanyId = '';
+            currentUserCompanyName = '';
+            currentUserName = '';
             showLogin();
         }
 
         async function checkAuthAndLoad() {
             try {
-                const res = await fetch('/api/superadmin/companies', {
+                const res = await fetch('/api/superadmin/me', {
                     headers: { 'Authorization': 'Bearer ' + authToken }
                 });
-                if (res.status === 401 || res.status === 403) {
+                if (!res.ok) {
                     handleLogout();
                     return;
                 }
+                const json = await res.json();
+                const me = json.data;
+                currentUserRole = me.role;
+                currentUserCompanyId = me.company_id;
+                currentUserCompanyName = me.company_name;
+                currentUserName = me.full_name;
+
+                applyRolePermissions();
                 showDashboardUI();
                 await initializeDashboard();
             } catch {
@@ -933,10 +1138,16 @@
                     `).join('');
                 }
 
-                // Default pilih company pertama jika ada
-                if (companiesCache.length > 0 && !selectedCompanyId) {
-                    selectedCompanyId = companiesCache[0].id;
-                    document.getElementById('selectedCompanyLabel').innerText = companiesCache[0].name;
+                // Pengaturan selected company berdasarkan role
+                if (companiesCache.length > 0) {
+                    if (currentUserRole !== 'superadmin') {
+                        selectedCompanyId = currentUserCompanyId;
+                        const myComp = companiesCache.find(c => c.id === currentUserCompanyId) || companiesCache[0];
+                        document.getElementById('selectedCompanyLabel').innerText = myComp ? myComp.name : (currentUserCompanyName || 'Usaha Saya');
+                    } else if (!selectedCompanyId) {
+                        selectedCompanyId = companiesCache[0].id;
+                        document.getElementById('selectedCompanyLabel').innerText = companiesCache[0].name;
+                    }
                 }
 
                 renderCompaniesTable();
@@ -946,6 +1157,9 @@
         }
 
         function selectCompany(id, name) {
+            if (currentUserRole !== 'superadmin' && id !== currentUserCompanyId) {
+                return; // Batasi perubahan vendor jika bukan superadmin
+            }
             selectedCompanyId = id === 'all' ? '' : id;
             document.getElementById('selectedCompanyLabel').innerText = name;
             refreshCurrentView();
@@ -956,6 +1170,7 @@
             else if (currentView === 'companies') renderCompaniesTable();
             else if (currentView === 'users') loadUsers();
             else if (currentView === 'packages') loadPackages();
+            else if (currentView === 'decoration-models') loadDecorationModels();
             else if (currentView === 'agendas') loadAgendas();
             else if (currentView === 'reports') loadReports();
             else if (currentView === 'apilogs') loadApiLogs(1);
@@ -965,7 +1180,7 @@
             currentView = viewName;
             
             // Sembunyikan semua section
-            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewAgendas', 'viewReports', 'viewApiLogs'];
+            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewDecorationModels', 'viewAgendas', 'viewReports', 'viewApiLogs'];
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if (el) el.classList.add('hidden');
@@ -979,10 +1194,11 @@
 
             const viewMap = {
                 'dashboard': { el: 'viewDashboard', title: 'Dashboard', path: '<span class="text-[#EA3838]">🏠</span> • Dashboard', nav: 'nav-dashboard' },
-                'companies': { el: 'viewCompanies', title: 'Usaha & Vendor (Companies)', path: 'Administration • Usaha & Vendor', nav: 'nav-companies' },
+                'companies': { el: 'viewCompanies', title: (currentUserRole === 'superadmin' ? 'Usaha & Vendor (Companies)' : 'Profil Usaha Saya'), path: 'Administration • Usaha & Vendor', nav: 'nav-companies' },
                 'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users' },
                 'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: 'Administration • API Log', nav: 'nav-apilogs', navDirect: 'nav-apilogs-direct' },
                 'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages' },
+                'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models' },
                 'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons' },
                 'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas' },
                 'reports': { el: 'viewReports', title: 'Laporan Keuangan', path: 'Report • Laporan Keuangan', nav: 'nav-reports' },
@@ -1199,11 +1415,13 @@
                             <div class="text-[10px] text-emerald-600 font-semibold mt-1">📅 ${c.total_agendas || 0} Agenda</div>
                         </td>
                         <td class="py-3 px-5 text-right">
-                            ${c.id !== 'cmp_default' ? `
-                                <button onclick="handleDeleteCompany('${c.id}', '${c.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
-                                    Hapus
-                                </button>
-                            ` : `<span class="text-[11px] text-slate-400 font-semibold">Utama</span>`}
+                            ${currentUserRole === 'superadmin' ? (
+                                c.id !== 'cmp_default' ? `
+                                    <button onclick="handleDeleteCompany('${c.id}', '${c.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
+                                        Hapus
+                                    </button>
+                                ` : `<span class="text-[11px] text-slate-400 font-semibold">Utama</span>`
+                            ) : `<span class="text-[11px] text-slate-400 font-semibold">-</span>`}
                         </td>
                     </tr>
                 `;
@@ -1261,6 +1479,7 @@
                 const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
                 const json = await res.json();
                 const packages = json.data || [];
+                packagesCache = packages;
 
                 if (packages.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-slate-400">Tidak ada paket dekorasi</td></tr>`;
@@ -1276,6 +1495,369 @@
                 `).join('');
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // MASTER MODEL DEKORASI
+        // ==========================================
+        async function loadDecorationModels() {
+            const tbody = document.getElementById('decorationModelsTableBody');
+            const countInfo = document.getElementById('decorationModelCountInfo');
+            if (!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Memuat model dekorasi...</td></tr>`;
+            if (countInfo) countInfo.innerText = 'Memuat data model...';
+
+            try {
+                let url = '/api/decoration-models';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                decorationModelsCache = json.data || [];
+                renderDecorationModels(decorationModelsCache);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+                if (countInfo) countInfo.innerText = 'Gagal memuat';
+            }
+        }
+
+        function filterDecorationModels(query) {
+            const q = (query || '').toLowerCase().trim();
+            if (!q) {
+                renderDecorationModels(decorationModelsCache);
+                return;
+            }
+            const filtered = decorationModelsCache.filter(m => 
+                (m.name && m.name.toLowerCase().includes(q)) ||
+                (m.width && m.width.toLowerCase().includes(q)) ||
+                (m.description && m.description.toLowerCase().includes(q))
+            );
+            renderDecorationModels(filtered);
+        }
+
+        function renderDecorationModels(models) {
+            const tbody = document.getElementById('decorationModelsTableBody');
+            const countInfo = document.getElementById('decorationModelCountInfo');
+            if (!tbody) return;
+
+            if (countInfo) {
+                countInfo.innerText = `${models.length} model dekorasi ditemukan`;
+            }
+
+            if (!models || models.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada model dekorasi. Silakan tambah model baru.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = models.map(m => {
+                const photoHtml = m.image_url ? `
+                    <div class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-200 shadow-2xs">
+                        <img src="${m.image_url}" alt="${m.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\\'text-xl text-slate-300\\'>🖼️</span>'">
+                        <a href="${m.image_url}" target="_blank" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition">🔍</a>
+                    </div>
+                ` : `
+                    <div class="w-14 h-14 rounded-xl border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-xl text-slate-300 select-none">
+                        🖼️
+                    </div>
+                `;
+
+                const widthBadge = m.width ? `
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-100">
+                        📏 ${m.width}
+                    </span>
+                ` : `<span class="text-slate-400 italic text-[11px]">-</span>`;
+
+                const priceDisplay = `Rp ${Number(m.price || m.base_price || 0).toLocaleString('id-ID')}`;
+
+                let packagesBadges = `<span class="text-slate-400 text-xs italic">Belum ditautkan</span>`;
+                if (m.package_links && m.package_links.length > 0) {
+                    packagesBadges = m.package_links.map(pl => {
+                        const extraBadge = pl.additional_price > 0 ? 
+                            `<span class="text-emerald-700 font-mono text-[10px] font-bold bg-emerald-100/60 px-1.5 py-0.5 rounded ml-1">+Rp ${Number(pl.additional_price).toLocaleString('id-ID')}</span>` : 
+                            `<span class="text-slate-400 text-[10px] ml-1">(+Rp 0)</span>`;
+                        return `
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 mr-1 mb-1 border border-slate-200/60">
+                                📦 <b class="ml-1">${pl.package_name || 'Paket'}</b> ${extraBadge}
+                            </span>
+                        `;
+                    }).join('');
+                }
+
+                const safeName = (m.name || '').replace(/'/g, "\\'");
+
+                return `
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="py-3 px-5">${photoHtml}</td>
+                        <td class="py-3 px-5">
+                            <div class="font-bold text-slate-900">${m.name}</div>
+                            ${m.description ? `<div class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${m.description}</div>` : ''}
+                        </td>
+                        <td class="py-3 px-5">${widthBadge}</td>
+                        <td class="py-3 px-5 font-mono text-emerald-600 font-bold">${priceDisplay}</td>
+                        <td class="py-3 px-5 max-w-xs">${packagesBadges}</td>
+                        <td class="py-3 px-5 text-right">
+                            <div class="inline-flex items-center gap-1.5">
+                                <button onclick="openDecorationModelModal('${m.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-sky-600 hover:bg-sky-50 border border-sky-100 transition">
+                                    Edit
+                                </button>
+                                <button onclick="handleDeleteDecorationModel('${m.id}', '${safeName}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100 transition">
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function fetchPackagesForModelModal() {
+            try {
+                let url = '/api/packages';
+                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                packagesCache = json.data || [];
+            } catch (err) {
+                console.error('Failed to load packages for model modal', err);
+            }
+        }
+
+        async function openDecorationModelModal(id = null) {
+            const modal = document.getElementById('modalDecorationModel');
+            const errBox = document.getElementById('modelErrorBox');
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
+
+            document.getElementById('inputModelId').value = id || '';
+            document.getElementById('inputModelName').value = '';
+            document.getElementById('inputModelWidth').value = '';
+            document.getElementById('inputModelPrice').value = '';
+            document.getElementById('inputModelDescription').value = '';
+            document.getElementById('inputModelImageUrl').value = '';
+            document.getElementById('inputModelImageFile').value = '';
+            updateModelImagePreview('');
+
+            const title = document.getElementById('modalDecorationModelTitle');
+            title.innerText = id ? 'Edit Model Dekorasi' : 'Tambah Model Dekorasi';
+
+            const container = document.getElementById('modelPackageLinksContainer');
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Memuat daftar paket...</p>';
+
+            modal.classList.remove('hidden');
+
+            // Load packages
+            await fetchPackagesForModelModal();
+
+            // Render package checkboxes
+            if (packagesCache.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Belum ada paket dekorasi. Tambah paket terlebih dahulu jika ingin menautkan.</p>';
+            } else {
+                container.innerHTML = packagesCache.map(p => `
+                    <div class="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-200">
+                        <label class="flex items-center gap-2 cursor-pointer flex-1">
+                            <input type="checkbox" id="pkg_cb_${p.id}" value="${p.id}" onchange="togglePkgPriceInput('${p.id}')"
+                                class="rounded border-slate-300 text-[#EA3838] focus:ring-[#EA3838]">
+                            <span class="text-xs font-semibold text-slate-800">${p.name}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">(Rp ${Number(p.base_price || 0).toLocaleString('id-ID')})</span>
+                        </label>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="text-[10px] text-slate-500 font-medium">+ Biaya (Rp):</span>
+                            <input type="number" id="pkg_price_${p.id}" value="0" min="0" disabled
+                                class="w-28 px-2 py-1 text-xs rounded-lg border border-slate-200 text-right font-mono focus:outline-none focus:ring-1 focus:ring-[#EA3838] disabled:bg-slate-100 disabled:text-slate-400">
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // If edit mode, populate data
+            if (id) {
+                const m = decorationModelsCache.find(x => String(x.id) === String(id));
+                if (m) {
+                    document.getElementById('inputModelName').value = m.name || '';
+                    document.getElementById('inputModelWidth').value = m.width || '';
+                    document.getElementById('inputModelPrice').value = m.price || m.base_price || 0;
+                    document.getElementById('inputModelDescription').value = m.description || '';
+                    document.getElementById('inputModelImageUrl').value = m.image_url || '';
+                    updateModelImagePreview(m.image_url || '');
+
+                    // Pre-check packages
+                    if (m.package_links && Array.isArray(m.package_links)) {
+                        m.package_links.forEach(pl => {
+                            const cb = document.getElementById('pkg_cb_' + pl.package_id);
+                            const priceInput = document.getElementById('pkg_price_' + pl.package_id);
+                            if (cb) {
+                                cb.checked = true;
+                                if (priceInput) {
+                                    priceInput.disabled = false;
+                                    priceInput.value = pl.additional_price || 0;
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        function closeDecorationModelModal() {
+            document.getElementById('modalDecorationModel').classList.add('hidden');
+        }
+
+        function togglePkgPriceInput(pkgId) {
+            const cb = document.getElementById('pkg_cb_' + pkgId);
+            const input = document.getElementById('pkg_price_' + pkgId);
+            if (!cb || !input) return;
+            if (cb.checked) {
+                input.disabled = false;
+                input.focus();
+            } else {
+                input.disabled = true;
+                input.value = 0;
+            }
+        }
+
+        function updateModelImagePreview(url) {
+            const box = document.getElementById('modelImagePreviewBox');
+            if (!box) return;
+            if (url && url.trim() !== '') {
+                box.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+            } else {
+                box.innerHTML = `<span class="text-2xl text-slate-300">🖼️</span>`;
+            }
+        }
+
+        async function handleModelImageFileSelected(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+
+            // Show local preview immediately
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                updateModelImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to server /api/upload
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const btn = document.getElementById('btnSubmitDecorationModel');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Mengunggah gambar...';
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    body: formData
+                });
+                const json = await res.json();
+                if (res.ok && json.url) {
+                    document.getElementById('inputModelImageUrl').value = json.url;
+                } else {
+                    alert('Gagal mengunggah gambar: ' + (json.error || 'Terjadi kesalahan'));
+                }
+            } catch (err) {
+                alert('Gagal mengunggah gambar: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        async function handleSaveDecorationModel(e) {
+            e.preventDefault();
+            const errBox = document.getElementById('modelErrorBox');
+            errBox.classList.add('hidden');
+
+            const id = document.getElementById('inputModelId').value;
+            const name = document.getElementById('inputModelName').value.trim();
+            const width = document.getElementById('inputModelWidth').value.trim();
+            const price = parseFloat(document.getElementById('inputModelPrice').value) || 0;
+            const imageUrl = document.getElementById('inputModelImageUrl').value.trim();
+            const description = document.getElementById('inputModelDescription').value.trim();
+
+            if (!name) {
+                errBox.innerText = 'Nama model dekorasi wajib diisi';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            // Collect package links
+            const packageLinks = [];
+            packagesCache.forEach(p => {
+                const cb = document.getElementById('pkg_cb_' + p.id);
+                if (cb && cb.checked) {
+                    const priceInput = document.getElementById('pkg_price_' + p.id);
+                    const addPrice = priceInput ? (parseFloat(priceInput.value) || 0) : 0;
+                    packageLinks.push({
+                        package_id: p.id,
+                        additional_price: addPrice
+                    });
+                }
+            });
+
+            const payload = {
+                name: name,
+                image_url: imageUrl,
+                price: price,
+                width: width,
+                description: description,
+                package_links: packageLinks
+            };
+
+            const btn = document.getElementById('btnSubmitDecorationModel');
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                let url = id ? `/api/decoration-models/${id}` : '/api/decoration-models';
+                if (!id && selectedCompanyId) {
+                    url += '?company_id=' + selectedCompanyId;
+                }
+                const method = id ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || json.message || 'Gagal menyimpan model dekorasi');
+                }
+
+                closeDecorationModelModal();
+                loadDecorationModels();
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Model';
+            }
+        }
+
+        async function handleDeleteDecorationModel(id, name) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus model dekorasi "${name}"?`)) return;
+
+            try {
+                const res = await fetch(`/api/decoration-models/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || json.message || 'Gagal menghapus model dekorasi');
+                }
+                loadDecorationModels();
+            } catch (err) {
+                alert('Gagal menghapus: ' + err.message);
             }
         }
 
@@ -1675,6 +2257,7 @@
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeLogDataModal();
+                closeDecorationModelModal();
             }
         });
     </script>

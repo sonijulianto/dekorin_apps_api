@@ -287,20 +287,58 @@ func DeleteAddon(c *fiber.Ctx) error {
 // GetDecorationModels menangani GET /api/decoration-models
 func GetDecorationModels(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
-	var modelsList []models.DecorationModel
+	userRole, _ := c.Locals("user_role").(string)
 
 	query := config.DB.Model(&models.DecorationModel{})
-	if companyID != "" {
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			query = query.Where("company_id = ?", qComp)
+		}
+	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
+	var modelsList []models.DecorationModel
 	if err := query.Order("sort_order ASC, created_at ASC").Find(&modelsList).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data model dekorasi"})
 	}
 
+	// Ambil relasi package_decoration_models untuk setiap model
+	var modelIDs []string
+	for _, m := range modelsList {
+		modelIDs = append(modelIDs, m.ID)
+	}
+
+	var allPkgModels []models.PackageDecorationModel
+	if len(modelIDs) > 0 {
+		config.DB.Where("decoration_model_id IN ?", modelIDs).Find(&allPkgModels)
+	}
+
+	pkgMap := make(map[string][]models.PackageDecorationModel)
+	for _, pm := range allPkgModels {
+		pkgMap[pm.DecorationModelID] = append(pkgMap[pm.DecorationModelID], pm)
+	}
+
+	var resp []models.DecorationModelResponse
+	for _, m := range modelsList {
+		resp = append(resp, models.DecorationModelResponse{
+			ID:           m.ID,
+			CompanyID:    m.CompanyID,
+			Name:         m.Name,
+			ImageURL:     m.ImageURL,
+			Price:        m.Price,
+			Width:        m.Width,
+			Description:  m.Description,
+			SortOrder:    m.SortOrder,
+			PackageLinks: pkgMap[m.ID],
+			CreatedAt:    m.CreatedAt,
+			UpdatedAt:    m.UpdatedAt,
+		})
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil data model dekorasi",
-		"data":    modelsList,
+		"data":    resp,
 	})
 }
 
@@ -323,6 +361,12 @@ func ReorderDecorationModels(c *fiber.Ctx) error {
 // CreateDecorationModel menangani POST /api/decoration-models
 func CreateDecorationModel(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" {
+			companyID = qComp
+		}
+	}
 	if companyID == "" {
 		companyID = "cmp_default"
 	}
@@ -352,6 +396,25 @@ func CreateDecorationModel(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan model dekorasi: " + err.Error()})
 	}
 
+	// Hubungkan ke paket jika package_links dikirimkan
+	if len(req.PackageLinks) > 0 {
+		for idx, pl := range req.PackageLinks {
+			if strings.TrimSpace(pl.PackageID) != "" {
+				pkgModel := models.PackageDecorationModel{
+					ID:                fmt.Sprintf("pm_%s", uuid.New().String()[:8]),
+					CompanyID:         companyID,
+					PackageID:         strings.TrimSpace(pl.PackageID),
+					DecorationModelID: modelItem.ID,
+					AdditionalPrice:   pl.AdditionalPrice,
+					SortOrder:         idx + 1,
+					CreatedAt:         time.Now(),
+					UpdatedAt:         time.Now(),
+				}
+				config.DB.Create(&pkgModel)
+			}
+		}
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Model dekorasi berhasil dibuat",
 		"data":    modelItem,
@@ -361,11 +424,12 @@ func CreateDecorationModel(c *fiber.Ctx) error {
 // UpdateDecorationModel menangani PUT /api/decoration-models/:id
 func UpdateDecorationModel(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	id := c.Params("id")
 	var modelItem models.DecorationModel
 
 	query := config.DB.Where("id = ?", id)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
@@ -391,6 +455,26 @@ func UpdateDecorationModel(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal meng-update model dekorasi"})
 	}
 
+	// Update relasi paket jika package_links dikirimkan
+	if req.PackageLinks != nil {
+		config.DB.Where("decoration_model_id = ?", modelItem.ID).Delete(&models.PackageDecorationModel{})
+		for idx, pl := range req.PackageLinks {
+			if strings.TrimSpace(pl.PackageID) != "" {
+				pkgModel := models.PackageDecorationModel{
+					ID:                fmt.Sprintf("pm_%s", uuid.New().String()[:8]),
+					CompanyID:         modelItem.CompanyID,
+					PackageID:         strings.TrimSpace(pl.PackageID),
+					DecorationModelID: modelItem.ID,
+					AdditionalPrice:   pl.AdditionalPrice,
+					SortOrder:         idx + 1,
+					CreatedAt:         time.Now(),
+					UpdatedAt:         time.Now(),
+				}
+				config.DB.Create(&pkgModel)
+			}
+		}
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Model dekorasi berhasil diperbarui",
 		"data":    modelItem,
@@ -400,10 +484,11 @@ func UpdateDecorationModel(c *fiber.Ctx) error {
 // DeleteDecorationModel menangani DELETE /api/decoration-models/:id
 func DeleteDecorationModel(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	id := c.Params("id")
 
 	query := config.DB.Where("id = ?", id)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
