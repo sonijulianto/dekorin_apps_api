@@ -421,6 +421,24 @@
       gap: 6px;
     }
 
+    /* Protokol Kesehatan */
+    .prokes-card-dark {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 14px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+    .prokes-card-dark:hover {
+      transform: translateY(-2px);
+    }
+
     /* Wishes Form */
     .form-input {
       width: 100%;
@@ -639,7 +657,7 @@
         <div class="event-address">{{ .AkadAddress }}</div>
         {{ if .AkadMapsURL }}
         <a href="{{ .AkadMapsURL }}" target="_blank" class="btn-maps">
-          <i class="fa-solid fa-location-dot"></i>
+          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;">
           <span>Google Maps</span>
         </a>
         {{ end }}
@@ -654,7 +672,7 @@
         <div class="event-address">{{ .ResepsiAddress }}</div>
         {{ if .ResepsiMapsURL }}
         <a href="{{ .ResepsiMapsURL }}" target="_blank" class="btn-maps">
-          <i class="fa-solid fa-location-dot"></i>
+          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;">
           <span>Google Maps</span>
         </a>
         {{ end }}
@@ -766,6 +784,46 @@
         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin: 6px 0;">{{ .GiftAddress }}</p>
       </div>
       {{ end }}
+    </section>
+
+    <!-- PROTOKOL KESEHATAN (SECTION 6) -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <div class="luxury-header" data-aos="fade-up">
+        <div class="luxury-ornament">
+          <div class="line"></div>
+          <i class="fa-solid fa-shield-heart" style="color: var(--text-gold);"></i>
+          <div class="line rev"></div>
+        </div>
+        <h2 class="luxury-title">Protokol</h2>
+        <p class="luxury-sub">Kesehatan</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px;">
+        <div class="prokes-card-dark" data-aos="fade-up">
+          <img src="/assets/images/floral/asset-hp-1.png" alt="Cuci Tangan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
+          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Mencuci Tangan</span>
+        </div>
+        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="100">
+          <img src="/assets/images/floral/asset-hp-2.png" alt="Hand Sanitizer" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
+          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Hand Sanitizer</span>
+        </div>
+        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="200">
+          <img src="/assets/images/floral/asset-hp-3.png" alt="Hindari Kerumunan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
+          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Hindari Kerumunan</span>
+        </div>
+        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="300">
+          <img src="/assets/images/floral/asset-hp-4.png" alt="Pakai Masker" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
+          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Memakai Masker</span>
+        </div>
+        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="400">
+          <img src="/assets/images/floral/asset-hp-5.png" alt="Tidak Bersentuhan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
+          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Tidak Bersentuhan</span>
+        </div>
+        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="500">
+          <img src="/assets/images/floral/asset-hp-6.png" alt="Jaga Jarak" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
+          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Menjaga Jarak</span>
+        </div>
+      </div>
     </section>
 
     <!-- WISHES (RSVP) -->

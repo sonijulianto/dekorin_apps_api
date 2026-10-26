@@ -1772,7 +1772,7 @@
         </div>
         {{ if or .ResepsiMapsURL .AkadMapsURL }}
         <a class="btn-maps" href="{{ if .ResepsiMapsURL }}{{ .ResepsiMapsURL }}{{ else }}{{ .AkadMapsURL }}{{ end }}" target="_blank">
-          <i class="fa-solid fa-diamond-turn-right"></i>
+          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;">
           <span>Buka di Google Maps</span>
         </a>
         {{ end }}

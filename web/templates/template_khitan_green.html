@@ -202,6 +202,23 @@
       margin-top: 14px;
     }
 
+    /* Protokol Kesehatan */
+    .prokes-card-khitan {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 203, 88, 0.4);
+      border-radius: 14px;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
+    }
+    .prokes-card-khitan:hover {
+      transform: translateY(-2px);
+    }
+
     .bank-card {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 203, 88, 0.25);
@@ -370,7 +387,7 @@
 
         {{ if .AkadMapsURL }}
         <a href="{{ .AkadMapsURL }}" target="_blank" class="btn-maps">
-          <i class="fa-solid fa-map-location-dot"></i>
+          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;">
           <span>Buka Peta Lokasi</span>
         </a>
         {{ end }}
@@ -438,6 +455,39 @@
         <p style="font-size: 12px; color: #E2E8F0; line-height: 1.6; margin: 4px 0;">{{ .GiftAddress }}</p>
       </div>
       {{ end }}
+    </section>
+
+    <!-- PROTOKOL KESEHATAN -->
+    <section class="section-wrap" style="padding-top: 0;">
+      <h2 style="font-size: 24px; color: var(--gold-islamic); margin-bottom: 8px;" data-aos="fade-up">Protokol Kesehatan</h2>
+      <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 16px;" data-aos="fade-up">Demi keselamatan dan kenyamanan bersama, mohon mematuhi anjuran berikut:</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <div class="prokes-card-khitan" data-aos="fade-up">
+          <img src="/assets/images/Asset-2.webp" alt="Pakai Masker" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;">
+          <span style="font-size: 11px; color: #1B4D3E; font-weight: 600;">Memakai Masker</span>
+        </div>
+        <div class="prokes-card-khitan" data-aos="fade-up" data-aos-delay="100">
+          <img src="/assets/images/Asset-3.webp" alt="Cuci Tangan Sabun" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;">
+          <span style="font-size: 11px; color: #1B4D3E; font-weight: 600;">Memakai Sabun</span>
+        </div>
+        <div class="prokes-card-khitan" data-aos="fade-up" data-aos-delay="200">
+          <img src="/assets/images/Asset-4.webp" alt="Mencuci Tangan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;">
+          <span style="font-size: 11px; color: #1B4D3E; font-weight: 600;">Mencuci Tangan</span>
+        </div>
+        <div class="prokes-card-khitan" data-aos="fade-up" data-aos-delay="300">
+          <img src="/assets/images/Asset-5.webp" alt="Menjaga Jarak" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;">
+          <span style="font-size: 11px; color: #1B4D3E; font-weight: 600;">Menjaga Jarak</span>
+        </div>
+        <div class="prokes-card-khitan" data-aos="fade-up" data-aos-delay="400">
+          <img src="/assets/images/Asset-6.webp" alt="Hand Sanitizer" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;">
+          <span style="font-size: 11px; color: #1B4D3E; font-weight: 600;">Hand Sanitizer</span>
+        </div>
+        <div class="prokes-card-khitan" data-aos="fade-up" data-aos-delay="500">
+          <img src="/assets/images/Asset-7.webp" alt="Tidak Bersentuhan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;">
+          <span style="font-size: 11px; color: #1B4D3E; font-weight: 600;">Tidak Bersentuhan</span>
+        </div>
+      </div>
     </section>
 
     <!-- SECTION 5: WISHES / UCAPAN -->

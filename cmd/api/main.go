@@ -99,6 +99,7 @@ func main() {
 	// Serve static upload directory
 	app.Static("/uploads", "./uploads")
 	app.Static("/assets", "./web/assets")
+	app.Static("/images", "./web/assets/images")
 
 	// Upload route
 	api.Post("/upload", handlers.UploadFile)
