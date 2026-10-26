@@ -99,43 +99,64 @@ func CreateInvitation(c *fiber.Ctx) error {
 		companyID = "cmp_default"
 	}
 
+	templateName := strings.TrimSpace(req.Template)
+	if templateName == "" {
+		templateName = "green-leaves"
+	}
+
+	eventType := strings.TrimSpace(req.EventType)
+	if eventType == "" {
+		eventType = "wedding"
+	}
+
 	invitation := models.Invitation{
-		ID:             invID,
-		CompanyID:      companyID,
-		Slug:           slug,
-		Title:          title,
-		CoverImage:     coverImage,
-		Quotes:         req.Quotes,
-		GroomName:      req.GroomName,
-		GroomNickname:  req.GroomNickname,
-		GroomParents:   req.GroomParents,
-		GroomInstagram: strings.TrimPrefix(req.GroomInstagram, "@"),
-		GroomPhoto:     req.GroomPhoto,
-		BrideName:      req.BrideName,
-		BrideNickname:  req.BrideNickname,
-		BrideParents:   req.BrideParents,
-		BrideInstagram: strings.TrimPrefix(req.BrideInstagram, "@"),
-		BridePhoto:     req.BridePhoto,
-		AkadDate:       req.AkadDate,
-		AkadTime:       req.AkadTime,
-		AkadVenue:      req.AkadVenue,
-		AkadAddress:    req.AkadAddress,
-		AkadMapsURL:    req.AkadMapsURL,
-		ResepsiDate:    req.ResepsiDate,
-		ResepsiTime:    req.ResepsiTime,
-		ResepsiVenue:   req.ResepsiVenue,
-		ResepsiAddress: req.ResepsiAddress,
-		ResepsiMapsURL: req.ResepsiMapsURL,
-		BankName1:      req.BankName1,
-		BankAccount1:   req.BankAccount1,
-		BankHolder1:    req.BankHolder1,
-		BankName2:      req.BankName2,
-		BankAccount2:   req.BankAccount2,
-		BankHolder2:    req.BankHolder2,
-		GiftAddress:    req.GiftAddress,
-		AudioURL:       req.AudioURL,
-		GalleryImages:  req.GalleryImages,
-		IsActive:       isActive,
+		ID:              invID,
+		CompanyID:       companyID,
+		Slug:            slug,
+		Title:           title,
+		Template:        templateName,
+		EventType:       eventType,
+		CoverImage:      coverImage,
+		Quotes:          req.Quotes,
+		GroomName:       req.GroomName,
+		GroomNickname:   req.GroomNickname,
+		GroomChildOrder: req.GroomChildOrder,
+		GroomParents:    req.GroomParents,
+		GroomInstagram:  strings.TrimPrefix(req.GroomInstagram, "@"),
+		GroomPhoto:      req.GroomPhoto,
+		BrideName:       req.BrideName,
+		BrideNickname:   req.BrideNickname,
+		BrideChildOrder: req.BrideChildOrder,
+		BrideParents:    req.BrideParents,
+		BrideInstagram:  strings.TrimPrefix(req.BrideInstagram, "@"),
+		BridePhoto:      req.BridePhoto,
+		ChildName:       req.ChildName,
+		ChildNickname:   req.ChildNickname,
+		ChildOrder:      req.ChildOrder,
+		AkadDate:        req.AkadDate,
+		AkadTime:        req.AkadTime,
+		AkadVenue:       req.AkadVenue,
+		AkadAddress:     req.AkadAddress,
+		AkadMapsURL:     req.AkadMapsURL,
+		ResepsiDate:     req.ResepsiDate,
+		ResepsiTime:     req.ResepsiTime,
+		ResepsiVenue:    req.ResepsiVenue,
+		ResepsiAddress:  req.ResepsiAddress,
+		ResepsiMapsURL:  req.ResepsiMapsURL,
+		BankName1:       req.BankName1,
+		BankAccount1:    req.BankAccount1,
+		BankHolder1:     req.BankHolder1,
+		BankName2:       req.BankName2,
+		BankAccount2:    req.BankAccount2,
+		BankHolder2:     req.BankHolder2,
+		GiftAddress:     req.GiftAddress,
+		WaConfirmation:  req.WaConfirmation,
+		AudioURL:        req.AudioURL,
+		GalleryImages:   req.GalleryImages,
+		YoutubeURL:      req.YoutubeURL,
+		LoveStory:       req.LoveStory,
+		TurutMengundang: req.TurutMengundang,
+		IsActive:        isActive,
 	}
 
 	if err := config.DB.Create(&invitation).Error; err != nil {
@@ -167,6 +188,12 @@ func UpdateInvitation(c *fiber.Ctx) error {
 		})
 	}
 
+	if strings.TrimSpace(req.Template) != "" {
+		invitation.Template = strings.TrimSpace(req.Template)
+	}
+	if strings.TrimSpace(req.EventType) != "" {
+		invitation.EventType = strings.TrimSpace(req.EventType)
+	}
 	if strings.TrimSpace(req.Slug) != "" {
 		invitation.Slug = strings.TrimSpace(req.Slug)
 	}
@@ -177,14 +204,19 @@ func UpdateInvitation(c *fiber.Ctx) error {
 	invitation.Quotes = req.Quotes
 	invitation.GroomName = req.GroomName
 	invitation.GroomNickname = req.GroomNickname
+	invitation.GroomChildOrder = req.GroomChildOrder
 	invitation.GroomParents = req.GroomParents
 	invitation.GroomInstagram = strings.TrimPrefix(req.GroomInstagram, "@")
 	invitation.GroomPhoto = req.GroomPhoto
 	invitation.BrideName = req.BrideName
 	invitation.BrideNickname = req.BrideNickname
+	invitation.BrideChildOrder = req.BrideChildOrder
 	invitation.BrideParents = req.BrideParents
 	invitation.BrideInstagram = strings.TrimPrefix(req.BrideInstagram, "@")
 	invitation.BridePhoto = req.BridePhoto
+	invitation.ChildName = req.ChildName
+	invitation.ChildNickname = req.ChildNickname
+	invitation.ChildOrder = req.ChildOrder
 	invitation.AkadDate = req.AkadDate
 	invitation.AkadTime = req.AkadTime
 	invitation.AkadVenue = req.AkadVenue
@@ -202,8 +234,12 @@ func UpdateInvitation(c *fiber.Ctx) error {
 	invitation.BankAccount2 = req.BankAccount2
 	invitation.BankHolder2 = req.BankHolder2
 	invitation.GiftAddress = req.GiftAddress
+	invitation.WaConfirmation = req.WaConfirmation
 	invitation.AudioURL = req.AudioURL
 	invitation.GalleryImages = req.GalleryImages
+	invitation.YoutubeURL = req.YoutubeURL
+	invitation.LoveStory = req.LoveStory
+	invitation.TurutMengundang = req.TurutMengundang
 	if req.IsActive != nil {
 		invitation.IsActive = *req.IsActive
 	}
@@ -308,6 +344,32 @@ func SubmitInvitationWish(c *fiber.Ctx) error {
 	})
 }
 
+// convertYoutubeToEmbed mengubah URL youtube biasa menjadi format embed iframe
+func convertYoutubeToEmbed(rawURL string) string {
+	rawURL = strings.TrimSpace(rawURL)
+	if rawURL == "" {
+		return ""
+	}
+	if strings.Contains(rawURL, "youtube.com/embed/") {
+		return rawURL
+	}
+	if strings.Contains(rawURL, "youtu.be/") {
+		parts := strings.Split(rawURL, "youtu.be/")
+		if len(parts) > 1 {
+			id := strings.Split(parts[1], "?")[0]
+			return fmt.Sprintf("https://www.youtube.com/embed/%s", id)
+		}
+	}
+	if strings.Contains(rawURL, "watch?v=") {
+		parts := strings.Split(rawURL, "watch?v=")
+		if len(parts) > 1 {
+			id := strings.Split(parts[1], "&")[0]
+			return fmt.Sprintf("https://www.youtube.com/embed/%s", id)
+		}
+	}
+	return rawURL
+}
+
 // ShowPublicInvitation menangani GET /invitation/:slug (Render Halaman HTML Web Undangan)
 func ShowPublicInvitation(c *fiber.Ctx) error {
 	slug := c.Params("slug")
@@ -316,10 +378,21 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString("Undangan tidak ditemukan atau tautan salah.")
 	}
 
+	if strings.TrimSpace(invitation.Template) == "" {
+		invitation.Template = "green-leaves"
+	}
+	if strings.TrimSpace(invitation.EventType) == "" {
+		invitation.EventType = "wedding"
+	}
+
 	// Ambil nama tamu dari query parameter ?to=...
 	guestTo := c.Query("to")
 	if strings.TrimSpace(guestTo) == "" {
 		guestTo = "Tamu Undangan"
+	} else {
+		// Rapikan format nama tamu jika ada tanda _ atau -
+		guestTo = strings.ReplaceAll(guestTo, "_", " ")
+		guestTo = strings.ReplaceAll(guestTo, "-", " & ")
 	}
 
 	// Ambil daftar ucapan
@@ -338,16 +411,32 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		}
 	}
 
+	// Pisahkan turut mengundang
+	var turutList []string
+	if strings.TrimSpace(invitation.TurutMengundang) != "" {
+		rawTurut := strings.Split(strings.ReplaceAll(invitation.TurutMengundang, "\r\n", "\n"), "\n")
+		for _, item := range rawTurut {
+			trimmed := strings.TrimSpace(item)
+			if trimmed != "" {
+				turutList = append(turutList, trimmed)
+			}
+		}
+	}
+
 	data := struct {
 		models.Invitation
-		GuestTo     string
-		GalleryList []string
-		Wishes      []models.InvitationWish
+		GuestTo           string
+		GalleryList       []string
+		Wishes            []models.InvitationWish
+		YoutubeEmbedURL   string
+		TurutMengundangList []string
 	}{
-		Invitation:  invitation,
-		GuestTo:     guestTo,
-		GalleryList: galleryList,
-		Wishes:      wishes,
+		Invitation:          invitation,
+		GuestTo:             guestTo,
+		GalleryList:         galleryList,
+		Wishes:              wishes,
+		YoutubeEmbedURL:     convertYoutubeToEmbed(invitation.YoutubeURL),
+		TurutMengundangList: turutList,
 	}
 
 	tmpl, err := template.ParseFiles("web/templates/wedding_invitation.html")

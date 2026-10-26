@@ -40,6 +40,82 @@
       --shadow: 0 10px 30px rgba(121, 166, 175, 0.15);
     }
 
+    /* ================= THEME TEMPLATES SYSTEM ================= */
+    /* 1. Green Leaves (Natural & Fresh) */
+    body.theme-green-leaves {
+      --primary-gold: #588157;
+      --primary-sage: #3A5A40;
+      --bg-cream: #F4F7F4;
+      --bg-dark: #1F2E22;
+      --text-gold: #588157;
+      --text-sage: #3A5A40;
+      --card-bg: #FFFFFF;
+      --shadow: 0 10px 30px rgba(58, 90, 64, 0.15);
+    }
+    /* 2. Creamy Latte (Warm & Classic) */
+    body.theme-creamy-latte {
+      --primary-gold: #B4846C;
+      --primary-sage: #7D5A50;
+      --bg-cream: #FAF5EF;
+      --bg-dark: #2B211E;
+      --text-gold: #B4846C;
+      --text-sage: #7D5A50;
+      --card-bg: #FFFFFF;
+      --shadow: 0 10px 30px rgba(125, 90, 80, 0.15);
+    }
+    /* 3. Floral Terracotta (Soft & Romantic) */
+    body.theme-floral {
+      --primary-gold: #D47A60;
+      --primary-sage: #8E443D;
+      --bg-cream: #FDF8F5;
+      --bg-dark: #2D1A16;
+      --text-gold: #D47A60;
+      --text-sage: #8E443D;
+      --card-bg: #FFFFFF;
+      --shadow: 0 10px 30px rgba(142, 68, 61, 0.15);
+    }
+    /* 4. Luxury Grey (Dark Modern Luxury) */
+    body.theme-luxury-grey {
+      --primary-gold: #D4A574;
+      --primary-sage: #A0AAB2;
+      --bg-cream: #181A1B;
+      --bg-dark: #121314;
+      --text-gold: #D4A574;
+      --text-sage: #E2E8F0;
+      --card-bg: #222528;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    body.theme-luxury-grey .app-wrapper {
+      background-color: #181A1B !important;
+      color: #E2E8F0 !important;
+    }
+    body.theme-luxury-grey .card-box,
+    body.theme-luxury-grey .wedding-card,
+    body.theme-luxury-grey .pay-item,
+    body.theme-luxury-grey .wish-item-box {
+      background-color: #222528 !important;
+      border: 1px solid rgba(212, 165, 116, 0.25) !important;
+      color: #E2E8F0 !important;
+    }
+    body.theme-luxury-grey input,
+    body.theme-luxury-grey textarea,
+    body.theme-luxury-grey select {
+      background-color: #2A2D31 !important;
+      color: #FFF !important;
+      border-color: rgba(212, 165, 116, 0.3) !important;
+    }
+    /* 5. Khitan Green (Islamic Emerald Khitan) */
+    body.theme-khitan-green {
+      --primary-gold: #2E8B57;
+      --primary-sage: #1B4D3E;
+      --bg-cream: #F0F7F4;
+      --bg-dark: #12372A;
+      --text-gold: #2E8B57;
+      --text-sage: #1B4D3E;
+      --card-bg: #FFFFFF;
+      --shadow: 0 10px 30px rgba(27, 77, 62, 0.15);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -1349,7 +1425,7 @@
     }
   </style>
 </head>
-<body>
+<body class="theme-{{ .Template }} {{ if eq .EventType "khitan" }}event-khitan{{ end }}">
 
   <!-- Audio Background Player (Owlink MP3) -->
   <audio id="bgMusic" loop src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/owlink/45fd8f10-e568-11f0-9566-cd08157352d1.mp3{{ end }}"></audio>
@@ -1515,7 +1591,7 @@
             </p>
             {{ end }}
             <h4><b>{{ .GroomName }}</b></h4>
-            <p class="child-number"><b>Putra dari</b></p>
+            <p class="child-number"><b>{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</b></p>
             <p>{{ .GroomParents }}</p>
           </div>
         </div>
@@ -1575,7 +1651,7 @@
             </p>
             {{ end }}
             <h4><b>{{ .BrideName }}</b></h4>
-            <p class="child-number"><b>Putri dari</b></p>
+            <p class="child-number"><b>{{ if .BrideChildOrder }}{{ .BrideChildOrder }}{{ else }}Putri dari{{ end }}</b></p>
             <p>{{ .BrideParents }}</p>
           </div>
         </div>
@@ -1703,6 +1779,16 @@
       </div>
     </section>
 
+    {{ if .LoveStory }}
+    <!-- LOVE STORY / PERJALANAN CINTA SECTION -->
+    <section id="loveStorySection" style="padding: 30px 20px; text-align: center;">
+      <h2 class="section-heading" data-aos="fade-up">Kisah Cinta Kami</h2>
+      <div style="background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow); border: 1px solid rgba(175, 160, 131, 0.25); text-align: left; margin-top: 15px;" data-aos="fade-up">
+        <p style="white-space: pre-line; line-height: 1.8; font-size: 14px; color: var(--text-sage);">{{ .LoveStory }}</p>
+      </div>
+    </section>
+    {{ end }}
+
     <!-- GALLERIES SECTION -->
     <section id="galleries">
       <h2 class="section-heading" data-aos="fade-up">Galeri Foto</h2>
@@ -1723,6 +1809,16 @@
         {{ end }}
       </div>
     </section>
+
+    {{ if .YoutubeEmbedURL }}
+    <!-- VIDEO MOMENT SECTION -->
+    <section id="videoMomentSection" style="padding: 30px 20px; text-align: center;">
+      <h2 class="section-heading" data-aos="fade-up">Video Moment</h2>
+      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: var(--radius-lg); box-shadow: var(--shadow); margin-top: 15px; border: 1px solid rgba(175, 160, 131, 0.2);" data-aos="zoom-in">
+        <iframe src="{{ .YoutubeEmbedURL }}" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </section>
+    {{ end }}
 
     <!-- DIGITAL ENVELOPE / REKENING HADIAH SECTION -->
     <section class="pay-stick" id="paySection">
@@ -1817,6 +1913,18 @@
         {{ end }}
       </div>
     </section>
+
+    {{ if .TurutMengundangList }}
+    <!-- TURUT MENGUNDANG SECTION -->
+    <section id="turutMengundangSection" style="padding: 24px 20px 10px; text-align: center;">
+      <h3 style="font-size: 15px; font-weight: 600; color: var(--primary-gold); margin-bottom: 12px; letter-spacing: 2px;" data-aos="fade-up">TURUT MENGUNDANG</h3>
+      <div style="font-size: 13px; line-height: 1.8; color: var(--text-sage);" data-aos="fade-up">
+        {{ range .TurutMengundangList }}
+          <p style="margin-bottom: 4px;">{{ . }}</p>
+        {{ end }}
+      </div>
+    </section>
+    {{ end }}
 
     <!-- THANK YOU FOOTER (Exact Match Owlink Javanese) -->
     <footer class="thank-you">
