@@ -521,6 +521,9 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		}
 	}
 
+	c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	c.Set("Pragma", "no-cache")
+	c.Set("Expires", "0")
 	c.Set("Content-Type", "text/html; charset=utf-8")
 	return tmpl.Execute(c.Response().BodyWriter(), data)
 }

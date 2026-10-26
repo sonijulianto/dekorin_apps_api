@@ -5,60 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>{{ .Title }}</title>
 
-  <!-- Google Fonts -->
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts matching original repository -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- AOS -->
+  <!-- AOS Animation -->
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
 
   <style>
     :root {
-      --bg-dark: #121516;
-      --bg-gradient: linear-gradient(135deg, #2C3333 0%, #1a1f1f 50%, #2C3333 100%);
-      --glass-card: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.12);
       --text-gold: #D4A574;
-      --text-white: #F8FAFC;
-      --text-muted: #94A3B8;
     }
-
-    * {
-      box-sizing: border-box;
+    body {
+      font-family: 'Montserrat', 'Poppins', sans-serif;
+      background-color: #0b0d0e;
+      color: #F8FAFC;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: #0b0d0e;
-      color: var(--text-white);
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
       overflow-x: hidden;
     }
-
-    .app-frame {
-      width: 100%;
-      max-width: 480px;
-      background: var(--bg-gradient);
-      min-height: 100vh;
-      position: relative;
-      box-shadow: 0 0 60px rgba(0,0,0,0.8);
-      overflow-x: hidden;
+    .font-cursive {
+      font-family: 'Great Vibes', 'Dancing Script', cursive;
     }
-
-    /* Ambient Circles */
-    .ambient-circle {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      pointer-events: none;
+    .font-serif {
+      font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+    }
+    .font-sans {
+      font-family: 'Montserrat', 'Poppins', sans-serif;
     }
 
     /* Floating Audio Button */
@@ -69,485 +49,50 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(44, 51, 51, 0.8);
-      backdrop-filter: blur(10px);
-      color: var(--text-gold);
+      background: rgba(44, 51, 51, 0.85);
+      backdrop-filter: blur(12px);
+      color: #D4A574;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
       z-index: 999;
       cursor: pointer;
-      border: 1px solid var(--text-gold);
+      border: 1px solid rgba(212, 165, 116, 0.6);
       transition: all 0.3s;
     }
     .audio-btn.spinning {
-      animation: spinAudio 4s linear infinite;
+      animation: spinAudio 5s linear infinite;
     }
     @keyframes spinAudio {
       100% { transform: rotate(360deg); }
     }
 
-    /* Opening Overlay */
-    #openingOverlay {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(18,21,22,0.92) 0%, rgba(44,51,51,0.95) 100%), 
-                  url('{{ if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/templates/green-leaves/bg-section1.webp{{ end }}') center/cover no-repeat;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      text-align: center;
-      transition: opacity 0.8s ease, visibility 0.8s;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-    #openingOverlay.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .opening-badge {
-      font-size: 11px;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: var(--text-gold);
-      margin-bottom: 12px;
-      font-family: 'Cinzel', serif;
-    }
-    .opening-couple {
-      font-family: 'Great Vibes', cursive;
-      font-size: 46px;
-      color: var(--text-white);
-      line-height: 1.2;
-      margin: 10px 0;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.6);
-    }
-    .opening-couple span {
-      color: var(--text-gold);
-      font-size: 32px;
-      display: block;
-      margin: 4px 0;
-    }
-    .opening-guest-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 24px;
-      letter-spacing: 1px;
-    }
-    .opening-guest-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--text-gold);
-      margin: 6px 0 24px;
-    }
-    .btn-open {
-      background: linear-gradient(135deg, rgba(212,165,116,0.3) 0%, rgba(212,165,116,0.1) 100%);
-      color: var(--text-white);
-      border: 1px solid var(--text-gold);
-      backdrop-filter: blur(10px);
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-      transition: all 0.3s;
-    }
-    .btn-open:hover {
-      background: var(--text-gold);
-      color: #121516;
-      transform: scale(1.05);
-    }
-
-    /* Section Styling */
-    .section-wrap {
-      padding: 45px 20px;
-      position: relative;
-      text-align: center;
-    }
-    .luxury-header {
-      margin-bottom: 24px;
-      position: relative;
-    }
-    .luxury-ornament {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    .luxury-ornament .line {
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(212,165,116,0.6));
-    }
-    .luxury-ornament .line.rev {
-      background: linear-gradient(90deg, rgba(212,165,116,0.6), transparent);
-    }
-    .luxury-ornament i {
-      color: var(--text-gold);
-      font-size: 16px;
-    }
-    .luxury-title {
-      font-family: 'Cinzel', serif;
-      font-size: 24px;
-      letter-spacing: 3px;
-      color: var(--text-white);
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-    .luxury-sub {
-      font-family: 'Great Vibes', cursive;
-      font-size: 26px;
-      color: var(--text-gold);
-      margin-top: 2px;
-    }
-
-    /* Glass Cards */
-    .glass-card {
-      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-      backdrop-filter: blur(14px);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Couple Profile */
-    .couple-portrait {
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 16px;
-      border-radius: 50%;
-      padding: 4px;
-      background: linear-gradient(135deg, var(--text-gold), transparent);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    }
-    .couple-portrait img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .couple-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--text-white);
-      margin-bottom: 4px;
-    }
-    .couple-order {
-      font-size: 12px;
-      color: var(--text-gold);
-      font-weight: 500;
-    }
-    .couple-parents {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .couple-ig {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-gold);
-      text-decoration: none;
-      margin-top: 8px;
-    }
-
-    /* Event Cards */
-    .event-card {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 22px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .event-banner-img {
-      height: 200px;
-      width: 100%;
-      background-position: center;
-      background-size: cover;
-      background-repeat: no-repeat;
-      border-radius: 16px;
-      margin-bottom: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .countdown-arch-img {
-      height: 220px;
-      width: 100%;
-      background-position: center;
-      background-size: cover;
-      border-radius: 100px 100px 16px 16px;
-      margin-bottom: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .closing-banner-img {
-      height: 180px;
-      max-width: 320px;
-      margin: 0 auto 20px;
-      background-position: center;
-      background-size: cover;
-      border-radius: 18px;
-      border: 1px solid rgba(212, 165, 116, 0.3);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-    }
-    .event-type {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      letter-spacing: 2px;
-      color: var(--text-gold);
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    .event-date {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: var(--text-white);
-      margin-bottom: 4px;
-    }
-    .event-time {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-    .event-venue {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-white);
-    }
-    .event-address {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin: 4px 0 16px;
-    }
-
-    .btn-maps {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, rgba(212,165,116,0.2) 0%, rgba(212,165,116,0.05) 100%);
-      color: var(--text-gold);
-      border: 1px solid var(--text-gold);
-      text-decoration: none;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    .btn-maps:hover {
-      background: var(--text-gold);
-      color: #121516;
-    }
-
-    /* Countdown Grid */
-    .cd-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .cd-tile {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(212, 165, 116, 0.25);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 14px 6px;
-    }
-    .cd-num {
-      font-family: 'Cinzel', serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-gold);
-    }
-    .cd-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    /* Gallery Grid */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 15px;
-    }
-    .gallery-tile {
-      aspect-ratio: 1;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    }
-    .gallery-tile img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s;
-    }
-    .gallery-tile:hover img {
-      transform: scale(1.08);
-    }
-
-    /* Bank Account Cards */
-    .bank-card {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(212, 165, 116, 0.3);
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 14px;
-    }
-    .bank-name {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      color: var(--text-gold);
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-    }
-    .bank-number {
-      font-family: monospace;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-white);
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-    }
-    .bank-holder {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-    .btn-copy {
-      background: rgba(212, 165, 116, 0.15);
-      color: var(--text-gold);
-      border: 1px solid var(--text-gold);
-      padding: 7px 18px;
-      border-radius: 15px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Protokol Kesehatan */
-    .prokes-card-dark {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 14px 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      transition: transform 0.2s;
-    }
-    .prokes-card-dark:hover {
-      transform: translateY(-2px);
-    }
-
-    /* Wishes Form */
-    .form-input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: white;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-family: inherit;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      outline: none;
-    }
-    .form-input:focus {
-      border-color: var(--text-gold);
-    }
-    .btn-submit-wish {
-      width: 100%;
-      background: linear-gradient(135deg, var(--text-gold) 0%, #b8860b 100%);
-      color: #121516;
-      border: none;
-      padding: 14px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .wish-box {
-      max-height: 380px;
-      overflow-y: auto;
-      text-align: left;
-    }
-    .wish-bubble {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 10px;
-    }
-    .wish-header {
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text-gold);
-      display: flex;
-      justify-content: space-between;
-    }
-    .wish-body {
-      font-size: 12.5px;
-      color: #cbd5e1;
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-
     /* Toast */
     #toast {
       position: fixed;
-      bottom: 30px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(212, 165, 116, 0.95);
-      color: #121516;
-      padding: 10px 22px;
-      border-radius: 25px;
-      font-size: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1e293b;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      font-size: 13px;
       font-weight: 600;
       opacity: 0;
-      transition: opacity 0.3s;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
       z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     #toast.show {
       opacity: 1;
+      transform: translateX(-50%) translateY(10px);
     }
   </style>
 </head>
-<body>
+<body class="flex justify-center min-h-screen">
 
   <!-- Audio Player -->
   <audio id="bgMusic" loop src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/owlink/45fd8f10-e568-11f0-9566-cd08157352d1.mp3{{ end }}"></audio>
@@ -555,474 +100,1121 @@
     <i class="fa-solid fa-music"></i>
   </div>
 
-  <div id="toast">Nomor rekening disalin!</div>
+  <div id="toast">Nomor rekening berhasil disalin!</div>
 
-  <!-- OPENING COVER LUXURY GREY -->
-  <div id="openingOverlay">
-    <div class="ambient-circle" style="width: 280px; height: 280px; top: -50px; left: -50px;"></div>
-    <div class="ambient-circle" style="width: 220px; height: 220px; bottom: -30px; right: -30px;"></div>
+  <!-- ============================================== -->
+  <!-- OPENING OVERLAY (EXACT REPO OPENING COMPONENT) -->
+  <!-- ============================================== -->
+  <div
+    id="openingOverlay"
+    class="fixed inset-0 z-[1000] flex flex-col justify-center items-center text-white bg-cover bg-center bg-no-repeat transition-opacity duration-700"
+    style="background-image: url('{{ if .CoverImage }}{{ .CoverImage }}{{ else if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}');"
+  >
+    <!-- Enhanced overlay with subtle gradient -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/35 w-full"></div>
 
-    <p class="opening-badge" data-aos="fade-down">The Wedding Of</p>
-    <h1 class="opening-couple" data-aos="zoom-in">
-      {{ .GroomNickname }}
-      <span>&amp;</span>
-      {{ .BrideNickname }}
-    </h1>
+    <!-- Subtle decorative elements that won't interfere with the photo -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none">
+      <div class="absolute top-10 left-10 w-20 h-20 rounded-full border border-white/20"></div>
+      <div class="absolute bottom-32 right-12 w-16 h-16 rounded-full border border-white/15"></div>
+      <div class="absolute top-1/3 right-8 w-12 h-12 rounded-full border border-white/10"></div>
+      <div class="absolute bottom-1/3 left-8 w-24 h-24 rounded-full border border-white/15"></div>
+    </div>
 
-    <div style="width: 40px; height: 1px; background: var(--text-gold); margin: 15px auto;" data-aos="fade-up"></div>
+    <div class="w-full max-w-md relative z-10 px-6 py-8 overflow-hidden flex flex-col justify-center items-center text-white" data-aos="fade-up">
+      <!-- Main Content Section -->
+      <div class="relative text-center mb-6 w-full">
+        <!-- Elegant backdrop for text readability -->
+        <div class="absolute -inset-4 sm:-inset-6 bg-gradient-to-br from-white/15 to-white/5 rounded-3xl border border-white/20 shadow-2xl backdrop-blur-md"></div>
 
-    <p class="opening-guest-label" data-aos="fade-up">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-    <h3 class="opening-guest-name" data-aos="fade-up">{{ .GuestTo }}</h3>
+        <div class="relative z-10 py-6 px-4">
+          <h2 class="font-serif text-xs sm:text-sm tracking-widest font-light text-white/90 mb-6" style="letter-spacing: 4px;">
+            The Wedding Of
+          </h2>
 
-    <button class="btn-open" onclick="openInvitation()" data-aos="zoom-in">
-      <i class="fa-regular fa-envelope-open"></i>
-      <span>Open Invitation</span>
-    </button>
+          <!-- Names with elegant styling -->
+          <div class="text-3xl sm:text-4xl font-cursive my-6 font-normal text-center">
+            <h4 class="text-white drop-shadow-lg leading-tight">{{ .GroomName }}</h4>
+            <div class="flex items-center justify-center my-3">
+              <div class="w-8 h-px bg-white/60"></div>
+              <i class="fa-solid fa-heart mx-3 text-red-300 text-lg animate-pulse drop-shadow-lg"></i>
+              <div class="w-8 h-px bg-white/60"></div>
+            </div>
+            <h4 class="text-white drop-shadow-lg leading-tight">{{ .BrideName }}</h4>
+          </div>
+
+          <h2 class="font-serif text-xs sm:text-sm tracking-widest font-light text-white/90" style="letter-spacing: 3px;">
+            {{ if .AkadDate }}{{ .AkadDate }}{{ end }}
+          </h2>
+        </div>
+      </div>
+
+      <!-- Invitation Section -->
+      <div class="w-full relative text-center mt-4">
+        <!-- Elegant backdrop for invitation -->
+        <div class="absolute -inset-4 sm:-inset-6 bg-gradient-to-br from-white/10 to-white/5 rounded-2xl border border-white/15 shadow-xl backdrop-blur-md"></div>
+
+        <div class="relative z-10 py-6 px-4">
+          <!-- Decorative line above -->
+          <div class="flex items-center justify-center mb-3">
+            <div class="w-6 h-px bg-gradient-to-r from-transparent to-white/50"></div>
+            <div class="mx-2 w-1 h-1 rounded-full bg-white/50"></div>
+            <div class="w-6 h-px bg-gradient-to-l from-transparent to-white/50"></div>
+          </div>
+
+          <p class="text-white/90 text-xs sm:text-sm font-serif tracking-wide drop-shadow-lg">
+            Kepada Yth. Bapak/Ibu/Saudara/i
+          </p>
+          <p class="text-white text-xl sm:text-2xl mt-2 mb-5 font-serif drop-shadow-lg">
+            {{ .GuestTo }}
+          </p>
+
+          <!-- Enhanced button -->
+          <button
+            onclick="openInvitation()"
+            class="group relative inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm text-white text-sm py-3 px-8 rounded-2xl font-sans border border-white/30 shadow-xl hover:scale-105 active:scale-95 transition-all duration-300"
+          >
+            <i class="fa-regular fa-envelope-open text-base mr-2"></i>
+            <span class="tracking-wide font-medium">Open Invitation</span>
+          </button>
+
+          <!-- Decorative line below -->
+          <div class="flex items-center justify-center mt-5">
+            <div class="w-6 h-px bg-gradient-to-r from-transparent to-white/50"></div>
+            <div class="mx-2 w-1 h-1 rounded-full bg-white/50"></div>
+            <div class="w-6 h-px bg-gradient-to-l from-transparent to-white/50"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- MAIN LUXURY CONTAINER -->
-  <div class="app-frame" id="content">
-    
-    <!-- Ambient decor circles -->
-    <div class="ambient-circle" style="width: 350px; height: 350px; top: 120px; left: -100px;"></div>
-    <div class="ambient-circle" style="width: 250px; height: 250px; top: 800px; right: -80px;"></div>
+  <!-- ============================================== -->
+  <!-- MAIN APP CONTAINER (MAX-W-MD MOBILE FRAME)      -->
+  <!-- ============================================== -->
+  <div class="w-full max-w-[480px] bg-[#1a1f1f] min-h-screen relative shadow-2xl overflow-x-hidden" id="content">
 
-    <!-- QUOTE SECTION -->
-    <section class="section-wrap">
-      {{ if .Sec1Photo }}
-      <div style="height: 240px; width: 100%; max-width: 380px; margin: 0 auto 20px; background: url('{{ .Sec1Photo }}') center/cover no-repeat; border-radius: 20px; border: 1px solid rgba(212,165,116,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5);" data-aos="zoom-in"></div>
-      {{ end }}
-      <div class="glass-card" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-feather"></i>
-          <div class="line rev"></div>
-        </div>
-        <p style="font-size: 13px; line-height: 1.8; color: #cbd5e1; font-style: italic;">
-          {{ if .Quotes }}{{ .Quotes }}{{ else }}"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21){{ end }}
-        </p>
-      </div>
-    </section>
-
-    <!-- COUPLE PROFILE -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-heart" style="color: #f87171;"></i>
-          <div class="line rev"></div>
-        </div>
-        <h2 class="luxury-title">Mempelai</h2>
-        <p class="luxury-sub">The Happy Couple</p>
+    <!-- ============================================== -->
+    <!-- SECTION 1: HERO / AYAT WITH FULL BACKGROUND     -->
+    <!-- ============================================== -->
+    <div
+      class="w-full min-h-screen relative bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center"
+      style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}');"
+    >
+      <!-- Background decorative elements -->
+      <div class="absolute inset-0 opacity-10 pointer-events-none">
+        <div class="absolute top-10 left-10 w-32 h-32 rounded-full border border-white/20"></div>
+        <div class="absolute bottom-20 right-10 w-24 h-24 rounded-full border border-white/20"></div>
+        <div class="absolute top-1/2 left-1/4 w-16 h-16 rounded-full border border-white/20"></div>
+        <div class="absolute top-1/3 right-1/4 w-12 h-12 rounded-full border border-white/20"></div>
       </div>
 
-      <!-- Groom -->
-      <div class="glass-card" data-aos="fade-up">
-        <div class="couple-portrait">
-          <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg{{ end }}" alt="{{ .GroomName }}" onerror="this.src='/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg'">
-        </div>
-        <h3 class="couple-name">{{ .GroomName }}</h3>
-        <p class="couple-order">{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</p>
-        <p class="couple-parents">{{ .GroomParents }}</p>
-        {{ if .GroomInstagram }}
-        <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" class="couple-ig">
-          <i class="fa-brands fa-instagram"></i>
-          <span>@{{ .GroomInstagram }}</span>
-        </a>
-        {{ end }}
-      </div>
+      <!-- Enhanced gradient overlays -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-black/75 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 pointer-events-none"></div>
 
-      <div style="font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--text-gold); margin: 10px 0;" data-aos="zoom-in">&amp;</div>
+      <div class="w-full min-h-screen relative z-10 flex flex-col items-center justify-center text-white px-6 py-16">
+        <div class="w-full text-center space-y-6">
+          <div data-aos="fade-up">
+            <!-- Decorative top element -->
+            <div class="flex items-center justify-center mb-5">
+              <div class="w-16 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+              <i class="fa-solid fa-heart mx-4 text-white/60 text-lg animate-pulse"></i>
+              <div class="w-16 h-px bg-gradient-to-l from-transparent to-white/40"></div>
+            </div>
 
-      <!-- Bride -->
-      <div class="glass-card" data-aos="fade-up">
-        <div class="couple-portrait">
-          <img src="{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/owlink/3005d740-e3aa-11f0-a9de-b37562d0916b.jpg{{ end }}" alt="{{ .BrideName }}" onerror="this.src='/assets/owlink/3005d740-e3aa-11f0-a9de-b37562d0916b.jpg'">
-        </div>
-        <h3 class="couple-name">{{ .BrideName }}</h3>
-        <p class="couple-order">{{ if .BrideChildOrder }}{{ .BrideChildOrder }}{{ else }}Putri dari{{ end }}</p>
-        <p class="couple-parents">{{ .BrideParents }}</p>
-        {{ if .BrideInstagram }}
-        <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" class="couple-ig">
-          <i class="fa-brands fa-instagram"></i>
-          <span>@{{ .BrideInstagram }}</span>
-        </a>
-        {{ end }}
-      </div>
-    </section>
+            <h2 class="text-white text-sm sm:text-base font-serif font-light uppercase drop-shadow-lg" style="letter-spacing: 4px;">
+              The Wedding Of
+            </h2>
 
-    <!-- COUNTDOWN -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="glass-card" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-hourglass-half"></i>
-          <div class="line rev"></div>
-        </div>
-        <h3 style="font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 2px; color: var(--text-white); margin-bottom: 14px;">COUNTDOWN EVENT</h3>
-        {{ if .EventPhoto }}
-        <div class="countdown-arch-img" style="background-image: url('{{ .EventPhoto }}');" data-aos="zoom-in"></div>
-        {{ end }}
-        <div class="cd-grid" data-aos="zoom-in">
-          <div class="cd-tile"><div class="cd-num" id="cdDays">00</div><div class="cd-label">Hari</div></div>
-          <div class="cd-tile"><div class="cd-num" id="cdHours">00</div><div class="cd-label">Jam</div></div>
-          <div class="cd-tile"><div class="cd-num" id="cdMins">00</div><div class="cd-label">Menit</div></div>
-          <div class="cd-tile"><div class="cd-num" id="cdSecs">00</div><div class="cd-label">Detik</div></div>
+            <!-- Names with glassmorphism background -->
+            <div class="relative bg-gradient-to-br from-white/10 to-white/5 rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl backdrop-blur-md mt-6">
+              <!-- Decorative corner elements -->
+              <div class="absolute top-4 left-4 w-3 h-3 border-l-2 border-t-2 border-white/30 rounded-tl-lg"></div>
+              <div class="absolute top-4 right-4 w-3 h-3 border-r-2 border-t-2 border-white/30 rounded-tr-lg"></div>
+              <div class="absolute bottom-4 left-4 w-3 h-3 border-l-2 border-b-2 border-white/30 rounded-bl-lg"></div>
+              <div class="absolute bottom-4 right-4 w-3 h-3 border-r-2 border-b-2 border-white/30 rounded-br-lg"></div>
+
+              <div class="space-y-3 font-serif">
+                <h1 class="text-2xl sm:text-3xl font-light text-white leading-tight drop-shadow-lg">
+                  {{ .GroomName }}
+                </h1>
+                <div class="flex items-center justify-center space-x-3">
+                  <div class="w-12 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
+                  <span class="text-xl sm:text-2xl text-white/90 font-light">&amp;</span>
+                  <div class="w-12 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-light text-white leading-tight drop-shadow-lg">
+                  {{ .BrideName }}
+                </h1>
+              </div>
+            </div>
+
+            <!-- Description / Date -->
+            <div class="max-w-md mx-auto mt-5">
+              <p class="text-white/90 font-sans text-center text-xs leading-relaxed bg-white/5 backdrop-blur-sm border border-white/10 px-5 py-2.5 rounded-2xl tracking-wide">
+                {{ if .AkadDate }}{{ .AkadDate }}{{ end }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Quranic verse with enhanced styling -->
+          <div class="space-y-4 max-w-md mx-auto mt-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="relative bg-gradient-to-br from-white/10 to-white/5 rounded-2xl border border-white/20 p-5 sm:p-6 shadow-2xl backdrop-blur-md">
+              <blockquote class="text-xs sm:text-sm font-serif leading-relaxed text-white/95 italic font-light text-center">
+                {{ if .Quotes }}{{ .Quotes }}{{ else }}"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21){{ end }}
+              </blockquote>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- SCHEDULE EVENTS -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-ring"></i>
-          <div class="line rev"></div>
+    <!-- ============================================== -->
+    <!-- SECTION 2: MEMPELAI (THE HAPPY COUPLE)          -->
+    <!-- ============================================== -->
+    <div
+      class="flex flex-col justify-center items-center py-16 px-4 relative overflow-hidden"
+      style="background-image: linear-gradient(180deg, #404747 0%, #3A3E3E 100%);"
+    >
+      <!-- Background decorative elements -->
+      <div class="absolute inset-0 opacity-5 pointer-events-none">
+        <div class="absolute top-10 left-10 w-32 h-32 rounded-full border border-white/20"></div>
+        <div class="absolute bottom-20 right-10 w-24 h-24 rounded-full border border-white/20"></div>
+        <div class="absolute top-1/2 left-1/4 w-16 h-16 rounded-full border border-white/20"></div>
+      </div>
+
+      <!-- Enhanced Title Section -->
+      <div class="text-center mb-8 relative z-10">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+          <i class="fa-solid fa-heart mx-4 text-white/60 text-lg animate-pulse"></i>
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-white/40"></div>
         </div>
-        <h2 class="luxury-title">Event</h2>
-        <p class="luxury-sub">Wedding Schedule</p>
+
+        <h2 class="text-white text-3xl font-serif mb-3 tracking-wide" data-aos="fade-up">
+          Our Wedding
+        </h2>
+
+        <div class="max-w-md mx-auto">
+          <h4
+            class="text-white/90 font-serif text-center text-xs leading-relaxed italic px-4 py-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            Tanpa mengurangi rasa hormat, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara Pernikahan kami
+          </h4>
+        </div>
       </div>
 
-      <!-- Akad -->
-      <div class="event-card" data-aos="fade-up">
-        {{ if .AkadPhoto }}
-        <div class="event-banner-img" style="background-image: url('{{ .AkadPhoto }}');"></div>
-        {{ end }}
-        <div class="event-type">AKAD NIKAH</div>
-        <div class="event-date">{{ .AkadDate }}</div>
-        <div class="event-time"><i class="fa-regular fa-clock"></i> {{ .AkadTime }}</div>
-        <div class="event-venue">{{ .AkadVenue }}</div>
-        <div class="event-address">{{ .AkadAddress }}</div>
-        {{ if .AkadMapsURL }}
-        <a href="{{ .AkadMapsURL }}" target="_blank" class="btn-maps">
-          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;">
-          <span>Google Maps</span>
-        </a>
-        {{ end }}
+      <!-- GROOM CARD -->
+      <div class="mt-4 px-2 w-full max-w-md" data-aos="fade-right" data-aos-delay="250">
+        <div class="group relative">
+          <!-- Glow effect -->
+          <div class="absolute -inset-1 bg-gradient-to-r from-white/10 to-white/5 rounded-tr-[36px] blur-sm opacity-75"></div>
+
+          <div class="relative flex w-full shadow-2xl shadow-black/50 rounded-tr-[32px] overflow-hidden">
+            <!-- Groom Vertical Sidebar -->
+            <div
+              class="w-1/5 relative flex items-center justify-center"
+              style="background-image: linear-gradient(180deg, #A19788 0%, #2C3333 70%); min-height: 320px;"
+            >
+              <div class="rotate-90 text-white text-2xl sm:text-3xl font-serif tracking-widest drop-shadow-lg whitespace-nowrap">
+                GROOM
+              </div>
+              <div class="absolute top-4 left-1/2 -translate-x-1/2 w-8 h-px bg-white/30"></div>
+              <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-8 h-px bg-white/30"></div>
+            </div>
+
+            <!-- Groom Image -->
+            <div
+              class="w-4/5 relative h-[320px] rounded-tr-[32px] bg-cover bg-center bg-no-repeat"
+              style="background-image: url('{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg{{ end }}');"
+            >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Groom Info Card Below -->
+        <div class="mt-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl border border-white/20 p-5 text-center text-white shadow-2xl">
+            <!-- Corner Accents -->
+            <div class="absolute top-3 left-3 w-3 h-3 border-l-2 border-t-2 border-white/30 rounded-tl-lg"></div>
+            <div class="absolute top-3 right-3 w-3 h-3 border-r-2 border-t-2 border-white/30 rounded-tr-lg"></div>
+            <div class="absolute bottom-3 left-3 w-3 h-3 border-l-2 border-b-2 border-white/30 rounded-bl-lg"></div>
+            <div class="absolute bottom-3 right-3 w-3 h-3 border-r-2 border-b-2 border-white/30 rounded-br-lg"></div>
+
+            <div class="relative z-10">
+              <h4 class="text-xl sm:text-2xl font-serif font-bold mb-2 tracking-wide text-white drop-shadow-lg">
+                {{ .GroomName }}
+              </h4>
+
+              <div class="flex items-center justify-center mb-3">
+                <div class="w-8 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+                <div class="mx-2 w-1 h-1 rounded-full bg-white/60"></div>
+                <div class="w-8 h-px bg-gradient-to-l from-transparent to-white/40"></div>
+              </div>
+
+              <div class="text-xs sm:text-sm font-sans text-white/90 leading-relaxed mb-4 bg-black/25 rounded-2xl p-3.5 backdrop-blur-sm">
+                <span class="block text-white/70 text-[10px] uppercase tracking-wider mb-1">
+                  {{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}
+                </span>
+                <div class="font-medium">
+                  {{ .GroomParents }}
+                </div>
+              </div>
+
+              {{ if .GroomInstagram }}
+              <div class="flex justify-center items-center">
+                <a
+                  href="https://instagram.com/{{ .GroomInstagram }}"
+                  target="_blank"
+                  class="relative inline-flex items-center bg-gradient-to-r from-purple-600/90 to-pink-600/90 hover:from-purple-700 hover:to-pink-700 py-2.5 px-5 rounded-2xl font-medium text-xs transition-all duration-300 shadow-xl border border-white/10"
+                >
+                  <i class="fa-brands fa-instagram mr-2 text-base"></i>
+                  <span>@{{ .GroomInstagram }}</span>
+                </a>
+              </div>
+              {{ end }}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Resepsi -->
-      <div class="event-card" data-aos="fade-up">
-        {{ if .ResepsiPhoto }}
-        <div class="event-banner-img" style="background-image: url('{{ .ResepsiPhoto }}');"></div>
-        {{ end }}
-        <div class="event-type">RESEPSI</div>
-        <div class="event-date">{{ .ResepsiDate }}</div>
-        <div class="event-time"><i class="fa-regular fa-clock"></i> {{ .ResepsiTime }}</div>
-        <div class="event-venue">{{ .ResepsiVenue }}</div>
-        <div class="event-address">{{ .ResepsiAddress }}</div>
-        {{ if .ResepsiMapsURL }}
-        <a href="{{ .ResepsiMapsURL }}" target="_blank" class="btn-maps">
-          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle;">
-          <span>Google Maps</span>
-        </a>
-        {{ end }}
+      <!-- Couple Names Flourish Between -->
+      <div class="text-white my-8 text-center relative z-10" data-aos="zoom-in">
+        <div class="flex items-center justify-center">
+          <div class="w-10 h-px bg-white/60"></div>
+          <i class="fa-solid fa-heart mx-4 text-red-400 text-2xl animate-pulse drop-shadow-lg"></i>
+          <div class="w-10 h-px bg-white/60"></div>
+        </div>
       </div>
-    </section>
 
-    <!-- LOVE STORY -->
+      <!-- BRIDE CARD -->
+      <div class="px-2 w-full max-w-md" data-aos="fade-left" data-aos-delay="250">
+        <div class="group relative">
+          <!-- Glow effect -->
+          <div class="absolute -inset-1 bg-gradient-to-l from-white/10 to-white/5 rounded-tl-[36px] blur-sm opacity-75"></div>
+
+          <div class="relative flex w-full shadow-2xl shadow-black/50 rounded-tl-[32px] overflow-hidden">
+            <!-- Bride Image -->
+            <div
+              class="w-4/5 relative h-[320px] rounded-tl-[32px] bg-cover bg-center bg-no-repeat"
+              style="background-image: url('{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/owlink/3005d740-e3aa-11f0-a9de-b37562d0916b.jpg{{ end }}');"
+            >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+            </div>
+
+            <!-- Bride Vertical Sidebar -->
+            <div
+              class="w-1/5 relative flex items-center justify-center"
+              style="background-image: linear-gradient(180deg, #A19788 0%, #2C3333 70%); min-height: 320px;"
+            >
+              <div class="rotate-90 text-white text-2xl sm:text-3xl font-serif tracking-widest drop-shadow-lg whitespace-nowrap">
+                BRIDE
+              </div>
+              <div class="absolute top-4 left-1/2 -translate-x-1/2 w-8 h-px bg-white/30"></div>
+              <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-8 h-px bg-white/30"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bride Info Card Below -->
+        <div class="mt-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl border border-white/20 p-5 text-center text-white shadow-2xl">
+            <!-- Corner Accents -->
+            <div class="absolute top-3 left-3 w-3 h-3 border-l-2 border-t-2 border-white/30 rounded-tl-lg"></div>
+            <div class="absolute top-3 right-3 w-3 h-3 border-r-2 border-t-2 border-white/30 rounded-tr-lg"></div>
+            <div class="absolute bottom-3 left-3 w-3 h-3 border-l-2 border-b-2 border-white/30 rounded-bl-lg"></div>
+            <div class="absolute bottom-3 right-3 w-3 h-3 border-r-2 border-b-2 border-white/30 rounded-br-lg"></div>
+
+            <div class="relative z-10">
+              <h4 class="text-xl sm:text-2xl font-serif font-bold mb-2 tracking-wide text-white drop-shadow-lg">
+                {{ .BrideName }}
+              </h4>
+
+              <div class="flex items-center justify-center mb-3">
+                <div class="w-8 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+                <div class="mx-2 w-1 h-1 rounded-full bg-white/60"></div>
+                <div class="w-8 h-px bg-gradient-to-l from-transparent to-white/40"></div>
+              </div>
+
+              <div class="text-xs sm:text-sm font-sans text-white/90 leading-relaxed mb-4 bg-black/25 rounded-2xl p-3.5 backdrop-blur-sm">
+                <span class="block text-white/70 text-[10px] uppercase tracking-wider mb-1">
+                  {{ if .BrideChildOrder }}{{ .BrideChildOrder }}{{ else }}Putri dari{{ end }}
+                </span>
+                <div class="font-medium">
+                  {{ .BrideParents }}
+                </div>
+              </div>
+
+              {{ if .BrideInstagram }}
+              <div class="flex justify-center items-center">
+                <a
+                  href="https://instagram.com/{{ .BrideInstagram }}"
+                  target="_blank"
+                  class="relative inline-flex items-center bg-gradient-to-r from-purple-600/90 to-pink-600/90 hover:from-purple-700 hover:to-pink-700 py-2.5 px-5 rounded-2xl font-medium text-xs transition-all duration-300 shadow-xl border border-white/10"
+                >
+                  <i class="fa-brands fa-instagram mr-2 text-base"></i>
+                  <span>@{{ .BrideInstagram }}</span>
+                </a>
+              </div>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 3: WEDDING EVENT (AKAD & RESEPSI)      -->
+    <!-- ============================================== -->
+    <div
+      class="flex justify-center items-center flex-col px-4 py-16 relative overflow-hidden"
+      style="background-image: linear-gradient(135deg, #2C3333 0%, #1a1f1f 50%, #2C3333 100%);"
+    >
+      <!-- Background decorative elements -->
+      <div class="absolute inset-0 opacity-5 pointer-events-none">
+        <div class="absolute top-20 left-20 w-40 h-40 rounded-full border border-white/20"></div>
+        <div class="absolute bottom-32 right-16 w-28 h-28 rounded-full border border-white/20"></div>
+        <div class="absolute top-1/3 right-1/4 w-20 h-20 rounded-full border border-white/20"></div>
+      </div>
+
+      <div class="text-center mb-10 relative z-10" data-aos="zoom-in">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+          <i class="fa-solid fa-ring mx-4 text-white/60 text-xl animate-pulse"></i>
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-white/40"></div>
+        </div>
+        <h2 class="font-serif text-white text-3xl font-light tracking-wide mb-1">
+          WEDDING
+        </h2>
+        <h2 class="text-white/80 text-2xl font-cursive tracking-wider">Event</h2>
+      </div>
+
+      <!-- CARD AKAD NIKAH -->
+      <div class="relative w-full max-w-md mt-4 group" data-aos="fade-up">
+        <div class="relative shadow-2xl shadow-black/60 rounded-t-[36px] overflow-hidden">
+          <!-- Top Akad Banner Image -->
+          <div
+            class="bg-cover bg-center bg-no-repeat rounded-t-[36px] h-[340px] w-full relative"
+            style="background-image: url('{{ if .AkadPhoto }}{{ .AkadPhoto }}{{ else if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}');"
+          >
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+          </div>
+
+          <!-- Bottom Split -->
+          <div class="flex w-full">
+            <!-- Sidebar Left -->
+            <div class="w-1/4 min-h-[300px] bg-gradient-to-b from-gray-800 to-gray-900 relative flex items-center justify-center">
+              <div class="rotate-90 text-white text-2xl font-serif tracking-[0.2em] drop-shadow-lg whitespace-nowrap">
+                AKAD NIKAH
+              </div>
+            </div>
+
+            <!-- Content Right -->
+            <div class="w-3/4 py-8 px-4 flex justify-center items-center flex-col bg-gradient-to-br from-white to-gray-50 relative text-gray-800">
+              <!-- Corner decoration -->
+              <div class="absolute top-4 left-4 w-3 h-3 border-l-2 border-t-2 border-gray-300 rounded-tl-lg"></div>
+              <div class="absolute top-4 right-4 w-3 h-3 border-r-2 border-t-2 border-gray-300 rounded-tr-lg"></div>
+              <div class="absolute bottom-4 left-4 w-3 h-3 border-l-2 border-b-2 border-gray-300 rounded-bl-lg"></div>
+              <div class="absolute bottom-4 right-4 w-3 h-3 border-r-2 border-b-2 border-gray-300 rounded-br-lg"></div>
+
+              <h2 class="text-gray-700 font-serif text-xl sm:text-2xl mb-2 font-light tracking-wide event-day" data-raw="{{ .AkadDate }}">
+                {{ .AkadDate }}
+              </h2>
+
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-px bg-gradient-to-r from-transparent to-gray-400"></div>
+                <div class="mx-2 w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                <div class="w-12 h-px bg-gradient-to-l from-transparent to-gray-400"></div>
+              </div>
+
+              <h2 class="text-gray-800 font-serif text-4xl sm:text-5xl mb-4 font-bold drop-shadow-sm event-num"></h2>
+
+              <h2 class="text-gray-800 font-serif text-base sm:text-lg mb-4 font-medium event-my"></h2>
+
+              <div class="bg-gray-100/80 rounded-xl p-3 mb-4 border border-gray-200 text-center w-full">
+                <p class="text-gray-600 font-sans text-xs sm:text-sm font-medium leading-relaxed">
+                  <i class="fa-regular fa-clock mr-1"></i> {{ if .AkadTime }}{{ .AkadTime }}{{ else }}08:00 - 10:00 WIB{{ end }}
+                </p>
+                {{ if .AkadVenue }}
+                <p class="text-gray-800 font-sans text-xs font-bold mt-1">
+                  {{ .AkadVenue }}
+                </p>
+                {{ end }}
+                {{ if .AkadAddress }}
+                <p class="text-gray-500 font-sans text-[11px] mt-0.5">
+                  {{ .AkadAddress }}
+                </p>
+                {{ end }}
+              </div>
+
+              {{ if .AkadMapsURL }}
+              <a
+                href="{{ .AkadMapsURL }}"
+                target="_blank"
+                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white py-2.5 px-6 rounded-xl transition shadow-md border border-gray-700 text-xs font-medium"
+              >
+                <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-4 h-4 object-contain">
+                <span>Google Maps</span>
+              </a>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD RESEPSI -->
+      <div class="relative w-full max-w-md mt-12 group" data-aos="fade-up">
+        <div class="relative shadow-2xl shadow-black/60 rounded-t-[36px] overflow-hidden">
+          <!-- Top Resepsi Banner Image -->
+          <div
+            class="bg-cover bg-center bg-no-repeat rounded-t-[36px] h-[340px] w-full relative"
+            style="background-image: url('{{ if .ResepsiPhoto }}{{ .ResepsiPhoto }}{{ else if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}');"
+          >
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+          </div>
+
+          <!-- Bottom Split -->
+          <div class="flex w-full">
+            <!-- Content Left -->
+            <div class="w-3/4 py-8 px-4 flex justify-center items-center flex-col bg-gradient-to-bl from-white to-gray-50 relative text-gray-800">
+              <!-- Corner decoration -->
+              <div class="absolute top-4 left-4 w-3 h-3 border-l-2 border-t-2 border-gray-300 rounded-tl-lg"></div>
+              <div class="absolute top-4 right-4 w-3 h-3 border-r-2 border-t-2 border-gray-300 rounded-tr-lg"></div>
+              <div class="absolute bottom-4 left-4 w-3 h-3 border-l-2 border-b-2 border-gray-300 rounded-bl-lg"></div>
+              <div class="absolute bottom-4 right-4 w-3 h-3 border-r-2 border-b-2 border-gray-300 rounded-br-lg"></div>
+
+              <h2 class="text-gray-700 font-serif text-xl sm:text-2xl mb-2 font-light tracking-wide event-day" data-raw="{{ .ResepsiDate }}">
+                {{ .ResepsiDate }}
+              </h2>
+
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-px bg-gradient-to-r from-transparent to-gray-400"></div>
+                <div class="mx-2 w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                <div class="w-12 h-px bg-gradient-to-l from-transparent to-gray-400"></div>
+              </div>
+
+              <h2 class="text-gray-800 font-serif text-4xl sm:text-5xl mb-4 font-bold drop-shadow-sm event-num"></h2>
+
+              <h2 class="text-gray-800 font-serif text-base sm:text-lg mb-4 font-medium event-my"></h2>
+
+              <div class="bg-gray-100/80 rounded-xl p-3 mb-4 border border-gray-200 text-center w-full">
+                <p class="text-gray-600 font-sans text-xs sm:text-sm font-medium leading-relaxed">
+                  <i class="fa-regular fa-clock mr-1"></i> {{ if .ResepsiTime }}{{ .ResepsiTime }}{{ else }}11:00 - 14:00 WIB{{ end }}
+                </p>
+                {{ if .ResepsiVenue }}
+                <p class="text-gray-800 font-sans text-xs font-bold mt-1">
+                  {{ .ResepsiVenue }}
+                </p>
+                {{ end }}
+                {{ if .ResepsiAddress }}
+                <p class="text-gray-500 font-sans text-[11px] mt-0.5">
+                  {{ .ResepsiAddress }}
+                </p>
+                {{ end }}
+              </div>
+
+              {{ if .ResepsiMapsURL }}
+              <a
+                href="{{ .ResepsiMapsURL }}"
+                target="_blank"
+                class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white py-2.5 px-6 rounded-xl transition shadow-md border border-gray-700 text-xs font-medium"
+              >
+                <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-4 h-4 object-contain">
+                <span>Google Maps</span>
+              </a>
+              {{ end }}
+            </div>
+
+            <!-- Sidebar Right -->
+            <div class="w-1/4 min-h-[300px] bg-gradient-to-b from-gray-800 to-gray-900 relative flex items-center justify-center">
+              <div class="rotate-90 text-white text-2xl font-serif tracking-[0.2em] drop-shadow-lg whitespace-nowrap">
+                RESEPSI
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COUNTDOWN SECTION -->
+      <div class="mt-16 w-full max-w-md flex flex-col items-center" data-aos="fade-up">
+        <div class="text-center mb-8">
+          <div class="flex items-center justify-center mb-3">
+            <div class="w-12 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+            <i class="fa-solid fa-hourglass-half mx-3 text-white/60 text-lg animate-pulse"></i>
+            <div class="w-12 h-px bg-gradient-to-l from-transparent to-white/40"></div>
+          </div>
+          <h2 class="font-serif text-white text-2xl font-light tracking-wide mb-1">
+            EVENT
+          </h2>
+          <h2 class="text-white/80 text-xl font-cursive tracking-wider">Countdown</h2>
+        </div>
+
+        <!-- Arch Event Picture -->
+        <div class="w-full px-4 mb-8">
+          <div
+            class="bg-cover bg-center bg-no-repeat rounded-t-[140px] h-[340px] w-full shadow-2xl relative overflow-hidden border border-white/15"
+            style="background-image: url('{{ if .EventPhoto }}{{ .EventPhoto }}{{ else if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}');"
+          >
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+          </div>
+        </div>
+
+        <!-- 4 Countdown Tiles -->
+        <div class="grid grid-cols-4 gap-3 w-full px-2 text-white">
+          <div class="relative bg-white/10 backdrop-blur-xl rounded-2xl p-3 border border-white/20 flex flex-col justify-center items-center shadow-lg">
+            <h4 class="text-2xl sm:text-3xl font-bold mb-1" id="cdDays">00</h4>
+            <h4 class="text-[10px] sm:text-xs uppercase tracking-wider text-white/80">Hari</h4>
+          </div>
+          <div class="relative bg-white/10 backdrop-blur-xl rounded-2xl p-3 border border-white/20 flex flex-col justify-center items-center shadow-lg">
+            <h4 class="text-2xl sm:text-3xl font-bold mb-1" id="cdHours">00</h4>
+            <h4 class="text-[10px] sm:text-xs uppercase tracking-wider text-white/80">Jam</h4>
+          </div>
+          <div class="relative bg-white/10 backdrop-blur-xl rounded-2xl p-3 border border-white/20 flex flex-col justify-center items-center shadow-lg">
+            <h4 class="text-2xl sm:text-3xl font-bold mb-1" id="cdMins">00</h4>
+            <h4 class="text-[10px] sm:text-xs uppercase tracking-wider text-white/80">Menit</h4>
+          </div>
+          <div class="relative bg-white/10 backdrop-blur-xl rounded-2xl p-3 border border-white/20 flex flex-col justify-center items-center shadow-lg">
+            <h4 class="text-2xl sm:text-3xl font-bold mb-1" id="cdSecs">00</h4>
+            <h4 class="text-[10px] sm:text-xs uppercase tracking-wider text-white/80">Detik</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 4: LOVE STORY (IF AVAILABLE)            -->
+    <!-- ============================================== -->
     {{ if .LoveStory }}
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="glass-card" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-book-bookmark"></i>
-          <div class="line rev"></div>
+    <div
+      class="flex justify-center items-center flex-col px-5 py-16 relative overflow-hidden"
+      style="background-image: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);"
+    >
+      <div class="text-center mb-8 relative z-10" data-aos="zoom-in">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-gray-400/60"></div>
+          <i class="fa-solid fa-heart mx-3 text-red-400/80 text-xl animate-pulse"></i>
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-gray-400/60"></div>
         </div>
-        <h2 class="luxury-title" style="font-size: 18px; margin-bottom: 12px;">OUR STORY</h2>
-        <p style="white-space: pre-line; font-size: 13px; line-height: 1.8; color: #cbd5e1; text-align: left;">{{ .LoveStory }}</p>
+        <h2 class="font-serif text-gray-800 text-3xl font-light tracking-wide mb-1">
+          LOVE
+        </h2>
+        <h2 class="text-gray-600 text-2xl font-cursive tracking-wider">Story</h2>
       </div>
-    </section>
+
+      <div class="w-full max-w-md relative z-10" data-aos="fade-up">
+        <div class="relative bg-gradient-to-br from-white to-gray-50/90 rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-200">
+          <p class="whitespace-pre-line font-sans text-xs sm:text-sm leading-relaxed text-gray-700 text-left">
+            {{ .LoveStory }}
+          </p>
+        </div>
+      </div>
+    </div>
     {{ end }}
 
-    <!-- VIDEO MOMENT -->
-    {{ if .YoutubeEmbedURL }}
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-play"></i>
-          <div class="line rev"></div>
+    <!-- ============================================== -->
+    <!-- SECTION 5: MOMENT GALLERY & VIDEO               -->
+    <!-- ============================================== -->
+    <div
+      class="flex justify-center items-center flex-col px-4 py-16 relative overflow-hidden"
+      style="background-image: linear-gradient(135deg, #2C3333 0%, #1a1f1f 50%, #2C3333 100%);"
+    >
+      <div class="text-center mb-10 relative z-10" data-aos="zoom-in">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-white/40"></div>
+          <i class="fa-solid fa-camera mx-4 text-white/60 text-xl animate-pulse"></i>
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-white/40"></div>
         </div>
-        <h2 class="luxury-title">Cinema</h2>
-        <p class="luxury-sub">Moment Video</p>
+        <h2 class="font-serif text-white text-3xl font-light tracking-wide mb-1">
+          MOMENT
+        </h2>
+        <h2 class="text-white/80 text-2xl font-cursive tracking-wider">Gallery</h2>
       </div>
-      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 20px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);" data-aos="zoom-in">
-        <iframe src="{{ .YoutubeEmbedURL }}" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen></iframe>
-      </div>
-    </section>
-    {{ end }}
 
-    <!-- GALLERY -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-camera-retro"></i>
-          <div class="line rev"></div>
+      <!-- Video Embed -->
+      {{ if .YoutubeEmbedURL }}
+      <div class="w-full max-w-md mb-8 relative" data-aos="zoom-in">
+        <div class="relative bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border border-white/20 shadow-2xl">
+          <div class="relative pb-[56.25%] h-0 rounded-xl overflow-hidden">
+            <iframe src="{{ .YoutubeEmbedURL }}" class="absolute inset-0 w-full h-full border-0" allowfullscreen></iframe>
+          </div>
         </div>
-        <h2 class="luxury-title">Moment</h2>
-        <p class="luxury-sub">Gallery</p>
       </div>
-      <div class="gallery-grid">
+      {{ end }}
+
+      <!-- Gallery Grid -->
+      <div class="grid grid-cols-6 gap-3 w-full max-w-md relative z-10" data-aos="fade-up">
         {{ if .GalleryList }}
-          {{ range .GalleryList }}
-          <div class="gallery-tile" data-aos="zoom-in">
-            <img src="{{ . }}" alt="Galeri">
+          {{ range $i, $img := .GalleryList }}
+          <div
+            class="relative overflow-hidden rounded-xl border border-white/20 shadow-xl cursor-pointer hover:scale-[1.02] transition-transform duration-300 {{ if eq $i 0 }}col-span-6 aspect-video{{ else if eq $i 1 }}col-span-4 aspect-square{{ else }}col-span-2 aspect-square{{ end }}"
+            onclick="openImageModal('{{ $img }}')"
+          >
+            <img src="{{ $img }}" alt="Gallery {{$i}}" class="w-full h-full object-cover" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+              <i class="fa-solid fa-expand text-white text-lg"></i>
+            </div>
           </div>
           {{ end }}
         {{ else }}
-          <div class="gallery-tile" data-aos="zoom-in">
-            <img src="{{ if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}" alt="Galeri">
+          <div class="col-span-6 aspect-video rounded-xl overflow-hidden border border-white/20 shadow-xl" onclick="openImageModal('{{ if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}')">
+            <img src="{{ if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}" alt="Gallery" class="w-full h-full object-cover">
           </div>
         {{ end }}
       </div>
-    </section>
+    </div>
 
-    <!-- DIGITAL GIFT -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-gift"></i>
-          <div class="line rev"></div>
-        </div>
-        <h2 class="luxury-title">Wedding</h2>
-        <p class="luxury-sub">Gift</p>
+    <!-- Lightbox Modal -->
+    <div id="imageModal" class="fixed inset-0 z-[2000] hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4" onclick="closeImageModal()">
+      <button class="absolute top-5 right-5 text-white text-2xl font-bold w-10 h-10 rounded-full bg-black/60 flex items-center justify-center border border-white/20">✕</button>
+      <img id="modalImg" src="" alt="Enlarged" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain">
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 6: PROTOKOL KESEHATAN                  -->
+    <!-- ============================================== -->
+    <div class="flex flex-col items-center justify-center py-12 px-4 bg-[#121516] text-white">
+      <div class="text-center mb-8" data-aos="zoom-in">
+        <h2 class="font-serif text-2xl mb-1">Protokol</h2>
+        <h2 class="font-cursive text-xl text-[#D4A574]">Kesehatan</h2>
       </div>
 
-      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;" data-aos="fade-up">
-        Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Apabila Anda ingin memberikan ungkapan tanda kasih secara cashless:
-      </p>
-
-      {{ if .BankAccount1 }}
-      <div class="bank-card" data-aos="fade-up">
-        <div class="bank-name">{{ .BankName1 }}</div>
-        <div class="bank-number" id="acc1">{{ .BankAccount1 }}</div>
-        <div class="bank-holder">a.n {{ .BankHolder1 }}</div>
-        <button class="btn-copy" onclick="copyNum('acc1')">
-          <i class="fa-regular fa-copy"></i>
-          <span>Salin Rekening</span>
-        </button>
-      </div>
-      {{ end }}
-
-      {{ if .BankAccount2 }}
-      <div class="bank-card" data-aos="fade-up">
-        <div class="bank-name">{{ .BankName2 }}</div>
-        <div class="bank-number" id="acc2">{{ .BankAccount2 }}</div>
-        <div class="bank-holder">a.n {{ .BankHolder2 }}</div>
-        <button class="btn-copy" onclick="copyNum('acc2')">
-          <i class="fa-regular fa-copy"></i>
-          <span>Salin Rekening</span>
-        </button>
-      </div>
-      {{ end }}
-
-      {{ if .GiftAddress }}
-      <div class="bank-card" data-aos="fade-up">
-        <div class="bank-name"><i class="fa-solid fa-location-arrow"></i> Kirim Kado Fisik</div>
-        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin: 6px 0;">{{ .GiftAddress }}</p>
-      </div>
-      {{ end }}
-    </section>
-
-    <!-- PROTOKOL KESEHATAN (SECTION 6) -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-shield-heart" style="color: var(--text-gold);"></i>
-          <div class="line rev"></div>
+      <div class="grid grid-cols-3 gap-3 w-full max-w-md">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center text-center backdrop-blur-sm" data-aos="fade-up">
+          <img src="/assets/images/floral/asset-hp-1.png" alt="Cuci Tangan" class="w-10 h-10 object-contain mb-2 filter brightness-110">
+          <span class="text-[10px] text-gray-300 font-medium">Mencuci Tangan</span>
         </div>
-        <h2 class="luxury-title">Protokol</h2>
-        <p class="luxury-sub">Kesehatan</p>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px;">
-        <div class="prokes-card-dark" data-aos="fade-up">
-          <img src="/assets/images/floral/asset-hp-1.png" alt="Cuci Tangan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
-          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Mencuci Tangan</span>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center text-center backdrop-blur-sm" data-aos="fade-up" data-aos-delay="100">
+          <img src="/assets/images/floral/asset-hp-2.png" alt="Hand Sanitizer" class="w-10 h-10 object-contain mb-2 filter brightness-110">
+          <span class="text-[10px] text-gray-300 font-medium">Hand Sanitizer</span>
         </div>
-        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="100">
-          <img src="/assets/images/floral/asset-hp-2.png" alt="Hand Sanitizer" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
-          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Hand Sanitizer</span>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center text-center backdrop-blur-sm" data-aos="fade-up" data-aos-delay="200">
+          <img src="/assets/images/floral/asset-hp-3.png" alt="Hindari Kerumunan" class="w-10 h-10 object-contain mb-2 filter brightness-110">
+          <span class="text-[10px] text-gray-300 font-medium">Hindari Kerumunan</span>
         </div>
-        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="200">
-          <img src="/assets/images/floral/asset-hp-3.png" alt="Hindari Kerumunan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
-          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Hindari Kerumunan</span>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center text-center backdrop-blur-sm" data-aos="fade-up" data-aos-delay="300">
+          <img src="/assets/images/floral/asset-hp-4.png" alt="Pakai Masker" class="w-10 h-10 object-contain mb-2 filter brightness-110">
+          <span class="text-[10px] text-gray-300 font-medium">Memakai Masker</span>
         </div>
-        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="300">
-          <img src="/assets/images/floral/asset-hp-4.png" alt="Pakai Masker" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
-          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Memakai Masker</span>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center text-center backdrop-blur-sm" data-aos="fade-up" data-aos-delay="400">
+          <img src="/assets/images/floral/asset-hp-5.png" alt="Tidak Bersentuhan" class="w-10 h-10 object-contain mb-2 filter brightness-110">
+          <span class="text-[10px] text-gray-300 font-medium">Tidak Bersentuhan</span>
         </div>
-        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="400">
-          <img src="/assets/images/floral/asset-hp-5.png" alt="Tidak Bersentuhan" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
-          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Tidak Bersentuhan</span>
-        </div>
-        <div class="prokes-card-dark" data-aos="fade-up" data-aos-delay="500">
-          <img src="/assets/images/floral/asset-hp-6.png" alt="Jaga Jarak" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: brightness(1.2);">
-          <span style="font-size: 11px; color: #cbd5e1; font-weight: 500;">Menjaga Jarak</span>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center text-center backdrop-blur-sm" data-aos="fade-up" data-aos-delay="500">
+          <img src="/assets/images/floral/asset-hp-6.png" alt="Jaga Jarak" class="w-10 h-10 object-contain mb-2 filter brightness-110">
+          <span class="text-[10px] text-gray-300 font-medium">Menjaga Jarak</span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- WISHES (RSVP) -->
-    <section class="section-wrap" style="padding-top: 0;">
-      <div class="luxury-header" data-aos="fade-up">
-        <div class="luxury-ornament">
-          <div class="line"></div>
-          <i class="fa-solid fa-envelope"></i>
-          <div class="line rev"></div>
+    <!-- ============================================== -->
+    <!-- SECTION 7: UCAPAN & DOA (WISHES RSVP)          -->
+    <!-- ============================================== -->
+    <div
+      id="sectionWishes"
+      class="flex justify-center items-center flex-col px-4 py-16 relative overflow-hidden"
+      style="background-image: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);"
+    >
+      <div class="text-center mb-8 relative z-10" data-aos="zoom-in">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-gray-400/60"></div>
+          <i class="fa-solid fa-envelope mx-3 text-gray-500 text-xl animate-pulse"></i>
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-gray-400/60"></div>
         </div>
-        <h2 class="luxury-title">Ucapan</h2>
-        <p class="luxury-sub">&amp; Doa</p>
+        <h2 class="font-serif text-gray-800 text-3xl font-light tracking-wide mb-1">
+          UCAPAN
+        </h2>
+        <h2 class="text-gray-600 text-2xl font-cursive tracking-wider">&amp; Doa</h2>
       </div>
 
-      <div class="glass-card" style="text-align: left;" data-aos="fade-up">
-        <form onsubmit="postWish(event)">
-          <label style="font-size: 12px; color: var(--text-gold);">Nama Anda</label>
-          <input type="text" id="wName" class="form-input" value="{{ .GuestTo }}" required>
+      <div class="w-full max-w-md relative z-10" data-aos="fade-up">
+        <div class="bg-gradient-to-br from-white to-gray-50/90 rounded-3xl shadow-2xl border border-gray-200/80 p-6 sm:p-8">
+          <form onsubmit="postWish(event)">
+            <div class="mb-4 text-left">
+              <label class="block text-gray-700 font-sans text-xs font-semibold mb-1.5">Nama Anda</label>
+              <input type="text" id="wName" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-800 outline-none focus:ring-2 focus:ring-[#D4A574]" value="{{ .GuestTo }}" required>
+            </div>
 
-          <label style="font-size: 12px; color: var(--text-gold);">Konfirmasi Kehadiran</label>
-          <select id="wAtt" class="form-input">
-            <option value="hadir">Hadir</option>
-            <option value="ragu">Masih Ragu</option>
-            <option value="tidak_hadir">Tidak Hadir</option>
-          </select>
+            <div class="mb-4 text-left">
+              <label class="block text-gray-700 font-sans text-xs font-semibold mb-1.5">Konfirmasi Kehadiran</label>
+              <select id="wAtt" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-800 outline-none focus:ring-2 focus:ring-[#D4A574]">
+                <option value="hadir">Hadir</option>
+                <option value="ragu">Masih Ragu</option>
+                <option value="tidak_hadir">Tidak Hadir</option>
+              </select>
+            </div>
 
-          <label style="font-size: 12px; color: var(--text-gold);">Ucapan &amp; Doa</label>
-          <textarea id="wMsg" class="form-input" rows="3" placeholder="Sampaikan doa dan harapan terbaik Anda..." required></textarea>
+            <div class="mb-5 text-left">
+              <label class="block text-gray-700 font-sans text-xs font-semibold mb-1.5">Ucapan &amp; Doa</label>
+              <textarea id="wMsg" rows="3" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-800 outline-none focus:ring-2 focus:ring-[#D4A574]" placeholder="Sampaikan doa dan ucapan terbaik Anda..." required></textarea>
+            </div>
 
-          <button type="submit" class="btn-submit-wish" id="btnWish">
-            <i class="fa-regular fa-paper-plane"></i> Kirim Ucapan
+            <button type="submit" id="btnWish" class="w-full py-3 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white text-xs font-bold uppercase tracking-wider transition shadow-lg">
+              <i class="fa-regular fa-paper-plane mr-2"></i> Kirim Ucapan
+            </button>
+          </form>
+        </div>
+
+        <!-- Wishes List -->
+        <div class="mt-8 max-h-[360px] overflow-y-auto space-y-3" id="wList">
+          {{ range .Wishes }}
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 text-left">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-gray-800">{{ .GuestName }}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full {{ if eq .Attendance "hadir" }}bg-emerald-50 text-emerald-600 font-semibold{{ else if eq .Attendance "ragu" }}bg-amber-50 text-amber-600 font-semibold{{ else }}bg-gray-100 text-gray-500{{ end }}">
+                {{ .Attendance }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed">{{ .Message }}</p>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 8: WEDDING GIFT (REKENING / HADIAH)     -->
+    <!-- ============================================== -->
+    <div
+      class="flex justify-center items-center flex-col px-4 py-16 relative overflow-hidden"
+      style="background-image: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);"
+    >
+      <div class="text-center mb-8 relative z-10" data-aos="zoom-in">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-16 h-px bg-gradient-to-r from-transparent to-gray-400/60"></div>
+          <i class="fa-solid fa-gift mx-3 text-gray-500 text-xl animate-pulse"></i>
+          <div class="w-16 h-px bg-gradient-to-l from-transparent to-gray-400/60"></div>
+        </div>
+        <h2 class="font-serif text-gray-800 text-3xl font-light tracking-wide mb-1">
+          WEDDING
+        </h2>
+        <h2 class="text-gray-600 text-2xl font-cursive tracking-wider">Gift</h2>
+        <p class="text-xs text-gray-500 mt-2 max-w-sm px-4">
+          Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Apabila Anda ingin memberikan tanda kasih secara cashless:
+        </p>
+      </div>
+
+      <div class="w-full max-w-md space-y-4 relative z-10">
+        {{ if .BankAccount1 }}
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-6 shadow-xl border border-gray-200 text-center" data-aos="fade-up">
+          <h3 class="font-serif text-gray-800 text-lg font-light tracking-wide mb-2">{{ .BankName1 }}</h3>
+          <div class="bg-gray-100 rounded-2xl py-3 px-4 font-mono text-lg font-bold text-gray-800 tracking-wider mb-2" id="acc1">
+            {{ .BankAccount1 }}
+          </div>
+          <p class="text-xs text-gray-500 mb-4">a.n {{ .BankHolder1 }}</p>
+          <button onclick="copyNum('acc1')" class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white text-xs font-semibold py-2.5 px-6 rounded-xl transition shadow">
+            <i class="fa-regular fa-copy mr-1.5"></i> Salin Rekening
           </button>
-        </form>
-      </div>
+        </div>
+        {{ end }}
 
-      <div class="wish-box" id="wList" data-aos="fade-up">
-        {{ range .Wishes }}
-        <div class="wish-bubble">
-          <div class="wish-header">
-            <span>{{ .GuestName }}</span>
-            <span style="font-size: 11px; color: var(--text-muted);">{{ .Attendance }}</span>
+        {{ if .BankAccount2 }}
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-6 shadow-xl border border-gray-200 text-center" data-aos="fade-up">
+          <h3 class="font-serif text-gray-800 text-lg font-light tracking-wide mb-2">{{ .BankName2 }}</h3>
+          <div class="bg-gray-100 rounded-2xl py-3 px-4 font-mono text-lg font-bold text-gray-800 tracking-wider mb-2" id="acc2">
+            {{ .BankAccount2 }}
           </div>
-          <div class="wish-body">{{ .Message }}</div>
+          <p class="text-xs text-gray-500 mb-4">a.n {{ .BankHolder2 }}</p>
+          <button onclick="copyNum('acc2')" class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white text-xs font-semibold py-2.5 px-6 rounded-xl transition shadow">
+            <i class="fa-regular fa-copy mr-1.5"></i> Salin Rekening
+          </button>
+        </div>
+        {{ end }}
+
+        {{ if .GiftAddress }}
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-6 shadow-xl border border-gray-200 text-center" data-aos="fade-up">
+          <h3 class="font-serif text-gray-800 text-lg font-light tracking-wide mb-2"><i class="fa-solid fa-location-dot text-rose-500 mr-2"></i>Kirim Kado Fisik</h3>
+          <p class="text-xs text-gray-600 leading-relaxed">{{ .GiftAddress }}</p>
         </div>
         {{ end }}
       </div>
-    </section>
+    </div>
 
-    <!-- TURUT MENGUNDANG -->
+    <!-- ============================================== -->
+    <!-- SECTION: TURUT MENGUNDANG                       -->
+    <!-- ============================================== -->
     {{ if .TurutMengundangList }}
-    <section class="section-wrap" style="padding-top: 0;">
-      <h4 style="font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; color: var(--text-gold); margin-bottom: 12px;" data-aos="fade-up">TURUT MENGUNDANG</h4>
-      <div style="font-size: 12.5px; line-height: 1.8; color: #94a3b8;" data-aos="fade-up">
+    <div class="py-12 px-6 text-center bg-[#121516] text-white">
+      <h4 class="font-serif text-xs uppercase tracking-widest text-[#D4A574] mb-4" data-aos="fade-up">
+        TURUT MENGUNDANG
+      </h4>
+      <div class="text-xs leading-relaxed text-gray-400 space-y-1" data-aos="fade-up">
         {{ range .TurutMengundangList }}
         <p>{{ . }}</p>
         {{ end }}
       </div>
-    </section>
+    </div>
     {{ end }}
 
-    <!-- FOOTER -->
-    <footer style="padding: 40px 20px 90px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
-      {{ if .ClosingPhoto }}
-      <div class="closing-banner-img" style="background-image: url('{{ .ClosingPhoto }}');" data-aos="zoom-in"></div>
-      {{ end }}
-      <h2 style="font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--text-gold); margin-bottom: 8px;">Thank You</h2>
-      <p style="font-size: 12px; line-height: 1.6; color: #94a3b8; max-width: 320px; margin: 0 auto;">Atas kehadiran dan doa restunya kami ucapkan terima kasih.</p>
-      <h4 style="font-family: 'Playfair Display', serif; font-size: 17px; margin-top: 16px; color: var(--text-white); letter-spacing: 1px;">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h4>
-    </footer>
+    <!-- ============================================== -->
+    <!-- SECTION 9: CLOSING (EXACT REPO section9.tsx)   -->
+    <!-- ============================================== -->
+    <div
+      class="flex justify-center items-center flex-col h-full w-full bg-center bg-no-repeat bg-cover relative min-h-screen py-16 px-6"
+      style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else if .CoverImage }}{{ .CoverImage }}{{ else }}/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg{{ end }}');"
+    >
+      <!-- Enhanced overlay with subtle gradient -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/20 pointer-events-none w-full"></div>
+
+      <!-- Subtle decorative elements that won't interfere with the photo -->
+      <div class="absolute inset-0 opacity-10 pointer-events-none">
+        <div class="absolute top-10 left-10 w-20 h-20 rounded-full border border-white/20"></div>
+        <div class="absolute bottom-32 right-12 w-16 h-16 rounded-full border border-white/15"></div>
+        <div class="absolute top-1/3 right-8 w-12 h-12 rounded-full border border-white/10"></div>
+        <div class="absolute bottom-1/3 left-8 w-24 h-24 rounded-full border border-white/15"></div>
+      </div>
+
+      <div class="w-full h-full relative z-10 overflow-hidden flex flex-col items-center justify-center text-white">
+        <!-- Main Content Section -->
+        <div class="relative text-center mb-12 w-full max-w-sm" data-aos="zoom-in">
+          <!-- Elegant backdrop for text readability -->
+          <div class="absolute -inset-6 sm:-inset-8 bg-gradient-to-br from-white/10 to-white/5 rounded-3xl border border-white/20 shadow-2xl backdrop-blur-md"></div>
+
+          <div class="relative z-10 py-8 px-4">
+            <!-- Header with decorative elements -->
+            <div class="flex items-center justify-center mb-6">
+              <div class="w-12 h-px bg-gradient-to-r from-transparent to-white/60"></div>
+              <div class="mx-3 w-2 h-2 rounded-full bg-white/70"></div>
+              <div class="w-12 h-px bg-gradient-to-l from-transparent to-white/60"></div>
+            </div>
+
+            <h2 class="font-serif text-sm tracking-widest font-light text-white/90 mb-8" style="letter-spacing: 4px;">
+              The Wedding Of
+            </h2>
+
+            <!-- Names with elegant styling -->
+            <div class="text-3xl md:text-4xl font-cursive my-8 font-normal text-center">
+              <h4 class="text-white drop-shadow-lg leading-tight">{{ .GroomName }}</h4>
+              <div class="flex items-center justify-center my-4">
+                <div class="w-8 h-px bg-white/60"></div>
+                <i class="fa-solid fa-heart mx-3 text-red-300 text-xl animate-pulse drop-shadow-lg"></i>
+                <div class="w-8 h-px bg-white/60"></div>
+              </div>
+              <h4 class="text-white drop-shadow-lg leading-tight">{{ .BrideName }}</h4>
+            </div>
+
+            <h2 class="font-serif text-sm tracking-widest font-light text-white/90" style="letter-spacing: 4px;">
+              {{ if .AkadDate }}{{ .AkadDate }}{{ end }}
+            </h2>
+
+            <!-- Bottom decorative elements -->
+            <div class="flex items-center justify-center mt-6">
+              <div class="w-8 h-px bg-gradient-to-r from-transparent to-white/60"></div>
+              <div class="mx-2 w-1.5 h-1.5 rounded-full bg-white/60"></div>
+              <div class="w-8 h-px bg-gradient-to-l from-transparent to-white/60"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thank you message -->
+        <div class="text-center mb-16 max-w-sm" data-aos="fade-up" data-aos-delay="200">
+          <p class="text-white/90 text-sm font-sans px-4 leading-relaxed tracking-wide drop-shadow-lg">
+            Atas kehadiran dan doa restunya kami ucapkan terimakasih.
+          </p>
+        </div>
+
+        <!-- Floating Glass Action Buttons (Message, WhatsApp, Instagram) -->
+        <div class="flex items-center justify-center space-x-3 mb-6" data-aos="fade-up" data-aos-delay="400">
+          <!-- Wishes / Message Anchor -->
+          <a href="#sectionWishes" class="relative group">
+            <div class="relative bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/30 shadow-xl hover:scale-110 transition-all duration-300 w-12 h-12 flex items-center justify-center">
+              <i class="fa-regular fa-envelope text-amber-300 text-lg drop-shadow-lg"></i>
+            </div>
+          </a>
+
+          <!-- WhatsApp -->
+          {{ if .WaConfirmation }}
+          <a href="https://wa.me/{{ .WaConfirmation }}" target="_blank" class="relative group">
+            <div class="relative bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/30 shadow-xl hover:scale-110 transition-all duration-300 w-12 h-12 flex items-center justify-center">
+              <i class="fa-brands fa-whatsapp text-green-400 text-xl drop-shadow-lg"></i>
+            </div>
+          </a>
+          {{ end }}
+
+          <!-- Instagram -->
+          {{ if or .GroomInstagram .BrideInstagram }}
+          <a href="https://instagram.com/{{ if .GroomInstagram }}{{ .GroomInstagram }}{{ else }}{{ .BrideInstagram }}{{ end }}" target="_blank" class="relative group">
+            <div class="relative bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/30 shadow-xl hover:scale-110 transition-all duration-300 w-12 h-12 flex items-center justify-center">
+              <i class="fa-brands fa-instagram text-pink-400 text-xl drop-shadow-lg"></i>
+            </div>
+          </a>
+          {{ end }}
+        </div>
+
+        <!-- Footer Brand / Credit -->
+        <div class="text-center text-xs text-white/60 tracking-widest font-sans uppercase">
+          Family Invitation
+        </div>
+      </div>
+    </div>
 
   </div>
 
-  <!-- Scripts -->
+  <!-- AOS Scripts -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    AOS.init({ duration: 900, once: false });
+    AOS.init({ duration: 800, once: false });
 
+    // Audio Control
     const music = document.getElementById('bgMusic');
     const audioBtn = document.getElementById('audioToggle');
     let isPlaying = false;
 
     function openInvitation() {
-      document.getElementById('openingOverlay').classList.add('hidden');
+      const overlay = document.getElementById('openingOverlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 700);
+
       music.play().then(() => {
         isPlaying = true;
         audioBtn.classList.add('spinning');
-      }).catch(() => {});
-      setTimeout(() => AOS.refresh(), 400);
+      }).catch(err => {
+        console.log("Audio autoplay prevented:", err);
+      });
     }
 
     function toggleAudio() {
       if (isPlaying) {
         music.pause();
         audioBtn.classList.remove('spinning');
+        isPlaying = false;
       } else {
         music.play();
         audioBtn.classList.add('spinning');
+        isPlaying = true;
       }
-      isPlaying = !isPlaying;
     }
 
+    // Copy Account Number
     function copyNum(id) {
-      const text = document.getElementById(id).innerText;
-      navigator.clipboard.writeText(text);
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      const text = document.getElementById(id).innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.innerText = 'Nomor rekening ' + text + ' berhasil disalin!';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+      });
     }
 
-    // Countdown
-    const eventTime = new Date('{{ .AkadDate }}').getTime() || (Date.now() + 1000 * 60 * 60 * 24 * 30);
-    function updateCd() {
-      const diff = eventTime - Date.now();
-      if (diff > 0) {
-        document.getElementById('cdDays').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-        document.getElementById('cdHours').innerText = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
-        document.getElementById('cdMins').innerText = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
-        document.getElementById('cdSecs').innerText = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+    // Modal Image
+    function openImageModal(url) {
+      document.getElementById('modalImg').src = url;
+      document.getElementById('imageModal').classList.remove('hidden');
+    }
+    function closeImageModal() {
+      document.getElementById('imageModal').classList.add('hidden');
+    }
+
+    // Date Splitter Helper for Event Cards
+    function formatEventDates() {
+      document.querySelectorAll('.event-day').forEach(el => {
+        const raw = (el.dataset.raw || '').trim();
+        if (!raw) return;
+        const parent = el.closest('div');
+        const numEl = parent.querySelector('.event-num');
+        const myEl = parent.querySelector('.event-my');
+        
+        if (raw.includes(',')) {
+          const parts = raw.split(',');
+          el.innerText = parts[0].trim();
+          const rest = parts.slice(1).join(',').trim().split(/\s+/);
+          if (numEl) numEl.innerText = rest[0] || '';
+          if (myEl) myEl.innerText = rest.slice(1).join(' ') || '';
+        } else {
+          const words = raw.split(/\s+/);
+          if (words.length >= 3) {
+            el.innerText = words[0];
+            if (numEl) numEl.innerText = words[1];
+            if (myEl) myEl.innerText = words.slice(2).join(' ');
+          } else {
+            el.innerText = raw;
+            if (numEl) numEl.innerText = '';
+            if (myEl) myEl.innerText = '';
+          }
+        }
+      });
+    }
+    formatEventDates();
+
+    // Event Countdown Calculation
+    const targetDateStr = '{{ .AkadDate }}';
+    let targetTime = Date.now() + 1000 * 60 * 60 * 24 * 30; // default 30 days
+    if (targetDateStr) {
+      const parsed = Date.parse(targetDateStr);
+      if (!isNaN(parsed) && parsed > Date.now()) {
+        targetTime = parsed;
       }
     }
-    setInterval(updateCd, 1000);
-    updateCd();
 
-    // RSVP Post
+    function updateCountdown() {
+      const now = Date.now();
+      const diff = Math.max(0, targetTime - now);
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const elD = document.getElementById('cdDays');
+      const elH = document.getElementById('cdHours');
+      const elM = document.getElementById('cdMins');
+      const elS = document.getElementById('cdSecs');
+      if (elD) elD.innerText = d.toString().padStart(2, '0');
+      if (elH) elH.innerText = h.toString().padStart(2, '0');
+      if (elM) elM.innerText = m.toString().padStart(2, '0');
+      if (elS) elS.innerText = s.toString().padStart(2, '0');
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Submit Wish
     async function postWish(e) {
       e.preventDefault();
       const btn = document.getElementById('btnWish');
-      btn.disabled = true;
-      btn.innerText = 'MENGIRIM...';
+      const name = document.getElementById('wName').value.trim();
+      const att = document.getElementById('wAtt').value;
+      const msg = document.getElementById('wMsg').value.trim();
 
-      const payload = {
-        guest_name: document.getElementById('wName').value,
-        attendance: document.getElementById('wAtt').value,
-        message: document.getElementById('wMsg').value,
-        guest_count: 1
-      };
+      if (!msg) return;
+
+      btn.disabled = true;
+      btn.innerText = 'Mengirim...';
 
       try {
-        const res = await fetch('/api/invitations/{{ .Slug }}/wishes', {
+        const slug = '{{ .Slug }}';
+        const res = await fetch('/api/invitations/' + slug + '/wishes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ guest_name: name, attendance: att, message: msg })
         });
-        if (res.ok) {
-          const item = document.createElement('div');
-          item.className = 'wish-bubble';
-          item.innerHTML = `<div class="wish-header"><span>${payload.guest_name}</span><span style="font-size:11px;color:#888;">${payload.attendance}</span></div><div class="wish-body">${payload.message}</div>`;
-          document.getElementById('wList').prepend(item);
-          document.getElementById('wMsg').value = '';
-          btn.innerText = 'TERKIRIM! ✅';
-        } else {
-          btn.innerText = 'GAGAL KIRIM';
-        }
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Gagal mengirim');
+
+        // Append to list
+        const list = document.getElementById('wList');
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-gray-200 text-left';
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-gray-800">${name}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold">${att}</span>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed">${msg}</p>
+        `;
+        list.insertBefore(card, list.firstChild);
+
+        document.getElementById('wMsg').value = '';
+        alert('Terima kasih, ucapan Anda berhasil terkirim!');
       } catch (err) {
-        btn.innerText = 'GAGAL KIRIM';
+        alert('Gagal mengirim ucapan: ' + err.message);
       } finally {
-        setTimeout(() => { btn.disabled = false; btn.innerText = 'KIRIM UCAPAN'; }, 2500);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-regular fa-paper-plane mr-2"></i> Kirim Ucapan';
       }
     }
   </script>
