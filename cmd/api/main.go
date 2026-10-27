@@ -47,8 +47,12 @@ func main() {
 	superadmin.Get("/dashboard-stats", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.GetSuperadminDashboardStats)
 	superadmin.Get("/companies", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.GetAllCompanies)
 	superadmin.Post("/companies", middleware.Protected(), middleware.RequireSuperadmin(), handlers.CreateCompanyWithInitialOwner)
-	superadmin.Put("/companies/:id", middleware.Protected(), middleware.RequireRole("superadmin", "owner"), handlers.UpdateCompany)
+	superadmin.Put("/companies/:id", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.UpdateCompany)
 	superadmin.Delete("/companies/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.DeleteCompany)
+
+	// Company profile routes (Data profil badan usaha masing-masing vendor dekorasi)
+	api.Get("/company/profile", middleware.Protected(), handlers.GetMyCompanyProfile)
+	api.Put("/company/profile", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateMyCompanyProfile)
 
 	// User routes
 	api.Get("/users", middleware.Protected(), handlers.GetAllUsers)

@@ -89,10 +89,20 @@ func Login(c *fiber.Ctx) error {
 	companyName := ""
 	companyAddress := ""
 	companyPhone := ""
+	companyLogo := ""
+	companyEmail := ""
+	companyDescription := ""
+	companyInstagram := ""
+	companyBankInfo := ""
 	if user.Company != nil {
 		companyName = user.Company.Name
 		companyAddress = user.Company.Address
 		companyPhone = user.Company.Phone
+		companyLogo = user.Company.LogoURL
+		companyEmail = user.Company.Email
+		companyDescription = user.Company.Description
+		companyInstagram = user.Company.Instagram
+		companyBankInfo = user.Company.BankInfo
 	}
 
 	// Return data user beserta token-nya
@@ -100,15 +110,20 @@ func Login(c *fiber.Ctx) error {
 		"message": "Login berhasil",
 		"token":   tokenString,
 		"data": models.UserResponse{
-			ID:             user.ID,
-			CompanyID:      user.CompanyID,
-			CompanyName:    companyName,
-			CompanyAddress: companyAddress,
-			CompanyPhone:   companyPhone,
-			FullName:       user.FullName,
-			Phone:          user.Phone,
-			Email:          user.Email,
-			Role:           user.Role,
+			ID:                 user.ID,
+			CompanyID:          user.CompanyID,
+			CompanyName:        companyName,
+			CompanyAddress:     companyAddress,
+			CompanyPhone:       companyPhone,
+			CompanyLogo:        companyLogo,
+			CompanyEmail:       companyEmail,
+			CompanyDescription: companyDescription,
+			CompanyInstagram:   companyInstagram,
+			CompanyBankInfo:    companyBankInfo,
+			FullName:           user.FullName,
+			Phone:              user.Phone,
+			Email:              user.Email,
+			Role:               user.Role,
 		},
 	})
 }

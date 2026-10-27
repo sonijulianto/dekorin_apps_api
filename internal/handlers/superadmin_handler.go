@@ -166,19 +166,40 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 	}
 
 	companyName := ""
+	companyAddress := ""
+	companyPhone := ""
+	companyLogo := ""
+	companyEmail := ""
+	companyDescription := ""
+	companyInstagram := ""
+	companyBankInfo := ""
 	if user.Company != nil {
 		companyName = user.Company.Name
+		companyAddress = user.Company.Address
+		companyPhone = user.Company.Phone
+		companyLogo = user.Company.LogoURL
+		companyEmail = user.Company.Email
+		companyDescription = user.Company.Description
+		companyInstagram = user.Company.Instagram
+		companyBankInfo = user.Company.BankInfo
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data": models.UserResponse{
-			ID:          user.ID,
-			CompanyID:   user.CompanyID,
-			CompanyName: companyName,
-			FullName:    user.FullName,
-			Phone:       user.Phone,
-			Email:       user.Email,
-			Role:        user.Role,
+			ID:                 user.ID,
+			CompanyID:          user.CompanyID,
+			CompanyName:        companyName,
+			CompanyAddress:     companyAddress,
+			CompanyPhone:       companyPhone,
+			CompanyLogo:        companyLogo,
+			CompanyEmail:       companyEmail,
+			CompanyDescription: companyDescription,
+			CompanyInstagram:   companyInstagram,
+			CompanyBankInfo:    companyBankInfo,
+			FullName:           user.FullName,
+			Phone:              user.Phone,
+			Email:              user.Email,
+			Role:               user.Role,
 		},
 	})
 }
@@ -222,17 +243,24 @@ func GetAllCompanies(c *fiber.Ctx) error {
 		}
 
 		results = append(results, models.CompanyDetailResponse{
-			ID:           comp.ID,
-			Name:         comp.Name,
-			Address:      comp.Address,
-			Phone:        comp.Phone,
-			LogoURL:      comp.LogoURL,
-			TotalOwners:  totalOwners,
-			TotalAdmins:  totalAdmins,
-			TotalCrew:    totalCrew,
-			TotalAgendas: totalAgendas,
-			OwnersList:   ownersList,
-			CreatedAt:    comp.CreatedAt,
+			ID:            comp.ID,
+			Name:          comp.Name,
+			Address:       comp.Address,
+			Phone:         comp.Phone,
+			Email:         comp.Email,
+			LogoURL:       comp.LogoURL,
+			Description:   comp.Description,
+			Instagram:     comp.Instagram,
+			BankInfo:      comp.BankInfo,
+			UpdatedBy:     comp.UpdatedBy,
+			UpdatedByName: comp.UpdatedByName,
+			TotalOwners:   totalOwners,
+			TotalAdmins:   totalAdmins,
+			TotalCrew:     totalCrew,
+			TotalAgendas:  totalAgendas,
+			OwnersList:    ownersList,
+			CreatedAt:     comp.CreatedAt,
+			UpdatedAt:     comp.UpdatedAt,
 		})
 	}
 
@@ -349,6 +377,16 @@ func CreateCompanyWithInitialOwner(c *fiber.Ctx) error {
 // UpdateCompany handles PUT /api/superadmin/companies/:id
 func UpdateCompany(c *fiber.Ctx) error {
 	id := c.Params("id")
+	userRole, _ := c.Locals("user_role").(string)
+	userCompanyID := middleware.GetCompanyID(c)
+
+	// Non-superadmin hanya boleh mengedit company miliknya sendiri
+	if !strings.EqualFold(userRole, "superadmin") && userCompanyID != id {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Anda hanya berhak memperbarui data profil usaha milik Anda sendiri",
+		})
+	}
+
 	var comp models.Company
 	if err := config.DB.Where("id = ?", id).First(&comp).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -356,13 +394,7 @@ func UpdateCompany(c *fiber.Ctx) error {
 		})
 	}
 
-	type updateReq struct {
-		Name    string `json:"name"`
-		Address string `json:"address"`
-		Phone   string `json:"phone"`
-		LogoURL string `json:"logo_url"`
-	}
-	var req updateReq
+	var req models.UpdateCompanyRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
 	}
@@ -376,8 +408,28 @@ func UpdateCompany(c *fiber.Ctx) error {
 	if req.Phone != "" {
 		comp.Phone = utils.NormalizePhone(req.Phone)
 	}
+	if req.Email != "" {
+		comp.Email = strings.TrimSpace(req.Email)
+	}
 	if req.LogoURL != "" {
 		comp.LogoURL = strings.TrimSpace(req.LogoURL)
+	}
+	if req.Description != "" {
+		comp.Description = strings.TrimSpace(req.Description)
+	}
+	if req.Instagram != "" {
+		comp.Instagram = strings.TrimSpace(req.Instagram)
+	}
+	if req.BankInfo != "" {
+		comp.BankInfo = strings.TrimSpace(req.BankInfo)
+	}
+
+	// Catat siapa yang melakukan update ke database
+	userID, _ := c.Locals("user_id").(string)
+	comp.UpdatedBy = userID
+	var updatingUser models.User
+	if err := config.DB.Where("id = ?", userID).First(&updatingUser).Error; err == nil {
+		comp.UpdatedByName = updatingUser.FullName
 	}
 
 	comp.UpdatedAt = time.Now()
@@ -389,6 +441,85 @@ func UpdateCompany(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Data perusahaan berhasil diperbarui",
+		"data":    comp,
+	})
+}
+
+// GetMyCompanyProfile handles GET /api/company/profile (Profil bisnis user login)
+func GetMyCompanyProfile(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Pengguna tidak terikat dengan badan usaha manapun",
+		})
+	}
+
+	var comp models.Company
+	if err := config.DB.Where("id = ?", companyID).First(&comp).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Data profil usaha tidak ditemukan",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Berhasil memuat profil usaha",
+		"data":    comp,
+	})
+}
+
+// UpdateMyCompanyProfile handles PUT /api/company/profile (Hanya Owner & Admin)
+func UpdateMyCompanyProfile(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	if companyID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Pengguna tidak terikat dengan badan usaha manapun",
+		})
+	}
+
+	var comp models.Company
+	if err := config.DB.Where("id = ?", companyID).First(&comp).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Data usaha tidak ditemukan",
+		})
+	}
+
+	var req models.UpdateCompanyRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
+	}
+
+	if strings.TrimSpace(req.Name) != "" {
+		comp.Name = strings.TrimSpace(req.Name)
+	}
+	comp.Address = strings.TrimSpace(req.Address)
+	if req.Phone != "" {
+		comp.Phone = utils.NormalizePhone(req.Phone)
+	}
+	comp.Email = strings.TrimSpace(req.Email)
+	if req.LogoURL != "" {
+		comp.LogoURL = strings.TrimSpace(req.LogoURL)
+	}
+	comp.Description = strings.TrimSpace(req.Description)
+	comp.Instagram = strings.TrimSpace(req.Instagram)
+	comp.BankInfo = strings.TrimSpace(req.BankInfo)
+
+	// Catat siapa yang melakukan update ke database
+	userID, _ := c.Locals("user_id").(string)
+	comp.UpdatedBy = userID
+	var updatingUser models.User
+	if err := config.DB.Where("id = ?", userID).First(&updatingUser).Error; err == nil {
+		comp.UpdatedByName = updatingUser.FullName
+	}
+
+	comp.UpdatedAt = time.Now()
+	if err := config.DB.Save(&comp).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui profil usaha: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Profil usaha berhasil diperbarui",
 		"data":    comp,
 	})
 }

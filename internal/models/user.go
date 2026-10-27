@@ -19,15 +19,20 @@ type User struct {
 
 // UserResponse adalah format balikan API yang aman dikirim ke Client
 type UserResponse struct {
-	ID             string `json:"id"`
-	CompanyID      string `json:"company_id"`
-	CompanyName    string `json:"company_name,omitempty"`
-	CompanyAddress string `json:"company_address,omitempty"`
-	CompanyPhone   string `json:"company_phone,omitempty"`
-	FullName       string `json:"full_name"`
-	Phone          string `json:"phone"`
-	Email          string `json:"email"`
-	Role           string `json:"role"`
-	CreatedAt      string `json:"created_at,omitempty"`
-	UpdatedAt      string `json:"updated_at,omitempty"`
+	ID                 string `json:"id"`
+	CompanyID          string `json:"company_id"`
+	CompanyName        string `json:"company_name,omitempty"`
+	CompanyAddress     string `json:"company_address,omitempty"`
+	CompanyPhone       string `json:"company_phone,omitempty"`
+	CompanyLogo        string `json:"company_logo,omitempty"`
+	CompanyEmail       string `json:"company_email,omitempty"`
+	CompanyDescription string `json:"company_description,omitempty"`
+	CompanyInstagram   string `json:"company_instagram,omitempty"`
+	CompanyBankInfo    string `json:"company_bank_info,omitempty"`
+	FullName           string `json:"full_name"`
+	Phone              string `json:"phone"`
+	Email              string `json:"email"`
+	Role               string `json:"role"`
+	CreatedAt          string `json:"created_at,omitempty"`
+	UpdatedAt          string `json:"updated_at,omitempty"`
 }
