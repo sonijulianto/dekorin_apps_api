@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 	"time"
@@ -113,6 +114,27 @@ func GetApiLogs(c *fiber.Ctx) error {
 	})
 }
 
+// parseJsonIfPossible mengurai string JSON menjadi map atau array interface jika valid
+func parseJsonIfPossible(raw string) interface{} {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return raw
+	}
+	for (strings.HasPrefix(trimmed, "{") && strings.HasSuffix(trimmed, "}")) ||
+		(strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]")) {
+		var parsed interface{}
+		if err := json.Unmarshal([]byte(trimmed), &parsed); err == nil {
+			if strVal, ok := parsed.(string); ok {
+				trimmed = strings.TrimSpace(strVal)
+				continue
+			}
+			return parsed
+		}
+		break
+	}
+	return raw
+}
+
 // GetApiLogByID menangani GET /api/apilog/:id
 func GetApiLogByID(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -131,6 +153,9 @@ func GetApiLogByID(c *fiber.Ctx) error {
 		statusCodeStr = "200"
 	}
 
+	reqData := parseJsonIfPossible(logItem.ReqData)
+	respData := parseJsonIfPossible(logItem.ResponseData)
+
 	dataMap := fiber.Map{
 		"id":            logItem.ID,
 		"url":           logItem.URL,
@@ -138,8 +163,8 @@ func GetApiLogByID(c *fiber.Ctx) error {
 		"ip_addr":       logItem.IPAddr,
 		"username":      logItem.Username,
 		"log_time":      logItem.LogTime.Format("2006-01-02 15:04:05"),
-		"req_data":      logItem.ReqData,
-		"response_data": logItem.ResponseData,
+		"req_data":      reqData,
+		"response_data": respData,
 		"status":        logItem.Status,
 		"status_code":   statusCodeStr,
 		"remark":        logItem.Remark,

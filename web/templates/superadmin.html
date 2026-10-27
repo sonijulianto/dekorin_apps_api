@@ -2104,7 +2104,7 @@
                             Copy
                         </button>
                     </div>
-                    <div class="bg-slate-50/60 border border-slate-200 rounded-lg p-3.5 overflow-auto max-h-[420px] font-mono text-[11px] leading-relaxed text-slate-800">
+                    <div class="bg-slate-50/60 border border-slate-200 rounded-lg p-3.5 overflow-auto max-h-[520px] md:max-h-[65vh] font-mono text-[11px] leading-relaxed text-slate-800">
                         <pre id="viewReqDataContent" class="whitespace-pre"></pre>
                     </div>
                 </div>
@@ -2118,7 +2118,7 @@
                             Copy
                         </button>
                     </div>
-                    <div class="bg-slate-50/60 border border-slate-200 rounded-lg p-3.5 overflow-auto max-h-[420px] font-mono text-[11px] leading-relaxed text-slate-800">
+                    <div class="bg-slate-50/60 border border-slate-200 rounded-lg p-3.5 overflow-auto max-h-[520px] md:max-h-[65vh] font-mono text-[11px] leading-relaxed text-slate-800">
                         <pre id="viewRespDataContent" class="whitespace-pre"></pre>
                     </div>
                 </div>
@@ -4379,6 +4379,52 @@
             container.innerHTML = html;
         }
 
+        function tryFormatJsonString(val) {
+            if (val === null || val === undefined) return val;
+            if (typeof val === 'object') return val;
+            if (typeof val === 'string') {
+                let trimmed = val.trim();
+                while ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+                    try {
+                        const parsed = JSON.parse(trimmed);
+                        val = parsed;
+                        if (typeof parsed === 'string') {
+                            trimmed = parsed.trim();
+                        } else {
+                            break;
+                        }
+                    } catch (e) {
+                        break;
+                    }
+                }
+            }
+            return val;
+        }
+
+        function formatJsonSyntax(json) {
+            let str = typeof json !== 'string' ? JSON.stringify(json, null, 2) : json;
+            if (!str) return '';
+            const escaped = str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            return escaped.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'text-sky-600 font-mono'; // number
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'text-indigo-950 font-bold font-mono'; // key
+                    } else {
+                        cls = 'text-emerald-700 font-mono'; // string
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'text-amber-600 font-bold font-mono'; // boolean
+                } else if (/null/.test(match)) {
+                    cls = 'text-slate-400 italic font-mono'; // null
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
         async function openLogDataModal(logId) {
             const modal = document.getElementById('modalViewData');
             modal.classList.remove('hidden');
@@ -4389,7 +4435,7 @@
             // Set Request Data matching Screenshot 2
             const reqPayload = { "id": logId };
             currentLogReqText = JSON.stringify(reqPayload, null, 2);
-            reqPre.textContent = currentLogReqText;
+            reqPre.innerHTML = formatJsonSyntax(currentLogReqText);
 
             respPre.textContent = 'Memuat response data...';
 
@@ -4399,15 +4445,26 @@
                 });
                 const json = await res.json();
                 
+                // Rapihkan format JSON response_data dan req_data jika berupa string JSON
+                if (json && json.data) {
+                    if (json.data.response_data !== undefined && json.data.response_data !== null) {
+                        json.data.response_data = tryFormatJsonString(json.data.response_data);
+                    }
+                    if (json.data.req_data !== undefined && json.data.req_data !== null) {
+                        json.data.req_data = tryFormatJsonString(json.data.req_data);
+                    }
+                }
+
                 currentLogRespText = JSON.stringify(json, null, 2);
-                respPre.textContent = currentLogRespText;
+                respPre.innerHTML = formatJsonSyntax(currentLogRespText);
             } catch (err) {
-                currentLogRespText = JSON.stringify({
+                const errObj = {
                     status_code: 500,
                     success: false,
                     message: err.message
-                }, null, 2);
-                respPre.textContent = currentLogRespText;
+                };
+                currentLogRespText = JSON.stringify(errObj, null, 2);
+                respPre.innerHTML = formatJsonSyntax(currentLogRespText);
             }
         }
 
