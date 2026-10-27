@@ -51,7 +51,23 @@ done
 # 5. Icons
 curl -s -f -L -o web/assets/icons/google-maps-icon.webp "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/google-maps-icon.webp?v=$TIMESTAMP"
 
-# 6. Restart Service Dekorin
+# 6. Konfigurasi Nginx: Naikkan limit upload body agar file APK besar tidak terkena 413
+if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
+    echo "⚙️  Mengonfigurasi client_max_body_size 150M di Nginx..."
+    if ! grep -q "client_max_body_size" /etc/nginx/nginx.conf; then
+        sudo sed -i '/http {/a \    client_max_body_size 150M;' /etc/nginx/nginx.conf 2>/dev/null || true
+    else
+        sudo sed -i 's/client_max_body_size .*/client_max_body_size 150M;/g' /etc/nginx/nginx.conf 2>/dev/null || true
+    fi
+    for f in /etc/nginx/sites-available/* /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*; do
+        if [ -f "$f" ]; then
+            sudo sed -i 's/client_max_body_size [0-9]\+[kKmMgG]\+;/client_max_body_size 150M;/g' "$f" 2>/dev/null || true
+        fi
+    done
+    sudo nginx -t >/dev/null 2>&1 && sudo systemctl reload nginx 2>/dev/null || true
+fi
+
+# 7. Restart Service Dekorin
 echo "🔄 Me-restart service backend..."
 if command -v systemctl >/dev/null 2>&1; then
     sudo systemctl restart dekorin 2>/dev/null || sudo systemctl restart dekorin-api 2>/dev/null || systemctl restart dekorin 2>/dev/null || true
