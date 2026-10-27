@@ -166,6 +166,10 @@
                                 class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
                                 API Log
                             </a>
+                            <a href="javascript:void(0)" onclick="switchView('appversion')" id="nav-appversion"
+                                class="superadmin-only hidden block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
+                                📱 Rilis & Update APK
+                            </a>
                         </div>
                     </div>
 
@@ -253,6 +257,20 @@
                         <span class="nav-text">API Log</span>
                     </a>
 
+                    <!-- 9. Download Mobile App (Untuk Semua Role: Owner, Admin, Superadmin) -->
+                    <div class="pt-3 pb-1">
+                        <hr class="border-stone-200/70">
+                    </div>
+
+                    <a href="javascript:void(0)" onclick="openShareAppModal()" id="nav-download-apk"
+                        class="nav-item flex items-center px-3 py-2.5 rounded-xl text-stone-700 bg-stone-100/90 hover:bg-[#F9F3EC] hover:text-[#C59563] transition group border border-stone-200/80 shadow-sm">
+                        <span class="nav-icon text-lg mr-3 text-emerald-600 group-hover:scale-110 transition-transform">📲</span>
+                        <div class="nav-text flex flex-col text-left">
+                            <span class="font-bold text-xs text-stone-800">Unduh Aplikasi Mobile</span>
+                            <span class="text-[10px] text-stone-400 font-normal">Untuk HP & Tim Crew</span>
+                        </div>
+                    </a>
+
                 </nav>
             </aside>
 
@@ -263,6 +281,33 @@
                 <!-- VIEW 1: DASHBOARD (Exact Match to Screenshot)  -->
                 <!-- ============================================== -->
                 <div id="viewDashboard" class="space-y-6">
+
+                    <!-- BANNER DOWNLOAD APLIKASI MOBILE (OWNER, ADMIN, SUPERADMIN) -->
+                    <div class="bg-gradient-to-r from-stone-900 via-stone-800 to-[#2C2C2C] text-white rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border border-stone-700/50">
+                        <div class="relative z-10 max-w-2xl">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4A574]/20 border border-[#D4A574]/40 text-[#D4A574] text-xs font-bold mb-3">
+                                <span>📱</span>
+                                <span>Aplikasi Android Dekorin Mobile</span>
+                                <span id="dashBannerVersion" class="px-2 py-0.5 rounded-full bg-[#D4A574] text-stone-900 text-[10px] font-black">v1.0.0</span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">Pasang Aplikasi di HP Anda & Bagikan ke Tim Crew</h2>
+                            <p class="text-stone-300 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                                Kelola agenda acara langsung dari smartphone Anda dan bagikan file APK atau link unduh ini ke tim Crew lapangan agar seluruh jadwal & checklist acara tersinkronisasi.
+                            </p>
+                        </div>
+                        <div class="relative z-10 flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto">
+                            <a id="dashBtnDownloadApk" href="/download/apk" target="_blank"
+                                class="flex-1 sm:flex-initial px-5 py-3 rounded-2xl bg-[#D4A574] hover:bg-[#C59563] text-stone-900 font-extrabold text-xs sm:text-sm shadow-lg shadow-[#D4A574]/25 flex items-center justify-center gap-2 transition transform hover:-translate-y-0.5">
+                                <span>⬇️</span>
+                                <span>Download APK Android</span>
+                            </a>
+                            <button onclick="openShareAppModal()"
+                                class="flex-1 sm:flex-initial px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition backdrop-blur-sm">
+                                <span>📲</span>
+                                <span>Bagikan / Scan QR</span>
+                            </button>
+                        </div>
+                    </div>
                     
                     <!-- ROW 1: 6 KPI CARDS (3 cols x 2 rows) -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -829,7 +874,265 @@
                     </div>
                 </div>
 
+                <!-- ============================================== -->
+                <!-- VIEW 8: APP VERSION & APK RELEASE (SUPERADMIN) -->
+                <!-- ============================================== -->
+                <div id="viewAppVersion" class="hidden space-y-6">
+                    <!-- Header banner -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-stone-200/80 shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-bold text-slate-900">Rilis & Pembaruan APK Dekorin</h2>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 uppercase tracking-wide">Khusus Superadmin</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Unggah file APK baru hasil build Flutter untuk mendistribusikan pembaruan otomatis ke handphone pengguna tanpa melalui Play Store.</p>
+                        </div>
+                        <button onclick="loadAppVersions()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition">
+                            <span>🔄 Segarkan Data</span>
+                        </button>
+                    </div>
+
+                    <!-- Active Version Highlight Card -->
+                    <div id="activeVersionCard" class="bg-gradient-to-br from-[#FDFBF9] via-[#FAF5EE] to-[#F5EFE6] border border-[#D4A574]/40 rounded-2xl p-6 shadow-sm">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-14 h-14 rounded-2xl bg-[#D4A574] text-white flex items-center justify-center text-2xl font-bold shadow-md shadow-[#D4A574]/30 shrink-0">
+                                    📱
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold text-[#C59563] uppercase tracking-wider">Versi Rilis Aktif</span>
+                                        <span id="activeForceBadge" class="hidden px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Wajib Update</span>
+                                    </div>
+                                    <div class="flex items-baseline gap-2 mt-0.5">
+                                        <h3 id="activeVersionName" class="text-2xl font-black text-slate-900">v1.0.0</h3>
+                                        <span id="activeVersionCode" class="text-xs font-mono bg-white px-2 py-0.5 rounded border border-stone-200 text-stone-600">Build #1</span>
+                                    </div>
+                                    <p id="activeReleaseNotes" class="text-xs text-stone-600 mt-2 max-w-xl line-clamp-2">Memuat catatan rilis...</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                                <a id="btnDownloadActiveApk" href="#" target="_blank" class="px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs shadow-md shadow-[#D4A574]/20 flex items-center justify-center gap-2 transition">
+                                    <span>⬇️ Download File APK</span>
+                                </a>
+                                <button onclick="copyApkUrl()" class="px-3 py-2.5 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                                    <span>📋 Salin Link APK</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2 Column Layout: Upload Form & History Table -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        
+                        <!-- Left Column: Form Upload APK Baru (5 cols) -->
+                        <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200/80 shadow-sm p-6 space-y-4">
+                            <div class="border-b border-stone-100 pb-3">
+                                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                    <span>🚀</span> Unggah & Rilis APK Baru
+                                </h3>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Setelah diunggah, semua pengguna aplikasi Dekorin akan otomatis menerima notifikasi update.</p>
+                            </div>
+
+                            <form id="uploadApkForm" onsubmit="handleUploadApk(event)" class="space-y-4">
+                                <!-- File Input (Drag & Drop box) -->
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">File APK (.apk) *</label>
+                                    <div id="dropZone" class="border-2 border-dashed border-stone-300 hover:border-[#D4A574] rounded-xl p-4 text-center cursor-pointer transition bg-stone-50/50" onclick="document.getElementById('apkFileInput').click()">
+                                        <div class="text-2xl mb-1 text-stone-400">📦</div>
+                                        <p id="apkFileName" class="text-xs font-semibold text-stone-700 truncate">Pilih atau seret file .apk ke sini</p>
+                                        <p class="text-[10px] text-stone-400 mt-0.5">Format file harus .apk (Maksimal 150 MB)</p>
+                                    </div>
+                                    <input type="file" id="apkFileInput" accept=".apk" required class="hidden" onchange="onApkFileSelected(this)">
+                                </div>
+
+                                <!-- Version Name & Build Number in 2 cols -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Version Name *</label>
+                                        <input type="text" id="apkVersionName" required placeholder="Contoh: 1.0.1"
+                                            class="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-semibold">
+                                        <span class="text-[10px] text-stone-400">Sesuai versionName di pubspec</span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Build Number *</label>
+                                        <input type="number" id="apkVersionCode" required min="1" placeholder="Contoh: 2"
+                                            class="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-semibold">
+                                        <span class="text-[10px] text-stone-400">Harus lebih tinggi dari saat ini</span>
+                                    </div>
+                                </div>
+
+                                <!-- Min Version Code -->
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Versi Minimum Support (Build Number)</label>
+                                    <input type="number" id="apkMinVersionCode" min="1" value="1"
+                                        class="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-semibold">
+                                    <span class="text-[10px] text-stone-400">Pengguna dengan build number di bawah ini wajib update</span>
+                                </div>
+
+                                <!-- Force Update Checkbox -->
+                                <div class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50/60 border border-amber-200/60">
+                                    <input type="checkbox" id="apkForceUpdate" class="w-4 h-4 text-[#D4A574] rounded border-stone-300 focus:ring-[#D4A574]">
+                                    <label for="apkForceUpdate" class="text-xs font-bold text-amber-900 cursor-pointer">
+                                        Wajibkan Pembaruan (Force Update)
+                                        <span class="block text-[10px] font-normal text-amber-700">Pengguna tidak bisa menutup dialog update dan harus memperbarui</span>
+                                    </label>
+                                </div>
+
+                                <!-- Release Notes -->
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Catatan Rilis (Changelog) *</label>
+                                    <textarea id="apkReleaseNotes" rows="4" required placeholder="• Perbaikan bug pada login&#10;• Peningkatan kecepatan loading agenda&#10;• Desain baru cetak invoice"
+                                        class="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-medium"></textarea>
+                                </div>
+
+                                <!-- Upload Progress Indicator -->
+                                <div id="uploadProgressBarContainer" class="hidden space-y-1.5 p-3 rounded-xl bg-stone-50 border border-stone-200">
+                                    <div class="flex items-center justify-between text-xs font-semibold text-stone-700">
+                                        <span id="uploadStatusText">Mengunggah file APK...</span>
+                                        <span id="uploadPercentText" class="font-mono text-[#D4A574]">0%</span>
+                                    </div>
+                                    <div class="w-full bg-stone-200 rounded-full h-2 overflow-hidden">
+                                        <div id="uploadProgressBar" class="bg-[#D4A574] h-2 rounded-full transition-all duration-150" style="width: 0%"></div>
+                                    </div>
+                                </div>
+
+                                <div id="uploadApkError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+                                <div id="uploadApkSuccess" class="hidden p-3 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-100"></div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" id="btnSubmitApk"
+                                    class="w-full py-3 px-4 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs shadow-lg shadow-[#D4A574]/25 transition flex items-center justify-center gap-2">
+                                    <span>🚀 Terbitkan Versi Baru</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right Column: Histori Rilis APK (7 cols) -->
+                        <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200/80 shadow-sm p-6 space-y-4">
+                            <div class="border-b border-stone-100 pb-3 flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                        <span>📜</span> Histori Rilis APK
+                                    </h3>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Daftar semua versi APK yang pernah dirilis ke platform.</p>
+                                </div>
+                            </div>
+
+                            <!-- Table of Releases -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="border-b border-stone-100 text-stone-400 uppercase tracking-wider text-[10px]">
+                                            <th class="py-2.5 px-3">Versi</th>
+                                            <th class="py-2.5 px-3">Build</th>
+                                            <th class="py-2.5 px-3">Tipe</th>
+                                            <th class="py-2.5 px-3">Catatan Rilis</th>
+                                            <th class="py-2.5 px-3">Tanggal</th>
+                                            <th class="py-2.5 px-3 text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="appVersionHistoryTable" class="divide-y divide-stone-100 text-stone-700">
+                                        <tr>
+                                            <td colspan="6" class="py-8 text-center text-stone-400">Memuat histori rilis...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </main>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: UNDUH & BAGIKAN APLIKASI (OWNER/CREW) -->
+    <!-- ========================================== -->
+    <div id="shareAppModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 relative border border-stone-200">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-stone-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-[#D4A574]/20 text-[#C59563] flex items-center justify-center text-2xl font-bold">
+                        📱
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Unduh & Bagikan Aplikasi Dekorin</h3>
+                        <p class="text-xs text-stone-400 mt-0.5">Pasang di smartphone Anda atau kirimkan link ke tim Crew lapangan.</p>
+                    </div>
+                </div>
+                <button onclick="closeShareAppModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center text-sm font-bold transition">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Content in 2 Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <!-- Left: Download actions & notes (7 cols) -->
+                <div class="md:col-span-7 space-y-4">
+                    <!-- Version Info Badge -->
+                    <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Versi Rilis Terbaru</span>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <h4 id="shareModalVersionName" class="text-lg font-black text-slate-900">v1.0.0</h4>
+                                <span id="shareModalVersionCode" class="text-xs font-mono text-stone-500 bg-white px-2 py-0.5 rounded border border-stone-200">Build #1</span>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            Android (.apk)
+                        </span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-2.5">
+                        <a id="shareModalBtnDownload" href="/download/apk" target="_blank"
+                            class="w-full py-3 px-4 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs shadow-md shadow-[#D4A574]/25 flex items-center justify-center gap-2 transition">
+                            <span>⬇️ Download File APK Sekarang</span>
+                        </a>
+
+                        <button onclick="copyShareApkUrl()"
+                            class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 font-bold text-xs flex items-center justify-center gap-2 transition">
+                            <span>📋 Salin Link Unduhan</span>
+                        </button>
+
+                        <button onclick="shareViaWhatsApp()"
+                            class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition">
+                            <span>💬 Bagikan ke Crew via WhatsApp</span>
+                        </button>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60 text-xs text-amber-900 space-y-1.5">
+                        <span class="font-bold flex items-center gap-1.5">
+                            <span>💡</span> Petunjuk Install di HP Android:
+                        </span>
+                        <ol class="list-decimal list-inside space-y-1 text-[11px] text-amber-800 leading-relaxed">
+                            <li>Klik tombol <b>Download APK</b> di atas.</li>
+                            <li>Buka file yang baru didownload di notifikasi HP.</li>
+                            <li>Jika muncul izin <i>"Izinkan dari sumber ini"</i> (Allow Unknown Sources), aktifkan izin tersebut.</li>
+                            <li>Klik <b>Pasang / Install</b> dan aplikasi siap digunakan login!</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Right: QR Code for Direct Phone Scan (5 cols) -->
+                <div class="md:col-span-5 flex flex-col items-center justify-center p-4 bg-stone-50 rounded-2xl border border-stone-200 text-center">
+                    <span class="text-xs font-bold text-stone-700 mb-1">Scan Kamera HP</span>
+                    <p class="text-[10px] text-stone-400 mb-3">Arahkan kamera smartphone ke QR Code ini untuk langsung mendownload APK.</p>
+                    
+                    <div class="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm inline-block">
+                        <img id="shareModalQrCode" src="" alt="QR Code Download APK" class="w-40 h-40 object-contain">
+                    </div>
+
+                    <span class="text-[10px] text-stone-500 font-mono mt-3 break-all" id="shareModalShortUrl">
+                        /download/apk
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1874,6 +2177,9 @@
                 // Sesuaikan menu
                 if (navConsolidation) navConsolidation.classList.add('hidden');
                 if (navCompanies) navCompanies.innerText = 'Profil Usaha (Company)';
+
+                // Sembunyikan elemen khusus Superadmin
+                document.querySelectorAll('.superadmin-only').forEach(el => el.classList.add('hidden'));
             } else {
                 // Akses penuh Superadmin
                 if (switcherBtn) switcherBtn.classList.remove('pointer-events-none');
@@ -1882,6 +2188,9 @@
                 if (btnCreateComp) btnCreateComp.classList.remove('hidden');
                 if (navConsolidation) navConsolidation.classList.remove('hidden');
                 if (navCompanies) navCompanies.innerText = 'Usaha & Vendor (Companies)';
+
+                // Tampilkan elemen khusus Superadmin
+                document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('hidden'));
             }
         }
 
@@ -2067,13 +2376,20 @@
             else if (currentView === 'invitations') loadInvitations();
             else if (currentView === 'reports') loadReports();
             else if (currentView === 'apilogs') loadApiLogs(1);
+            else if (currentView === 'appversion') loadAppVersions();
         }
 
         function switchView(viewName) {
+            if (viewName === 'appversion' && currentUserRole !== 'superadmin') {
+                alert('Akses ditolak: Menu Rilis APK hanya dapat diakses oleh Superadmin.');
+                switchView('dashboard');
+                return;
+            }
+
             currentView = viewName;
             
             // Sembunyikan semua section
-            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewDecorationModels', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs'];
+            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewDecorationModels', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs', 'viewAppVersion'];
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if (el) el.classList.add('hidden');
@@ -2094,6 +2410,7 @@
                 'companies': { el: 'viewCompanies', title: (currentUserRole === 'superadmin' ? 'Usaha & Vendor (Companies)' : 'Profil Usaha Saya'), path: 'Administration • Usaha & Vendor', nav: 'nav-companies', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: 'Administration • API Log', nav: 'nav-apilogs', navDirect: 'nav-apilogs-direct', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'appversion': { el: 'viewAppVersion', title: 'Rilis & Pembaruan APK', path: 'Administration • Rilis APK', nav: 'nav-appversion', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
@@ -2142,6 +2459,7 @@
         // LOAD STATS & CHARTS (Dashboard View)
         // ==========================================
         async function loadDashboardStats() {
+            fetchActiveVersionForDashboard();
             try {
                 let url = '/api/superadmin/dashboard-stats';
                 if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
@@ -4693,9 +5011,235 @@
             }
         }
 
+        // ==========================================
+        // APP VERSION & APK RELEASE LOGIC (SUPERADMIN ONLY)
+        // ==========================================
+        let currentActiveApkUrl = '';
+
+        function onApkFileSelected(input) {
+            const file = input.files && input.files[0];
+            if (file) {
+                if (!file.name.toLowerCase().endsWith('.apk')) {
+                    alert('Hanya file berekstensi .apk yang diperbolehkan!');
+                    input.value = '';
+                    document.getElementById('apkFileName').innerText = 'Pilih atau seret file .apk ke sini';
+                    return;
+                }
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('apkFileName').innerText = `${file.name} (${sizeMB} MB)`;
+            } else {
+                document.getElementById('apkFileName').innerText = 'Pilih atau seret file .apk ke sini';
+            }
+        }
+
+        async function loadAppVersions() {
+            if (currentUserRole !== 'superadmin') return;
+
+            try {
+                // 1. Ambil versi aktif
+                const resActive = await fetch('/api/app/version');
+                const jsonActive = await resActive.json();
+                if (jsonActive && jsonActive.data) {
+                    const act = jsonActive.data;
+                    document.getElementById('activeVersionName').innerText = 'v' + act.version_name;
+                    document.getElementById('activeVersionCode').innerText = 'Build #' + act.version_code;
+                    document.getElementById('activeReleaseNotes').innerText = act.release_notes || 'Tidak ada catatan rilis.';
+                    currentActiveApkUrl = act.download_url || '#';
+                    document.getElementById('btnDownloadActiveApk').href = currentActiveApkUrl;
+
+                    const forceBadge = document.getElementById('activeForceBadge');
+                    if (act.force_update) {
+                        forceBadge.classList.remove('hidden');
+                    } else {
+                        forceBadge.classList.add('hidden');
+                    }
+
+                    // Rekomendasikan build number berikutnya di form input jika kosong
+                    const nextCode = (act.version_code || 1) + 1;
+                    const codeInput = document.getElementById('apkVersionCode');
+                    if (codeInput && !codeInput.value) {
+                        codeInput.value = nextCode;
+                    }
+                }
+
+                // 2. Ambil histori versi
+                const resHist = await fetch('/api/app/version-history', {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const jsonHist = await resHist.json();
+                const tableBody = document.getElementById('appVersionHistoryTable');
+
+                if (!jsonHist.data || jsonHist.data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-stone-400">Belum ada histori versi APK.</td></tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = jsonHist.data.map((v, idx) => {
+                    const isLatest = idx === 0;
+                    const dateStr = v.created_at ? new Date(v.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                    const forceBadge = v.force_update 
+                        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Force</span>` 
+                        : `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 text-stone-600">Opsional</span>`;
+                    const latestBadge = isLatest ? `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase">Aktif</span>` : '';
+
+                    return `
+                        <tr class="hover:bg-stone-50/70 transition">
+                            <td class="py-3 px-3 font-bold text-slate-800">
+                                v${v.version_name} ${latestBadge}
+                            </td>
+                            <td class="py-3 px-3 font-mono text-stone-600">#${v.version_code}</td>
+                            <td class="py-3 px-3">${forceBadge}</td>
+                            <td class="py-3 px-3 text-stone-600 max-w-xs truncate" title="${(v.release_notes || '').replace(/"/g, '&quot;')}">
+                                ${v.release_notes || '-'}
+                            </td>
+                            <td class="py-3 px-3 text-stone-500 whitespace-nowrap text-[11px]">${dateStr}</td>
+                            <td class="py-3 px-3 text-right whitespace-nowrap">
+                                <a href="${v.download_url}" target="_blank" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-bold bg-[#D4A574]/15 text-[#C59563] hover:bg-[#D4A574]/25 transition mr-1">
+                                    Unduh
+                                </a>
+                                <button onclick="deleteAppVersion('${v.id}', '${v.version_name}')" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-bold text-rose-600 hover:bg-rose-50 transition">
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Gagal load data versi APK:", err);
+            }
+        }
+
+        function copyApkUrl() {
+            if (!currentActiveApkUrl || currentActiveApkUrl === '#') {
+                alert('URL APK belum tersedia');
+                return;
+            }
+            navigator.clipboard.writeText(currentActiveApkUrl).then(() => {
+                alert('Link download APK berhasil disalin ke clipboard:\n' + currentActiveApkUrl);
+            }).catch(() => {
+                prompt('Salin link download APK di bawah ini:', currentActiveApkUrl);
+            });
+        }
+
+        function handleUploadApk(e) {
+            e.preventDefault();
+            if (currentUserRole !== 'superadmin') {
+                alert('Hanya Superadmin yang berhak merilis APK.');
+                return;
+            }
+
+            const fileInput = document.getElementById('apkFileInput');
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) {
+                alert('Silakan pilih file APK terlebih dahulu!');
+                return;
+            }
+
+            const versionName = document.getElementById('apkVersionName').value.trim();
+            const versionCode = document.getElementById('apkVersionCode').value.trim();
+            const minVersionCode = document.getElementById('apkMinVersionCode').value.trim();
+            const releaseNotes = document.getElementById('apkReleaseNotes').value.trim();
+            const forceUpdate = document.getElementById('apkForceUpdate').checked;
+
+            const errEl = document.getElementById('uploadApkError');
+            const succEl = document.getElementById('uploadApkSuccess');
+            const progContainer = document.getElementById('uploadProgressBarContainer');
+            const progBar = document.getElementById('uploadProgressBar');
+            const progText = document.getElementById('uploadPercentText');
+            const statusText = document.getElementById('uploadStatusText');
+            const btnSubmit = document.getElementById('btnSubmitApk');
+
+            errEl.classList.add('hidden');
+            succEl.classList.add('hidden');
+            progContainer.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnSubmit.classList.add('opacity-50', 'pointer-events-none');
+
+            const formData = new FormData();
+            formData.append('apk', file);
+            formData.append('version_name', versionName);
+            formData.append('version_code', versionCode);
+            formData.append('min_version_code', minVersionCode);
+            formData.append('release_notes', releaseNotes);
+            formData.append('force_update', forceUpdate ? 'true' : 'false');
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/app/upload-apk', true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
+
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    progBar.style.width = percent + '%';
+                    progText.innerText = percent + '%';
+                    statusText.innerText = percent === 100 
+                        ? 'Memproses penyimpanan APK di server...' 
+                        : `Mengunggah APK (${(event.loaded/(1024*1024)).toFixed(1)} / ${(event.total/(1024*1024)).toFixed(1)} MB)...`;
+                }
+            };
+
+            xhr.onload = function() {
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove('opacity-50', 'pointer-events-none');
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    succEl.innerText = '✅ File APK berhasil diunggah dan versi ' + versionName + ' (Build #' + versionCode + ') telah aktif dirilis!';
+                    succEl.classList.remove('hidden');
+                    document.getElementById('uploadApkForm').reset();
+                    document.getElementById('apkFileName').innerText = 'Pilih atau seret file .apk ke sini';
+                    setTimeout(() => {
+                        progContainer.classList.add('hidden');
+                        progBar.style.width = '0%';
+                        progText.innerText = '0%';
+                    }, 2000);
+                    loadAppVersions();
+                } else {
+                    let errMsg = 'Gagal mengunggah file APK (' + xhr.status + ')';
+                    try {
+                        const resp = JSON.parse(xhr.responseText);
+                        errMsg = resp.error || resp.message || errMsg;
+                    } catch (_) {}
+                    errEl.innerText = '❌ ' + errMsg;
+                    errEl.classList.remove('hidden');
+                }
+            };
+
+            xhr.onerror = function() {
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove('opacity-50', 'pointer-events-none');
+                errEl.innerText = '❌ Terjadi kegagalan jaringan saat mengunggah APK.';
+                errEl.classList.remove('hidden');
+            };
+
+            xhr.send(formData);
+        }
+
+        async function deleteAppVersion(id, versionName) {
+            if (currentUserRole !== 'superadmin') return;
+            if (!confirm(`Apakah Anda yakin ingin menghapus catatan rilis versi ${versionName}?`)) return;
+
+            try {
+                const res = await fetch('/api/app/version/' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Data versi berhasil dihapus');
+                    loadAppVersions();
+                } else {
+                    alert(data.error || 'Gagal menghapus versi');
+                }
+            } catch (e) {
+                alert('Terjadi kesalahan: ' + e);
+            }
+        }
+
         // Close on Esc key
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                closeShareAppModal();
                 closeLogDataModal();
                 closePackageModal();
                 closeDecorationModelModal();
@@ -4703,6 +5247,80 @@
                 closeInvitationModal();
             }
         });
+
+        // ==========================================
+        // SHARE & DOWNLOAD MOBILE APP (FOR OWNER, ADMIN & CREW)
+        // ==========================================
+        async function fetchActiveVersionForDashboard() {
+            try {
+                const res = await fetch('/api/app/version');
+                const json = await res.json();
+                if (json && json.data) {
+                    const act = json.data;
+                    const vName = 'v' + act.version_name;
+                    const bCode = 'Build #' + act.version_code;
+                    const directUrl = window.location.origin + '/download/apk';
+                    currentActiveApkUrl = act.download_url || directUrl;
+
+                    // Update banner dashboard
+                    const bVer = document.getElementById('dashBannerVersion');
+                    if (bVer) bVer.innerText = vName;
+
+                    const btnDash = document.getElementById('dashBtnDownloadApk');
+                    if (btnDash) btnDash.href = directUrl;
+
+                    // Update modal share
+                    const mName = document.getElementById('shareModalVersionName');
+                    if (mName) mName.innerText = vName;
+
+                    const mCode = document.getElementById('shareModalVersionCode');
+                    if (mCode) mCode.innerText = bCode;
+
+                    const mBtn = document.getElementById('shareModalBtnDownload');
+                    if (mBtn) mBtn.href = directUrl;
+
+                    const mShort = document.getElementById('shareModalShortUrl');
+                    if (mShort) mShort.innerText = directUrl;
+
+                    // Generate QR Code URL
+                    const qrImg = document.getElementById('shareModalQrCode');
+                    if (qrImg) {
+                        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(directUrl);
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal load versi untuk dashboard/modal:", err);
+            }
+        }
+
+        function openShareAppModal() {
+            fetchActiveVersionForDashboard();
+            const modal = document.getElementById('shareAppModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeShareAppModal() {
+            const modal = document.getElementById('shareAppModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function copyShareApkUrl() {
+            const directUrl = window.location.origin + '/download/apk';
+            navigator.clipboard.writeText(directUrl).then(() => {
+                alert('Link download APK berhasil disalin ke clipboard:\n' + directUrl);
+            }).catch(() => {
+                prompt('Salin link download APK di bawah ini:', directUrl);
+            });
+        }
+
+        function shareViaWhatsApp() {
+            const directUrl = window.location.origin + '/download/apk';
+            const vName = document.getElementById('shareModalVersionName')?.innerText || 'terbaru';
+            const message = `Halo tim Crew Dekorin 👋,\n\nSilakan unduh dan pasang aplikasi Dekorin versi ${vName} di smartphone Android kamu untuk memantau agenda dan checklist acara dekorasi:\n\n🔗 Link Download: ${directUrl}\n\nSetelah didownload, buka file APK untuk memasang aplikasi. Terima kasih!`;
+            
+            const waUrl = 'https://wa.me/?text=' + encodeURIComponent(message);
+            window.open(waUrl, '_blank');
+        }
     </script>
 </body>
 </html>

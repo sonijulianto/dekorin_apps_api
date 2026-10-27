@@ -60,6 +60,7 @@ func ConnectDB() {
 		&models.InvitationWish{},
 		&models.Expense{},
 		&models.ApiLog{},
+		&models.AppVersion{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
@@ -84,6 +85,7 @@ func ConnectDB() {
 	SeedAddons(db)
 	SeedExpenses(db)
 	SeedApiLogs(db)
+	SeedAppVersion(db)
 }
 
 // SeedAddons mengisi data awal master item tambahan jika kosong
@@ -713,4 +715,28 @@ func SeedApiLogs(db *gorm.DB) {
 		fmt.Println("🌱 Seeding selesai: Data sample API logs berhasil ditambahkan!")
 	}
 }
+
+// SeedAppVersion mengisi data awal versi APK mobile app jika belum ada
+func SeedAppVersion(db *gorm.DB) {
+	var count int64
+	db.Model(&models.AppVersion{}).Count(&count)
+
+	if count == 0 {
+		initialVersion := models.AppVersion{
+			ID:             "ver_init_01",
+			Platform:       "android",
+			VersionName:    "1.0.0",
+			VersionCode:    1,
+			MinVersionCode: 1,
+			DownloadURL:    "https://103.150.191.59.sslip.io/uploads/apks/dekorin-latest.apk",
+			ReleaseNotes:   "• Rilis awal Dekorin App\n• Manajemen agenda, master paket, & undangan digital",
+			ForceUpdate:    false,
+			CreatedAt:      time.Now(),
+			UpdatedAt:      time.Now(),
+		}
+		db.Create(&initialVersion)
+		fmt.Println("🌱 Seeding selesai: Data AppVersion awal berhasil ditambahkan!")
+	}
+}
+
 

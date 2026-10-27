@@ -17,9 +17,9 @@ func main() {
 	// Koneksi ke Database PostgreSQL
 	config.ConnectDB()
 
-	// Initialize Fiber app dengan limit body 30MB untuk upload file
+	// Initialize Fiber app dengan limit body 150MB untuk upload file APK & gambar
 	app := fiber.New(fiber.Config{
-		BodyLimit: 30 * 1024 * 1024, // 30 MB
+		BodyLimit: 150 * 1024 * 1024, // 150 MB
 	})
 
 	// Middleware
@@ -95,6 +95,16 @@ func main() {
 	api.Get("/apilog/get", middleware.OptionalProtected(), handlers.GetApiLogs)
 	api.Get("/apilog/:id", middleware.OptionalProtected(), handlers.GetApiLogByID)
 	api.Get("/apilogs", middleware.OptionalProtected(), handlers.GetApiLogs)
+
+	// App Version & In-App Update routes (Hanya Superadmin yang berhak upload & atur versi)
+	api.Get("/app/version", handlers.GetLatestAppVersion)
+	api.Get("/apk/check-version", handlers.GetLatestAppVersion)
+	api.Get("/app/download-latest", handlers.DownloadLatestApk)
+	app.Get("/download/apk", handlers.DownloadLatestApk)
+	api.Get("/app/version-history", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetAppVersionHistory)
+	api.Post("/app/version", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UpdateAppVersion)
+	api.Post("/app/upload-apk", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UploadApkFile)
+	api.Delete("/app/version/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.DeleteAppVersion)
 
 	// Serve static upload directory
 	app.Static("/uploads", "./uploads")
