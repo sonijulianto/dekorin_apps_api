@@ -21,3 +21,9 @@ type UpdateUserRequest struct {
 	Role     string `json:"role"`
 	Password string `json:"password"` // opsional jika ingin mengubah password
 }
+
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"current_password"`
+	NewPassword     string `json:"new_password"`
+}
+

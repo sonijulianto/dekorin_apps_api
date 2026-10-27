@@ -38,6 +38,7 @@ func main() {
 
 	// Routes
 	auth.Post("/login", handlers.Login)
+	auth.Post("/change-password", middleware.Protected(), handlers.ChangePassword)
 
 	// Superadmin / Web Admin routes (dapat diakses superadmin, owner, dan admin)
 	superadmin := api.Group("/superadmin")

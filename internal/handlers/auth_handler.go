@@ -112,3 +112,77 @@ func Login(c *fiber.Ctx) error {
 		},
 	})
 }
+
+// ChangePassword handles POST /api/auth/change-password
+func ChangePassword(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Sesi tidak valid atau telah berakhir",
+		})
+	}
+
+	req := new(models.ChangePasswordRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	currentPassword := strings.TrimSpace(req.CurrentPassword)
+	newPassword := strings.TrimSpace(req.NewPassword)
+
+	if currentPassword == "" || newPassword == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Password saat ini dan password baru wajib diisi",
+		})
+	}
+
+	if len(newPassword) < 6 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Password baru minimal 6 karakter",
+		})
+	}
+
+	var user models.User
+	if err := config.DB.Where("id = ?", userID).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Pengguna tidak ditemukan",
+		})
+	}
+
+	// Verifikasi password saat ini menggunakan Bcrypt
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword)); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Password saat ini salah",
+		})
+	}
+
+	// Cegah penggunaan password yang sama persis
+	if currentPassword == newPassword {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Password baru tidak boleh sama dengan password saat ini",
+		})
+	}
+
+	// Hash password baru
+	hashed, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengenkripsi password baru",
+		})
+	}
+
+	user.Password = string(hashed)
+	user.UpdatedAt = time.Now()
+	if err := config.DB.Save(&user).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui password",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Password berhasil diubah",
+	})
+}
+

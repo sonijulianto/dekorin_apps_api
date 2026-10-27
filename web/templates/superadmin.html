@@ -120,6 +120,10 @@
                             <p class="font-bold text-slate-900 truncate" id="dropdownUserName">Superadmin Dekorin</p>
                             <p class="text-[11px] text-slate-400 font-semibold" id="dropdownUserRole">Platform Administrator</p>
                         </div>
+                        <button onclick="openChangePasswordModal()" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 font-semibold flex items-center gap-2 transition">
+                            <svg class="w-4 h-4 text-[#D4A574]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                            <span>Ubah Kata Sandi</span>
+                        </button>
                         <button onclick="handleLogout()" class="w-full text-left px-4 py-2 hover:bg-rose-50 text-rose-600 font-semibold flex items-center gap-2 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                             <span>Keluar (Logout)</span>
@@ -1204,6 +1208,50 @@
         </div>
     </div>
 
+    <!-- CHANGE PASSWORD MODAL -->
+    <div id="changePasswordModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Ubah Kata Sandi</h3>
+                        <p class="text-[11px] text-slate-400">Perbarui kata sandi akun Anda</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeChangePasswordModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formChangePassword" onsubmit="handleChangePassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Saat Ini *</label>
+                    <input type="password" id="inputCurrentPassword" required placeholder="Masukkan kata sandi lama"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Baru *</label>
+                    <input type="password" id="inputNewPassword" required minlength="6" placeholder="Minimal 6 karakter"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Konfirmasi Kata Sandi Baru *</label>
+                    <input type="password" id="inputConfirmPassword" required minlength="6" placeholder="Ulangi kata sandi baru"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div id="changePasswordError" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
+                <div id="changePasswordSuccess" class="hidden p-3 rounded-xl bg-emerald-50 text-emerald-600 text-xs font-medium border border-emerald-100"></div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" id="btnSubmitChangePassword" class="px-5 py-2 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">Simpan Kata Sandi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- SUCCESS CREDENTIAL MODAL -->
     <div id="successModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4">
@@ -2242,6 +2290,84 @@
             currentUserCompanyName = '';
             currentUserName = '';
             showLogin();
+        }
+
+        function openChangePasswordModal() {
+            const dropdown = document.getElementById('userDropdownMenu');
+            if (dropdown) dropdown.classList.add('hidden');
+            const form = document.getElementById('formChangePassword');
+            if (form) form.reset();
+            const errBox = document.getElementById('changePasswordError');
+            if (errBox) errBox.classList.add('hidden');
+            const succBox = document.getElementById('changePasswordSuccess');
+            if (succBox) succBox.classList.add('hidden');
+            const modal = document.getElementById('changePasswordModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeChangePasswordModal() {
+            const modal = document.getElementById('changePasswordModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleChangePassword(e) {
+            e.preventDefault();
+            const current_password = document.getElementById('inputCurrentPassword').value;
+            const new_password = document.getElementById('inputNewPassword').value;
+            const confirm_password = document.getElementById('inputConfirmPassword').value;
+            const errBox = document.getElementById('changePasswordError');
+            const succBox = document.getElementById('changePasswordSuccess');
+            const btn = document.getElementById('btnSubmitChangePassword');
+
+            errBox.classList.add('hidden');
+            succBox.classList.add('hidden');
+
+            if (new_password.length < 6) {
+                errBox.innerText = 'Password baru minimal 6 karakter';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            if (new_password !== confirm_password) {
+                errBox.innerText = 'Konfirmasi kata sandi baru tidak cocok';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            if (new_password === current_password) {
+                errBox.innerText = 'Password baru tidak boleh sama dengan password saat ini';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const res = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ current_password, new_password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal mengubah kata sandi');
+
+                succBox.innerText = 'Kata sandi berhasil diperbarui!';
+                succBox.classList.remove('hidden');
+                document.getElementById('formChangePassword').reset();
+                setTimeout(() => {
+                    closeChangePasswordModal();
+                }, 1500);
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Kata Sandi';
+            }
         }
 
         async function checkAuthAndLoad() {
