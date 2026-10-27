@@ -227,28 +227,7 @@
                         <span class="nav-text">Undangan Digital</span>
                     </a>
 
-                    <!-- 5. Report -->
-                    <a href="javascript:void(0)" onclick="switchView('reports')" id="nav-reports"
-                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition">
-                        <span class="nav-icon text-base mr-3 text-stone-500">📄</span>
-                        <span class="nav-text">Report</span>
-                    </a>
-
-                    <!-- 6. Report Consolidation -->
-                    <a href="javascript:void(0)" onclick="switchView('dashboard')" id="nav-consolidation"
-                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
-                        <span class="nav-icon text-base mr-3 text-slate-500">📑</span>
-                        <span class="nav-text">Report Consolidation</span>
-                    </a>
-
-                    <!-- 7. Survey -->
-                    <a href="javascript:void(0)" onclick="switchView('survey')" id="nav-survey"
-                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
-                        <span class="nav-icon text-base mr-3 text-slate-500">📢</span>
-                        <span class="nav-text">Survey</span>
-                    </a>
-
-                    <!-- 8. API Log (Direct) -->
+                    <!-- API Log (Direct) -->
                     <a href="javascript:void(0)" onclick="switchView('apilogs')" id="nav-apilogs-direct"
                         class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
                         <span class="nav-icon text-base mr-3 text-slate-500">📜</span>
@@ -2200,7 +2179,6 @@
             const chevron = document.getElementById('companySwitcherChevron');
             const btnAll = document.getElementById('btnCompanyAll');
             const btnCreateComp = document.getElementById('btnOpenCreateCompany');
-            const navConsolidation = document.getElementById('nav-consolidation');
             const navCompanies = document.getElementById('nav-companies');
 
             if (currentUserRole !== 'superadmin') {
@@ -2217,7 +2195,6 @@
                 if (btnCreateComp) btnCreateComp.classList.add('hidden');
 
                 // Sesuaikan menu
-                if (navConsolidation) navConsolidation.classList.add('hidden');
                 if (navCompanies) navCompanies.innerText = 'Profil Usaha (Company)';
 
                 // Sembunyikan elemen khusus Superadmin
