@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"dekorin_apps_api/internal/config"
 	"dekorin_apps_api/internal/handlers"
 	"dekorin_apps_api/internal/middleware"
+	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -16,6 +18,9 @@ import (
 func main() {
 	// Koneksi ke Database PostgreSQL
 	config.ConnectDB()
+
+	// Menjalankan background worker untuk pembersihan disk & log lama secara otomatis
+	startAutoCleanWorker()
 
 	// Initialize Fiber app dengan limit body 150MB untuk upload file APK & gambar
 	app := fiber.New(fiber.Config{
@@ -149,4 +154,26 @@ func main() {
 	}
 	log.Printf("Server started at http://localhost:%s\n", port)
 	log.Fatal(app.Listen(":" + port))
+}
+
+// startAutoCleanWorker menjalankan pembersihan berkala otomatis di latar belakang
+func startAutoCleanWorker() {
+	go func() {
+		// Jalankan sekali saat startup server
+		runLogCleanup()
+
+		// Jadwalkan pembersihan setiap 24 jam
+		ticker := time.NewTicker(24 * time.Hour)
+		for range ticker.C {
+			runLogCleanup()
+		}
+	}()
+}
+
+func runLogCleanup() {
+	cutoff := time.Now().AddDate(0, 0, -30) // Log lebih lama dari 30 hari
+	res := config.DB.Where("created_at < ?", cutoff).Delete(&models.ApiLog{})
+	if res.Error == nil && res.RowsAffected > 0 {
+		log.Printf("🧹 [AutoClean] Berhasil membersihkan %d log API lama (> 30 hari)\n", res.RowsAffected)
+	}
 }

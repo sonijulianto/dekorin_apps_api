@@ -206,6 +206,9 @@ func UploadApkFile(c *fiber.Ctx) error {
 		})
 	}
 
+	// Auto Retention: Bersihkan file APK lama di disk, simpan hanya 5 rilis terakhir
+	cleanOldApkFiles(5)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message":      "File APK dan versi baru berhasil dirilis!",
 		"filename":     filename,
@@ -215,6 +218,7 @@ func UploadApkFile(c *fiber.Ctx) error {
 }
 
 // DeleteAppVersion menangani DELETE /api/app/version/:id (Khusus Superadmin)
+// Menghapus data dari database sekaligus menghapus file APK fisik dari disk server
 func DeleteAppVersion(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
@@ -223,15 +227,59 @@ func DeleteAppVersion(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := config.DB.Delete(&models.AppVersion{}, "id = ?", id).Error; err != nil {
+	var appVersion models.AppVersion
+	if err := config.DB.First(&appVersion, "id = ?", id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Data versi tidak ditemukan",
+		})
+	}
+
+	// Hapus file fisik APK dari disk server
+	if appVersion.DownloadURL != "" {
+		parts := strings.Split(appVersion.DownloadURL, "/")
+		if len(parts) > 0 {
+			fname := parts[len(parts)-1]
+			// Jangan hapus dekorin-latest.apk
+			if fname != "dekorin-latest.apk" && strings.HasSuffix(fname, ".apk") {
+				filePath := filepath.Join("./uploads/apks", fname)
+				_ = os.Remove(filePath)
+			}
+		}
+	}
+
+	// Hapus record dari database
+	if err := config.DB.Delete(&appVersion).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal menghapus versi: " + err.Error(),
 		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Data versi berhasil dihapus",
+		"message": "Data versi dan file fisik APK berhasil dibersihkan dari server",
 	})
+}
+
+// cleanOldApkFiles menjaga kuota disk dengan menghapus file APK lama melebihi batas keepLatest
+func cleanOldApkFiles(keepLatest int) {
+	var versions []models.AppVersion
+	if err := config.DB.Where("platform = ?", "android").Order("version_code DESC, created_at DESC").Find(&versions).Error; err != nil {
+		return
+	}
+
+	if len(versions) > keepLatest {
+		for _, v := range versions[keepLatest:] {
+			if v.DownloadURL != "" {
+				parts := strings.Split(v.DownloadURL, "/")
+				if len(parts) > 0 {
+					fname := parts[len(parts)-1]
+					if fname != "dekorin-latest.apk" && strings.HasSuffix(fname, ".apk") {
+						filePath := filepath.Join("./uploads/apks", fname)
+						_ = os.Remove(filePath)
+					}
+				}
+			}
+		}
+	}
 }
 
 // DownloadLatestApk menangani GET /download/apk dan GET /api/app/download-latest
