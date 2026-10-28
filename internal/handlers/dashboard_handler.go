@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"strings"
 	"time"
 
 	"dekorin_apps_api/internal/config"
@@ -21,9 +22,19 @@ type DashboardSummaryResponse struct {
 }
 
 // GetDashboardSummary handles GET /api/dashboard/summary
-// Otomatis terisolasi hanya untuk company_id user yang sedang login
+// Otomatis terisolasi hanya untuk company_id user yang sedang login,
+// atau filter query company_id jika diakses oleh superadmin.
 func GetDashboardSummary(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := strings.TrimSpace(c.Query("company_id")); qComp != "" && qComp != "all" {
+			companyID = qComp
+		} else {
+			companyID = ""
+		}
+	}
 
 	// 1. Total Pendapatan: Diambil dari semua agenda perusahaan yang payment_status = 'paid'
 	agendaQuery := config.DB.Preload("ClientForm").Where("payment_status = ?", "paid")
@@ -76,9 +87,9 @@ func GetDashboardSummary(c *fiber.Ctx) error {
 	}
 	upcomingListQuery.Order("event_date_time ASC").Limit(10).Find(&upcomingAgendas)
 
-	// 5. Ambil 5 pengeluaran terbaru
+	// 5. Ambil pengeluaran terbaru (maks 10)
 	var recentExpenses []models.Expense
-	recentExpenseQuery := config.DB.Order("date DESC, created_at DESC").Limit(5)
+	recentExpenseQuery := config.DB.Order("date DESC, created_at DESC").Limit(10)
 	if companyID != "" {
 		recentExpenseQuery = recentExpenseQuery.Where("company_id = ?", companyID)
 	}

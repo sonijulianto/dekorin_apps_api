@@ -286,128 +286,109 @@
                         </div>
                     </div>
                     
-                    <!-- ROW 1: 6 KPI CARDS (3 cols x 2 rows) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- ROW 1: 4 FINANCIAL & BOOKING SUMMARY CARDS (Matching Mobile App) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         
-                        <!-- Card 1: Target Call -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center text-xl font-bold">
-                                📍
+                        <!-- Card 1: Pendapatan -->
+                        <div class="bg-white rounded-2xl p-5 border border-emerald-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold shrink-0">
+                                💰
                             </div>
-                            <div class="text-right">
-                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statTargetCall">7741</h3>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">Target Call</p>
-                            </div>
-                        </div>
-
-                        <!-- Card 2: Actual Call -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl font-bold">
-                                🚀
-                            </div>
-                            <div class="text-right">
-                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statActualCall">1795</h3>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">Actual Call</p>
+                            <div class="text-right min-w-0 pl-3">
+                                <span class="text-[11px] font-semibold text-emerald-600 block">Hanya agenda lunas</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight truncate" id="dashTotalRevenue">Rp 0</h3>
+                                <p class="text-xs font-bold text-slate-400 mt-0.5">Pendapatan</p>
                             </div>
                         </div>
 
-                        <!-- Card 3: Pending Call -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-400 flex items-center justify-center text-xl font-bold">
-                                🕒
+                        <!-- Card 2: Pengeluaran -->
+                        <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold shrink-0">
+                                🛒
                             </div>
-                            <div class="text-right">
-                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statPendingCall">0</h3>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">Pending Call</p>
-                            </div>
-                        </div>
-
-                        <!-- Card 4: Effective Call -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center text-xl font-bold">
-                                ✈️
-                            </div>
-                            <div class="text-right">
-                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statEffectiveCall">900</h3>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">Effective Call</p>
+                            <div class="text-right min-w-0 pl-3">
+                                <span class="text-[11px] font-semibold text-amber-600 block">Biaya operasional</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight truncate" id="dashTotalExpense">Rp 0</h3>
+                                <p class="text-xs font-bold text-slate-400 mt-0.5">Pengeluaran</p>
                             </div>
                         </div>
 
-                        <!-- Card 5: Visibility -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center text-xl font-bold">
-                                ↗️
+                        <!-- Card 3: Keuntungan -->
+                        <div class="bg-white rounded-2xl p-5 border border-blue-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold shrink-0">
+                                📈
                             </div>
-                            <div class="text-right">
-                                <h3 class="text-3xl font-extrabold text-slate-900 leading-none" id="statVisibility">112/528</h3>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">visibility</p>
+                            <div class="text-right min-w-0 pl-3">
+                                <span class="text-[11px] font-semibold text-blue-600 block">Pendapatan - Beban</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight truncate" id="dashTotalProfit">Rp 0</h3>
+                                <p class="text-xs font-bold text-slate-400 mt-0.5">Keuntungan</p>
                             </div>
                         </div>
 
-                        <!-- Card 6: Revenue -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-xl font-bold">
-                                📊
+                        <!-- Card 4: Agenda -->
+                        <div class="bg-white rounded-2xl p-5 border border-[#D4A574]/30 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                            <div class="w-12 h-12 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center text-xl font-bold shrink-0">
+                                📅
                             </div>
-                            <div class="text-right">
-                                <h3 class="text-2xl font-extrabold text-slate-900 leading-none tracking-tight" id="statRevenue">Rp 635.509.000,00</h3>
-                                <p class="text-xs font-semibold text-slate-400 mt-1">Revenue</p>
+                            <div class="text-right min-w-0 pl-3">
+                                <span class="text-[11px] font-semibold text-[#C59563] block">Jadwal ≥ Hari Ini</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight truncate" id="dashUpcomingCount">0 Event</h3>
+                                <p class="text-xs font-bold text-slate-400 mt-0.5">Agenda</p>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- ROW 2: 3 LEADERBOARD CARDS -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                        
-                        <!-- Col 1: Top Customers -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                            <h3 class="font-bold text-slate-900 text-sm mb-4">Top Customers</h3>
-                            <div class="space-y-3" id="topCustomersList">
-                                <!-- Injected via JS -->
+                    <!-- ROW 2: TOMBOL AKSI CEPAT INPUT PENGELUARAN (Matching Mobile Quick Action) -->
+                    <div class="bg-white rounded-2xl p-5 border border-[#D4A574]/40 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-[#D4A574] transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center text-xl font-bold shrink-0">
+                                📝
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Ada Pengeluaran Baru?</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">Catat belanja bunga, properti dekor, sewa armada, upah crew, dan operasional lainnya</p>
                             </div>
                         </div>
-
-                        <!-- Col 2: Top Products -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                            <h3 class="font-bold text-slate-900 text-sm mb-4">Top Products</h3>
-                            <div class="space-y-3" id="topProductsList">
-                                <!-- Injected via JS -->
-                            </div>
-                        </div>
-
-                        <!-- Col 3: Top Revenue -->
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                            <h3 class="font-bold text-slate-900 text-sm mb-4">Top Revenue</h3>
-                            <div class="space-y-3" id="topRevenueList">
-                                <!-- Injected via JS -->
-                            </div>
-                        </div>
-
+                        <button onclick="openExpenseModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25 shrink-0">
+                            <span>+ Catat Pengeluaran</span>
+                        </button>
                     </div>
 
-                    <!-- ROW 3: CHARTS (Bar Chart + Donut Chart) -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    <!-- ROW 3: DUA KOLOM - PENGELUARAN TERKINI & BOOKING MENDATANG (Matching Mobile Sections) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                         
-                        <!-- Bar Chart (Col 7) -->
-                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm lg:col-span-7 flex flex-col justify-between">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-bold text-slate-900 text-sm">Monthly Trend & Activity</h3>
-                                <span class="text-[11px] font-semibold text-slate-400">Tahun 2026</span>
+                        <!-- Kolom Kiri: Pengeluaran Terkini -->
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pengeluaran Terkini</h3>
+                                    <span id="dashExpenseCountBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold">0 transaksi</span>
+                                </div>
+                                <button onclick="openExpenseModal()" class="text-xs font-bold text-[#C59563] hover:underline flex items-center gap-1">
+                                    <span>+ Catat Baru</span>
+                                </button>
                             </div>
-                            <div class="h-64 w-full">
-                                <canvas id="chartBarCanvas"></canvas>
+                            
+                            <div id="dashRecentExpensesList" class="space-y-3">
+                                <div class="p-8 text-center text-slate-400 text-xs">Memuat catatan pengeluaran...</div>
                             </div>
                         </div>
 
-                        <!-- Donut Chart (Col 5) -->
-                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm lg:col-span-5 flex flex-col justify-between">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-bold text-slate-900 text-sm">Revenue Distribution</h3>
-                                <span class="text-[11px] font-semibold text-slate-400">By Customer / Event</span>
+                        <!-- Kolom Kanan: Booking Mendatang (>= Hari Ini) -->
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">Booking Mendatang (≥ Hari Ini)</h3>
+                                    <span id="dashUpcomingAgendasBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-[#F9F3EC] text-[#C59563] font-bold">0 Event</span>
+                                </div>
+                                <button onclick="switchView('agendas')" class="text-xs font-bold text-[#C59563] hover:underline flex items-center gap-1">
+                                    <span>Lihat Semua Agenda →</span>
+                                </button>
                             </div>
-                            <div class="h-64 w-full flex items-center justify-center">
-                                <canvas id="chartDonutCanvas"></canvas>
+
+                            <div id="dashUpcomingAgendasList" class="space-y-3">
+                                <div class="p-8 text-center text-slate-400 text-xs">Memuat booking mendatang...</div>
                             </div>
                         </div>
 
@@ -1235,6 +1216,101 @@
                 <button onclick="copyCredentialText()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs">Salin Kredensial</button>
                 <button onclick="closeSuccessModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">Tutup</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: CATAT PENGELUARAN (Sesuai Mobile)                 -->
+    <!-- ======================================================== -->
+    <div id="modalExpense" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4 sticky -top-6 sm:-top-7 bg-white z-10 pt-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#F9F3EC] text-[#D4A574] flex items-center justify-center text-lg font-bold">
+                        🛒
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900">Catat Pengeluaran</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Catat belanja bunga, properti dekor, sewa mobil, dll</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeExpenseModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <div id="expenseErrorBox" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold"></div>
+
+            <form id="formExpense" onsubmit="handleSaveExpense(event)" class="space-y-4">
+                <!-- Dropdown Company (Superadmin only) -->
+                <div id="expenseCompanyWrapper" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Usaha / Vendor *</label>
+                    <select id="expenseCompanyId" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] bg-slate-50 font-medium">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Keterangan / Judul -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan Pengeluaran *</label>
+                    <input type="text" id="expenseTitle" required placeholder="Misal: Pembelian Bunga Mawar & Baby Breath"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <!-- Nominal Biaya -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal Biaya (Rp) *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-slate-500">Rp</span>
+                        <input type="text" id="expenseAmount" required placeholder="500.000" oninput="formatExpenseAmountInput(this)"
+                            class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                </div>
+
+                <!-- Kategori Pengeluaran (Chips) -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kategori *</label>
+                    <div class="flex flex-wrap gap-2" id="expenseCategoryChips">
+                        <button type="button" onclick="selectExpenseCategory('Bunga')" data-category="Bunga"
+                            class="expense-cat-chip px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-pink-200 bg-pink-50 text-pink-700">🌸 Bunga</button>
+                        <button type="button" onclick="selectExpenseCategory('Properti Dekor')" data-category="Properti Dekor"
+                            class="expense-cat-chip px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">🛋️ Properti Dekor</button>
+                        <button type="button" onclick="selectExpenseCategory('Operasional')" data-category="Operasional"
+                            class="expense-cat-chip px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">⚙️ Operasional</button>
+                        <button type="button" onclick="selectExpenseCategory('Transport')" data-category="Transport"
+                            class="expense-cat-chip px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">🚚 Transport</button>
+                        <button type="button" onclick="selectExpenseCategory('Honor Crew')" data-category="Honor Crew"
+                            class="expense-cat-chip px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">👥 Honor Crew</button>
+                        <button type="button" onclick="selectExpenseCategory('Lainnya')" data-category="Lainnya"
+                            class="expense-cat-chip px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">💳 Lainnya</button>
+                    </div>
+                    <input type="hidden" id="expenseSelectedCategory" value="Bunga">
+                </div>
+
+                <!-- Tanggal Transaksi -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Transaksi</label>
+                    <input type="date" id="expenseDate" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <!-- Catatan Tambahan -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
+                    <textarea id="expenseNotes" rows="2" placeholder="Toko/vendor, no. nota, dll"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeExpenseModal()"
+                        class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitExpense"
+                        class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                        Simpan Pengeluaran
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -2552,13 +2628,13 @@
         }
 
         // ==========================================
-        // LOAD STATS & CHARTS (Dashboard View)
+        // LOAD STATS & DASHBOARD (Matching Mobile App)
         // ==========================================
         async function loadDashboardStats() {
             fetchActiveVersionForDashboard();
             try {
-                let url = '/api/superadmin/dashboard-stats';
-                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                let url = '/api/dashboard/summary';
+                if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
 
                 const res = await fetch(url, {
                     headers: { 'Authorization': 'Bearer ' + authToken }
@@ -2567,144 +2643,345 @@
                 const d = json.data;
                 if (!d) return;
 
-                // Format angka Rupiah
-                const formatRp = (num) => 'Rp ' + Number(num || 0).toLocaleString('id-ID') + ',00';
+                // Format Rupiah
+                const formatRp = (num) => 'Rp ' + Number(num || 0).toLocaleString('id-ID');
 
-                // 1. Update 6 KPI Cards
-                document.getElementById('statTargetCall').innerText = d.target_call.toLocaleString('id-ID');
-                document.getElementById('statActualCall').innerText = d.actual_call.toLocaleString('id-ID');
-                document.getElementById('statPendingCall').innerText = d.pending_call.toLocaleString('id-ID');
-                document.getElementById('statEffectiveCall').innerText = d.effective_call.toLocaleString('id-ID');
-                document.getElementById('statVisibility').innerText = d.visibility;
-                document.getElementById('statRevenue').innerText = formatRp(d.revenue);
+                // 1. Update 4 Financial & Booking Summary Cards
+                const revEl = document.getElementById('dashTotalRevenue');
+                if (revEl) revEl.innerText = formatRp(d.total_revenue);
 
-                // 2. Render Top Customers
-                const custEl = document.getElementById('topCustomersList');
-                if (custEl && d.top_customers) {
-                    custEl.innerHTML = d.top_customers.map(c => `
-                        <div class="flex items-center justify-between border-l-4 border-cyan-400 pl-3 py-1">
-                            <span class="font-bold text-xs text-slate-800 uppercase tracking-tight">${c.rank}. ${c.name}</span>
-                            <span class="font-semibold text-xs text-slate-700 font-mono">${formatRp(c.amount)}</span>
-                        </div>
-                    `).join('');
-                }
+                const expEl = document.getElementById('dashTotalExpense');
+                if (expEl) expEl.innerText = formatRp(d.total_expense);
 
-                // 3. Render Top Products
-                const prodEl = document.getElementById('topProductsList');
-                if (prodEl && d.top_products) {
-                    prodEl.innerHTML = d.top_products.map(p => `
-                        <div class="flex items-center justify-between border-l-4 border-cyan-400 pl-3 py-1">
-                            <div>
-                                <span class="font-bold text-xs text-slate-800">${p.rank}. ${p.code}</span>
-                                <span class="block text-[11px] text-cyan-600 font-medium">${p.name}</span>
-                            </div>
-                            <span class="font-semibold text-xs text-slate-700 font-mono">${Number(p.count).toLocaleString('id-ID')}</span>
-                        </div>
-                    `).join('');
-                }
+                const profEl = document.getElementById('dashTotalProfit');
+                if (profEl) profEl.innerText = formatRp(d.total_profit);
 
-                // 4. Render Top Revenue
-                const revEl = document.getElementById('topRevenueList');
-                if (revEl && d.top_revenue) {
-                    revEl.innerHTML = d.top_revenue.map(r => `
-                        <div class="flex items-center justify-between border-l-4 border-cyan-400 pl-3 py-1">
-                            <div>
-                                <span class="font-bold text-xs text-slate-800">${r.rank}. ${r.code}</span>
-                                <span class="block text-[11px] text-slate-500 font-medium">${r.client_name}</span>
-                            </div>
-                            <span class="font-semibold text-xs text-slate-700 font-mono">${formatRp(r.amount)}</span>
-                        </div>
-                    `).join('');
-                }
+                const upCountEl = document.getElementById('dashUpcomingCount');
+                if (upCountEl) upCountEl.innerText = (d.upcoming_bookings_count || 0) + ' Event';
 
-                // 5. Render Bar Chart (Solid Red Bars matching Screenshot)
-                renderBarChart(d.chart_bar);
+                // Update Badges
+                const expBadge = document.getElementById('dashExpenseCountBadge');
+                if (expBadge) expBadge.innerText = (d.recent_expenses || []).length + ' transaksi';
 
-                // 6. Render Donut Chart (Purple, Pink, Blue, Teal matching Screenshot)
-                renderDonutChart(d.chart_donut);
+                const agdBadge = document.getElementById('dashUpcomingAgendasBadge');
+                if (agdBadge) agdBadge.innerText = (d.upcoming_bookings_count || 0) + ' Event';
+
+                // 2. Render Pengeluaran Terkini
+                renderRecentExpenses(d.recent_expenses || []);
+
+                // 3. Render Booking Mendatang
+                renderUpcomingAgendas(d.upcoming_agendas || []);
 
             } catch (err) {
-                console.error("Gagal load dashboard stats:", err);
+                console.error("Gagal load dashboard summary:", err);
             }
         }
 
-        function renderBarChart(chartData) {
-            const ctx = document.getElementById('chartBarCanvas');
-            if (!ctx) return;
+        function renderRecentExpenses(expenses) {
+            const container = document.getElementById('dashRecentExpensesList');
+            if (!container) return;
 
-            const labels = chartData.map(c => c.label);
-            const dataVals = chartData.map(c => c.value);
+            if (!expenses || expenses.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <span class="text-3xl block mb-2">🧾</span>
+                        <p class="text-xs font-semibold text-slate-500">Belum ada catatan pengeluaran.</p>
+                        <button onclick="openExpenseModal()" class="text-xs font-bold text-[#C59563] hover:underline mt-1.5 inline-block">
+                            + Catat Pengeluaran Pertama
+                        </button>
+                    </div>
+                `;
+                return;
+            }
 
-            if (barChart) barChart.destroy();
+            container.innerHTML = expenses.map(exp => {
+                const catLower = (exp.category || '').toLowerCase();
+                let catIcon = '💳';
+                let catBadgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
 
-            barChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Volume',
-                        data: dataVals,
-                        backgroundColor: '#D4A574', // Brand Gold (Matching Mobile App)
-                        borderRadius: 4,
-                        barThickness: 20
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 250,
-                            ticks: { stepSize: 50, font: { family: 'Poppins', size: 10 } },
-                            grid: { color: '#E2E8F0' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Poppins', size: 10 } }
-                        }
-                    }
+                if (catLower.includes('bunga')) {
+                    catIcon = '🌸';
+                    catBadgeClass = 'bg-pink-50 text-pink-700 border-pink-200';
+                } else if (catLower.includes('properti') || catLower.includes('dekor')) {
+                    catIcon = '🛋️';
+                    catBadgeClass = 'bg-purple-50 text-purple-700 border-purple-200';
+                } else if (catLower.includes('transport') || catLower.includes('operasional')) {
+                    catIcon = '🚚';
+                    catBadgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+                } else if (catLower.includes('crew') || catLower.includes('honor') || catLower.includes('upah')) {
+                    catIcon = '👥';
+                    catBadgeClass = 'bg-teal-50 text-teal-700 border-teal-200';
+                }
+
+                // Format date dd MMM yyyy
+                let formattedDate = '-';
+                if (exp.date) {
+                    const dt = new Date(exp.date);
+                    formattedDate = dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                }
+
+                const amountFormatted = 'Rp ' + Number(exp.amount || 0).toLocaleString('id-ID');
+                const escapeTitle = (exp.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                return `
+                    <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/60 transition group bg-white shadow-xs">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg border ${catBadgeClass} shrink-0">
+                                ${catIcon}
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-slate-900 truncate" title="${exp.title}">${exp.title}</h4>
+                                <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                                    <span class="font-medium text-slate-600">${exp.category || 'Lainnya'}</span>
+                                    <span>•</span>
+                                    <span>${formattedDate}</span>
+                                    ${exp.notes ? `<span class="hidden sm:inline text-slate-400 truncate max-w-[120px]" title="${exp.notes}">(${exp.notes})</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0 pl-3 flex items-center gap-3">
+                            <div>
+                                <span class="block text-xs sm:text-sm font-extrabold text-rose-600 font-mono">- ${amountFormatted}</span>
+                            </div>
+                            <button onclick="handleDeleteExpense('${exp.id}', '${escapeTitle}')" title="Hapus catatan pengeluaran"
+                                class="opacity-70 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderUpcomingAgendas(agendas) {
+            const container = document.getElementById('dashUpcomingAgendasList');
+            if (!container) return;
+
+            if (!agendas || agendas.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <span class="text-3xl block mb-2">📅</span>
+                        <p class="text-xs font-semibold text-slate-500">Tidak ada booking mendatang yang terjadwal.</p>
+                        <button onclick="openAgendaModal()" class="text-xs font-bold text-[#C59563] hover:underline mt-1.5 inline-block">
+                            + Buat Agenda Pertama
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = agendas.map(a => {
+                // Biaya total
+                const pkgPrice = Number(a.package_price || 0);
+                const modelPrice = Number(a.model_additional_price || 0);
+                const transport = Number(a.transport_fee || 0);
+                let totalCost = pkgPrice + modelPrice + transport;
+                if (a.client_form && Number(a.client_form.total_price) > 0) {
+                    totalCost = Number(a.client_form.total_price) + modelPrice + transport;
+                }
+
+                // Payment Status Badge
+                const isPaid = (a.payment_status || '').toLowerCase() === 'paid';
+                const hasDp = Number(a.dp_amount || 0) > 0;
+                let paymentBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Belum Bayar</span>`;
+                if (isPaid) {
+                    paymentBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Lunas</span>`;
+                } else if (hasDp) {
+                    paymentBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">DP Masuk</span>`;
+                }
+
+                // Tanggal Acara
+                let formattedDateTime = '-';
+                if (a.event_date_time) {
+                    const dt = new Date(a.event_date_time);
+                    formattedDateTime = dt.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' }) + ' • ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                const displayPackage = a.backdrop_title ? a.backdrop_title : (a.package_name || 'Tanpa Paket');
+                const escapeName = (a.client_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                return `
+                    <div class="p-4 rounded-xl border border-slate-100 hover:border-[#D4A574]/40 hover:shadow-sm transition bg-white space-y-2.5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h4 class="text-sm font-bold text-slate-900 truncate">${a.client_name || 'Klien Tanpa Nama'}</h4>
+                                <div class="flex items-center gap-1.5 mt-0.5 text-xs text-slate-600">
+                                    <span class="text-[#D4A574]">🎉</span>
+                                    <span class="font-medium truncate">${displayPackage}</span>
+                                </div>
+                            </div>
+                            <div class="shrink-0">
+                                ${paymentBadge}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-50 text-xs">
+                            <div class="flex items-center gap-2 text-slate-500">
+                                <span>📅</span>
+                                <span class="font-medium text-[11px]">${formattedDateTime}</span>
+                                ${a.maps_url ? `
+                                    <a href="${a.maps_url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-[#C59563] hover:underline font-semibold ml-1">
+                                        <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-3.5 h-3.5 object-contain inline-block"> Maps
+                                    </a>
+                                ` : ''}
+                            </div>
+                            <div class="font-bold text-slate-900 font-mono text-xs">
+                                Rp ${totalCost.toLocaleString('id-ID')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // EXPENSE MODAL & ACTIONS
+        // ==========================================
+        function openExpenseModal() {
+            const modal = document.getElementById('modalExpense');
+            const errBox = document.getElementById('expenseErrorBox');
+            if (errBox) {
+                errBox.classList.add('hidden');
+                errBox.innerText = '';
+            }
+
+            document.getElementById('formExpense').reset();
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            selectExpenseCategory('Bunga');
+
+            const compWrapper = document.getElementById('expenseCompanyWrapper');
+            const compSelect = document.getElementById('expenseCompanyId');
+            if (currentUserRole === 'superadmin' && companiesCache.length > 0) {
+                compWrapper.classList.remove('hidden');
+                compSelect.innerHTML = companiesCache.map(c => `
+                    <option value="${c.id}" ${c.id === selectedCompanyId ? 'selected' : ''}>${c.name}</option>
+                `).join('');
+            } else {
+                compWrapper.classList.add('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            document.getElementById('expenseTitle').focus();
+        }
+
+        function closeExpenseModal() {
+            document.getElementById('modalExpense').classList.add('hidden');
+        }
+
+        function selectExpenseCategory(category) {
+            document.getElementById('expenseSelectedCategory').value = category;
+            const chips = document.querySelectorAll('.expense-cat-chip');
+            chips.forEach(btn => {
+                if (btn.getAttribute('data-category') === category) {
+                    btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                    btn.classList.add('bg-[#D4A574]/20', 'text-[#C59563]', 'border-[#D4A574]', 'font-bold');
+                } else {
+                    btn.classList.remove('bg-[#D4A574]/20', 'text-[#C59563]', 'border-[#D4A574]', 'font-bold');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
                 }
             });
         }
 
-        function renderDonutChart(donutData) {
-            const ctx = document.getElementById('chartDonutCanvas');
-            if (!ctx) return;
+        function formatExpenseAmountInput(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (!val) {
+                input.value = '';
+                return;
+            }
+            input.value = Number(val).toLocaleString('id-ID');
+        }
 
-            const labels = donutData.map(d => d.label);
-            const values = donutData.map(d => d.value);
-            const colors = donutData.map(d => d.color);
+        async function handleSaveExpense(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitExpense');
+            const errBox = document.getElementById('expenseErrorBox');
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
 
-            if (donutChart) donutChart.destroy();
+            const title = document.getElementById('expenseTitle').value.trim();
+            const rawAmount = document.getElementById('expenseAmount').value.replace(/\./g, '').replace(/,/g, '').trim();
+            const amount = parseFloat(rawAmount) || 0;
+            const category = document.getElementById('expenseSelectedCategory').value;
+            const date = document.getElementById('expenseDate').value;
+            const notes = document.getElementById('expenseNotes').value.trim();
 
-            donutChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 10,
-                                font: { family: 'Poppins', size: 10 }
-                            }
-                        }
+            if (!title) {
+                errBox.innerText = 'Keterangan pengeluaran wajib diisi.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            if (amount <= 0) {
+                errBox.innerText = 'Nominal pengeluaran harus lebih dari Rp 0.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            let compId = selectedCompanyId;
+            if (currentUserRole === 'superadmin') {
+                const compSelect = document.getElementById('expenseCompanyId');
+                if (compSelect && compSelect.value) compId = compSelect.value;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                let url = '/api/expenses';
+                if (compId) url += '?company_id=' + encodeURIComponent(compId);
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
                     },
-                    cutout: '60%'
+                    body: JSON.stringify({
+                        company_id: compId,
+                        title: title,
+                        amount: amount,
+                        category: category,
+                        date: date,
+                        notes: notes
+                    })
+                });
+
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || json.message || 'Gagal menyimpan pengeluaran');
                 }
-            });
+
+                closeExpenseModal();
+                await loadDashboardStats();
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Pengeluaran';
+            }
+        }
+
+        async function handleDeleteExpense(id, title) {
+            if (!confirm(`Yakin ingin menghapus catatan pengeluaran "${title}"?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/expenses/' + encodeURIComponent(id), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || json.message || 'Gagal menghapus pengeluaran');
+                }
+
+                await loadDashboardStats();
+            } catch (err) {
+                alert('Gagal menghapus pengeluaran: ' + err.message);
+            }
         }
 
         // ==========================================

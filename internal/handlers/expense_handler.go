@@ -15,10 +15,15 @@ import (
 // GetExpenses handles GET /api/expenses
 func GetExpenses(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	var expenses []models.Expense
 	query := config.DB.Model(&models.Expense{})
 
-	if companyID != "" {
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := strings.TrimSpace(c.Query("company_id")); qComp != "" && qComp != "all" {
+			query = query.Where("company_id = ?", qComp)
+		}
+	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 
@@ -53,15 +58,25 @@ func GetExpenses(c *fiber.Ctx) error {
 // CreateExpense handles POST /api/expenses
 func CreateExpense(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
-	if companyID == "" {
-		companyID = "cmp_default"
-	}
+	userRole, _ := c.Locals("user_role").(string)
 
 	var req models.CreateExpenseRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Format request tidak valid",
 		})
+	}
+
+	if strings.EqualFold(userRole, "superadmin") {
+		if strings.TrimSpace(req.CompanyID) != "" {
+			companyID = strings.TrimSpace(req.CompanyID)
+		} else if qComp := strings.TrimSpace(c.Query("company_id")); qComp != "" && qComp != "all" {
+			companyID = qComp
+		}
+	}
+
+	if companyID == "" {
+		companyID = "cmp_default"
 	}
 
 	req.Title = strings.TrimSpace(req.Title)
@@ -118,6 +133,7 @@ func CreateExpense(c *fiber.Ctx) error {
 // DeleteExpense handles DELETE /api/expenses/:id
 func DeleteExpense(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 	id := c.Params("id")
 	if id == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -126,7 +142,7 @@ func DeleteExpense(c *fiber.Ctx) error {
 	}
 
 	query := config.DB.Where("id = ?", id)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 

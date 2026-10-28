@@ -17,9 +17,10 @@ type Expense struct {
 
 // CreateExpenseRequest payload untuk membuat pengeluaran baru
 type CreateExpenseRequest struct {
-	Title    string  `json:"title"`
-	Amount   float64 `json:"amount"`
-	Category string  `json:"category"`
-	Date     string  `json:"date"` // Format "2006-01-02" atau ISO8601
-	Notes    string  `json:"notes"`
+	CompanyID string  `json:"company_id"`
+	Title     string  `json:"title"`
+	Amount    float64 `json:"amount"`
+	Category  string  `json:"category"`
+	Date      string  `json:"date"` // Format "2006-01-02" atau ISO8601
+	Notes     string  `json:"notes"`
 }
