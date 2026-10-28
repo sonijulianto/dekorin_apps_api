@@ -160,10 +160,6 @@
                                 class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
                                 Data Pengguna (Users)
                             </a>
-                            <a href="javascript:void(0)" onclick="switchView('apilogs')" id="nav-apilogs"
-                                class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
-                                API Log
-                            </a>
                             <a href="javascript:void(0)" onclick="switchView('appversion')" id="nav-appversion"
                                 class="superadmin-only hidden block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
                                 📱 Rilis & Update APK
@@ -225,9 +221,9 @@
                         <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#D4A574]/20 text-[#C59563] font-bold">New</span>
                     </a>
 
-                    <!-- API Log (Direct) -->
+                    <!-- API Log (Direct - Superadmin Only) -->
                     <a href="javascript:void(0)" onclick="switchView('apilogs')" id="nav-apilogs-direct"
-                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                        class="superadmin-only hidden nav-item flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
                         <span class="nav-icon text-base mr-3 text-slate-500">📜</span>
                         <span class="nav-text">API Log</span>
                     </a>
@@ -2550,8 +2546,8 @@
         }
 
         function switchView(viewName) {
-            if (viewName === 'appversion' && currentUserRole !== 'superadmin') {
-                alert('Akses ditolak: Menu Rilis APK hanya dapat diakses oleh Superadmin.');
+            if ((viewName === 'appversion' || viewName === 'apilogs') && currentUserRole !== 'superadmin') {
+                alert('Akses ditolak: Menu ini hanya dapat diakses oleh Superadmin.');
                 switchView('dashboard');
                 return;
             }
@@ -2579,7 +2575,7 @@
                 'dashboard': { el: 'viewDashboard', title: 'Dashboard', path: '<span class="text-[#C59563]">🏠</span> • Dashboard', nav: 'nav-dashboard' },
                 'companies': { el: 'viewCompanies', title: (currentUserRole === 'superadmin' ? 'Usaha & Vendor (Companies)' : 'Profil Usaha Saya'), path: 'Administration • Usaha & Vendor', nav: 'nav-companies', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
-                'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: 'Administration • API Log', nav: 'nav-apilogs', navDirect: 'nav-apilogs-direct', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: '<span class="text-slate-600">📜</span> • API Log System', nav: 'nav-apilogs-direct' },
                 'appversion': { el: 'viewAppVersion', title: 'Rilis & Pembaruan APK', path: 'Administration • Rilis APK', nav: 'nav-appversion', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
