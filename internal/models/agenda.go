@@ -47,10 +47,11 @@ type Agenda struct {
 	FormToken            string      `gorm:"type:varchar(50);uniqueIndex" json:"form_token"`
 	FormStatus           string      `gorm:"type:varchar(50);default:'pending'" json:"form_status"` // pending, filled
 	DpAmount             float64     `gorm:"type:decimal(15,2);default:0" json:"dp_amount"`
-	Notes                string      `gorm:"type:text" json:"notes"`
-	ClientForm           *ClientForm `gorm:"foreignKey:AgendaID" json:"client_form,omitempty"`
-	CreatedAt            time.Time   `json:"created_at"`
-	UpdatedAt            time.Time   `json:"updated_at"`
+	Notes                string           `gorm:"type:text" json:"notes"`
+	ClientForm           *ClientForm      `gorm:"foreignKey:AgendaID" json:"client_form,omitempty"`
+	AgendaProperties     []AgendaProperty `gorm:"foreignKey:AgendaID" json:"agenda_properties,omitempty"`
+	CreatedAt            time.Time        `json:"created_at"`
+	UpdatedAt            time.Time        `json:"updated_at"`
 }
 
 // CalculateTotalBiaya menghitung total biaya keseluruhan agenda (paket + model + addon + transport)
@@ -79,8 +80,9 @@ type CreateAgendaRequest struct {
 	ModelWidth           string  `json:"model_width"`
 	ModelImageURL        string  `json:"model_image_url"`
 	ModelAdditionalPrice float64 `json:"model_additional_price"`
-	TransportFee         float64 `json:"transport_fee"`
-	Notes                string  `json:"notes"`
+	TransportFee         float64               `json:"transport_fee"`
+	Notes                string                `json:"notes"`
+	AgendaProperties     []AgendaPropertyInput `json:"agenda_properties,omitempty"`
 }
 
 // UpdateDpRequest adalah payload untuk input/update pembayaran DP

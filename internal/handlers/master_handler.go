@@ -356,22 +356,33 @@ func GetDecorationModels(c *fiber.Ctx) error {
 		pkgMap[pm.DecorationModelID] = append(pkgMap[pm.DecorationModelID], pm)
 	}
 
+	var allModelProps []models.DecorationModelProperty
+	if len(modelIDs) > 0 {
+		config.DB.Preload("Property").Where("decoration_model_id IN ?", modelIDs).Find(&allModelProps)
+	}
+
+	modelPropMap := make(map[string][]models.DecorationModelProperty)
+	for _, mp := range allModelProps {
+		modelPropMap[mp.DecorationModelID] = append(modelPropMap[mp.DecorationModelID], mp)
+	}
+
 	var resp []models.DecorationModelResponse
 	for _, m := range modelsList {
 		resp = append(resp, models.DecorationModelResponse{
-			ID:           m.ID,
-			CompanyID:    m.CompanyID,
-			BrandID:      m.BrandID,
-			BrandName:    m.BrandName,
-			Name:         m.Name,
-			ImageURL:     m.ImageURL,
-			Price:        m.Price,
-			Width:        m.Width,
-			Description:  m.Description,
-			SortOrder:    m.SortOrder,
-			PackageLinks: pkgMap[m.ID],
-			CreatedAt:    m.CreatedAt,
-			UpdatedAt:    m.UpdatedAt,
+			ID:              m.ID,
+			CompanyID:       m.CompanyID,
+			BrandID:         m.BrandID,
+			BrandName:       m.BrandName,
+			Name:            m.Name,
+			ImageURL:        m.ImageURL,
+			Price:           m.Price,
+			Width:           m.Width,
+			Description:     m.Description,
+			SortOrder:       m.SortOrder,
+			PackageLinks:    pkgMap[m.ID],
+			ModelProperties: modelPropMap[m.ID],
+			CreatedAt:       m.CreatedAt,
+			UpdatedAt:       m.UpdatedAt,
 		})
 	}
 
@@ -459,6 +470,29 @@ func CreateDecorationModel(c *fiber.Ctx) error {
 		}
 	}
 
+	// Simpan template properti & alat bawaan jika dikirimkan
+	if len(req.ModelProperties) > 0 {
+		for _, mp := range req.ModelProperties {
+			if strings.TrimSpace(mp.PropertyID) != "" {
+				qty := mp.DefaultQty
+				if qty <= 0 {
+					qty = 1
+				}
+				dmp := models.DecorationModelProperty{
+					ID:                fmt.Sprintf("dmp_%s", uuid.New().String()[:8]),
+					CompanyID:         companyID,
+					DecorationModelID: modelItem.ID,
+					PropertyID:        strings.TrimSpace(mp.PropertyID),
+					DefaultQty:        qty,
+					Notes:             strings.TrimSpace(mp.Notes),
+					CreatedAt:         time.Now(),
+					UpdatedAt:         time.Now(),
+				}
+				config.DB.Create(&dmp)
+			}
+		}
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Model dekorasi berhasil dibuat",
 		"data":    modelItem,
@@ -521,6 +555,30 @@ func UpdateDecorationModel(c *fiber.Ctx) error {
 		}
 	}
 
+	// Update template properti & alat bawaan jika dikirimkan
+	if req.ModelProperties != nil {
+		config.DB.Where("decoration_model_id = ?", modelItem.ID).Delete(&models.DecorationModelProperty{})
+		for _, mp := range req.ModelProperties {
+			if strings.TrimSpace(mp.PropertyID) != "" {
+				qty := mp.DefaultQty
+				if qty <= 0 {
+					qty = 1
+				}
+				dmp := models.DecorationModelProperty{
+					ID:                fmt.Sprintf("dmp_%s", uuid.New().String()[:8]),
+					CompanyID:         modelItem.CompanyID,
+					DecorationModelID: modelItem.ID,
+					PropertyID:        strings.TrimSpace(mp.PropertyID),
+					DefaultQty:        qty,
+					Notes:             strings.TrimSpace(mp.Notes),
+					CreatedAt:         time.Now(),
+					UpdatedAt:         time.Now(),
+				}
+				config.DB.Create(&dmp)
+			}
+		}
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Model dekorasi berhasil diperbarui",
 		"data":    modelItem,
@@ -538,8 +596,9 @@ func DeleteDecorationModel(c *fiber.Ctx) error {
 		query = query.Where("company_id = ?", companyID)
 	}
 
-	// Hapus relasi di package_models terlebih dahulu
+	// Hapus relasi di package_models dan decoration_model_properties terlebih dahulu
 	config.DB.Where("decoration_model_id = ?", id).Delete(&models.PackageDecorationModel{})
+	config.DB.Where("decoration_model_id = ?", id).Delete(&models.DecorationModelProperty{})
 
 	if err := query.Delete(&models.DecorationModel{}).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghapus model dekorasi"})

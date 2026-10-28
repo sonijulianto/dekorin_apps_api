@@ -13,9 +13,10 @@ type DecorationModel struct {
 	Price       float64   `gorm:"type:decimal(15,2);not null;default:0" json:"price"`
 	Width       string    `gorm:"type:varchar(50)" json:"width"` // Contoh: "3 Meter", "4 Meter", dsb.
 	Description string    `gorm:"type:text" json:"description"`
-	SortOrder   int       `gorm:"type:int;default:0" json:"sort_order"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	SortOrder       int                       `gorm:"type:int;default:0" json:"sort_order"`
+	ModelProperties []DecorationModelProperty `gorm:"foreignKey:DecorationModelID" json:"model_properties,omitempty"`
+	CreatedAt       time.Time                 `json:"created_at"`
+	UpdatedAt       time.Time                 `json:"updated_at"`
 }
 
 // PackageDecorationModel menghubungkan Package dengan Model Dekorasi beserta harga tambahan
@@ -45,30 +46,32 @@ type PackageLinkInput struct {
 
 // CreateOrUpdateDecorationModelRequest adalah payload request untuk membuat atau mengubah model dekorasi
 type CreateOrUpdateDecorationModelRequest struct {
-	BrandID      string             `json:"brand_id"`
-	Name         string             `json:"name"`
-	ImageURL     string             `json:"image_url"`
-	Price        float64            `json:"price"`
-	Width        string             `json:"width"`
-	Description  string             `json:"description"`
-	PackageLinks []PackageLinkInput `json:"package_links,omitempty"`
+	BrandID         string                `json:"brand_id"`
+	Name            string                `json:"name"`
+	ImageURL        string                `json:"image_url"`
+	Price           float64               `json:"price"`
+	Width           string                `json:"width"`
+	Description     string                `json:"description"`
+	PackageLinks    []PackageLinkInput    `json:"package_links,omitempty"`
+	ModelProperties []ModelPropertyInput  `json:"model_properties,omitempty"`
 }
 
 // DecorationModelResponse adalah representasi model dekorasi beserta link paketnya
 type DecorationModelResponse struct {
-	ID           string                   `json:"id"`
-	CompanyID    string                   `json:"company_id"`
-	BrandID      string                   `json:"brand_id"`
-	BrandName    string                   `json:"brand_name"`
-	Name         string                   `json:"name"`
-	ImageURL     string                   `json:"image_url"`
-	Price        float64                  `json:"price"`
-	Width        string                   `json:"width"`
-	Description  string                   `json:"description"`
-	SortOrder    int                      `gorm:"type:int;default:0" json:"sort_order"`
-	PackageLinks []PackageDecorationModel `json:"package_links,omitempty"`
-	CreatedAt    time.Time                `json:"created_at"`
-	UpdatedAt    time.Time                `json:"updated_at"`
+	ID              string                    `json:"id"`
+	CompanyID       string                    `json:"company_id"`
+	BrandID         string                    `json:"brand_id"`
+	BrandName       string                    `json:"brand_name"`
+	Name            string                    `json:"name"`
+	ImageURL        string                    `json:"image_url"`
+	Price           float64                   `json:"price"`
+	Width           string                    `json:"width"`
+	Description     string                    `json:"description"`
+	SortOrder       int                       `gorm:"type:int;default:0" json:"sort_order"`
+	PackageLinks    []PackageDecorationModel  `json:"package_links,omitempty"`
+	ModelProperties []DecorationModelProperty `json:"model_properties,omitempty"`
+	CreatedAt       time.Time                 `json:"created_at"`
+	UpdatedAt       time.Time                 `json:"updated_at"`
 }
 
 // ReorderDecorationModelsRequest adalah payload untuk mengatur urutan model dekorasi

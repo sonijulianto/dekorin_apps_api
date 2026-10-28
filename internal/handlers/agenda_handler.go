@@ -261,6 +261,48 @@ func CreateAgenda(c *fiber.Ctx) error {
 		})
 	}
 
+	// Simpan atau Auto-populate Pick List Agenda
+	if len(req.AgendaProperties) > 0 {
+		for _, ap := range req.AgendaProperties {
+			qty := ap.Qty
+			if qty <= 0 {
+				qty = 1
+			}
+			item := models.AgendaProperty{
+				ID:         fmt.Sprintf("ap_%s", uuid.New().String()[:8]),
+				CompanyID:  companyID,
+				AgendaID:   agenda.ID,
+				PropertyID: ap.PropertyID,
+				CustomName: ap.CustomName,
+				Qty:        qty,
+				Notes:      ap.Notes,
+				IsPacked:   ap.IsPacked,
+				IsReturned: ap.IsReturned,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			}
+			config.DB.Create(&item)
+		}
+	} else if modelID != "" {
+		var modelProps []models.DecorationModelProperty
+		config.DB.Where("decoration_model_id = ?", modelID).Find(&modelProps)
+		for _, mp := range modelProps {
+			item := models.AgendaProperty{
+				ID:         fmt.Sprintf("ap_%s", uuid.New().String()[:8]),
+				CompanyID:  companyID,
+				AgendaID:   agenda.ID,
+				PropertyID: mp.PropertyID,
+				Qty:        mp.DefaultQty,
+				Notes:      mp.Notes,
+				IsPacked:   false,
+				IsReturned: false,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			}
+			config.DB.Create(&item)
+		}
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Agenda berhasil dibuat",
 		"data":    agenda,

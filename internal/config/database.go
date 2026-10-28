@@ -62,6 +62,9 @@ func ConnectDB() {
 		&models.Expense{},
 		&models.ApiLog{},
 		&models.AppVersion{},
+		&models.Property{},
+		&models.DecorationModelProperty{},
+		&models.AgendaProperty{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
@@ -87,6 +90,7 @@ func ConnectDB() {
 	SeedExpenses(db)
 	SeedApiLogs(db)
 	SeedAppVersion(db)
+	SeedProperties(db)
 }
 
 // SeedAddons mengisi data awal master item tambahan jika kosong
@@ -739,5 +743,282 @@ func SeedAppVersion(db *gorm.DB) {
 		fmt.Println("🌱 Seeding selesai: Data AppVersion awal berhasil ditambahkan!")
 	}
 }
+
+// SeedProperties mengisi data awal master properti dekorasi & alat kerja serta template model
+func SeedProperties(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Property{}).Count(&count)
+
+	if count == 0 {
+		trackTrue := true
+		trackFalse := false
+
+		initialProps := []models.Property{
+			// PROPERTI (track_stock = true)
+			{
+				ID:         "prop_01",
+				CompanyID:  "cmp_default",
+				Name:       "Lampu Sorot LED 50 Watt Warm White",
+				Category:   "Lighting",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 4,
+				Unit:       "unit",
+				Notes:      "Lampu sorot kuning hangat untuk backdrop",
+				SortOrder:  1,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "prop_02",
+				CompanyID:  "cmp_default",
+				Name:       "Tiang Arch Kayu Rustic 3m",
+				Category:   "Rangka / Backdrop",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 2,
+				Unit:       "set",
+				Notes:      "Rangka lengkung kayu solid",
+				SortOrder:  2,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "prop_03",
+				CompanyID:  "cmp_default",
+				Name:       "Frame Hexagon Gold Metallic 4m",
+				Category:   "Rangka / Backdrop",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 1,
+				Unit:       "set",
+				Notes:      "Rangka heksagonal besi finishing gold",
+				SortOrder:  3,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "prop_04",
+				CompanyID:  "cmp_default",
+				Name:       "Kain Tile Broken White 6m",
+				Category:   "Kain / Drapes",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 8,
+				Unit:       "pcs",
+				Notes:      "Kain layer backdrop lembut",
+				SortOrder:  4,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "prop_05",
+				CompanyID:  "cmp_default",
+				Name:       "Standing Flower Kayu Jati Minimalis",
+				Category:   "Properti Tambahan",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 6,
+				Unit:       "pcs",
+				Notes:      "Penyangga bunga kanan kiri backdrop",
+				SortOrder:  5,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "prop_06",
+				CompanyID:  "cmp_default",
+				Name:       "Karpet Rumput Sintetis Premium 3x2m",
+				Category:   "Alas / Lantai",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 3,
+				Unit:       "roll",
+				Notes:      "Rumput sintetis tebal 3cm",
+				SortOrder:  6,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "prop_07",
+				CompanyID:  "cmp_default",
+				Name:       "Welcome Sign Woodboard Stand",
+				Category:   "Properti Tambahan",
+				Type:       "property",
+				TrackStock: trackTrue,
+				TotalStock: 2,
+				Unit:       "unit",
+				Notes:      "Standing papan selamat datang kayu",
+				SortOrder:  7,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+
+			// ALAT KERJA / TOOLS (track_stock = false)
+			{
+				ID:         "tool_01",
+				CompanyID:  "cmp_default",
+				Name:       "Tangga Lipat Aluminium 2 Meter",
+				Category:   "Alat Kerja",
+				Type:       "tool",
+				TrackStock: trackFalse,
+				TotalStock: 2,
+				Unit:       "unit",
+				Notes:      "Tangga lipat pemasangan backdrop",
+				SortOrder:  8,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "tool_02",
+				CompanyID:  "cmp_default",
+				Name:       "Pistol Lem Tembak (Hot Glue Gun)",
+				Category:   "Alat Kerja",
+				Type:       "tool",
+				TrackStock: trackFalse,
+				TotalStock: 4,
+				Unit:       "unit",
+				Notes:      "Lem tembak beserta isi lem batang",
+				SortOrder:  9,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "tool_03",
+				CompanyID:  "cmp_default",
+				Name:       "Kabel Rol 15 Meter",
+				Category:   "Alat Kerja",
+				Type:       "tool",
+				TrackStock: trackFalse,
+				TotalStock: 3,
+				Unit:       "roll",
+				Notes:      "Kabel rol colokan 4 lubang",
+				SortOrder:  10,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "tool_04",
+				CompanyID:  "cmp_default",
+				Name:       "Gunting Bunga & Tang Kawat",
+				Category:   "Alat Kerja",
+				Type:       "tool",
+				TrackStock: trackFalse,
+				TotalStock: 4,
+				Unit:       "pcs",
+				Notes:      "Pemotong kawat & tangkai bunga",
+				SortOrder:  11,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "tool_05",
+				CompanyID:  "cmp_default",
+				Name:       "Staples Tembak Kayu (Gun Tacker)",
+				Category:   "Alat Kerja",
+				Type:       "tool",
+				TrackStock: trackFalse,
+				TotalStock: 2,
+				Unit:       "unit",
+				Notes:      "Staples tembak kain & isi staples",
+				SortOrder:  12,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				ID:         "tool_06",
+				CompanyID:  "cmp_default",
+				Name:       "Kotak Toolkit & Cable Ties",
+				Category:   "Alat Kerja",
+				Type:       "tool",
+				TrackStock: trackFalse,
+				TotalStock: 2,
+				Unit:       "box",
+				Notes:      "Obeng, palu, kawat, lakban, & tali tis",
+				SortOrder:  13,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+		}
+
+		for _, p := range initialProps {
+			db.Create(&p)
+		}
+		fmt.Println("🌱 Seeding selesai: Data Master Properti & Alat berhasil ditambahkan!")
+
+		// Hubungkan template bawaan untuk Model mdl_01 ("Model Rustic Arch Wood")
+		templateModel01 := []models.DecorationModelProperty{
+			{
+				ID:                "dmp_01",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "prop_02", // Tiang Arch Kayu Rustic
+				DefaultQty:        1,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "dmp_02",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "prop_04", // Kain Tile Broken White
+				DefaultQty:        2,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "dmp_03",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "prop_01", // Lampu Sorot LED 50W
+				DefaultQty:        2,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "dmp_04",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "prop_05", // Standing Flower Kayu
+				DefaultQty:        2,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "dmp_05",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "tool_01", // Tangga Lipat 2M
+				DefaultQty:        1,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "dmp_06",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "tool_02", // Pistol Lem Tembak
+				DefaultQty:        1,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+			{
+				ID:                "dmp_07",
+				CompanyID:         "cmp_default",
+				DecorationModelID: "mdl_01",
+				PropertyID:        "tool_03", // Kabel Rol 15M
+				DefaultQty:        1,
+				CreatedAt:         time.Now(),
+				UpdatedAt:         time.Now(),
+			},
+		}
+
+		for _, t := range templateModel01 {
+			db.Create(&t)
+		}
+		fmt.Println("🌱 Seeding selesai: Template Properti Model Rustic Arch Wood berhasil dihubungkan!")
+	}
+}
+
 
 

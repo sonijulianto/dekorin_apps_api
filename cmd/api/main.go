@@ -109,6 +109,22 @@ func main() {
 	api.Put("/decoration-models/:id", middleware.Protected(), handlers.UpdateDecorationModel)
 	api.Delete("/decoration-models/:id", middleware.Protected(), handlers.DeleteDecorationModel)
 
+	// Master Properties & Tools routes (Inventaris Properti Dekorasi & Alat Kerja)
+	api.Get("/properties", middleware.Protected(), handlers.GetProperties)
+	api.Get("/properties/availability", middleware.Protected(), handlers.GetPropertiesAvailability)
+	api.Post("/properties", middleware.Protected(), handlers.CreateProperty)
+	api.Put("/properties/:id", middleware.Protected(), handlers.UpdateProperty)
+	api.Delete("/properties/:id", middleware.Protected(), handlers.DeleteProperty)
+
+	// Agenda Pick List routes (Paperless Checklist Muat & Bongkar)
+	api.Get("/agendas/:id/properties", middleware.Protected(), handlers.GetAgendaProperties)
+	api.Post("/agendas/:id/properties/populate", middleware.Protected(), handlers.PopulateAgendaProperties)
+	api.Post("/agendas/:id/properties", middleware.Protected(), handlers.AddAgendaProperty)
+	api.Put("/agendas/:id/properties/:item_id", middleware.Protected(), handlers.UpdateAgendaPropertyItem)
+	api.Patch("/agendas/:id/properties/:item_id/pack", middleware.Protected(), handlers.ToggleAgendaPropertyPacked)
+	api.Patch("/agendas/:id/properties/:item_id/return", middleware.Protected(), handlers.ToggleAgendaPropertyReturned)
+	api.Delete("/agendas/:id/properties/:item_id", middleware.Protected(), handlers.DeleteAgendaPropertyItem)
+
 	// API Logs routes (sesuai Screenshot)
 	api.Get("/apilog/get", middleware.OptionalProtected(), handlers.GetApiLogs)
 	api.Get("/apilog/:id", middleware.OptionalProtected(), handlers.GetApiLogByID)
