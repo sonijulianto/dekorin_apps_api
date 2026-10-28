@@ -1309,19 +1309,30 @@
     </div>
 
     <!-- ======================================================== -->
-    <!-- MODAL: TAMBAH AGENDA ACARA                               -->
+    <!-- MODAL: TAMBAH / EDIT AGENDA ACARA                        -->
     <!-- ======================================================== -->
     <div id="modalAgenda" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4 sticky -top-6 sm:-top-8 bg-white z-10 pt-2">
                 <div>
                     <h3 class="text-lg font-bold text-slate-900" id="modalAgendaTitle">Tambah Agenda Acara Baru</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Jadwalkan booking event, tentukan paket dekorasi, model, dan lokasi acara</p>
+                    <p class="text-xs text-slate-400 mt-0.5" id="modalAgendaSubtitle">Jadwalkan booking event, tentukan paket dekorasi, model, dan lokasi acara</p>
                 </div>
                 <button type="button" onclick="closeAgendaModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
             </div>
 
+            <!-- Warning Banner bila Agenda Terlewat / Selesai -->
+            <div id="agendaLockedWarning" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5">
+                <span class="text-base shrink-0">🔒</span>
+                <div>
+                    <div class="font-bold text-amber-900">Agenda Acara Terkunci (Mode Lihat Saja)</div>
+                    <div class="text-[11px] text-amber-700 mt-0.5" id="agendaLockedReason">Data rincian acara tidak dapat diubah karena acara telah selesai atau jadwal tanggal acara sudah terlewat.</div>
+                </div>
+            </div>
+
             <form id="formAgenda" onsubmit="handleSaveAgenda(event)" class="space-y-4">
+                <input type="hidden" id="inputAgendaId" value="">
+
                 <!-- Data Klien & Acara -->
                 <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-3">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-[#C59563] flex items-center gap-1.5">
@@ -1339,10 +1350,19 @@
                                 class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Judul / Tulisan Backdrop</label>
-                        <input type="text" id="inputAgendaBackdropTitle" placeholder="Contoh: The Wedding of Sarah & Dimas"
-                            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Judul / Tulisan Backdrop</label>
+                            <input type="text" id="inputAgendaBackdropTitle" placeholder="Contoh: The Wedding of Sarah & Dimas"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Brand / Sub-Brand Usaha</label>
+                            <select id="inputAgendaBrandId"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] bg-white">
+                                <option value="">-- Brand Utama --</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -1432,14 +1452,52 @@
                     </div>
                 </div>
 
-                <!-- Total Estimasi Biaya Box -->
-                <div class="p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC] to-[#F5EBE1] border border-[#D4A574]/20 flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-bold text-[#C59563] uppercase tracking-wider block">Estimasi Total Biaya</span>
-                        <span class="text-xs text-slate-500">Paket + Tambahan Model + Transport</span>
+                <!-- Status Acara & Status Pembayaran & DP -->
+                <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#C59563] flex items-center gap-1.5">
+                        <span>🏷️</span> Status Acara & Pembayaran
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Status Acara</label>
+                            <select id="inputAgendaStatus"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] bg-white font-medium">
+                                <option value="upcoming">Mendatang (Upcoming)</option>
+                                <option value="completed">Selesai (Completed)</option>
+                                <option value="cancelled">Dibatalkan (Cancelled)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Status Pembayaran</label>
+                            <select id="inputAgendaPaymentStatus" onchange="handleAgendaPaymentStatusChanged(this.value)"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] bg-white font-medium">
+                                <option value="unpaid">Belum Bayar (Unpaid)</option>
+                                <option value="dp">DP Terbayar</option>
+                                <option value="paid">Lunas (Paid)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal DP (Rp)</label>
+                            <input type="number" id="inputAgendaDpAmount" min="0" value="0" oninput="calculateAgendaTotal()"
+                                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-xl sm:text-2xl font-black text-slate-900 font-mono" id="agendaTotalEstimatedDisplay">Rp 0</span>
+                </div>
+
+                <!-- Total Estimasi Biaya Box & Sisa Pelunasan -->
+                <div class="p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC] to-[#F5EBE1] border border-[#D4A574]/20 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold text-[#C59563] uppercase tracking-wider block">Estimasi Total Biaya</span>
+                            <span class="text-xs text-slate-500">Paket + Tambahan Model + Transport</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xl sm:text-2xl font-black text-slate-900 font-mono" id="agendaTotalEstimatedDisplay">Rp 0</span>
+                        </div>
+                    </div>
+                    <div id="agendaSisaBox" class="border-t border-[#D4A574]/20 pt-2 flex items-center justify-between text-xs">
+                        <span class="text-slate-600 font-medium">Sisa Pelunasan (dikurangi DP):</span>
+                        <span class="font-bold text-[#C59563] font-mono text-sm" id="agendaSisaPelunasanDisplay">Rp 0</span>
                     </div>
                 </div>
 
@@ -2197,6 +2255,7 @@
         let packagesCache = [];
         let decorationModelsCache = [];
         let agendasCache = [];
+        let companyBrandsCache = [];
         let currentView = 'dashboard';
         let barChart = null;
         let donutChart = null;
@@ -3784,6 +3843,65 @@
         // ==========================================
         // AGENDAS & BOOKINGS MANAGEMENT
         // ==========================================
+
+        // Menentukan apakah agenda masih belum terlewat sehingga masih bisa diedit
+        function isAgendaEditable(a) {
+            if (!a) return false;
+            const status = (a.status || '').toLowerCase();
+            // Jika status sudah selesai atau dibatalkan, sudah tidak bisa diedit
+            if (status === 'completed' || status === 'cancelled') {
+                return false;
+            }
+            // Jika tanggal acara sudah lewat dari hari ini
+            if (a.event_date_time) {
+                const eventDate = new Date(a.event_date_time);
+                const now = new Date();
+                const endOfEventDay = new Date(eventDate);
+                endOfEventDay.setHours(23, 59, 59, 999);
+                if (now > endOfEventDay) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function ensureAgendaMasterDataLoaded() {
+            const promises = [];
+            if (packagesCache.length === 0) {
+                let pkgUrl = '/api/packages';
+                if (selectedCompanyId) pkgUrl += '?company_id=' + selectedCompanyId;
+                promises.push(
+                    fetch(pkgUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
+                        .then(r => r.json())
+                        .then(d => { if (d.data) packagesCache = d.data; })
+                        .catch(() => {})
+                );
+            }
+            if (decorationModelsCache.length === 0) {
+                let dmUrl = '/api/decoration-models';
+                if (selectedCompanyId) dmUrl += '?company_id=' + selectedCompanyId;
+                promises.push(
+                    fetch(dmUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
+                        .then(r => r.json())
+                        .then(d => { if (d.data) decorationModelsCache = d.data; })
+                        .catch(() => {})
+                );
+            }
+            if (companyBrandsCache.length === 0) {
+                let bUrl = '/api/company/brands';
+                if (selectedCompanyId) bUrl += '?company_id=' + selectedCompanyId;
+                promises.push(
+                    fetch(bUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
+                        .then(r => r.json())
+                        .then(d => { if (d.data) companyBrandsCache = d.data; })
+                        .catch(() => {})
+                );
+            }
+            if (promises.length > 0) {
+                await Promise.all(promises);
+            }
+        }
+
         async function loadAgendas() {
             const tbody = document.getElementById('agendasTableBody');
             const countInfo = document.getElementById('agendaCountInfo');
@@ -3800,23 +3918,8 @@
                 agendasCache = json.data || [];
                 renderAgendasTable(agendasCache);
 
-                // Pastikan master data paket & model juga ter-cache di background
-                if (packagesCache.length === 0) {
-                    let pkgUrl = '/api/packages';
-                    if (selectedCompanyId) pkgUrl += '?company_id=' + selectedCompanyId;
-                    fetch(pkgUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
-                        .then(r => r.json())
-                        .then(d => { if (d.data) packagesCache = d.data; })
-                        .catch(() => {});
-                }
-                if (decorationModelsCache.length === 0) {
-                    let dmUrl = '/api/decoration-models';
-                    if (selectedCompanyId) dmUrl += '?company_id=' + selectedCompanyId;
-                    fetch(dmUrl, { headers: { 'Authorization': 'Bearer ' + authToken } })
-                        .then(r => r.json())
-                        .then(d => { if (d.data) decorationModelsCache = d.data; })
-                        .catch(() => {});
-                }
+                // Cache master data di background
+                ensureAgendaMasterDataLoaded();
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-rose-500">Gagal memuat agenda: ${err.message}</td></tr>`;
                 if (countInfo) countInfo.innerText = 'Gagal memuat';
@@ -3840,6 +3943,7 @@
                     (a.backdrop_title && a.backdrop_title.toLowerCase().includes(query)) ||
                     (a.package_name && a.package_name.toLowerCase().includes(query)) ||
                     (a.model_name && a.model_name.toLowerCase().includes(query)) ||
+                    (a.brand_name && a.brand_name.toLowerCase().includes(query)) ||
                     (a.notes && a.notes.toLowerCase().includes(query))
                 );
             }
@@ -3874,6 +3978,8 @@
             }
 
             tbody.innerHTML = agendas.map(a => {
+                const editable = isAgendaEditable(a);
+
                 const statusConfig = {
                     'upcoming': { label: 'Mendatang', bg: 'bg-blue-50 text-blue-700 border-blue-200/60' },
                     'completed': { label: 'Selesai', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/60' },
@@ -3904,6 +4010,8 @@
                 const transport = Number(a.transport_fee || 0);
                 const formPrice = a.client_form && a.client_form.total_price > 0 ? Number(a.client_form.total_price) : 0;
                 const totalCost = formPrice > 0 ? (formPrice + transport) : (pkgPrice + modelPrice + transport);
+                const dpAmount = Number(a.dp_amount || 0);
+                const sisaPelunasan = Math.max(0, totalCost - dpAmount);
 
                 const escapeName = (a.client_name || '').replace(/'/g, "\\'");
 
@@ -3911,6 +4019,11 @@
                     <tr class="hover:bg-slate-50/60 transition group">
                         <!-- Klien & Kontak -->
                         <td class="py-3.5 px-5">
+                            ${a.brand_name ? `
+                                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30 mb-1">
+                                    <span>🏷️</span> ${a.brand_name}
+                                </div>
+                            ` : ''}
                             <div class="font-bold text-slate-900 text-xs sm:text-sm">${a.client_name || '-'}</div>
                             ${a.backdrop_title ? `<div class="text-[11px] text-slate-500 font-medium">${a.backdrop_title}</div>` : ''}
                             <div class="flex items-center gap-2 mt-1">
@@ -3931,11 +4044,22 @@
                         <td class="py-3.5 px-5">
                             <div class="font-bold text-slate-800 text-xs">${dateDisplay}</div>
                             <div class="text-[11px] text-slate-500 font-mono">${timeDisplay}</div>
+                            <div class="mt-1">
+                                ${editable ? `
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Belum Terlewat
+                                    </span>
+                                ` : `
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                        🔒 ${a.status === 'completed' ? 'Selesai' : (a.status === 'cancelled' ? 'Dibatalkan' : 'Terlewat')}
+                                    </span>
+                                `}
+                            </div>
                             ${a.maps_url ? `
-                                <a href="${a.maps_url}" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-[#C59563] hover:text-[#B38352] font-semibold hover:underline mt-1">
+                                <a href="${a.maps_url}" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] text-[#C59563] hover:text-[#B38352] font-semibold hover:underline mt-1.5">
                                     <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-3.5 h-3.5 object-contain inline-block"> Google Maps
                                 </a>
-                            ` : '<span class="text-[10px] text-slate-400 block mt-1">Lokasi belum diisi</span>'}
+                            ` : '<span class="text-[10px] text-slate-400 block mt-1.5">Lokasi belum diisi</span>'}
                         </td>
 
                         <!-- Paket & Model Dekorasi -->
@@ -3966,7 +4090,8 @@
                                     ${paymentConfig.label}
                                 </span>
                             </div>
-                            ${a.dp_amount > 0 ? `<div class="text-[10px] font-mono text-emerald-600">DP: Rp ${Number(a.dp_amount).toLocaleString('id-ID')}</div>` : ''}
+                            ${dpAmount > 0 ? `<div class="text-[10px] font-mono text-emerald-600 font-semibold">DP: Rp ${dpAmount.toLocaleString('id-ID')}</div>` : ''}
+                            ${sisaPelunasan > 0 && totalCost > 0 ? `<div class="text-[10px] font-mono text-amber-700">Sisa: Rp ${sisaPelunasan.toLocaleString('id-ID')}</div>` : ''}
                         </td>
 
                         <!-- Total Biaya -->
@@ -3984,12 +4109,23 @@
                         <!-- Aksi -->
                         <td class="py-3.5 px-5 text-right">
                             <div class="flex items-center justify-end gap-1.5">
+                                ${editable ? `
+                                    <button onclick="openEditAgendaModal('${a.id}')" title="Edit Agenda Acara (Belum Terlewat)"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#F9F3EC] text-[#C59563] hover:bg-[#F4ECE2] hover:text-[#B38352] transition font-bold text-xs border border-[#D4A574]/30 shadow-xs">
+                                        <span>✏️</span> <span class="hidden md:inline">Edit</span>
+                                    </button>
+                                ` : `
+                                    <button onclick="openEditAgendaModal('${a.id}')" title="Agenda sudah selesai / terlewat (Klik untuk lihat detail terkunci)"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition font-medium text-xs border border-slate-200">
+                                        <span>🔒</span> <span class="hidden md:inline">Detail</span>
+                                    </button>
+                                `}
                                 <button onclick="copyClientFormLink('${a.form_token}')" title="Salin Link Detail Booking Klien"
-                                    class="p-2 rounded-xl bg-[#F9F3EC] text-[#C59563] hover:bg-[#F4ECE2] hover:text-[#B38352] transition font-bold text-xs">
+                                    class="p-2 rounded-xl bg-slate-50 text-slate-600 hover:bg-[#F9F3EC] hover:text-[#C59563] transition font-bold text-xs border border-slate-100">
                                     🔗
                                 </button>
                                 <button onclick="handleDeleteAgenda('${a.id}', '${escapeName}')" title="Hapus Agenda Acara"
-                                    class="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition font-bold text-xs">
+                                    class="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition font-bold text-xs border border-slate-100">
                                     🗑️
                                 </button>
                             </div>
@@ -4002,10 +4138,29 @@
         async function openAgendaModal() {
             const modal = document.getElementById('modalAgenda');
             const errBox = document.getElementById('agendaErrorBox');
+            const warningBox = document.getElementById('agendaLockedWarning');
+            const titleEl = document.getElementById('modalAgendaTitle');
+            const subtitleEl = document.getElementById('modalAgendaSubtitle');
+            const submitBtn = document.getElementById('btnSubmitAgenda');
+            const formEl = document.getElementById('formAgenda');
+
             errBox.classList.add('hidden');
             errBox.innerText = '';
+            warningBox.classList.add('hidden');
 
-            document.getElementById('formAgenda').reset();
+            titleEl.innerText = 'Tambah Agenda Acara Baru';
+            subtitleEl.innerText = 'Jadwalkan booking event, tentukan paket dekorasi, model, dan lokasi acara';
+            submitBtn.classList.remove('hidden');
+            submitBtn.innerText = 'Buat Agenda';
+
+            document.getElementById('inputAgendaId').value = '';
+            formEl.reset();
+
+            // Aktifkan semua input
+            Array.from(formEl.elements).forEach(el => {
+                el.disabled = false;
+            });
+
             const previewBox = document.getElementById('agendaModelPreviewBox');
             previewBox.classList.add('hidden');
             previewBox.classList.remove('flex');
@@ -4018,30 +4173,18 @@
             const localISOTime = (new Date(tomorrow - tzOffset)).toISOString().slice(0, 16);
             document.getElementById('inputAgendaEventDateTime').value = localISOTime;
 
-            // Pastikan master data paket & model sudah ter-cache
-            if (packagesCache.length === 0) {
-                try {
-                    let url = '/api/packages';
-                    if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
-                    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
-                    const json = await res.json();
-                    packagesCache = json.data || [];
-                } catch (e) {
-                    console.error('Error fetching packages for agenda modal', e);
-                }
-            }
+            // Default status
+            document.getElementById('inputAgendaStatus').value = 'upcoming';
+            document.getElementById('inputAgendaPaymentStatus').value = 'unpaid';
+            document.getElementById('inputAgendaDpAmount').value = 0;
 
-            if (decorationModelsCache.length === 0) {
-                try {
-                    let url = '/api/decoration-models';
-                    if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
-                    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
-                    const json = await res.json();
-                    decorationModelsCache = json.data || [];
-                } catch (e) {
-                    console.error('Error fetching decoration models for agenda modal', e);
-                }
-            }
+            // Pastikan master data paket & model & brand sudah ter-cache
+            await ensureAgendaMasterDataLoaded();
+
+            // Populate Brands dropdown
+            const brandSelect = document.getElementById('inputAgendaBrandId');
+            brandSelect.innerHTML = '<option value="">-- Brand Utama --</option>' +
+                companyBrandsCache.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
 
             // Populate Packages dropdown
             const pkgSelect = document.getElementById('inputAgendaPackageId');
@@ -4050,6 +4193,105 @@
 
             // Populate Models dropdown
             populateAgendaModelSelect();
+
+            calculateAgendaTotal();
+            modal.classList.remove('hidden');
+        }
+
+        async function openEditAgendaModal(agendaId) {
+            const a = agendasCache.find(x => String(x.id) === String(agendaId));
+            if (!a) {
+                alert('Data agenda tidak ditemukan.');
+                return;
+            }
+
+            const modal = document.getElementById('modalAgenda');
+            const errBox = document.getElementById('agendaErrorBox');
+            const warningBox = document.getElementById('agendaLockedWarning');
+            const warningReason = document.getElementById('agendaLockedReason');
+            const titleEl = document.getElementById('modalAgendaTitle');
+            const subtitleEl = document.getElementById('modalAgendaSubtitle');
+            const submitBtn = document.getElementById('btnSubmitAgenda');
+            const formEl = document.getElementById('formAgenda');
+
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
+            document.getElementById('inputAgendaId').value = a.id;
+
+            // Pastikan master data ter-cache
+            await ensureAgendaMasterDataLoaded();
+
+            // Populate Brands
+            const brandSelect = document.getElementById('inputAgendaBrandId');
+            brandSelect.innerHTML = '<option value="">-- Brand Utama --</option>' +
+                companyBrandsCache.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+            brandSelect.value = a.brand_id || '';
+
+            // Populate Packages
+            const pkgSelect = document.getElementById('inputAgendaPackageId');
+            pkgSelect.innerHTML = '<option value="">-- Pilih Paket Dekorasi --</option>' +
+                packagesCache.map(p => `<option value="${p.id}">${p.name} (Rp ${Number(p.base_price || 0).toLocaleString('id-ID')})</option>`).join('');
+            pkgSelect.value = a.package_id || '';
+            document.getElementById('inputAgendaPackagePrice').value = a.package_price || 0;
+
+            // Populate Models
+            populateAgendaModelSelect(a.package_id || '');
+            document.getElementById('inputAgendaModelId').value = a.model_id || '';
+            document.getElementById('inputAgendaModelAdditionalPrice').value = a.model_additional_price || 0;
+            handleAgendaModelChanged(a.model_id || '');
+
+            // Isi rincian data klien & acara
+            document.getElementById('inputAgendaClientName').value = a.client_name || '';
+            document.getElementById('inputAgendaClientPhone').value = a.client_phone || '';
+            document.getElementById('inputAgendaBackdropTitle').value = a.backdrop_title || '';
+            document.getElementById('inputAgendaMapsUrl').value = a.maps_url || '';
+            document.getElementById('inputAgendaTransportFee').value = a.transport_fee || 0;
+            document.getElementById('inputAgendaStatus').value = (a.status || 'upcoming').toLowerCase();
+            document.getElementById('inputAgendaPaymentStatus').value = (a.payment_status || 'unpaid').toLowerCase();
+            document.getElementById('inputAgendaDpAmount').value = a.dp_amount || 0;
+            document.getElementById('inputAgendaNotes').value = a.notes || '';
+
+            if (a.event_date_time) {
+                const d = new Date(a.event_date_time);
+                const tzOffset = d.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 16);
+                document.getElementById('inputAgendaEventDateTime').value = localISOTime;
+            }
+
+            const editable = isAgendaEditable(a);
+
+            if (!editable) {
+                // Mode Terkunci (Read-Only)
+                warningBox.classList.remove('hidden');
+                const statusLower = (a.status || '').toLowerCase();
+                if (statusLower === 'completed') {
+                    warningReason.innerText = 'Status agenda ini telah "Selesai" (Completed). Rincian acara sudah terkunci dan tidak dapat diubah.';
+                } else if (statusLower === 'cancelled') {
+                    warningReason.innerText = 'Status agenda ini telah "Dibatalkan" (Cancelled). Rincian acara tidak dapat diubah.';
+                } else {
+                    warningReason.innerText = 'Jadwal tanggal acara ini telah terlewat. Sesuai aturan sistem, agenda yang sudah terlewat tidak dapat diedit lagi.';
+                }
+                titleEl.innerText = 'Detail Agenda Acara (Terkunci)';
+                subtitleEl.innerText = 'Agenda acara telah terlewat atau selesai. Rincian data di bawah hanya untuk dilihat (mode baca saja).';
+                submitBtn.classList.add('hidden');
+
+                Array.from(formEl.elements).forEach(el => {
+                    if (el.tagName !== 'BUTTON' || el.type === 'submit') {
+                        el.disabled = true;
+                    }
+                });
+            } else {
+                // Mode Edit Aktif
+                warningBox.classList.add('hidden');
+                titleEl.innerText = 'Edit Agenda Acara';
+                subtitleEl.innerText = 'Perbarui rincian pemesanan, paket, model dekorasi, jadwal, atau status pembayaran acara';
+                submitBtn.classList.remove('hidden');
+                submitBtn.innerText = 'Simpan Perubahan';
+
+                Array.from(formEl.elements).forEach(el => {
+                    el.disabled = false;
+                });
+            }
 
             calculateAgendaTotal();
             modal.classList.remove('hidden');
@@ -4199,14 +4441,34 @@
             calculateAgendaTotal();
         }
 
+        function handleAgendaPaymentStatusChanged(val) {
+            const dpInput = document.getElementById('inputAgendaDpAmount');
+            if (val === 'paid') {
+                const total = calculateAgendaTotal();
+                if (Number(dpInput.value) === 0) {
+                    dpInput.value = total;
+                }
+            } else if (val === 'unpaid') {
+                dpInput.value = 0;
+            }
+            calculateAgendaTotal();
+        }
+
         function calculateAgendaTotal() {
             const pkgPrice = Number(document.getElementById('inputAgendaPackagePrice').value) || 0;
             const modelPrice = Number(document.getElementById('inputAgendaModelAdditionalPrice').value) || 0;
             const transport = Number(document.getElementById('inputAgendaTransportFee').value) || 0;
+            const dp = Number(document.getElementById('inputAgendaDpAmount')?.value) || 0;
             const total = pkgPrice + modelPrice + transport;
+            const sisa = Math.max(0, total - dp);
+
             const display = document.getElementById('agendaTotalEstimatedDisplay');
             if (display) {
                 display.innerText = 'Rp ' + total.toLocaleString('id-ID');
+            }
+            const sisaDisplay = document.getElementById('agendaSisaPelunasanDisplay');
+            if (sisaDisplay) {
+                sisaDisplay.innerText = 'Rp ' + sisa.toLocaleString('id-ID');
             }
             return total;
         }
@@ -4218,9 +4480,13 @@
             errBox.classList.add('hidden');
             errBox.innerText = '';
 
+            const agendaId = document.getElementById('inputAgendaId').value.trim();
+            const isEdit = !!agendaId;
+
             const clientName = document.getElementById('inputAgendaClientName').value.trim();
             const clientPhone = document.getElementById('inputAgendaClientPhone').value.trim();
             const backdropTitle = document.getElementById('inputAgendaBackdropTitle').value.trim();
+            const brandId = document.getElementById('inputAgendaBrandId').value;
             const eventDateTime = document.getElementById('inputAgendaEventDateTime').value;
             let mapsUrl = document.getElementById('inputAgendaMapsUrl').value.trim();
             if (mapsUrl && !mapsUrl.startsWith('http://') && !mapsUrl.startsWith('https://')) {
@@ -4231,6 +4497,9 @@
             const modelId = document.getElementById('inputAgendaModelId').value;
             const modelAdditionalPrice = Number(document.getElementById('inputAgendaModelAdditionalPrice').value) || 0;
             const transportFee = Number(document.getElementById('inputAgendaTransportFee').value) || 0;
+            const status = document.getElementById('inputAgendaStatus').value;
+            const paymentStatus = document.getElementById('inputAgendaPaymentStatus').value;
+            const dpAmount = Number(document.getElementById('inputAgendaDpAmount').value) || 0;
             const notes = document.getElementById('inputAgendaNotes').value.trim();
 
             if (!clientName) {
@@ -4256,13 +4525,21 @@
                 }
             }
 
+            let packageName = '';
+            if (packageId) {
+                const p = packagesCache.find(x => String(x.id) === String(packageId));
+                if (p) packageName = p.name;
+            }
+
             const payload = {
                 client_name: clientName,
                 client_phone: clientPhone,
                 backdrop_title: backdropTitle,
+                brand_id: brandId,
                 event_date_time: eventDateTime,
                 maps_url: mapsUrl,
                 package_id: packageId,
+                package_name: packageName,
                 package_price: packagePrice,
                 model_id: modelId,
                 model_name: modelName,
@@ -4270,20 +4547,23 @@
                 model_image_url: modelImageUrl,
                 model_additional_price: modelAdditionalPrice,
                 transport_fee: transportFee,
+                status: status,
+                payment_status: paymentStatus,
+                dp_amount: dpAmount,
                 notes: notes
             };
 
             btn.disabled = true;
-            btn.innerText = 'Menyimpan...';
+            btn.innerText = isEdit ? 'Menyimpan...' : 'Membuat...';
 
             try {
-                let url = '/api/agendas';
+                let url = isEdit ? `/api/agendas/${agendaId}` : '/api/agendas';
                 if (currentUserRole === 'superadmin' && selectedCompanyId) {
                     url += '?company_id=' + selectedCompanyId;
                 }
 
                 const res = await fetch(url, {
-                    method: 'POST',
+                    method: isEdit ? 'PUT' : 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + authToken
@@ -4298,13 +4578,13 @@
 
                 closeAgendaModal();
                 await loadAgendas();
-                alert('Agenda acara untuk "' + clientName + '" berhasil dibuat!');
+                alert(isEdit ? `Perubahan agenda acara "${clientName}" berhasil disimpan!` : `Agenda acara untuk "${clientName}" berhasil dibuat!`);
             } catch (err) {
                 errBox.innerText = err.message;
                 errBox.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Buat Agenda';
+                btn.innerText = isEdit ? 'Simpan Perubahan' : 'Buat Agenda';
             }
         }
 

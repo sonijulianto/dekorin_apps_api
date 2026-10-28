@@ -72,6 +72,7 @@ func main() {
 	// Agenda routes
 	api.Get("/agendas", middleware.Protected(), handlers.GetAgendas)
 	api.Post("/agendas", middleware.Protected(), handlers.CreateAgenda)
+	api.Put("/agendas/:id", middleware.Protected(), handlers.UpdateAgenda)
 	api.Put("/agendas/:id/dp", middleware.Protected(), handlers.UpdateAgendaDp)
 	api.Put("/agendas/:id/transport", middleware.Protected(), handlers.UpdateAgendaTransport)
 	api.Put("/agendas/:id/package", middleware.Protected(), handlers.UpdateAgendaPackage)

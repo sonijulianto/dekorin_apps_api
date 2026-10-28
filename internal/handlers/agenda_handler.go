@@ -848,4 +848,201 @@ func DeleteAgenda(c *fiber.Ctx) error {
 	})
 }
 
+// UpdateAgenda handles PUT /api/agendas/:id (Pembaruan lengkap agenda acara selama belum terlewat)
+func UpdateAgenda(c *fiber.Ctx) error {
+	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var req models.UpdateAgendaRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	var agenda models.Agenda
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	// Aturan: kalau agenda sudah selesai atau terlewat, data acara tidak dapat diubah
+	now := time.Now()
+	isCompleted := strings.ToLower(agenda.Status) == "completed"
+	isCancelled := strings.ToLower(agenda.Status) == "cancelled"
+
+	// Cek apakah tanggal acara sudah lewat (bandingkan dengan akhir hari tanggal acara)
+	isDatePassed := false
+	if !agenda.EventDateTime.IsZero() {
+		endOfDay := time.Date(agenda.EventDateTime.Year(), agenda.EventDateTime.Month(), agenda.EventDateTime.Day(), 23, 59, 59, 999999999, agenda.EventDateTime.Location())
+		if now.After(endOfDay) {
+			isDatePassed = true
+		}
+	}
+
+	// Jika agenda sudah selesai atau terlewat, tolak perubahan rincian
+	if isCompleted || isCancelled || isDatePassed {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai atau tanggal acara telah terlewat, rincian acara tidak dapat diubah lagi.",
+		})
+	}
+
+	// Validasi nama klien
+	if strings.TrimSpace(req.ClientName) != "" {
+		agenda.ClientName = strings.TrimSpace(req.ClientName)
+	}
+	if req.ClientPhone != "" {
+		agenda.ClientPhone = strings.TrimSpace(req.ClientPhone)
+	}
+	if req.BackdropTitle != "" {
+		agenda.BackdropTitle = strings.TrimSpace(req.BackdropTitle)
+	}
+
+	// Parsing tanggal acara baru jika diberikan
+	if strings.TrimSpace(req.EventDateTime) != "" {
+		timeFormats := []string{
+			time.RFC3339,
+			"2006-01-02T15:04:05",
+			"2006-01-02 15:04:05",
+			"2006-01-02 15:04",
+			"2006-01-02T15:04",
+		}
+		for _, format := range timeFormats {
+			if t, err := time.Parse(format, req.EventDateTime); err == nil {
+				agenda.EventDateTime = t
+				break
+			}
+		}
+	}
+
+	// Maps URL
+	mapsURL := strings.TrimSpace(req.MapsURL)
+	if mapsURL != "" && !strings.HasPrefix(mapsURL, "http://") && !strings.HasPrefix(mapsURL, "https://") {
+		mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
+	}
+	agenda.MapsURL = mapsURL
+
+	// Update Brand jika dipilih
+	brandID := strings.TrimSpace(req.BrandID)
+	if brandID != "" && brandID != agenda.BrandID {
+		var brand models.CompanyBrand
+		targetCompanyID := agenda.CompanyID
+		if err := config.DB.Where("id = ? AND company_id = ?", brandID, targetCompanyID).First(&brand).Error; err == nil {
+			agenda.BrandID = brand.ID
+			agenda.BrandName = brand.Name
+			agenda.BrandLogo = brand.LogoURL
+			agenda.BrandPhone = brand.Phone
+			agenda.BrandInstagram = brand.Instagram
+			agenda.BrandDescription = brand.Description
+		}
+	} else if brandID == "" && req.BrandID != "" {
+		agenda.BrandID = ""
+		agenda.BrandName = ""
+		agenda.BrandLogo = ""
+		agenda.BrandPhone = ""
+		agenda.BrandInstagram = ""
+		agenda.BrandDescription = ""
+	}
+
+	// Paket Dekorasi
+	if strings.TrimSpace(req.PackageID) != "" {
+		agenda.PackageID = strings.TrimSpace(req.PackageID)
+		if strings.TrimSpace(req.PackageName) != "" {
+			agenda.PackageName = strings.TrimSpace(req.PackageName)
+		} else {
+			var pkg models.Package
+			if err := config.DB.Where("id = ?", agenda.PackageID).First(&pkg).Error; err == nil {
+				agenda.PackageName = pkg.Name
+				if req.PackagePrice == 0 {
+					agenda.PackagePrice = pkg.BasePrice
+				}
+			}
+		}
+	} else if strings.TrimSpace(req.PackageName) != "" {
+		agenda.PackageName = strings.TrimSpace(req.PackageName)
+	}
+	if req.PackagePrice >= 0 {
+		agenda.PackagePrice = req.PackagePrice
+	}
+
+	// Model Dekorasi
+	modelID := strings.TrimSpace(req.ModelID)
+	if modelID != "" {
+		agenda.ModelID = modelID
+		agenda.ModelName = strings.TrimSpace(req.ModelName)
+		agenda.ModelWidth = strings.TrimSpace(req.ModelWidth)
+		agenda.ModelImageURL = strings.TrimSpace(req.ModelImageURL)
+		agenda.ModelAdditionalPrice = req.ModelAdditionalPrice
+
+		if agenda.ModelName == "" || agenda.ModelImageURL == "" {
+			var decorModel models.DecorationModel
+			if err := config.DB.Where("id = ?", modelID).First(&decorModel).Error; err == nil {
+				if agenda.ModelName == "" {
+					agenda.ModelName = decorModel.Name
+				}
+				if agenda.ModelWidth == "" {
+					agenda.ModelWidth = decorModel.Width
+				}
+				if agenda.ModelImageURL == "" {
+					agenda.ModelImageURL = decorModel.ImageURL
+				}
+			}
+		}
+	} else if req.ModelID != "" {
+		agenda.ModelID = ""
+		agenda.ModelName = ""
+		agenda.ModelWidth = ""
+		agenda.ModelImageURL = ""
+		agenda.ModelAdditionalPrice = 0
+	}
+
+	// Transport fee
+	agenda.TransportFee = req.TransportFee
+
+	// DP
+	if req.DpAmount >= 0 {
+		agenda.DpAmount = req.DpAmount
+	}
+
+	// Payment status
+	if req.PaymentStatus != "" {
+		pStatus := strings.ToLower(strings.TrimSpace(req.PaymentStatus))
+		if pStatus == "paid" || pStatus == "dp" || pStatus == "unpaid" {
+			agenda.PaymentStatus = pStatus
+		}
+	}
+
+	// Status acara
+	if req.Status != "" {
+		status := strings.ToLower(strings.TrimSpace(req.Status))
+		if status == "upcoming" || status == "completed" || status == "cancelled" {
+			agenda.Status = status
+		}
+	}
+
+	// Notes
+	agenda.Notes = strings.TrimSpace(req.Notes)
+	agenda.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate agenda: " + err.Error(),
+		})
+	}
+
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Agenda acara berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
 

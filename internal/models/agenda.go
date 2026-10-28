@@ -139,6 +139,29 @@ type UpdateAgendaBrandRequest struct {
 	BrandID string `json:"brand_id"`
 }
 
+// UpdateAgendaRequest adalah payload untuk memperbarui data agenda secara lengkap
+type UpdateAgendaRequest struct {
+	BrandID              string  `json:"brand_id"`
+	ClientName           string  `json:"client_name"`
+	ClientPhone          string  `json:"client_phone"`
+	BackdropTitle        string  `json:"backdrop_title"`
+	EventDateTime        string  `json:"event_date_time"`
+	MapsURL              string  `json:"maps_url"`
+	PackageID            string  `json:"package_id"`
+	PackageName          string  `json:"package_name"`
+	PackagePrice         float64 `json:"package_price"`
+	ModelID              string  `json:"model_id"`
+	ModelName            string  `json:"model_name"`
+	ModelWidth           string  `json:"model_width"`
+	ModelImageURL        string  `json:"model_image_url"`
+	ModelAdditionalPrice float64 `json:"model_additional_price"`
+	TransportFee         float64 `json:"transport_fee"`
+	DpAmount             float64 `json:"dp_amount"`
+	PaymentStatus        string  `json:"payment_status"`
+	Status               string  `json:"status"`
+	Notes                string  `json:"notes"`
+}
+
 
 
 
