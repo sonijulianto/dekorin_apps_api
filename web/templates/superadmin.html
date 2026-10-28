@@ -212,19 +212,17 @@
                                 class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
                                 Agenda & Booking Acara
                             </a>
-                            <a href="javascript:void(0)" onclick="switchView('invitations')" id="nav-invitations"
-                                class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition flex items-center justify-between">
-                                <span>Undangan Digital</span>
-                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#D4A574]/20 text-[#C59563] font-bold">New</span>
-                            </a>
                         </div>
                     </div>
 
                     <!-- Undangan Digital Direct Nav -->
                     <a href="javascript:void(0)" onclick="switchView('invitations')" id="nav-invitations-direct"
-                        class="nav-item flex items-center px-3 py-2.5 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition">
-                        <span class="nav-icon text-base mr-3 text-stone-500">💌</span>
-                        <span class="nav-text">Undangan Digital</span>
+                        class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition">
+                        <div class="flex items-center">
+                            <span class="nav-icon text-base mr-3 text-stone-500">💌</span>
+                            <span class="nav-text">Undangan Digital</span>
+                        </div>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#D4A574]/20 text-[#C59563] font-bold">New</span>
                     </a>
 
                     <!-- API Log (Direct) -->
@@ -2587,7 +2585,7 @@
                 'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas', parentSubmenu: 'transSubmenu', parentCaret: 'transCaret' },
-                'invitations': { el: 'viewInvitations', title: 'Undangan Digital', path: 'Transaction • Undangan Digital', nav: 'nav-invitations', navDirect: 'nav-invitations-direct', parentSubmenu: 'transSubmenu', parentCaret: 'transCaret' },
+                'invitations': { el: 'viewInvitations', title: 'Undangan Digital', path: '<span class="text-[#C59563]">💌</span> • Undangan Digital', nav: 'nav-invitations-direct' },
                 'reports': { el: 'viewReports', title: 'Laporan Keuangan', path: 'Report • Laporan Keuangan', nav: 'nav-reports' },
                 'survey': { el: 'viewDashboard', title: 'Survey & Undangan', path: 'Survey • Undangan Digital', nav: 'nav-survey' }
             };
