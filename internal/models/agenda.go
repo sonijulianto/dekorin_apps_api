@@ -6,6 +6,8 @@ import "time"
 type Package struct {
 	ID            string                   `gorm:"primaryKey;type:varchar(50)" json:"id"`
 	CompanyID     string                   `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
+	BrandID       string                   `gorm:"type:varchar(50);index;default:''" json:"brand_id"`
+	BrandName     string                   `gorm:"type:varchar(150);default:''" json:"brand_name"`
 	Name          string                   `gorm:"type:varchar(150);not null" json:"name"`
 	ImageURL      string                   `gorm:"type:text" json:"image_url"`
 	Description   string                   `gorm:"type:text" json:"description"`
@@ -20,6 +22,12 @@ type Package struct {
 type Agenda struct {
 	ID                   string      `gorm:"primaryKey;type:varchar(50)" json:"id"`
 	CompanyID            string      `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
+	BrandID              string      `gorm:"type:varchar(50);index;default:''" json:"brand_id"`
+	BrandName            string      `gorm:"type:varchar(150);default:''" json:"brand_name"`
+	BrandLogo            string      `gorm:"type:text" json:"brand_logo"`
+	BrandPhone           string      `gorm:"type:varchar(50);default:''" json:"brand_phone"`
+	BrandInstagram       string      `gorm:"type:varchar(100);default:''" json:"brand_instagram"`
+	BrandDescription     string      `gorm:"type:text" json:"brand_description"`
 	ClientName           string      `gorm:"type:varchar(150);not null" json:"client_name"`
 	ClientPhone          string      `gorm:"type:varchar(50)" json:"client_phone"`
 	BackdropTitle        string      `gorm:"type:varchar(150)" json:"backdrop_title"`
@@ -58,6 +66,7 @@ func (a *Agenda) CalculateTotalBiaya() float64 {
 
 // CreateAgendaRequest adalah payload untuk membuat agenda baru
 type CreateAgendaRequest struct {
+	BrandID              string  `json:"brand_id"`
 	ClientName           string  `json:"client_name"`
 	ClientPhone          string  `json:"client_phone"`
 	BackdropTitle        string  `json:"backdrop_title"`
@@ -123,6 +132,11 @@ type UpdateModelRequest struct {
 // UpdateNotesRequest adalah payload untuk mengubah catatan / request tambahan agenda
 type UpdateNotesRequest struct {
 	Notes string `json:"notes"`
+}
+
+// UpdateAgendaBrandRequest adalah payload untuk mengubah brand yang terhubung dengan agenda
+type UpdateAgendaBrandRequest struct {
+	BrandID string `json:"brand_id"`
 }
 
 

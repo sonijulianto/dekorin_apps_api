@@ -70,6 +70,18 @@ func GetAgendas(c *fiber.Ctx) error {
 			}
 		}
 
+		// Sinkronkan informasi Brand jika agenda memiliki brand_id
+		if agendas[i].BrandID != "" && agendas[i].BrandName == "" {
+			var brand models.CompanyBrand
+			if err := config.DB.Where("id = ?", agendas[i].BrandID).First(&brand).Error; err == nil {
+				agendas[i].BrandName = brand.Name
+				agendas[i].BrandLogo = brand.LogoURL
+				agendas[i].BrandPhone = brand.Phone
+				agendas[i].BrandInstagram = brand.Instagram
+				agendas[i].BrandDescription = brand.Description
+			}
+		}
+
 		if agendas[i].FormToken == "" {
 			agendas[i].FormToken = uuid.New().String()[:8]
 			if agendas[i].FormStatus == "" {
@@ -133,12 +145,16 @@ func CreateAgenda(c *fiber.Ctx) error {
 	// Ambil nama & harga paket dari master Paket (jika ada)
 	packageName := "Belum Dipilih"
 	packagePrice := req.PackagePrice
+	brandID := strings.TrimSpace(req.BrandID)
 	if strings.TrimSpace(req.PackageID) != "" {
 		var pkg models.Package
 		if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
 			packageName = pkg.Name
 			if packagePrice == 0 {
 				packagePrice = pkg.BasePrice
+			}
+			if brandID == "" && pkg.BrandID != "" {
+				brandID = pkg.BrandID
 			}
 		} else {
 			packageName = "Paket Khusus"
@@ -164,6 +180,9 @@ func CreateAgenda(c *fiber.Ctx) error {
 			if modelImageURL == "" {
 				modelImageURL = decorModel.ImageURL
 			}
+			if brandID == "" && decorModel.BrandID != "" {
+				brandID = decorModel.BrandID
+			}
 		}
 	}
 
@@ -181,6 +200,25 @@ func CreateAgenda(c *fiber.Ctx) error {
 		companyID = "cmp_default"
 	}
 
+	// Ambil data sub-brand jika dipilih
+	brandName := ""
+	brandLogo := ""
+	brandPhone := ""
+	brandInstagram := ""
+	brandDescription := ""
+	if brandID != "" {
+		var brand models.CompanyBrand
+		if err := config.DB.Where("id = ? AND company_id = ?", brandID, companyID).First(&brand).Error; err == nil {
+			brandName = brand.Name
+			brandLogo = brand.LogoURL
+			brandPhone = brand.Phone
+			brandInstagram = brand.Instagram
+			brandDescription = brand.Description
+		} else {
+			brandID = ""
+		}
+	}
+
 	mapsURL := strings.TrimSpace(req.MapsURL)
 	if mapsURL != "" && !strings.HasPrefix(mapsURL, "http://") && !strings.HasPrefix(mapsURL, "https://") {
 		mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
@@ -189,6 +227,12 @@ func CreateAgenda(c *fiber.Ctx) error {
 	agenda := models.Agenda{
 		ID:                   agendaID,
 		CompanyID:            companyID,
+		BrandID:              brandID,
+		BrandName:            brandName,
+		BrandLogo:            brandLogo,
+		BrandPhone:           brandPhone,
+		BrandInstagram:       brandInstagram,
+		BrandDescription:     brandDescription,
 		ClientName:           strings.TrimSpace(req.ClientName),
 		ClientPhone:          strings.TrimSpace(req.ClientPhone),
 		BackdropTitle:        backdropTitle,
@@ -238,6 +282,16 @@ func GetPackages(c *fiber.Ctx) error {
 	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
+
+	// Opsional filter berdasarkan brand_id
+	if qBrand := c.Query("brand_id"); qBrand != "" && qBrand != "all" {
+		if qBrand == "main" || qBrand == "default" {
+			query = query.Where("brand_id = '' OR brand_id IS NULL")
+		} else {
+			query = query.Where("brand_id = ?", qBrand)
+		}
+	}
+
 	if err := query.Order("sort_order ASC, created_at ASC").Find(&packages).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil data paket",
@@ -695,6 +749,69 @@ func UpdateAgendaNotes(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Catatan agenda berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaBrand handles PUT /api/agendas/:id/brand
+func UpdateAgendaBrand(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.UpdateAgendaBrandRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var agenda models.Agenda
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	brandID := strings.TrimSpace(req.BrandID)
+	if brandID == "" {
+		agenda.BrandID = ""
+		agenda.BrandName = ""
+		agenda.BrandLogo = ""
+		agenda.BrandPhone = ""
+		agenda.BrandInstagram = ""
+		agenda.BrandDescription = ""
+	} else {
+		var brand models.CompanyBrand
+		if err := config.DB.Where("id = ? AND company_id = ?", brandID, agenda.CompanyID).First(&brand).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Brand tidak ditemukan",
+			})
+		}
+		agenda.BrandID = brand.ID
+		agenda.BrandName = brand.Name
+		agenda.BrandLogo = brand.LogoURL
+		agenda.BrandPhone = brand.Phone
+		agenda.BrandInstagram = brand.Instagram
+		agenda.BrandDescription = brand.Description
+	}
+
+	agenda.UpdatedAt = time.Now()
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui brand agenda: " + err.Error(),
+		})
+	}
+
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Brand agenda berhasil diperbarui",
 		"data":    agenda,
 	})
 }

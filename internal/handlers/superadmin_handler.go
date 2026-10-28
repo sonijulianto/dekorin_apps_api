@@ -524,6 +524,180 @@ func UpdateMyCompanyProfile(c *fiber.Ctx) error {
 	})
 }
 
+// GetCompanyBrands handles GET /api/company/brands (Mengambil daftar sub-brand usaha)
+func GetCompanyBrands(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			companyID = qComp
+		}
+	}
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
+
+	var brands []models.CompanyBrand
+	if err := config.DB.Where("company_id = ?", companyID).Order("created_at ASC").Find(&brands).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengambil daftar sub-brand: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Berhasil mengambil daftar brand",
+		"data":    brands,
+	})
+}
+
+// CreateCompanyBrand handles POST /api/company/brands
+func CreateCompanyBrand(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+			companyID = qComp
+		}
+	}
+	if companyID == "" {
+		companyID = "cmp_default"
+	}
+
+	var req models.CreateOrUpdateBrandRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
+	}
+
+	if strings.TrimSpace(req.Name) == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama brand wajib diisi"})
+	}
+
+	brand := models.CompanyBrand{
+		ID:          fmt.Sprintf("brd_%s", uuid.New().String()[:8]),
+		CompanyID:   companyID,
+		Name:        strings.TrimSpace(req.Name),
+		LogoURL:     strings.TrimSpace(req.LogoURL),
+		Description: strings.TrimSpace(req.Description),
+		Phone:       utils.NormalizePhone(req.Phone),
+		Instagram:   strings.TrimSpace(req.Instagram),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	if err := config.DB.Create(&brand).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal membuat brand baru: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Brand berhasil ditambahkan",
+		"data":    brand,
+	})
+}
+
+// UpdateCompanyBrand handles PUT /api/company/brands/:id
+func UpdateCompanyBrand(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	id := c.Params("id")
+
+	var brand models.CompanyBrand
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&brand).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Brand tidak ditemukan"})
+	}
+
+	var req models.CreateOrUpdateBrandRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
+	}
+
+	if strings.TrimSpace(req.Name) != "" {
+		brand.Name = strings.TrimSpace(req.Name)
+	}
+	brand.LogoURL = strings.TrimSpace(req.LogoURL)
+	brand.Description = strings.TrimSpace(req.Description)
+	if req.Phone != "" {
+		brand.Phone = utils.NormalizePhone(req.Phone)
+	} else {
+		brand.Phone = ""
+	}
+	brand.Instagram = strings.TrimSpace(req.Instagram)
+	brand.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&brand).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui brand: " + err.Error(),
+		})
+	}
+
+	// Sinkronkan nama & identitas brand ke Package, DecorationModel, dan Agenda terkait
+	config.DB.Model(&models.Package{}).Where("brand_id = ?", brand.ID).Update("brand_name", brand.Name)
+	config.DB.Model(&models.DecorationModel{}).Where("brand_id = ?", brand.ID).Update("brand_name", brand.Name)
+	config.DB.Model(&models.Agenda{}).Where("brand_id = ?", brand.ID).Updates(map[string]interface{}{
+		"brand_name":        brand.Name,
+		"brand_logo":        brand.LogoURL,
+		"brand_phone":       brand.Phone,
+		"brand_instagram":   brand.Instagram,
+		"brand_description": brand.Description,
+	})
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Brand berhasil diperbarui",
+		"data":    brand,
+	})
+}
+
+// DeleteCompanyBrand handles DELETE /api/company/brands/:id
+func DeleteCompanyBrand(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	id := c.Params("id")
+
+	var brand models.CompanyBrand
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if err := query.First(&brand).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Brand tidak ditemukan"})
+	}
+
+	if err := config.DB.Delete(&brand).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal menghapus brand: " + err.Error(),
+		})
+	}
+
+	// Kembalikan paket & model dekorasi ke brand utama (default)
+	config.DB.Model(&models.Package{}).Where("brand_id = ?", id).Updates(map[string]interface{}{
+		"brand_id":   "",
+		"brand_name": "",
+	})
+	config.DB.Model(&models.DecorationModel{}).Where("brand_id = ?", id).Updates(map[string]interface{}{
+		"brand_id":   "",
+		"brand_name": "",
+	})
+	config.DB.Model(&models.Agenda{}).Where("brand_id = ?", id).Updates(map[string]interface{}{
+		"brand_id":          "",
+		"brand_name":        "",
+		"brand_logo":        "",
+		"brand_phone":       "",
+		"brand_instagram":   "",
+		"brand_description": "",
+	})
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Brand berhasil dihapus",
+	})
+}
+
 // DeleteCompany handles DELETE /api/superadmin/companies/:id
 func DeleteCompany(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -539,6 +713,7 @@ func DeleteCompany(c *fiber.Ctx) error {
 	}
 
 	// Hapus data berelasi
+	config.DB.Where("company_id = ?", id).Delete(&models.CompanyBrand{})
 	config.DB.Where("company_id = ?", id).Delete(&models.User{})
 	config.DB.Where("company_id = ?", id).Delete(&models.Agenda{})
 	config.DB.Where("company_id = ?", id).Delete(&models.Expense{})

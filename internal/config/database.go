@@ -49,6 +49,7 @@ func ConnectDB() {
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
 	err = DB.AutoMigrate(
 		&models.Company{},
+		&models.CompanyBrand{},
 		&models.User{},
 		&models.Package{},
 		&models.Agenda{},

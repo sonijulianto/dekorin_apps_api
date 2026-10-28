@@ -66,3 +66,26 @@ type CreateCompanyRequest struct {
 	OwnerEmail     string `json:"owner_email"`
 	OwnerPassword  string `json:"owner_password"`
 }
+
+// CompanyBrand mewakili sub-brand di bawah satu badan usaha (Company)
+// Alamat dan Nomor Rekening tetap mengikuti Company induk, sedangkan Nama, Logo, WA, dan IG berbeda per brand.
+type CompanyBrand struct {
+	ID          string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID   string    `gorm:"type:varchar(50);index;not null" json:"company_id"`
+	Name        string    `gorm:"type:varchar(150);not null" json:"name"`
+	LogoURL     string    `gorm:"type:text" json:"logo_url"`
+	Description string    `gorm:"type:text" json:"description"`
+	Phone       string    `gorm:"type:varchar(50)" json:"phone"`
+	Instagram   string    `gorm:"type:varchar(100)" json:"instagram"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// CreateOrUpdateBrandRequest adalah payload untuk membuat atau mengubah sub-brand
+type CreateOrUpdateBrandRequest struct {
+	Name        string `json:"name"`
+	LogoURL     string `json:"logo_url"`
+	Description string `json:"description"`
+	Phone       string `json:"phone"`
+	Instagram   string `json:"instagram"`
+}

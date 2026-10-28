@@ -20,6 +20,8 @@ type BookingDetailViewData struct {
 	CompanyPhoneClean      string
 	CompanyAddress         string
 	CompanyLogo            string
+	CompanyInstagram       string
+	CompanyBankInfo        string
 	ClientName             string
 	ClientPhone            string
 	BackdropTitle          string
@@ -74,13 +76,49 @@ func ShowClientForm(c *fiber.Ctx) error {
 		company.Name = "Dekorin Organizer"
 	}
 
+	displayCompanyName := company.Name
+	displayCompanyLogo := company.LogoURL
+	displayCompanyPhone := company.Phone
+	displayCompanyInstagram := company.Instagram
+
+	// Jika agenda memiliki Brand khusus, gunakan identitas Brand (Nama, Logo, WA, Instagram)
+	// sementara Alamat & Rekening tetap menggunakan data usaha utama.
+	if agenda.BrandID != "" {
+		var brand models.CompanyBrand
+		if err := config.DB.Where("id = ?", agenda.BrandID).First(&brand).Error; err == nil {
+			if strings.TrimSpace(brand.Name) != "" {
+				displayCompanyName = brand.Name
+			}
+			if strings.TrimSpace(brand.LogoURL) != "" {
+				displayCompanyLogo = brand.LogoURL
+			}
+			if strings.TrimSpace(brand.Phone) != "" {
+				displayCompanyPhone = brand.Phone
+			}
+			if strings.TrimSpace(brand.Instagram) != "" {
+				displayCompanyInstagram = brand.Instagram
+			}
+		} else if strings.TrimSpace(agenda.BrandName) != "" {
+			displayCompanyName = agenda.BrandName
+			if strings.TrimSpace(agenda.BrandLogo) != "" {
+				displayCompanyLogo = agenda.BrandLogo
+			}
+			if strings.TrimSpace(agenda.BrandPhone) != "" {
+				displayCompanyPhone = agenda.BrandPhone
+			}
+			if strings.TrimSpace(agenda.BrandInstagram) != "" {
+				displayCompanyInstagram = agenda.BrandInstagram
+			}
+		}
+	}
+
 	// Bersihkan nomor WhatsApp vendor
 	companyPhoneClean := strings.Map(func(r rune) rune {
 		if r >= '0' && r <= '9' {
 			return r
 		}
 		return -1
-	}, company.Phone)
+	}, displayCompanyPhone)
 	if strings.HasPrefix(companyPhoneClean, "0") {
 		companyPhoneClean = "62" + companyPhoneClean[1:]
 	}
@@ -159,11 +197,13 @@ func ShowClientForm(c *fiber.Ctx) error {
 	}
 
 	data := BookingDetailViewData{
-		CompanyName:            company.Name,
-		CompanyPhone:           company.Phone,
+		CompanyName:            displayCompanyName,
+		CompanyPhone:           displayCompanyPhone,
 		CompanyPhoneClean:      companyPhoneClean,
 		CompanyAddress:         company.Address,
-		CompanyLogo:            company.LogoURL,
+		CompanyLogo:            displayCompanyLogo,
+		CompanyInstagram:       displayCompanyInstagram,
+		CompanyBankInfo:        company.BankInfo,
 		ClientName:             agenda.ClientName,
 		ClientPhone:            agenda.ClientPhone,
 		BackdropTitle:          agenda.BackdropTitle,

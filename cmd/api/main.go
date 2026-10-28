@@ -54,6 +54,12 @@ func main() {
 	api.Get("/company/profile", middleware.Protected(), handlers.GetMyCompanyProfile)
 	api.Put("/company/profile", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateMyCompanyProfile)
 
+	// Company Brand (Sub-Brand / Multi-Brand) routes
+	api.Get("/company/brands", middleware.Protected(), handlers.GetCompanyBrands)
+	api.Post("/company/brands", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.CreateCompanyBrand)
+	api.Put("/company/brands/:id", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateCompanyBrand)
+	api.Delete("/company/brands/:id", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.DeleteCompanyBrand)
+
 	// User routes
 	api.Get("/users", middleware.Protected(), handlers.GetAllUsers)
 	api.Post("/users", middleware.Protected(), handlers.CreateUser)
@@ -73,6 +79,7 @@ func main() {
 	api.Put("/agendas/:id/notes", middleware.Protected(), handlers.UpdateAgendaNotes)
 	api.Put("/agendas/:id/payment-status", middleware.Protected(), handlers.UpdateAgendaPaymentStatus)
 	api.Put("/agendas/:id/status", middleware.Protected(), handlers.UpdateAgendaStatus)
+	api.Put("/agendas/:id/brand", middleware.Protected(), handlers.UpdateAgendaBrand)
 	api.Delete("/agendas/:id", middleware.Protected(), handlers.DeleteAgenda)
 
 	// Expense routes

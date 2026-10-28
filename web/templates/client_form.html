@@ -373,6 +373,8 @@
     <footer class="pt-6 pb-4 text-center text-xs text-slate-400 space-y-1">
       <p class="font-semibold text-slate-600">{{.CompanyName}}</p>
       {{if .CompanyAddress}}<p class="text-[11px] text-slate-400">{{.CompanyAddress}}</p>{{end}}
+      {{if .CompanyInstagram}}<p class="text-[11px] text-[#C59563] font-medium">IG: {{.CompanyInstagram}}</p>{{end}}
+      {{if .CompanyBankInfo}}<p class="text-[11px] text-slate-500 pt-1">Info Rekening: {{.CompanyBankInfo}}</p>{{end}}
       <p class="text-[10px] text-slate-400 pt-1">Dokumen ini merupakan konfirmasi pemesanan resmi yang tercatat di sistem Dekorin.</p>
     </footer>
 

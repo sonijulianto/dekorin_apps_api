@@ -6,6 +6,8 @@ import "time"
 type DecorationModel struct {
 	ID          string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
 	CompanyID   string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
+	BrandID     string    `gorm:"type:varchar(50);index;default:''" json:"brand_id"`
+	BrandName   string    `gorm:"type:varchar(150);default:''" json:"brand_name"`
 	Name        string    `gorm:"type:varchar(150);not null" json:"name"`
 	ImageURL    string    `gorm:"type:text" json:"image_url"`
 	Price       float64   `gorm:"type:decimal(15,2);not null;default:0" json:"price"`
@@ -43,6 +45,7 @@ type PackageLinkInput struct {
 
 // CreateOrUpdateDecorationModelRequest adalah payload request untuk membuat atau mengubah model dekorasi
 type CreateOrUpdateDecorationModelRequest struct {
+	BrandID      string             `json:"brand_id"`
 	Name         string             `json:"name"`
 	ImageURL     string             `json:"image_url"`
 	Price        float64            `json:"price"`
@@ -55,12 +58,14 @@ type CreateOrUpdateDecorationModelRequest struct {
 type DecorationModelResponse struct {
 	ID           string                   `json:"id"`
 	CompanyID    string                   `json:"company_id"`
+	BrandID      string                   `json:"brand_id"`
+	BrandName    string                   `json:"brand_name"`
 	Name         string                   `json:"name"`
 	ImageURL     string                   `json:"image_url"`
 	Price        float64                  `json:"price"`
 	Width        string                   `json:"width"`
 	Description  string                   `json:"description"`
-	SortOrder    int                      `json:"sort_order"`
+	SortOrder    int                      `gorm:"type:int;default:0" json:"sort_order"`
 	PackageLinks []PackageDecorationModel `json:"package_links,omitempty"`
 	CreatedAt    time.Time                `json:"created_at"`
 	UpdatedAt    time.Time                `json:"updated_at"`

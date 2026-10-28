@@ -13,6 +13,19 @@ import (
 	"github.com/google/uuid"
 )
 
+// Helper untuk mengambil nama brand dari ID brand
+func resolveBrandName(companyID, brandID string) string {
+	brandID = strings.TrimSpace(brandID)
+	if brandID == "" {
+		return ""
+	}
+	var brand models.CompanyBrand
+	if err := config.DB.Where("id = ? AND company_id = ?", brandID, companyID).First(&brand).Error; err == nil {
+		return brand.Name
+	}
+	return ""
+}
+
 // ── Master Packages (Paket Dekorasi) ──────────────────────────
 
 // CreatePackage menangani POST /api/packages
@@ -37,9 +50,14 @@ func CreatePackage(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama paket wajib diisi"})
 	}
 
+	brandID := strings.TrimSpace(req.BrandID)
+	brandName := resolveBrandName(companyID, brandID)
+
 	pkg := models.Package{
 		ID:          fmt.Sprintf("pkg_%s", uuid.New().String()[:8]),
 		CompanyID:   companyID,
+		BrandID:     brandID,
+		BrandName:   brandName,
 		Name:        strings.TrimSpace(req.Name),
 		ImageURL:    strings.TrimSpace(req.ImageURL),
 		BasePrice:   req.BasePrice,
@@ -104,6 +122,8 @@ func UpdatePackage(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.Name) != "" {
 		pkg.Name = strings.TrimSpace(req.Name)
 	}
+	pkg.BrandID = strings.TrimSpace(req.BrandID)
+	pkg.BrandName = resolveBrandName(pkg.CompanyID, pkg.BrandID)
 	pkg.ImageURL = strings.TrimSpace(req.ImageURL)
 	pkg.BasePrice = req.BasePrice
 	pkg.Description = strings.TrimSpace(req.Description)
@@ -306,6 +326,15 @@ func GetDecorationModels(c *fiber.Ctx) error {
 		query = query.Where("company_id = ?", companyID)
 	}
 
+	// Opsional filter berdasarkan brand_id
+	if qBrand := c.Query("brand_id"); qBrand != "" && qBrand != "all" {
+		if qBrand == "main" || qBrand == "default" {
+			query = query.Where("brand_id = '' OR brand_id IS NULL")
+		} else {
+			query = query.Where("brand_id = ?", qBrand)
+		}
+	}
+
 	var modelsList []models.DecorationModel
 	if err := query.Order("sort_order ASC, created_at ASC").Find(&modelsList).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data model dekorasi"})
@@ -332,6 +361,8 @@ func GetDecorationModels(c *fiber.Ctx) error {
 		resp = append(resp, models.DecorationModelResponse{
 			ID:           m.ID,
 			CompanyID:    m.CompanyID,
+			BrandID:      m.BrandID,
+			BrandName:    m.BrandName,
 			Name:         m.Name,
 			ImageURL:     m.ImageURL,
 			Price:        m.Price,
@@ -388,9 +419,14 @@ func CreateDecorationModel(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama model dekorasi wajib diisi"})
 	}
 
+	brandID := strings.TrimSpace(req.BrandID)
+	brandName := resolveBrandName(companyID, brandID)
+
 	modelItem := models.DecorationModel{
 		ID:          fmt.Sprintf("mdl_%s", uuid.New().String()[:8]),
 		CompanyID:   companyID,
+		BrandID:     brandID,
+		BrandName:   brandName,
 		Name:        strings.TrimSpace(req.Name),
 		ImageURL:    strings.TrimSpace(req.ImageURL),
 		Price:       req.Price,
@@ -453,6 +489,8 @@ func UpdateDecorationModel(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.Name) != "" {
 		modelItem.Name = strings.TrimSpace(req.Name)
 	}
+	modelItem.BrandID = strings.TrimSpace(req.BrandID)
+	modelItem.BrandName = resolveBrandName(modelItem.CompanyID, modelItem.BrandID)
 	modelItem.ImageURL = strings.TrimSpace(req.ImageURL)
 	modelItem.Price = req.Price
 	modelItem.Width = strings.TrimSpace(req.Width)

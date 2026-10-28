@@ -30,6 +30,7 @@ type CreateOrUpdateAddonRequest struct {
 
 // CreateOrUpdatePackageRequest adalah payload request untuk membuat atau mengubah paket dekorasi
 type CreateOrUpdatePackageRequest struct {
+	BrandID       string              `json:"brand_id"`
 	Name          string              `json:"name"`
 	ImageURL      string              `json:"image_url"`
 	BasePrice     float64             `json:"base_price"`
