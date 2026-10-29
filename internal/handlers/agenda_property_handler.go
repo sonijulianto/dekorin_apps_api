@@ -295,7 +295,7 @@ func UpdateAgendaPropertyItem(c *fiber.Ctx) error {
 	})
 }
 
-// DeleteAgendaPropertyItem handles DELETE /api/agendas/:id/properties/:item_id
+	// DeleteAgendaPropertyItem handles DELETE /api/agendas/:id/properties/:item_id
 func DeleteAgendaPropertyItem(c *fiber.Ctx) error {
 	agendaID := c.Params("id")
 	itemID := c.Params("item_id")
@@ -305,4 +305,86 @@ func DeleteAgendaPropertyItem(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Item pick list berhasil dihapus"})
+}
+
+// BatchAddAgendaPropertiesRequest payload untuk menambahkan banyak barang sekaligus
+type BatchAddAgendaPropertiesRequest struct {
+	Items []models.AgendaPropertyInput `json:"items"`
+	Mode  string                       `json:"mode"` // "replace" (kosongkan dulu) atau "merge" (gabungkan)
+}
+
+// BatchAddAgendaProperties handles POST /api/agendas/:id/properties/batch
+func BatchAddAgendaProperties(c *fiber.Ctx) error {
+	agendaID := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+
+	var agenda models.Agenda
+	query := config.DB.Where("id = ?", agendaID)
+	if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Agenda tidak ditemukan"})
+	}
+
+	var req BatchAddAgendaPropertiesRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
+	}
+
+	if strings.ToLower(req.Mode) == "replace" {
+		config.DB.Where("agenda_id = ?", agendaID).Delete(&models.AgendaProperty{})
+	}
+
+	for _, it := range req.Items {
+		qty := it.Qty
+		if qty <= 0 {
+			qty = 1
+		}
+
+		if req.Mode != "replace" && strings.TrimSpace(it.PropertyID) != "" {
+			var existing models.AgendaProperty
+			if err := config.DB.Where("agenda_id = ? AND property_id = ?", agendaID, it.PropertyID).First(&existing).Error; err == nil {
+				existing.Qty = qty
+				if it.Notes != "" {
+					existing.Notes = it.Notes
+				}
+				existing.UpdatedAt = time.Now()
+				config.DB.Save(&existing)
+				continue
+			}
+		}
+
+		newItem := models.AgendaProperty{
+			ID:         fmt.Sprintf("ap_%s", uuid.New().String()[:8]),
+			CompanyID:  agenda.CompanyID,
+			AgendaID:   agenda.ID,
+			PropertyID: it.PropertyID,
+			CustomName: strings.TrimSpace(it.CustomName),
+			Qty:        qty,
+			Notes:      strings.TrimSpace(it.Notes),
+			IsPacked:   it.IsPacked,
+			IsReturned: it.IsReturned,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+		config.DB.Create(&newItem)
+	}
+
+	var updatedItems []models.AgendaProperty
+	config.DB.Preload("Property").Where("agenda_id = ?", agendaID).Find(&updatedItems)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Barang berhasil ditambahkan ke pick list",
+		"data":    updatedItems,
+	})
+}
+
+// ClearAgendaProperties handles DELETE /api/agendas/:id/properties/clear
+func ClearAgendaProperties(c *fiber.Ctx) error {
+	agendaID := c.Params("id")
+	if err := config.DB.Where("agenda_id = ?", agendaID).Delete(&models.AgendaProperty{}).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengosongkan pick list: " + err.Error()})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Pick list berhasil dikosongkan"})
 }

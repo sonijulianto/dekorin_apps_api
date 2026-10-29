@@ -119,6 +119,8 @@ func main() {
 	// Agenda Pick List routes (Paperless Checklist Muat & Bongkar)
 	api.Get("/agendas/:id/properties", middleware.Protected(), handlers.GetAgendaProperties)
 	api.Post("/agendas/:id/properties/populate", middleware.Protected(), handlers.PopulateAgendaProperties)
+	api.Post("/agendas/:id/properties/batch", middleware.Protected(), handlers.BatchAddAgendaProperties)
+	api.Delete("/agendas/:id/properties/clear", middleware.Protected(), handlers.ClearAgendaProperties)
 	api.Post("/agendas/:id/properties", middleware.Protected(), handlers.AddAgendaProperty)
 	api.Put("/agendas/:id/properties/:item_id", middleware.Protected(), handlers.UpdateAgendaPropertyItem)
 	api.Patch("/agendas/:id/properties/:item_id/pack", middleware.Protected(), handlers.ToggleAgendaPropertyPacked)
