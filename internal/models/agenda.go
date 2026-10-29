@@ -32,6 +32,7 @@ type Agenda struct {
 	ClientPhone          string      `gorm:"type:varchar(50)" json:"client_phone"`
 	BackdropTitle        string      `gorm:"type:varchar(150)" json:"backdrop_title"`
 	EventDateTime        time.Time   `json:"event_date_time"`
+	EventAddress         string      `gorm:"type:text;default:''" json:"event_address"`
 	MapsURL              string      `gorm:"type:text" json:"maps_url"`
 	PackageID            string      `gorm:"type:varchar(50)" json:"package_id"`
 	PackageName          string      `gorm:"type:varchar(150)" json:"package_name"`
@@ -72,6 +73,7 @@ type CreateAgendaRequest struct {
 	ClientPhone          string  `json:"client_phone"`
 	BackdropTitle        string  `json:"backdrop_title"`
 	EventDateTime        string  `json:"event_date_time"` // Format ISO8601 atau "2006-01-02 15:04"
+	EventAddress         string  `json:"event_address"`
 	MapsURL              string  `json:"maps_url"`
 	PackageID            string  `json:"package_id"`
 	PackagePrice         float64 `json:"package_price"`
@@ -141,6 +143,17 @@ type UpdateAgendaBrandRequest struct {
 	BrandID string `json:"brand_id"`
 }
 
+// UpdateAgendaScheduleRequest adalah payload untuk mengubah jadwal agenda (tanggal & waktu)
+type UpdateAgendaScheduleRequest struct {
+	EventDateTime string `json:"event_date_time"`
+}
+
+// UpdateAgendaLocationRequest adalah payload untuk mengubah alamat dan tautan Google Maps agenda
+type UpdateAgendaLocationRequest struct {
+	EventAddress string `json:"event_address"`
+	MapsURL      string `json:"maps_url"`
+}
+
 // UpdateAgendaRequest adalah payload untuk memperbarui data agenda secara lengkap
 type UpdateAgendaRequest struct {
 	BrandID              string  `json:"brand_id"`
@@ -148,6 +161,7 @@ type UpdateAgendaRequest struct {
 	ClientPhone          string  `json:"client_phone"`
 	BackdropTitle        string  `json:"backdrop_title"`
 	EventDateTime        string  `json:"event_date_time"`
+	EventAddress         string  `json:"event_address"`
 	MapsURL              string  `json:"maps_url"`
 	PackageID            string  `json:"package_id"`
 	PackageName          string  `json:"package_name"`

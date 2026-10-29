@@ -92,6 +92,10 @@ func GetAgendas(c *fiber.Ctx) error {
 				"form_status": agendas[i].FormStatus,
 			})
 		}
+
+		if agendas[i].EventAddress == "" && agendas[i].ClientForm != nil && agendas[i].ClientForm.EventAddress != "" {
+			agendas[i].EventAddress = agendas[i].ClientForm.EventAddress
+		}
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -237,6 +241,7 @@ func CreateAgenda(c *fiber.Ctx) error {
 		ClientPhone:          strings.TrimSpace(req.ClientPhone),
 		BackdropTitle:        backdropTitle,
 		EventDateTime:        eventTime,
+		EventAddress:         strings.TrimSpace(req.EventAddress),
 		MapsURL:              mapsURL,
 		PackageID:            req.PackageID,
 		PackageName:          packageName,
@@ -890,7 +895,137 @@ func DeleteAgenda(c *fiber.Ctx) error {
 	})
 }
 
-// UpdateAgenda handles PUT /api/agendas/:id (Pembaruan lengkap agenda acara selama belum terlewat)
+// UpdateAgendaSchedule handles PUT /api/agendas/:id/schedule (Pembaruan tanggal dan jam acara selama aktif)
+func UpdateAgendaSchedule(c *fiber.Ctx) error {
+	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var req models.UpdateAgendaScheduleRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	var agenda models.Agenda
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	if strings.ToLower(agenda.Status) == "completed" || strings.ToLower(agenda.Status) == "cancelled" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai atau dibatalkan, jadwal acara tidak dapat diubah.",
+		})
+	}
+
+	timeFormats := []string{
+		time.RFC3339,
+		"2006-01-02T15:04:05",
+		"2006-01-02 15:04:05",
+		"2006-01-02 15:04",
+		"2006-01-02T15:04",
+	}
+	parsed := false
+	for _, format := range timeFormats {
+		if t, err := time.Parse(format, strings.TrimSpace(req.EventDateTime)); err == nil {
+			agenda.EventDateTime = t
+			parsed = true
+			break
+		}
+	}
+
+	if !parsed {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format tanggal dan waktu tidak valid",
+		})
+	}
+
+	agenda.UpdatedAt = time.Now()
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate jadwal agenda: " + err.Error(),
+		})
+	}
+
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Jadwal acara berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgendaLocation handles PUT /api/agendas/:id/location (Pembaruan alamat & Maps lokasi selama aktif)
+func UpdateAgendaLocation(c *fiber.Ctx) error {
+	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var req models.UpdateAgendaLocationRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+
+	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	var agenda models.Agenda
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	if strings.ToLower(agenda.Status) == "completed" || strings.ToLower(agenda.Status) == "cancelled" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Agenda sudah selesai atau dibatalkan, alamat acara tidak dapat diubah.",
+		})
+	}
+
+	agenda.EventAddress = strings.TrimSpace(req.EventAddress)
+
+	mapsURL := strings.TrimSpace(req.MapsURL)
+	if mapsURL != "" && !strings.HasPrefix(mapsURL, "http://") && !strings.HasPrefix(mapsURL, "https://") {
+		mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
+	}
+	agenda.MapsURL = mapsURL
+	agenda.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengupdate lokasi agenda: " + err.Error(),
+		})
+	}
+
+	// Sinkronkan ke ClientForm jika ada
+	if agenda.ClientForm != nil {
+		config.DB.Model(&models.ClientForm{}).Where("id = ?", agenda.ClientForm.ID).Update("event_address", agenda.EventAddress)
+		agenda.ClientForm.EventAddress = agenda.EventAddress
+	} else if agenda.EventAddress != "" {
+		config.DB.Model(&models.ClientForm{}).Where("agenda_id = ?", agenda.ID).Update("event_address", agenda.EventAddress)
+	}
+
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Alamat dan lokasi acara berhasil diperbarui",
+		"data":    agenda,
+	})
+}
+
+// UpdateAgenda handles PUT /api/agendas/:id (Pembaruan lengkap agenda acara selama agenda masih aktif)
 func UpdateAgenda(c *fiber.Ctx) error {
 	id := c.Params("id")
 	companyID := middleware.GetCompanyID(c)
@@ -915,24 +1050,13 @@ func UpdateAgenda(c *fiber.Ctx) error {
 		})
 	}
 
-	// Aturan: kalau agenda sudah selesai atau terlewat, data acara tidak dapat diubah
-	now := time.Now()
+	// Aturan: kalau agenda sudah selesai atau dibatalkan, data acara tidak dapat diubah
 	isCompleted := strings.ToLower(agenda.Status) == "completed"
 	isCancelled := strings.ToLower(agenda.Status) == "cancelled"
 
-	// Cek apakah tanggal acara sudah lewat (bandingkan dengan akhir hari tanggal acara)
-	isDatePassed := false
-	if !agenda.EventDateTime.IsZero() {
-		endOfDay := time.Date(agenda.EventDateTime.Year(), agenda.EventDateTime.Month(), agenda.EventDateTime.Day(), 23, 59, 59, 999999999, agenda.EventDateTime.Location())
-		if now.After(endOfDay) {
-			isDatePassed = true
-		}
-	}
-
-	// Jika agenda sudah selesai atau terlewat, tolak perubahan rincian
-	if isCompleted || isCancelled || isDatePassed {
+	if isCompleted || isCancelled {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Agenda sudah selesai atau tanggal acara telah terlewat, rincian acara tidak dapat diubah lagi.",
+			"error": "Agenda sudah selesai atau dibatalkan, rincian acara tidak dapat diubah lagi.",
 		})
 	}
 
@@ -964,12 +1088,23 @@ func UpdateAgenda(c *fiber.Ctx) error {
 		}
 	}
 
-	// Maps URL
-	mapsURL := strings.TrimSpace(req.MapsURL)
-	if mapsURL != "" && !strings.HasPrefix(mapsURL, "http://") && !strings.HasPrefix(mapsURL, "https://") {
-		mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
+	// Event Address
+	if req.EventAddress != "" {
+		agenda.EventAddress = strings.TrimSpace(req.EventAddress)
+		if agenda.ClientForm != nil {
+			config.DB.Model(&models.ClientForm{}).Where("id = ?", agenda.ClientForm.ID).Update("event_address", agenda.EventAddress)
+			agenda.ClientForm.EventAddress = agenda.EventAddress
+		}
 	}
-	agenda.MapsURL = mapsURL
+
+	// Maps URL
+	if req.MapsURL != "" {
+		mapsURL := strings.TrimSpace(req.MapsURL)
+		if mapsURL != "" && !strings.HasPrefix(mapsURL, "http://") && !strings.HasPrefix(mapsURL, "https://") {
+			mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
+		}
+		agenda.MapsURL = mapsURL
+	}
 
 	// Update Brand jika dipilih
 	brandID := strings.TrimSpace(req.BrandID)
