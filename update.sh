@@ -43,7 +43,7 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in superadmin client_form wedding_invitation template_floral template_luxury_grey template_khitan_green template_creamy_latte template_green_leaves; do
+for t in landing superadmin client_form wedding_invitation template_floral template_luxury_grey template_khitan_green template_creamy_latte template_green_leaves; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
 done
