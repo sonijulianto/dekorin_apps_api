@@ -371,15 +371,6 @@ func SeedDecorationModels(db *gorm.DB) {
 func SeedUsers(db *gorm.DB) {
 	defaultUsers := []models.User{
 		{
-			ID:        "usr_superadmin",
-			CompanyID: "cmp_default",
-			FullName:  "Superadmin Dekorin",
-			Phone:     "081111111111",
-			Email:     "superadmin@dekorin.com",
-			Password:  "superadmin123",
-			Role:      "superadmin",
-		},
-		{
 			ID:        "usr_owner",
 			CompanyID: "cmp_default",
 			FullName:  "Owner Dekorin",
