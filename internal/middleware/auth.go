@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"log"
+	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +10,19 @@ import (
 )
 
 // JwtSecret adalah secret key untuk enkripsi dan verifikasi JWT token
-var JwtSecret = []byte("super-secret-key-dekorin-123")
+var JwtSecret = initJwtSecret()
+
+func initJwtSecret() []byte {
+	secret := strings.TrimSpace(os.Getenv("JWT_SECRET"))
+	if secret != "" {
+		if len(secret) < 32 {
+			log.Println("⚠️ [SECURITY WARNING] JWT_SECRET is shorter than 32 characters. Consider using a 256-bit secret.")
+		}
+		return []byte(secret)
+	}
+	log.Println("⚠️ [SECURITY WARNING] JWT_SECRET is not set in environment! Using fallback key. Please configure JWT_SECRET in production.")
+	return []byte("super-secret-key-dekorin-123")
+}
 
 // Protected memvalidasi Bearer JWT token dari header Authorization
 func Protected() fiber.Handler {

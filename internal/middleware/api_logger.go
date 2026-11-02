@@ -3,6 +3,7 @@ package middleware
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -12,6 +13,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
+
+var sensitivePattern = regexp.MustCompile(`(?i)"(password|current_password|new_password|token|secret)":\s*"[^"]*"`)
+
+// sanitizePayload menyamarkan data sensitif seperti password dan token sebelum dicatat ke database
+func sanitizePayload(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	return sensitivePattern.ReplaceAllString(raw, `"$1":"***REDACTED***"`)
+}
 
 // ApiLogger merekam setiap HTTP request dan response API ke database secara asynchronous
 func ApiLogger() fiber.Handler {
@@ -35,7 +46,7 @@ func ApiLogger() fiber.Handler {
 			ipAddr = strings.Split(fwd, ",")[0]
 		}
 
-		reqBody := string(c.Body())
+		reqBody := sanitizePayload(string(c.Body()))
 		if len(reqBody) > 100000 { // Batasi 100KB agar database tetap optimal
 			reqBody = reqBody[:100000] + "... (truncated)"
 		}
@@ -45,7 +56,7 @@ func ApiLogger() fiber.Handler {
 
 		// Ambil data setelah request selesai diproses
 		statusCode := c.Response().StatusCode()
-		respBody := string(c.Response().Body())
+		respBody := sanitizePayload(string(c.Response().Body()))
 		if len(respBody) > 100000 {
 			respBody = respBody[:100000] + "... (truncated)"
 		}

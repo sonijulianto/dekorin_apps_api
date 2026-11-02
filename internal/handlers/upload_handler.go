@@ -35,6 +35,14 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
+	// Validasi ukuran file (maksimal 5MB untuk gambar)
+	const maxFileSize = 5 * 1024 * 1024 // 5 MB
+	if file.Size > maxFileSize {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Ukuran file terlalu besar. Maksimal ukuran gambar adalah 5 MB",
+		})
+	}
+
 	// Buat direktori ./uploads jika belum ada
 	uploadsDir := "./uploads"
 	if err := os.MkdirAll(uploadsDir, os.ModePerm); err != nil {

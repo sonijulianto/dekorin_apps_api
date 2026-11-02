@@ -353,6 +353,9 @@ func GetPackages(c *fiber.Ctx) error {
 
 // ReorderPackages handles PUT /api/packages/reorder
 func ReorderPackages(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var req models.ReorderPackagesRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -361,7 +364,11 @@ func ReorderPackages(c *fiber.Ctx) error {
 	}
 
 	for idx, id := range req.PackageIDs {
-		config.DB.Model(&models.Package{}).Where("id = ?", id).Update("sort_order", idx)
+		query := config.DB.Model(&models.Package{}).Where("id = ?", id)
+		if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+			query = query.Where("company_id = ?", companyID)
+		}
+		query.Update("sort_order", idx)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -385,8 +392,15 @@ func UpdateAgendaDp(c *fiber.Ctx) error {
 		})
 	}
 
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var agenda models.Agenda
-	if err := config.DB.Preload("ClientForm").Where("id = ?", id).First(&agenda).Error; err != nil {
+	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Agenda tidak ditemukan",
 		})
@@ -437,8 +451,15 @@ func UpdateAgendaPaymentStatus(c *fiber.Ctx) error {
 		})
 	}
 
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var agenda models.Agenda
-	if err := config.DB.Preload("ClientForm").Where("id = ?", id).First(&agenda).Error; err != nil {
+	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Agenda tidak ditemukan",
 		})
@@ -487,8 +508,15 @@ func UpdateAgendaStatus(c *fiber.Ctx) error {
 		})
 	}
 
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var agenda models.Agenda
-	if err := config.DB.Preload("ClientForm").Where("id = ?", id).First(&agenda).Error; err != nil {
+	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Agenda tidak ditemukan",
 		})
@@ -523,8 +551,15 @@ func UpdateAgendaTransport(c *fiber.Ctx) error {
 		})
 	}
 
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var agenda models.Agenda
-	if err := config.DB.Where("id = ?", id).First(&agenda).Error; err != nil {
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Agenda tidak ditemukan",
 		})
@@ -568,8 +603,15 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 		})
 	}
 
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var agenda models.Agenda
-	if err := config.DB.Where("id = ?", id).First(&agenda).Error; err != nil {
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Agenda tidak ditemukan",
 		})

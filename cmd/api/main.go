@@ -129,10 +129,10 @@ func main() {
 	api.Patch("/agendas/:id/properties/:item_id/return", middleware.Protected(), handlers.ToggleAgendaPropertyReturned)
 	api.Delete("/agendas/:id/properties/:item_id", middleware.Protected(), handlers.DeleteAgendaPropertyItem)
 
-	// API Logs routes (sesuai Screenshot)
-	api.Get("/apilog/get", middleware.OptionalProtected(), handlers.GetApiLogs)
-	api.Get("/apilog/:id", middleware.OptionalProtected(), handlers.GetApiLogByID)
-	api.Get("/apilogs", middleware.OptionalProtected(), handlers.GetApiLogs)
+	// API Logs routes (Hanya dapat diakses oleh Superadmin)
+	api.Get("/apilog/get", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetApiLogs)
+	api.Get("/apilog/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetApiLogByID)
+	api.Get("/apilogs", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetApiLogs)
 
 	// App Version & In-App Update routes (Hanya Superadmin yang berhak upload & atur versi)
 	api.Get("/app/version", handlers.GetLatestAppVersion)
@@ -149,8 +149,8 @@ func main() {
 	app.Static("/assets", "./web/assets")
 	app.Static("/images", "./web/assets/images")
 
-	// Upload route
-	api.Post("/upload", handlers.UploadFile)
+	// Upload route (Wajib autentikasi)
+	api.Post("/upload", middleware.Protected(), handlers.UploadFile)
 
 	// Landing Page route
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -168,7 +168,7 @@ func main() {
 	// Client Web Form routes
 	app.Get("/form/:token", handlers.ShowClientForm)             // Public HTML form view
 	api.Post("/client-form/:token", handlers.SubmitClientForm)   // Submit form API
-	api.Get("/agendas/:id/client-form", handlers.GetClientFormByAgendaID) // Fetch submitted form for Flutter app
+	api.Get("/agendas/:id/client-form", middleware.Protected(), handlers.GetClientFormByAgendaID) // Fetch submitted form for Flutter app
 
 	// Digital Invitation routes
 	app.Get("/invitation/:slug", handlers.ShowPublicInvitation) // Public HTML wedding invitation

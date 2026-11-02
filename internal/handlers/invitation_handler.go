@@ -45,10 +45,18 @@ func GetInvitations(c *fiber.Ctx) error {
 // GetInvitationByID menangani GET /api/invitations/:id
 func GetInvitationByID(c *fiber.Ctx) error {
 	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	role, _ := c.Locals("user_role").(string)
+
+	query := config.DB.Preload("Wishes").Where("id = ?", id)
+	if !strings.EqualFold(role, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
 	var invitation models.Invitation
-	if err := config.DB.Preload("Wishes").Where("id = ?", id).First(&invitation).Error; err != nil {
+	if err := query.First(&invitation).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Undangan tidak ditemukan",
+			"error": "Undangan tidak ditemukan atau Anda tidak memiliki akses",
 		})
 	}
 
@@ -216,10 +224,18 @@ func CreateInvitation(c *fiber.Ctx) error {
 // UpdateInvitation menangani PUT /api/invitations/:id
 func UpdateInvitation(c *fiber.Ctx) error {
 	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	role, _ := c.Locals("user_role").(string)
+
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(role, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
 	var invitation models.Invitation
-	if err := config.DB.Where("id = ?", id).First(&invitation).Error; err != nil {
+	if err := query.First(&invitation).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Undangan tidak ditemukan",
+			"error": "Undangan tidak ditemukan atau Anda tidak memiliki akses",
 		})
 	}
 
@@ -306,10 +322,25 @@ func UpdateInvitation(c *fiber.Ctx) error {
 // DeleteInvitation menangani DELETE /api/invitations/:id
 func DeleteInvitation(c *fiber.Ctx) error {
 	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	role, _ := c.Locals("user_role").(string)
+
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(role, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	var invitation models.Invitation
+	if err := query.First(&invitation).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Undangan tidak ditemukan atau Anda tidak memiliki akses",
+		})
+	}
+
 	// Hapus ucapan terkait terlebih dahulu
 	config.DB.Where("invitation_id = ?", id).Delete(&models.InvitationWish{})
 
-	if err := config.DB.Where("id = ?", id).Delete(&models.Invitation{}).Error; err != nil {
+	if err := config.DB.Delete(&invitation).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal menghapus undangan",
 		})

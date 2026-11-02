@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"dekorin_apps_api/internal/config"
+	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -373,6 +374,20 @@ func SubmitClientForm(c *fiber.Ctx) error {
 // GetClientFormByAgendaID menangani GET /api/agendas/:id/client-form (Dipanggil dari Flutter)
 func GetClientFormByAgendaID(c *fiber.Ctx) error {
 	agendaID := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	// Verifikasi hak akses agenda sesuai tenant
+	var agenda models.Agenda
+	agendaQuery := config.DB.Where("id = ?", agendaID)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		agendaQuery = agendaQuery.Where("company_id = ?", companyID)
+	}
+	if err := agendaQuery.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan atau Anda tidak memiliki akses",
+		})
+	}
 
 	var clientForm models.ClientForm
 	if err := config.DB.Where("agenda_id = ?", agendaID).First(&clientForm).Error; err != nil {

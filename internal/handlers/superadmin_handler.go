@@ -92,16 +92,9 @@ func SuperadminLogin(c *fiber.Ctx) error {
 
 	// Verifikasi Password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(rawPassword)); err != nil {
-		// Recovery otomatis jika login dengan default superadmin & default password
-		if (user.Phone == "081111111111" || user.Email == "superadmin@dekorin.com") && rawPassword == "superadmin123" {
-			newHash, _ := bcrypt.GenerateFromPassword([]byte("superadmin123"), bcrypt.DefaultCost)
-			config.DB.Model(&user).Update("password", string(newHash))
-			user.Password = string(newHash)
-		} else {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Password yang Anda masukkan salah",
-			})
-		}
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Password yang Anda masukkan salah",
+		})
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -125,7 +118,7 @@ func SuperadminLogin(c *fiber.Ctx) error {
 		Name:     "superadmin_token",
 		Value:    tokenString,
 		Expires:  time.Now().Add(time.Hour * 24 * 7),
-		HTTPOnly: false,
+		HTTPOnly: true,
 		SameSite: "Lax",
 	})
 

@@ -269,6 +269,11 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	// Update password jika diisi
 	if strings.TrimSpace(req.Password) != "" {
+		if isSelf {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Untuk keamanan, silakan gunakan menu Ubah Password (/api/auth/change-password) untuk mengganti password akun Anda sendiri",
+			})
+		}
 		if len(strings.TrimSpace(req.Password)) < 6 {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Password baru minimal 6 karakter",

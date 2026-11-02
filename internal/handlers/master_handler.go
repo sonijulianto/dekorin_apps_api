@@ -207,13 +207,20 @@ func GetAddons(c *fiber.Ctx) error {
 
 // ReorderAddons menangani PUT /api/addons/reorder
 func ReorderAddons(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var req models.ReorderAddonsRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
 	}
 
 	for idx, id := range req.AddonIDs {
-		config.DB.Model(&models.Addon{}).Where("id = ?", id).Update("sort_order", idx)
+		query := config.DB.Model(&models.Addon{}).Where("id = ?", id)
+		if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+			query = query.Where("company_id = ?", companyID)
+		}
+		query.Update("sort_order", idx)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -394,13 +401,20 @@ func GetDecorationModels(c *fiber.Ctx) error {
 
 // ReorderDecorationModels menangani PUT /api/decoration-models/reorder
 func ReorderDecorationModels(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
 	var req models.ReorderDecorationModelsRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format request tidak valid"})
 	}
 
 	for idx, id := range req.ModelIDs {
-		config.DB.Model(&models.DecorationModel{}).Where("id = ?", id).Update("sort_order", idx+1)
+		query := config.DB.Model(&models.DecorationModel{}).Where("id = ?", id)
+		if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+			query = query.Where("company_id = ?", companyID)
+		}
+		query.Update("sort_order", idx+1)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
