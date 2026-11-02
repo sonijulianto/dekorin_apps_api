@@ -62,8 +62,12 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
-	// Buat URL lengkap yang bisa diakses publik
-	fileURL := fmt.Sprintf("%s://%s/uploads/%s", c.Protocol(), c.Hostname(), filename)
+	// Buat URL lengkap yang bisa diakses publik (mendukung HTTPS di balik reverse proxy Nginx/Cloudflare)
+	proto := strings.TrimSpace(c.Get("X-Forwarded-Proto"))
+	if proto == "" {
+		proto = c.Protocol()
+	}
+	fileURL := fmt.Sprintf("%s://%s/uploads/%s", proto, c.Hostname(), filename)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message":  "File gambar berhasil diunggah",

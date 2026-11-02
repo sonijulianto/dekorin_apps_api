@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var sensitivePattern = regexp.MustCompile(`(?i)"(password|current_password|new_password|token|secret)":\s*"[^"]*"`)
+var sensitivePattern = regexp.MustCompile(`(?i)"(password|current_password|new_password|token|edit_token|edit_pin|pin|secret)":\s*"[^"]*"`)
 
 // sanitizePayload menyamarkan data sensitif seperti password dan token sebelum dicatat ke database
 func sanitizePayload(raw string) string {
@@ -33,6 +33,9 @@ func ApiLogger() fiber.Handler {
 		if strings.HasPrefix(path, "/api/apilog") ||
 			strings.HasPrefix(path, "/uploads") ||
 			strings.HasPrefix(path, "/assets") ||
+			strings.HasPrefix(path, "/images") ||
+			strings.HasPrefix(path, "/kelola") ||
+			strings.HasPrefix(path, "/manage") ||
 			path == "/" ||
 			path == "/superadmin" {
 			return c.Next()

@@ -43,7 +43,7 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in landing superadmin client_form wedding_invitation template_floral template_luxury_grey template_khitan_green template_creamy_latte template_green_leaves; do
+for t in landing superadmin client_form invitation_portal wedding_invitation template_floral template_luxury_grey template_khitan_green template_creamy_latte template_green_leaves; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
 done
@@ -67,6 +67,53 @@ if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
             fi
         fi
     done
+    # 6b. Pastikan virtual host subdomain undangan.dekorin.my.id terdaftar di Nginx
+    if ! grep -rq "undangan.dekorin.my.id" /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null; then
+        echo "🌐 Menambahkan konfigurasi Nginx untuk subdomain undangan.dekorin.my.id..."
+        UNDANGAN_CONF="/etc/nginx/sites-available/undangan-dekorin"
+        if [ ! -d "/etc/nginx/sites-available" ]; then
+            UNDANGAN_CONF="/etc/nginx/conf.d/undangan-dekorin.conf"
+        fi
+        SSL_BLOCK=""
+        if [ -f "/etc/letsencrypt/live/undangan.dekorin.my.id/fullchain.pem" ]; then
+            SSL_BLOCK="    listen 443 ssl;\n    ssl_certificate /etc/letsencrypt/live/undangan.dekorin.my.id/fullchain.pem;\n    ssl_certificate_key /etc/letsencrypt/live/undangan.dekorin.my.id/privkey.pem;"
+        elif [ -f "/etc/letsencrypt/live/dekorin.my.id/fullchain.pem" ]; then
+            SSL_BLOCK="    listen 443 ssl;\n    ssl_certificate /etc/letsencrypt/live/dekorin.my.id/fullchain.pem;\n    ssl_certificate_key /etc/letsencrypt/live/dekorin.my.id/privkey.pem;"
+        fi
+        sudo bash -c "cat > $UNDANGAN_CONF" <<EOF
+server {
+    listen 80;
+$(printf "%b" "$SSL_BLOCK")
+    server_name undangan.dekorin.my.id;
+    client_max_body_size 150M;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+    }
+}
+EOF
+        if [ -d "/etc/nginx/sites-enabled" ] && [ "$UNDANGAN_CONF" = "/etc/nginx/sites-available/undangan-dekorin" ]; then
+            sudo ln -sf "$UNDANGAN_CONF" /etc/nginx/sites-enabled/undangan-dekorin
+        fi
+        if ! sudo nginx -t >/dev/null 2>&1; then
+            echo "⚠️  Validasi Nginx gagal untuk conf baru, membatalkan conf tambahan agar server tetap aman..."
+            sudo rm -f /etc/nginx/sites-enabled/undangan-dekorin "$UNDANGAN_CONF"
+        fi
+    fi
+
     sudo nginx -t >/dev/null 2>&1 && sudo systemctl reload nginx 2>/dev/null || true
 fi
 

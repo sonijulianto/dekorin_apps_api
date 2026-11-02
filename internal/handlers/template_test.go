@@ -113,3 +113,41 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		})
 	}
 }
+
+func TestInvitationPortalHelpers(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+	portalPath := filepath.Join(wd, "..", "..", "web", "templates", "invitation_portal.html")
+	info, err := os.Stat(portalPath)
+	if err != nil || info.Size() == 0 {
+		t.Fatalf("invitation_portal.html missing or empty: %v", err)
+	}
+
+	tok := generateEditToken()
+	if len(tok) < 32 {
+		t.Fatalf("generateEditToken entropy too short: %s", tok)
+	}
+
+	pin := generateEditPin()
+	if len(pin) != 6 {
+		t.Fatalf("generateEditPin expected 6 digits, got: %s", pin)
+	}
+
+	cases := map[string]string{
+		"Bagas Zulia":                                      "bagas-zulia",
+		"https://undangan.dekorin.my.id/bagas-zulia?to=AB": "bagas-zulia",
+		"https://dekorin.my.id/invitation/romeo_juliet/":   "romeo-juliet",
+	}
+	for input, expected := range cases {
+		got := sanitizeInvitationSlug(input)
+		if got != expected {
+			t.Errorf("sanitizeInvitationSlug(%q) = %q, expected %q", input, got, expected)
+		}
+	}
+
+	if !isReservedInvitationSlug("kelola") || !isReservedInvitationSlug("api") {
+		t.Errorf("Expected reserved slugs to be blocked")
+	}
+}

@@ -74,6 +74,11 @@ type Invitation struct {
 	EventPhoto   string `gorm:"type:text" json:"event_photo"`   // event.jpeg (Foto kartu countdown event)
 	ClosingPhoto string `gorm:"type:text" json:"closing_photo"` // closing.jpeg (Foto penutup / thank you)
 
+	// Akses Portal Mandiri Pengantin / Tuan Rumah (undangan.dekorin.my.id)
+	EditToken     string `gorm:"type:varchar(100);index;default:''" json:"edit_token"` // Token rahasia kelola mandiri (32+ char)
+	EditPin       string `gorm:"type:varchar(20);default:''" json:"edit_pin"`          // PIN 6 digit login manual
+	GuestListJSON string `gorm:"type:text" json:"guest_list_json"`                     // Daftar tamu generator WA tersimpan (JSON)
+
 	IsActive  bool      `gorm:"default:true" json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -152,4 +157,15 @@ type SubmitWishRequest struct {
 	Attendance string `json:"attendance"`
 	GuestCount int    `json:"guest_count"`
 	Message    string `json:"message"`
+}
+
+// PortalLoginRequest payload login manual portal pengantin menggunakan Slug & PIN
+type PortalLoginRequest struct {
+	Slug string `json:"slug"`
+	Pin  string `json:"pin"`
+}
+
+// SavePortalGuestsRequest payload penyimpanan daftar nama tamu generator WA di portal pengantin
+type SavePortalGuestsRequest struct {
+	GuestListJSON string `json:"guest_list_json"`
 }

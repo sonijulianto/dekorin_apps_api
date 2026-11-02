@@ -192,8 +192,11 @@ func main() {
 	// Upload route (Wajib autentikasi)
 	api.Post("/upload", middleware.Protected(), handlers.UploadFile)
 
-	// Landing Page route
+	// Landing Page route (atau Portal Pengantin jika diakses dari subdomain undangan.dekorin.my.id)
 	app.Get("/", func(c *fiber.Ctx) error {
+		if handlers.IsInvitationSubdomain(c) {
+			return handlers.ShowInvitationPortalPage(c)
+		}
 		return c.SendFile("./web/templates/landing.html")
 	})
 
@@ -210,15 +213,47 @@ func main() {
 	api.Post("/client-form/:token", formLimiter, handlers.SubmitClientForm)   // Submit form API
 	api.Get("/agendas/:id/client-form", middleware.Protected(), handlers.GetClientFormByAgendaID) // Fetch submitted form for Flutter app
 
+	// Rate Limiter khusus Portal Kelola Undangan Pengantin (90 req/menit agar upload banyak foto galeri lancar)
+	portalLimiter := limiter.New(limiter.Config{
+		Max:          90,
+		Expiration:   1 * time.Minute,
+		KeyGenerator: clientIP,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Terlalu banyak permintaan dalam waktu singkat. Silakan tunggu beberapa detik.",
+			})
+		},
+	})
+
+	// Portal Mandiri Pengantin / Tuan Rumah Acara (undangan.dekorin.my.id)
+	app.Get("/login", handlers.ShowInvitationPortalPage)
+	app.Get("/kelola-undangan", handlers.ShowInvitationPortalPage)
+	app.Get("/kelola", handlers.ShowInvitationPortalPage)
+	app.Get("/kelola/:token", portalLimiter, handlers.ShowInvitationPortalPage)
+	app.Get("/manage", handlers.ShowInvitationPortalPage)
+	app.Get("/manage/:token", portalLimiter, handlers.ShowInvitationPortalPage)
+
+	portalApi := api.Group("/invitation-portal")
+	portalApi.Post("/login", loginLimiter, handlers.PortalLogin)
+	portalApi.Get("/:token", portalLimiter, handlers.GetPortalInvitation)
+	portalApi.Put("/:token", portalLimiter, handlers.UpdatePortalInvitation)
+	portalApi.Put("/:token/guests", portalLimiter, handlers.SavePortalGuestList)
+	portalApi.Post("/:token/upload", portalLimiter, handlers.UploadPortalMedia)
+	portalApi.Get("/:token/export-csv", portalLimiter, handlers.ExportPortalWishesCSV)
+
 	// Digital Invitation routes
 	app.Get("/invitation/:slug", handlers.ShowPublicInvitation) // Public HTML wedding invitation
 	api.Get("/invitations", middleware.Protected(), handlers.GetInvitations)
 	api.Post("/invitations", middleware.Protected(), handlers.CreateInvitation)
 	api.Get("/invitations/:id", middleware.Protected(), handlers.GetInvitationByID)
 	api.Put("/invitations/:id", middleware.Protected(), handlers.UpdateInvitation)
+	api.Post("/invitations/:id/reset-access", middleware.Protected(), handlers.ResetInvitationAccess)
 	api.Delete("/invitations/:id", middleware.Protected(), handlers.DeleteInvitation)
 	api.Get("/invitations/:id/wishes", handlers.GetInvitationWishes)
 	api.Post("/invitations/:slug/wishes", handlers.SubmitInvitationWish)
+
+	// Short-URL undangan publik khusus subdomain undangan.dekorin.my.id/:slug (wajib paling akhir)
+	app.Get("/:slug", handlers.ShowSubdomainPublicInvitation)
 
 	// Start server (default port 3000 or from environment variable)
 	port := os.Getenv("PORT")

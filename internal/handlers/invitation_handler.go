@@ -18,11 +18,14 @@ import (
 // GetInvitations menangani GET /api/invitations (daftar undangan untuk admin)
 func GetInvitations(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
-	role, _ := c.Locals("role").(string)
+	role, _ := c.Locals("user_role").(string)
+	if role == "" {
+		role, _ = c.Locals("role").(string)
+	}
 
 	var invitations []models.Invitation
 	query := config.DB.Model(&models.Invitation{}).Preload("Wishes")
-	if role == "superadmin" {
+	if strings.EqualFold(role, "superadmin") {
 		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
 			query = query.Where("company_id = ?", qComp)
 		}
@@ -34,6 +37,10 @@ func GetInvitations(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil daftar undangan: " + err.Error(),
 		})
+	}
+
+	for i := range invitations {
+		ensureInvitationAccessCredentials(&invitations[i])
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -59,6 +66,8 @@ func GetInvitationByID(c *fiber.Ctx) error {
 			"error": "Undangan tidak ditemukan atau Anda tidak memiliki akses",
 		})
 	}
+
+	ensureInvitationAccessCredentials(&invitation)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil detail undangan",
@@ -206,6 +215,8 @@ func CreateInvitation(c *fiber.Ctx) error {
 		ResepsiPhoto:    req.ResepsiPhoto,
 		EventPhoto:      req.EventPhoto,
 		ClosingPhoto:    req.ClosingPhoto,
+		EditToken:       generateEditToken(),
+		EditPin:         generateEditPin(),
 		IsActive:        isActive,
 	}
 
@@ -305,6 +316,12 @@ func UpdateInvitation(c *fiber.Ctx) error {
 	invitation.ClosingPhoto = req.ClosingPhoto
 	if req.IsActive != nil {
 		invitation.IsActive = *req.IsActive
+	}
+	if strings.TrimSpace(invitation.EditToken) == "" {
+		invitation.EditToken = generateEditToken()
+	}
+	if strings.TrimSpace(invitation.EditPin) == "" {
+		invitation.EditPin = generateEditPin()
 	}
 
 	if err := config.DB.Save(&invitation).Error; err != nil {
@@ -454,6 +471,12 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 	var invitation models.Invitation
 	if err := config.DB.Where("slug = ?", slug).First(&invitation).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("Undangan tidak ditemukan atau tautan salah.")
+	}
+
+	// Jika undangan dinonaktifkan sementara (Draft) dan bukan mode preview portal
+	if !invitation.IsActive && c.Query("preview") != "1" {
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.Status(fiber.StatusOK).SendString(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Undangan Sedang Disiapkan</title><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF7F2;font-family:'Plus Jakarta Sans',sans-serif;padding:24px;"><div style="max-width:420px;background:#fff;border:1px solid rgba(212,165,116,0.3);border-radius:24px;padding:32px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.04);"><div style="font-size:40px;margin-bottom:12px;">✨</div><h1 style="margin:0 0 8px;font-size:20px;color:#2C2C2C;">Undangan Sedang Disiapkan</h1><p style="margin:0;font-size:14px;color:#64748B;line-height:1.6;">Tautan undangan ini sedang dalam tahap penyempurnaan oleh tuan rumah. Silakan kunjungi kembali nanti.</p></div></body></html>`)
 	}
 
 	if strings.TrimSpace(invitation.Template) == "" {

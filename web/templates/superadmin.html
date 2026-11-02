@@ -5193,6 +5193,10 @@
                         </td>
                         <td class="py-3 px-5 text-right">
                             <div class="inline-flex items-center gap-1">
+                                <button onclick="shareClientPortalAccess('${inv.id}')" title="Salin Akses Web Kelola Pengantin (Link & PIN)"
+                                    class="w-7 h-7 rounded-lg bg-[#F9F3EC] hover:bg-[#D4A574] hover:text-white text-[#C59563] border border-[#D4A574]/30 inline-flex items-center justify-center transition text-xs font-bold">
+                                    🔑
+                                </button>
                                 <a href="/invitation/${inv.slug}" target="_blank" title="Buka Web Undangan"
                                     class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#D4A574]/20 hover:text-[#C59563] text-slate-600 inline-flex items-center justify-center transition text-xs font-bold">
                                     👁️
@@ -5213,9 +5217,22 @@
         }
 
         function copyInvitationLink(slug) {
-            const url = window.location.origin + '/invitation/' + slug;
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const url = isLocal ? (window.location.origin + '/invitation/' + slug) : ('https://undangan.dekorin.my.id/' + slug);
             navigator.clipboard.writeText(url);
-            alert('Tautan undangan disalin:\n' + url);
+            alert('Tautan publik undangan disalin:\n' + url);
+        }
+
+        function shareClientPortalAccess(invId) {
+            const inv = (invitationsCache || []).find(i => i.id === invId);
+            if (!inv) return;
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const domainBase = isLocal ? window.location.origin : 'https://undangan.dekorin.my.id';
+            const publicUrl = isLocal ? `${domainBase}/invitation/${inv.slug}` : `${domainBase}/${inv.slug}`;
+            const manageUrl = `${domainBase}/kelola/${inv.edit_token || ''}`;
+            const msg = `Halo Kak! Berikut akses mandiri untuk mengelola Website Undangan Digital Anda:\n\n*${inv.title || inv.slug}*\n\n🔗 *Link Kelola Langsung (1-Klik):*\n${manageUrl}\n\n🔐 *Atau Login Manual di ${domainBase}:*\n• Kode Undangan: ${inv.slug}\n• PIN Akses: ${inv.edit_pin || '-'}\n\n🌐 *Link Publik Undangan:*\n${publicUrl}\n\nMelalui link kelola di atas, Kakak bisa mengedit data acara, foto, melihat konfirmasi kehadiran (RSVP), serta membuat nama tamu WhatsApp secara mandiri.`;
+            navigator.clipboard.writeText(msg);
+            alert('Pesan Akses Portal Pengantin berhasil disalin ke Clipboard!\nSilakan tempel (Paste) ke WhatsApp Klien:\n\n' + msg);
         }
 
         function switchInvTab(tabName) {
