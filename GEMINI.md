@@ -49,7 +49,7 @@
 - **Defensive Parsing (`fromJson`) di Flutter**:
   - Semua model di `dekorin_apps/lib/data/models/` wajib menggunakan *null-safe fallback* (mis. `json['field'] ?? ''`, `(json['price'] as num?)?.toDouble() ?? 0.0`) dan dilarang menggunakan *hard cast* tanpa nullable agar data lama di database tidak pernah menyebabkan *crash* / layar merah di aplikasi user.
 - **Checklist Wajib Sebelum Build APK Release (`dekorin_apps`)**:
-  - Pastikan `ApiEndpoint.baseUrl` di `dekorin_apps/lib/data/datasources/remote/api_endpoint.dart` mengarah ke URL production (`https://103.150.191.59.sslip.io/api`), bukan `localhost` atau IP lokal.
+  - Pastikan `ApiEndpoint.baseUrl` di `dekorin_apps/lib/data/datasources/remote/api_endpoint.dart` mengarah ke URL production (`https://dekorin.my.id/api`), bukan `localhost` atau IP lokal.
   - Naikkan `version` dan `build number` di `dekorin_apps/pubspec.yaml` setiap kali membuat rilis APK baru agar fitur In-App / OTA Update berjalan semestinya.
   - Wajib menjalankan `flutter analyze` dan memastikan **0 error** sebelum menjalankan `flutter build apk --release`.
   - Jika rilis membutuhkan perubahan endpoint/database baru, **backend wajib di-deploy ke VPS terlebih dahulu** sebelum APK baru didistribusikan ke user.

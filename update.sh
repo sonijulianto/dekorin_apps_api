@@ -88,5 +88,5 @@ fi
 
 echo "========================================"
 echo "✅ UPDATE BERHASIL & SELESAI!"
-echo "🌐 Silakan buka: https://103.150.191.59.sslip.io/superadmin"
+echo "🌐 Silakan buka: https://dekorin.my.id/superadmin"
 echo "========================================"

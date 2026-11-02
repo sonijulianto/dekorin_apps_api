@@ -733,7 +733,7 @@ func SeedAppVersion(db *gorm.DB) {
 			VersionName:    "1.0.0",
 			VersionCode:    1,
 			MinVersionCode: 1,
-			DownloadURL:    "https://103.150.191.59.sslip.io/uploads/apks/dekorin-latest.apk",
+			DownloadURL:    "https://dekorin.my.id/uploads/apks/dekorin-latest.apk",
 			ReleaseNotes:   "• Rilis awal Dekorin App\n• Manajemen agenda, master paket, & undangan digital",
 			ForceUpdate:    false,
 			CreatedAt:      time.Now(),
