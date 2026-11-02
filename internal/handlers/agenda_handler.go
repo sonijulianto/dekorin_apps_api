@@ -190,9 +190,9 @@ func CreateAgenda(c *fiber.Ctx) error {
 		}
 	}
 
-	// Buat Agenda ID & Form Token baru
+	// Buat Agenda ID & Form Token baru (Form Token 32-karakter acak berentropi tinggi untuk cegah brute-force)
 	agendaID := fmt.Sprintf("agd_%s", uuid.New().String()[:8])
-	formToken := uuid.New().String()[:8]
+	formToken := strings.ReplaceAll(uuid.New().String(), "-", "")
 	companyID := middleware.GetCompanyID(c)
 	userRole, _ := c.Locals("user_role").(string)
 	if strings.EqualFold(userRole, "superadmin") {

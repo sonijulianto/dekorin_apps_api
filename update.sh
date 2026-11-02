@@ -51,9 +51,9 @@ done
 # 5. Icons
 curl -s -f -L -o web/assets/icons/google-maps-icon.webp "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/google-maps-icon.webp?v=$TIMESTAMP"
 
-# 6. Konfigurasi Nginx: Naikkan limit upload body agar file APK besar tidak terkena 413
+# 6. Konfigurasi Nginx: Limit upload 150M & HTTP Security Headers
 if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
-    echo "⚙️  Mengonfigurasi client_max_body_size 150M di Nginx..."
+    echo "⚙️  Mengonfigurasi client_max_body_size 150M & Security Headers di Nginx..."
     if ! grep -q "client_max_body_size" /etc/nginx/nginx.conf; then
         sudo sed -i '/http {/a \    client_max_body_size 150M;' /etc/nginx/nginx.conf 2>/dev/null || true
     else
@@ -62,6 +62,9 @@ if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
     for f in /etc/nginx/sites-available/* /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*; do
         if [ -f "$f" ]; then
             sudo sed -i 's/client_max_body_size [0-9]\+[kKmMgG]\+;/client_max_body_size 150M;/g' "$f" 2>/dev/null || true
+            if ! grep -q "X-Content-Type-Options" "$f"; then
+                sudo sed -i '/server_name/a \    add_header X-Content-Type-Options "nosniff" always;\n    add_header X-Frame-Options "SAMEORIGIN" always;\n    add_header X-XSS-Protection "1; mode=block" always;\n    add_header Referrer-Policy "strict-origin-when-cross-origin" always;' "$f" 2>/dev/null || true
+            fi
         fi
     done
     sudo nginx -t >/dev/null 2>&1 && sudo systemctl reload nginx 2>/dev/null || true

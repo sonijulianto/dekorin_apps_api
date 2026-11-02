@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"dekorin_apps_api/internal/config"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -32,17 +34,55 @@ func main() {
 	app.Use(cors.New())   // Enable CORS for all origins
 	app.Use(middleware.ApiLogger()) // Automatic API Request & Response Logger
 
+	// Helper untuk mendeteksi IP klien secara akurat (termasuk di balik reverse proxy Nginx)
+	clientIP := func(c *fiber.Ctx) string {
+		if xff := c.Get("X-Forwarded-For"); xff != "" {
+			parts := strings.Split(xff, ",")
+			return strings.TrimSpace(parts[0])
+		}
+		if xRealIP := c.Get("X-Real-IP"); xRealIP != "" {
+			return xRealIP
+		}
+		return c.IP()
+	}
+
+	// Rate Limiter anti brute-force untuk endpoint login (maksimal 10 request per menit per IP)
+	loginLimiter := limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: clientIP,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Terlalu banyak percobaan login. Silakan tunggu 1 menit sebelum mencoba kembali.",
+			})
+		},
+	})
+
+	// Rate Limiter untuk form booking klien (maksimal 30 request per menit per IP)
+	formLimiter := limiter.New(limiter.Config{
+		Max:        30,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: clientIP,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Terlalu banyak permintaan ke formulir klien. Silakan coba beberapa saat lagi.",
+			})
+		},
+	})
+
 	// Group routes
 	api := app.Group("/api")
 	auth := api.Group("/auth")
 
 	// Routes
-	auth.Post("/login", handlers.Login)
+	auth.Post("/login", loginLimiter, handlers.Login)
 	auth.Post("/change-password", middleware.Protected(), handlers.ChangePassword)
 
 	// Superadmin / Web Admin routes (dapat diakses superadmin, owner, dan admin)
 	superadmin := api.Group("/superadmin")
-	superadmin.Post("/login", handlers.SuperadminLogin)
+	superadmin.Post("/login", loginLimiter, handlers.SuperadminLogin)
 	superadmin.Get("/me", middleware.Protected(), handlers.GetCurrentUserProfile)
 	superadmin.Get("/dashboard-stats", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.GetSuperadminDashboardStats)
 	superadmin.Get("/companies", middleware.Protected(), middleware.RequireRole("superadmin", "owner", "admin"), handlers.GetAllCompanies)
@@ -165,9 +205,9 @@ func main() {
 		return c.SendFile("./web/templates/superadmin.html")
 	})
 
-	// Client Web Form routes
-	app.Get("/form/:token", handlers.ShowClientForm)             // Public HTML form view
-	api.Post("/client-form/:token", handlers.SubmitClientForm)   // Submit form API
+	// Client Web Form routes (dengan rate limit untuk mencegah brute force token)
+	app.Get("/form/:token", formLimiter, handlers.ShowClientForm)             // Public HTML form view
+	api.Post("/client-form/:token", formLimiter, handlers.SubmitClientForm)   // Submit form API
 	api.Get("/agendas/:id/client-form", middleware.Protected(), handlers.GetClientFormByAgendaID) // Fetch submitted form for Flutter app
 
 	// Digital Invitation routes
