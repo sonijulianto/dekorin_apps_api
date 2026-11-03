@@ -189,6 +189,17 @@ func main() {
 	app.Static("/assets", "./web/assets")
 	app.Static("/images", "./web/assets/images")
 
+	// Direct Favicon handlers for root domain queries
+	app.Get("/favicon.ico", func(c *fiber.Ctx) error {
+		return c.SendFile("./web/assets/favicon.ico")
+	})
+	app.Get("/favicon.png", func(c *fiber.Ctx) error {
+		return c.SendFile("./web/assets/favicon.png")
+	})
+	app.Get("/apple-touch-icon.png", func(c *fiber.Ctx) error {
+		return c.SendFile("./web/assets/apple-touch-icon.png")
+	})
+
 	// Upload route (Wajib autentikasi)
 	api.Post("/upload", middleware.Protected(), handlers.UploadFile)
 

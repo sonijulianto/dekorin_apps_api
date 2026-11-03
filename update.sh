@@ -71,8 +71,12 @@ for n in 1 2 3 4 5 6; do
     curl -s -f -L -o "web/assets/templates/ta3/photos/gallery-${n}.jpg" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ta3/photos/gallery-${n}.jpg?v=$TIMESTAMP" || true
 done
 
-# 5. Icons
+# 5. Icons & Branding
 curl -s -f -L -o web/assets/icons/google-maps-icon.webp "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/google-maps-icon.webp?v=$TIMESTAMP"
+curl -s -f -L -o web/assets/favicon.ico "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.ico?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/favicon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.png?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/apple-touch-icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/apple-touch-icon.png?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/logo_icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/logo_icon.png?v=$TIMESTAMP" || true
 
 # 6. Konfigurasi Nginx: Limit upload 150M & HTTP Security Headers
 if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
