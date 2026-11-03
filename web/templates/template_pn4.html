@@ -2008,8 +2008,13 @@
                     <div class="fixed-bg-slide{{ if eq $idx 0 }} active{{ end }}" style="background-image: url('{{ $img }}');"></div>
                     {{ end }}
                 {{ end }}
-            {{ else if $customCover }}
-                <div class="fixed-bg-slide active" style="background-image: url('{{ $customCover }}');"></div>
+                {{ if lt (len .GalleryList) 3 }}
+                    {{ if .Sec1Photo }}<div class="fixed-bg-slide" style="background-image: url('{{ .Sec1Photo }}');"></div>{{ end }}
+                    {{ if .EventPhoto }}<div class="fixed-bg-slide" style="background-image: url('{{ .EventPhoto }}');"></div>{{ end }}
+                    {{ if .ClosingPhoto }}<div class="fixed-bg-slide" style="background-image: url('{{ .ClosingPhoto }}');"></div>{{ end }}
+                {{ end }}
+            {{ else if or $customCover .Sec1Photo .BridePhoto .GroomPhoto }}
+                <div class="fixed-bg-slide active" style="background-image: url('{{ if $customCover }}{{ $customCover }}{{ else if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}{{ .BridePhoto }}{{ end }}');"></div>
                 {{ if .Sec1Photo }}<div class="fixed-bg-slide" style="background-image: url('{{ .Sec1Photo }}');"></div>{{ end }}
                 {{ if .EventPhoto }}<div class="fixed-bg-slide" style="background-image: url('{{ .EventPhoto }}');"></div>{{ end }}
                 {{ if .ClosingPhoto }}<div class="fixed-bg-slide" style="background-image: url('{{ .ClosingPhoto }}');"></div>{{ end }}
@@ -2283,6 +2288,7 @@
 
             <!-- SECTION 4: #GALLERY & #cerita (Solid #6E6E6E) -->
             <section class="sec-grey-solid">
+                {{ if or .GalleryList .YoutubeEmbedURL }}
                 <div id="GALLERY">
                     <div class="pn4-dual-heading light pn-anim anim-zoomIn">
                         <span class="pn4-script-sub">Our</span>
@@ -2301,25 +2307,11 @@
                             {{ range .GalleryList }}
                             <span data-src="{{ . }}"></span>
                             {{ end }}
-                        {{ else }}
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi18.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi12.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi2.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi17.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi14.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi13.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi1.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi10.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi8.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi7.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi6.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi5.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi4.jpeg"></span>
-                            <span data-src="/assets/templates/pn4/photos/LeniArdi3.jpeg"></span>
                         {{ end }}
                     </div>
                     <div class="pn4-justified-gallery" id="pn4JustifiedGallery"></div>
                 </div>
+                {{ end }}
 
                 <!-- #cerita Love Story -->
                 {{ if ne .EventType "khitan" }}
@@ -2340,9 +2332,9 @@
             <section id="gift">
                 <div class="pn4-gift-polaroids">
                     <div class="pn4-polaroid left pn-anim anim-fadeInLeft" id="giftPolLeft"
-                         style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}/assets/templates/pn4/photos/LeniArdi5.jpeg{{ end }}');"></div>
+                         style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else if $customCover }}{{ $customCover }}{{ else }}/assets/templates/pn4/photos/LeniArdi5.jpeg{{ end }}');"></div>
                     <div class="pn4-polaroid right pn-anim anim-fadeInRight" id="giftPolRight"
-                         style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else }}/assets/templates/pn4/photos/LeniArdi1.jpeg{{ end }}');"></div>
+                         style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else if $customCover }}{{ $customCover }}{{ else }}/assets/templates/pn4/photos/LeniArdi1.jpeg{{ end }}');"></div>
                 </div>
 
                 <svg class="pn4-gift-main-icon pn-anim anim-zoomIn" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg"><path d="M425.7,77.369H398.424A53.658,53.658,0,0,0,350.263,0a73.108,73.108,0,0,0-73.026,73.026v4.343H249.21V73.026A73.108,73.108,0,0,0,176.184,0a53.658,53.658,0,0,0-48.161,77.369H94.3a55.682,55.682,0,0,0-55.619,55.618V464.381A55.682,55.682,0,0,0,94.3,520H425.7a55.682,55.682,0,0,0,55.619-55.619V132.987A55.682,55.682,0,0,0,425.7,77.369ZM212.763,490H94.3a25.648,25.648,0,0,1-25.619-25.619V132.987A25.648,25.648,0,0,1,94.3,107.369h118.46ZM219.21,77.369H176.184a23.685,23.685,0,0,1,0-47.369A43.075,43.075,0,0,1,219.21,73.026ZM277.237,490H242.763V107.369h34.474Zm30-416.974A43.076,43.076,0,0,1,350.263,30a23.685,23.685,0,0,1,0,47.369H307.237ZM451.316,464.381A25.648,25.648,0,0,1,425.7,490H307.237V107.369H425.7a25.648,25.648,0,0,1,25.619,25.618Z"></path><path d="M426.189,349.915A40.339,40.339,0,0,0,380,342.265a40.221,40.221,0,0,0-48.023,62.574c.487.688,37.327,37.633,37.327,37.633a15.179,15.179,0,0,0,21.392,0s36.84-36.945,37.327-37.633a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.634L380,410.742l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M426.189,169.907A40.341,40.341,0,0,0,380,162.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.635L380,230.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M186.189,349.907A40.341,40.341,0,0,0,140,342.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.635L140,410.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M140,162.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924h0A40.341,40.341,0,0,0,140,162.258Zm25.012,43.284L140,230.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path></svg>

@@ -432,6 +432,17 @@
               </p>
             </div>
 
+            <!-- NOTICE MONOCHROME PN4 -->
+            <div id="monochromeNoticeBox" class="hidden p-4 rounded-2xl border border-zinc-700 bg-zinc-900 text-zinc-100 space-y-2 shadow-sm">
+              <div class="flex items-center gap-2 text-amber-400 font-bold text-xs">
+                <span class="text-base">✨</span>
+                <span>Template Monochrome PN4 (Editorial Minimalist)</span>
+              </div>
+              <p class="text-xs text-zinc-300 leading-relaxed">
+                Tema ini mewajibkan seluruh foto terisi lengkap (<strong>*Mandatory</strong>) agar cover pembuka, panel sticky samping, kartu profil mempelai, countdown/live streaming, polaroid, dan album galeri tampil rapi tanpa ada foto yang kosong. Pastikan foto profil mempelai berorientasi potrait (3:4).
+              </p>
+            </div>
+
             <!-- FOTO SAMPUL & BANNER UTAMA -->
             <div id="sectionPhotoSlotsMain" class="pt-2 border-t border-slate-100 space-y-4">
               <div>
@@ -1579,6 +1590,7 @@
 
     function applyTemplateFormRules(templateId) {
       const isSakura = templateId === 'ta3';
+      const isMonochrome = templateId === 'pn4';
 
       // 1. Jenis Acara
       const eventSec = document.getElementById('eventTypeSelectorSection');
@@ -1592,11 +1604,13 @@
         }
       }
 
-      // 2. Foto Sampul & Notice Box Sakura
+      // 2. Foto Sampul & Notice Box
       const mainPhotosBox = document.getElementById('sectionPhotoSlotsMain');
       const sakuraNotice = document.getElementById('sakuraBlossomNoticeBox');
+      const monoNotice = document.getElementById('monochromeNoticeBox');
       if (mainPhotosBox) mainPhotosBox.classList.toggle('hidden', isSakura);
       if (sakuraNotice) sakuraNotice.classList.toggle('hidden', !isSakura);
+      if (monoNotice) monoNotice.classList.toggle('hidden', !isMonochrome);
 
       // 3. Foto Mempelai Pria & Wanita
       const groomSlot = document.getElementById('photoSlot_groom_photo');
@@ -1614,14 +1628,18 @@
       const galleryTitle = document.getElementById('galleryTitleLabel');
       const gallerySub = document.getElementById('gallerySubtitleLabel');
       if (galleryTitle) {
-        galleryTitle.textContent = isSakura 
-          ? '🖼️ Album Galeri Foto Momen (Dinamis)' 
-          : '🖼️ Album Galeri Foto Momen';
+        galleryTitle.textContent = isMonochrome
+          ? '🖼️ Album Galeri Foto Momen (*Wajib Min 1 Foto)'
+          : isSakura 
+            ? '🖼️ Album Galeri Foto Momen (Dinamis)' 
+            : '🖼️ Album Galeri Foto Momen';
       }
       if (gallerySub) {
-        gallerySub.textContent = isSakura
-          ? 'Unggah foto momen kebersamaan Anda (bebas tambah foto sebanyak mungkin tanpa batasan).'
-          : 'Unggah foto prewedding atau momen bahagia (bisa pilih banyak foto sekaligus).';
+        gallerySub.textContent = isMonochrome
+          ? 'Unggah foto momen kebersamaan Anda untuk album galeri dan latar transisi tema Monochrome.'
+          : isSakura
+            ? 'Unggah foto momen kebersamaan Anda (bebas tambah foto sebanyak mungkin tanpa batasan).'
+            : 'Unggah foto prewedding atau momen bahagia (bisa pilih banyak foto sekaligus).';
       }
     }
 
@@ -1833,8 +1851,54 @@
       btn.textContent = '⏳ Menyimpan...';
 
       const isSakura = selectedTemplateId === 'ta3';
+      const isMonochrome = selectedTemplateId === 'pn4';
       const eventType = isSakura ? 'wedding' : (document.querySelector('input[name="event_type"]:checked')?.value || 'wedding');
       const isKhitan = !isSakura && eventType === 'khitan';
+
+      if (isMonochrome) {
+        if (!photoValues.cover_image) {
+          alert('Foto Sampul Utama (Cover) wajib diunggah untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+        if (!isKhitan && !photoValues.bride_photo) {
+          alert('Foto Mempelai Wanita wajib diunggah untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+        if (!photoValues.groom_photo && !photoValues.child_photo) {
+          alert('Foto Mempelai Pria / Anak wajib diunggah untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+        if (!photoValues.sec1_photo) {
+          alert('Foto Pembuka / Section 1 wajib diunggah untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+        if (!photoValues.event_photo) {
+          alert('Foto Countdown Acara wajib diunggah untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+        if (!photoValues.closing_photo) {
+          alert('Foto Penutup / Ucapan Terima Kasih wajib diunggah untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+        if (!galleryUrls || galleryUrls.length === 0) {
+          alert('Minimal unggah 1 foto galeri momen untuk tema Monochrome (*Mandatory)!');
+          btn.disabled = false;
+          btn.textContent = '💾 Simpan Perubahan Undangan';
+          return;
+        }
+      }
 
       const childName = document.getElementById('f_child_name').value.trim();
       const childNickname = document.getElementById('f_child_nickname').value.trim();
