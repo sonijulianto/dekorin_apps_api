@@ -77,6 +77,7 @@ curl -s -f -L -o web/assets/favicon.ico "https://raw.githubusercontent.com/sonij
 curl -s -f -L -o web/assets/favicon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/apple-touch-icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/apple-touch-icon.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/logo_icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/logo_icon.png?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/dekorin_logo_square.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/dekorin_logo_square.png?v=$TIMESTAMP" || true
 
 # 6. Konfigurasi Nginx: Limit upload 150M & HTTP Security Headers
 if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
