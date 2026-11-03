@@ -37,6 +37,10 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		Wishes              []models.InvitationWish
 		YoutubeEmbedURL     string
 		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
 	}{
 		Invitation: models.Invitation{
 			ID:              "inv_test",
@@ -94,6 +98,10 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		},
 		YoutubeEmbedURL:     "https://www.youtube.com/embed/dQw4w9WgXcQ",
 		TurutMengundangList: []string{"Keluarga Besar Montague", "Keluarga Besar Capulet"},
+		OGTitle:             "The Wedding of Romeo & Juliet",
+		OGDescription:       "20 November 2026",
+		OGImage:             "https://dekorin.my.id/assets/dekorin_logo_square.png",
+		OGURL:               "https://dekorin.my.id/romeo-juliet",
 	}
 
 	for _, file := range templateFiles {
@@ -111,6 +119,62 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 
 			if buf.Len() == 0 {
 				t.Fatalf("Template %s executed to empty buffer", file)
+			}
+		})
+	}
+}
+
+func TestLoveStoryHiddenWhenEmpty(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
+	targets := []string{"template_pn4.html", "template_ta3.html"}
+
+	testDataWithoutStory := struct {
+		models.Invitation
+		GuestTo             string
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:        "inv_no_story",
+			Title:     "Pernikahan Tanpa Love Story",
+			Slug:      "tanpa-story",
+			EventType: "wedding",
+			LoveStory: "", // EMPTY LOVE STORY
+			IsActive:  true,
+		},
+		OGTitle: "Pernikahan Tanpa Love Story",
+	}
+
+	for _, file := range targets {
+		t.Run(file, func(t *testing.T) {
+			filePath := filepath.Join(templatesDir, file)
+			tmpl, err := template.ParseFiles(filePath)
+			if err != nil {
+				t.Fatalf("Failed to parse %s: %v", file, err)
+			}
+
+			var buf bytes.Buffer
+			if err := tmpl.Execute(&buf, testDataWithoutStory); err != nil {
+				t.Fatalf("Failed to execute %s: %v", file, err)
+			}
+
+			rendered := buf.String()
+			if bytes.Contains([]byte(rendered), []byte("href=\"#cerita\"")) {
+				t.Errorf("%s still contains href=\"#cerita\" link in navbar when LoveStory is empty!", file)
+			}
+			if bytes.Contains([]byte(rendered), []byte("id=\"cerita\"")) {
+				t.Errorf("%s still contains id=\"cerita\" section when LoveStory is empty!", file)
 			}
 		})
 	}
