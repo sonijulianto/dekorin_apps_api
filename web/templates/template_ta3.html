@@ -714,18 +714,25 @@
             display: block;
         }
         .ta3-masonry {
+            --ta3-gap: 10px;
             width: 100%;
-            column-count: 2;
-            column-gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--ta3-gap);
+            align-items: start;
         }
         .ta3-masonry-item {
-            break-inside: avoid;
-            margin-bottom: 10px;
             position: relative;
             border: 2px solid #FFABB8;
             overflow: hidden;
             cursor: pointer;
             background-color: #FFF5F7;
+            box-sizing: border-box;
+        }
+        .ta3-masonry-item:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+            justify-self: center;
+            width: calc(50% - (var(--ta3-gap) / 2));
         }
         .ta3-masonry-item img {
             width: 100%;
@@ -1329,8 +1336,8 @@
 
             #GALLERY .ta3-col-500 { padding: 15px 20px 85px; }
             #GALLERY .ta3-sec-script-heading { margin-top: 150px; }
-            .ta3-masonry { column-gap: 5px; }
-            .ta3-masonry-item { margin-bottom: 5px; }
+            .ta3-masonry { --ta3-gap: 6px; }
+            .ta3-masonry-item { margin-bottom: 0; }
 
             #gift { padding: 45px 15px 55px; }
             .ta3-gift-heading { margin-top: 30px; }

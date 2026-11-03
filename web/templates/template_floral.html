@@ -382,6 +382,11 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
+    .gallery-item:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - 5px);
+    }
     .gallery-item img {
       width: 100%;
       height: 100%;
