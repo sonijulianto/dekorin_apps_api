@@ -1691,7 +1691,7 @@
     <!-- =========================================================
          SECTION 6: #cerita LOVE STORY TIMELINE ([el:1e85b2fc])
          ========================================================= -->
-    {{ if ne .EventType "khitan" }}
+    {{ if and (ne .EventType "khitan") .LoveStory }}
     <section id="cerita" class="ta3-sec-boxed">
         <div class="ta3-col-500 ta3-bg-pink">
             <h2 class="ta3-sec-script-heading ta3-anim anim-zoom">Love Story</h2>
@@ -1928,9 +1928,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M89.269 1.998 C 83.325 5.560,82.031 8.952,82.031 20.967 L 82.031 31.250 67.703 31.250 C 32.891 31.250,9.171 48.174,1.555 78.445 C -0.876 88.105,-0.882 343.104,1.548 352.805 C 7.050 374.771,25.229 392.950,47.195 398.452 C 56.883 400.879,343.117 400.879,352.805 398.452 C 379.792 391.692,400.000 366.489,400.000 339.592 C 400.000 327.779,394.793 321.875,384.375 321.875 C 374.495 321.875,369.585 327.138,368.076 339.346 C 366.110 355.267,356.191 365.736,340.991 367.932 C 333.538 369.009,66.462 369.009,59.009 367.932 C 44.509 365.837,34.163 355.491,32.068 340.991 C 30.993 333.555,30.993 97.695,32.068 90.259 C 34.829 71.154,47.583 62.561,73.242 62.515 L 82.031 62.500 82.031 72.783 C 82.031 88.123,86.224 93.750,97.656 93.750 C 109.088 93.750,113.281 88.123,113.281 72.783 L 113.281 62.500 148.438 62.500 L 183.594 62.500 183.594 72.783 C 183.594 88.123,187.787 93.750,199.219 93.750 C 210.651 93.750,214.844 88.123,214.844 72.783 L 214.844 62.500 250.391 62.500 L 285.938 62.500 285.938 72.783 C 285.938 88.123,290.131 93.750,301.562 93.750 C 312.994 93.750,317.188 88.123,317.188 72.783 L 317.188 62.500 326.367 62.515 C 344.161 62.545,351.564 64.743,359.035 72.215 C 369.018 82.197,368.716 78.842,368.735 180.009 L 368.750 264.316 370.724 267.684 C 376.554 277.632,392.196 277.632,398.026 267.684 L 400.000 264.316 400.000 174.470 C 400.000 72.481,400.416 79.377,393.404 65.234 C 381.969 42.171,362.207 31.250,331.906 31.250 L 317.188 31.250 317.188 20.967 C 317.187 5.627,312.994 -0.000,301.562 -0.000 C 290.131 0.000,285.938 5.627,285.938 20.967 L 285.938 31.250 250.391 31.250 L 214.844 31.250 214.844 20.967 C 214.844 5.627,210.651 -0.000,199.219 -0.000 C 187.787 0.000,183.594 5.627,183.594 20.967 L 183.594 31.250 148.438 31.250 L 113.281 31.250 113.281 20.967 C 113.281 11.379,113.148 10.456,111.307 7.316 C 107.091 0.122,96.617 -2.406,89.269 1.998 M89.269 150.436 C 79.395 156.353,79.440 171.908,89.347 177.714 C 103.534 186.028,119.621 169.940,111.307 155.753 C 107.091 148.559,96.617 146.032,89.269 150.436 M157.237 150.436 C 147.364 156.353,147.409 171.908,157.316 177.714 C 164.743 182.066,175.066 179.555,179.276 172.372 C 187.600 158.169,171.339 141.984,157.237 150.436 M225.206 150.436 C 215.333 156.353,215.378 171.908,225.285 177.714 C 232.712 182.066,243.035 179.555,247.245 172.372 C 255.568 158.169,239.308 141.984,225.206 150.436 M293.175 150.436 C 283.302 156.353,283.346 171.908,293.253 177.714 C 300.680 182.066,311.004 179.555,315.214 172.372 C 323.537 158.169,307.276 141.984,293.175 150.436 M232.627 217.103 C 216.828 222.291,207.017 236.532,207.041 254.243 C 207.065 272.926,214.594 283.720,241.643 303.848 C 245.855 306.982,250.952 311.220,252.971 313.266 C 262.736 323.162,271.630 323.172,281.375 313.295 C 283.377 311.266,288.475 307.036,292.703 303.894 C 319.610 283.904,327.310 272.865,327.334 254.243 C 327.372 225.743,299.530 207.184,273.438 218.315 C 267.187 220.982,267.170 220.982,260.938 218.282 C 254.156 215.343,239.804 214.746,232.627 217.103 M89.269 218.405 C 79.395 224.322,79.440 239.876,89.347 245.682 C 103.534 253.996,119.621 237.909,111.307 223.722 C 107.091 216.528,96.617 214.001,89.269 218.405 M157.237 218.405 C 147.364 224.322,147.409 239.876,157.316 245.682 C 171.503 253.996,187.590 237.909,179.276 223.722 C 175.060 216.528,164.585 214.001,157.237 218.405 M250.625 248.774 C 251.785 249.389,253.746 251.184,254.982 252.763 C 260.834 260.239,273.683 260.356,279.134 252.984 C 282.944 247.831,290.433 245.902,293.750 249.219 C 297.569 253.038,295.159 259.750,287.428 266.821 C 282.640 271.201,268.227 282.031,267.188 282.031 C 264.752 282.031,244.971 265.686,241.283 260.625 C 235.318 252.441,241.866 244.134,250.625 248.774 M89.269 286.373 C 79.395 292.291,79.440 307.845,89.347 313.651 C 103.534 321.965,119.621 305.878,111.307 291.691 C 107.091 284.497,96.617 281.969,89.269 286.373 M157.237 286.373 C 147.364 292.291,147.409 307.845,157.316 313.651 C 171.503 321.965,187.590 305.878,179.276 291.691 C 175.060 284.497,164.585 281.969,157.237 286.373" fill-rule="evenodd"/></svg>
         </a>
         <!-- 4. #cerita (Rose / Love Story) -->
-        <a href="{{ if eq .EventType "khitan" }}#EVENT{{ else }}#cerita{{ end }}" class="ta3-nav-link" data-target="cerita" aria-label="Love Story">
+        {{ if and (ne .EventType "khitan") .LoveStory }}
+        <a href="#cerita" class="ta3-nav-link" data-target="cerita" aria-label="Love Story">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 371.137 371.137"><path d="M278.71,257.014c-1.209-2.154-3.4-3.574-5.861-3.797c-7.23-0.658-14.15-0.992-20.563-0.992c-26.504,0-46.094,5.623-58.395,16.725v-69.205c1.643,0.094,3.301,0.148,4.973,0.148c21.566,0,40.996-7.604,53.303-20.859c11.082-11.936,16.197-28.24,14.793-47.152c-1.668-22.441-7.867-33.361-13.336-42.996c-2.457-4.326-4.777-8.414-6.533-13.359c-8.797-24.748,9.123-48.604,9.293-48.826c2.01-2.596,2.096-6.197,0.213-8.889c-1.883-2.689-5.297-3.842-8.424-2.846c-1.029,0.328-8.627,2.801-19.43,7.52L205.548,1.891c-1.879-1.668-4.471-2.283-6.896-1.643c-34.541,9.127-50.49,19.084-56.113,23.295c-1.664-0.685-16.861-6.146-20.303-7.141c-6.756-1.951-8.365-2.416-11.193-0.967c-2.092,1.072-3.559,3.062-3.967,5.375c-0.406,2.314,0.295,4.686,1.895,6.406c0.172,0.186,17.047,18.717,8.842,42.725c-0.912,2.67-2.262,5.783-3.824,9.391c-5.393,12.449-12.779,29.498-12.832,52.51c-0.043,18.402,5.838,33.604,17.475,45.18c18.912,18.813,46.525,21.932,60.262,22.225v46.678c-12.164-12.135-32.324-18.279-60.039-18.279c-6.414,0-13.332,0.334-20.564,0.992c-2.459,0.225-4.65,1.644-5.859,3.799c-1.209,2.152-1.281,4.764-0.191,6.98c19.918,40.506,42.416,61.045,66.871,61.049c0.004,0,0.006,0,0.008,0c8.037,0,14.775-2.352,19.775-4.953v68.125c0,4.142,3.357,7.5,7.5,7.5c4.143,0,7.5-3.358,7.5-7.5v-42.729c4.797,2.256,10.947,4.137,18.135,4.137c24.455,0,46.955-20.541,66.873-61.051C279.989,261.778,279.919,259.168,278.71,257.014z M176.307,279.493c-2.834,2.133-9.061,5.973-17.191,5.973c-0.002,0-0.004,0-0.004,0c-16.17-0.002-32.715-14.695-48.191-42.648c2.727-0.113,5.375-0.172,7.932-0.172c25.262,0,43.123,5.656,51.648,16.357C176.714,266.799,176.714,275.532,176.307,279.493z M198.618,15.797l15.391,13.664c-9.154,4.684-19.225,10.527-29.018,17.564c-0.121-0.098-0.238-0.199-0.367-0.293c-8.836-6.357-17.699-11.539-25.816-15.693 M129.208,166.387c-8.693-8.649-13.086-20.26-13.053-34.51c0.045-19.92,6.449-34.703,11.596-46.582c1.619-3.738,3.148-7.268,4.254-10.502c5.365-15.697,2.928-29.51-1.121-39.693c11.277,4.219,26.525,11.098,41.82,21.592c-14.566,12.596-27.182,28.147-33.248,46.799c-10.314,31.723-4.131,53.391,2.873,65.98c1.926,3.465,4.021,6.436,6.094,8.979C141.575,175.793,134.804,171.954,129.208,166.387z M169.18,177.329c-0.156-0.107-0.27-0.18-0.434-0.275c-1.279-0.768-31.145-19.352-15.025-68.924c11.875-36.523,55.395-60.484,80.609-71.627c-4.385,11.609-7.295,27.391-1.375,44.047c2.197,6.184,4.955,11.043,7.623,15.742c5.145,9.063,10.004,17.621,11.422,36.701c1.104,14.854-2.539,26.91-10.826,35.836c-9.479,10.209-24.9,16.064-42.311,16.064C187.184,184.893,176.089,182.065,169.18,177.329z M212.026,310.045c-8.143,0-14.379-3.852-17.191-5.969c-0.412-3.992-0.4-12.709,5.803-20.494c8.525-10.701,26.385-16.357,51.648-16.357c2.557,0,5.205,0.057,7.932,0.172C244.739,295.352,228.194,310.045,212.026,310.045z"/></svg>
         </a>
+        {{ end }}
         <!-- 5. #GALLERY (Film Frame Heart) -->
         {{ if or .GalleryList .YoutubeEmbedURL }}
         <a href="#GALLERY" class="ta3-nav-link" data-target="GALLERY" aria-label="Gallery">
@@ -2116,72 +2118,56 @@
                         stories.push({ date: 'Kisah ' + (idx + 1), title: 'Perjalanan Cinta', body: blk });
                     }
                 });
-            } else {
-                stories = [
-                    {
-                        date: '14 Januari 2015',
-                        title: 'PERKENALAN',
-                        body: 'Tahun 2015 Kami dipertemukan saat menjadi Mahasiswa Baru, kami berada di satu Jurusan dan Kelas yang sama, pada saat itu kami hanya teman biasa.'
-                    },
-                    {
-                        date: '14 Januari 2016',
-                        title: 'AWAL HUBUNGAN',
-                        body: 'Setahun kemudian kami menjadi sahabat dekat, hingga di akhir Tahun 2016 dia menyatakan perasaannya kepada saya dan perjalanan hubungan kami hingga saat ini sudah berjalan 5 Tahun.'
-                    },
-                    {
-                        date: '14 Januari 2021',
-                        title: 'LAMARAN',
-                        body: 'Setelah waktu yg lama kami menjalin hubungan, dia mengajak untuk serius dan pada Tanggal 17 Januari 2021 dia membawa kedua orangtuanya ke keluarga saya untuk melamar.'
-                    },
-                    {
-                        date: '14 Januari 2021',
-                        title: 'PERNIKAHAN',
-                        body: 'Minggu, 25 Juli 2021 Kami melangsungkan akad nikah secara sederhana. Dengan Ridha Allah SWT dan kedua orangtua, Kami memulai lembaran baru dengan berbagai cerita indah.'
-                    }
-                ];
             }
 
-            var heartSvg = '<svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>';
-            stories.forEach(function(st) {
-                var item = document.createElement('div');
-                item.className = 'ta3-tl-item ta3-anim anim-up';
+            if (!stories.length) {
+                var ceritaEl = document.getElementById('cerita');
+                if (ceritaEl) ceritaEl.style.display = 'none';
+                var navCerita = document.querySelector('.ta3-nav-link[data-target="cerita"]');
+                if (navCerita) navCerita.style.display = 'none';
+            } else {
+                var heartSvg = '<svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>';
+                stories.forEach(function(st) {
+                    var item = document.createElement('div');
+                    item.className = 'ta3-tl-item ta3-anim anim-up';
 
-                var marker = document.createElement('div');
-                marker.className = 'ta3-tl-marker';
-                marker.innerHTML = heartSvg;
+                    var marker = document.createElement('div');
+                    marker.className = 'ta3-tl-marker';
+                    marker.innerHTML = heartSvg;
 
-                var cardWrap = document.createElement('div');
-                cardWrap.className = 'ta3-tl-card-wrap';
+                    var cardWrap = document.createElement('div');
+                    cardWrap.className = 'ta3-tl-card-wrap';
 
-                var arrow = document.createElement('div');
-                arrow.className = 'ta3-tl-arrow';
+                    var arrow = document.createElement('div');
+                    arrow.className = 'ta3-tl-arrow';
 
-                var card = document.createElement('div');
-                card.className = 'ta3-tl-card';
+                    var card = document.createElement('div');
+                    card.className = 'ta3-tl-card';
 
-                if (st.date) {
-                    var dEl = document.createElement('span');
-                    dEl.className = 'ta3-tl-date';
-                    dEl.textContent = st.date;
-                    card.appendChild(dEl);
-                }
-                if (st.title) {
-                    var tEl = document.createElement('span');
-                    tEl.className = 'ta3-tl-title';
-                    tEl.textContent = st.title;
-                    card.appendChild(tEl);
-                }
-                var bEl = document.createElement('div');
-                bEl.className = 'ta3-tl-body';
-                bEl.textContent = st.body;
-                card.appendChild(bEl);
+                    if (st.date) {
+                        var dEl = document.createElement('span');
+                        dEl.className = 'ta3-tl-date';
+                        dEl.textContent = st.date;
+                        card.appendChild(dEl);
+                    }
+                    if (st.title) {
+                        var tEl = document.createElement('span');
+                        tEl.className = 'ta3-tl-title';
+                        tEl.textContent = st.title;
+                        card.appendChild(tEl);
+                    }
+                    var bEl = document.createElement('div');
+                    bEl.className = 'ta3-tl-body';
+                    bEl.textContent = st.body;
+                    card.appendChild(bEl);
 
-                cardWrap.appendChild(arrow);
-                cardWrap.appendChild(card);
-                item.appendChild(marker);
-                item.appendChild(cardWrap);
-                tlWrap.appendChild(item);
-            });
+                    cardWrap.appendChild(arrow);
+                    cardWrap.appendChild(card);
+                    item.appendChild(marker);
+                    item.appendChild(cardWrap);
+                    tlWrap.appendChild(item);
+                });
+            }
 
             var tlFill = document.getElementById('ta3TimelineFill');
             if (tlFill) {

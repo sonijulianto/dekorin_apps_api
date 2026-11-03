@@ -2287,6 +2287,7 @@
             </section>
 
             <!-- SECTION 4: #GALLERY & #cerita (Solid #6E6E6E) -->
+            {{ if or .GalleryList .YoutubeEmbedURL (and (ne .EventType "khitan") .LoveStory) }}
             <section class="sec-grey-solid">
                 {{ if or .GalleryList .YoutubeEmbedURL }}
                 <div id="GALLERY">
@@ -2314,7 +2315,7 @@
                 {{ end }}
 
                 <!-- #cerita Love Story -->
-                {{ if ne .EventType "khitan" }}
+                {{ if and (ne .EventType "khitan") .LoveStory }}
                 <div id="cerita">
                     <div class="pn4-dual-heading light pn-anim anim-zoomIn">
                         <span class="pn4-script-sub">Our</span>
@@ -2327,6 +2328,7 @@
                 </div>
                 {{ end }}
             </section>
+            {{ end }}
 
             <!-- SECTION 5: #gift -->
             <section id="gift">
@@ -2584,13 +2586,15 @@
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V7A5.006,5.006,0,0,0,19,2ZM2,7A3,3,0,0,1,5,4H19a3,3,0,0,1,3,3V8H2ZM19,22H5a3,3,0,0,1-3-3V10H22v9A3,3,0,0,1,19,22Z"></path><circle cx="12" cy="15" r="1.5"></circle><circle cx="7" cy="15" r="1.5"></circle><circle cx="17" cy="15" r="1.5"></circle></svg>
                 </a>
             </li>
+            {{ if or .GalleryList .YoutubeEmbedURL }}
             <li class="pn4-nav-item" data-target="GALLERY">
                 <span class="pn4-nav-tooltip">Gallery</span>
                 <a href="#GALLERY" class="pn4-nav-link" aria-label="Gallery">
                     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"><path d="M322.266 8.494 C 307.022 12.478,299.934 30.132,307.503 45.262 C 311.134 52.520,317.724 59.124,331.774 69.586 C 337.716 74.010,344.775 79.731,347.461 82.298 L 352.344 86.966 357.227 82.303 C 359.912 79.738,367.195 73.815,373.411 69.140 C 397.481 51.039,404.135 38.977,398.756 23.191 C 392.142 3.779,359.497 2.906,353.780 21.988 C 352.644 25.778,352.043 25.778,350.907 21.988 C 348.009 12.314,333.607 5.529,322.266 8.494 M52.212 25.018 C 29.296 28.885,10.865 44.558,2.831 67.008 L 0.391 73.828 0.166 205.078 C 0.007 298.025,0.192 337.798,0.801 341.365 C 4.704 364.206,22.927 383.585,46.875 390.360 C 54.778 392.596,345.222 392.596,353.125 390.360 C 381.037 382.464,399.315 359.751,399.531 332.696 L 399.609 322.813 397.220 319.805 C 386.690 306.547,370.326 313.084,368.080 331.446 C 366.429 344.949,358.521 354.819,346.340 358.582 C 338.323 361.058,61.677 361.058,53.660 358.582 C 41.966 354.970,33.638 344.964,32.031 332.596 C 31.056 325.092,31.056 91.315,32.031 83.811 C 33.638 71.442,41.966 61.437,53.660 57.825 C 58.661 56.280,60.703 56.250,160.854 56.250 L 262.950 56.250 266.391 54.492 C 278.002 48.560,278.002 31.909,266.391 25.977 L 262.950 24.219 159.405 24.311 C 102.455 24.361,54.218 24.680,52.212 25.018 M68.766 88.477 C 54.073 95.983,59.349 118.750,75.781 118.750 C 77.949 118.750,80.711 118.058,82.797 116.992 C 97.489 109.486,92.213 86.719,75.781 86.719 C 73.614 86.719,70.851 87.411,68.766 88.477 M131.266 88.477 C 116.573 95.983,121.849 118.750,138.281 118.750 C 140.449 118.750,143.211 118.058,145.297 116.992 C 159.989 109.486,154.713 86.719,138.281 86.719 C 136.114 86.719,133.351 87.411,131.266 88.477 M215.007 96.452 C 194.440 101.136,181.586 117.245,180.676 139.479 C 179.734 162.508,188.628 176.078,220.313 199.951 C 227.402 205.293,236.024 212.396,239.472 215.735 C 246.226 222.278,249.707 224.219,254.688 224.219 C 259.668 224.219,263.149 222.278,269.903 215.735 C 273.351 212.396,281.973 205.293,289.063 199.951 C 324.846 172.989,335.334 152.256,326.664 125.620 C 317.895 98.682,283.913 86.744,259.280 101.949 L 254.688 104.783 250.095 101.949 C 240.800 96.212,226.144 93.916,215.007 96.452 M377.359 105.664 C 375.467 106.631,372.844 108.773,371.530 110.424 L 369.141 113.426 369.141 185.547 L 369.141 257.667 371.530 260.670 C 378.326 269.211,390.424 269.211,397.220 260.670 L 399.609 257.667 399.609 185.547 L 399.609 113.426 397.220 110.424 C 394.113 106.519,388.964 103.906,384.375 103.906 C 382.208 103.906,379.445 104.598,377.359 105.664 M231.976 128.712 C 235.441 130.479,237.229 133.049,238.360 137.891 C 240.339 146.357,242.095 149.119,247.144 151.708 C 256.889 156.704,268.384 150.970,270.415 140.101 C 272.110 131.026,275.618 127.734,283.594 127.734 C 299.912 127.734,301.893 145.325,287.199 159.766 C 281.784 165.088,256.080 185.156,254.678 185.156 C 250.613 185.156,217.739 156.532,214.556 150.221 C 207.578 136.388,219.109 122.151,231.976 128.712 M68.766 299.414 C 54.073 306.921,59.349 329.688,75.781 329.688 C 77.949 329.688,80.711 328.995,82.797 327.930 C 97.489 320.423,92.213 297.656,75.781 297.656 C 73.614 297.656,70.851 298.348,68.766 299.414 M131.266 299.414 C 116.573 306.921,121.849 329.688,138.281 329.688 C 140.449 329.688,143.211 328.995,145.297 327.930 C 159.989 320.423,154.713 297.656,138.281 297.656 C 136.114 297.656,133.351 298.348,131.266 299.414 M193.766 299.414 C 179.073 306.921,184.349 329.688,200.781 329.688 C 202.949 329.688,205.711 328.995,207.797 327.930 C 222.489 320.423,217.213 297.656,200.781 297.656 C 198.614 297.656,195.851 298.348,193.766 299.414 M256.266 299.414 C 241.573 306.921,246.849 329.688,263.281 329.688 C 265.449 329.688,268.211 328.995,270.297 327.930 C 284.989 320.423,279.713 297.656,263.281 297.656 C 261.114 297.656,258.351 298.348,256.266 299.414 M318.766 299.414 C 304.073 306.921,309.349 329.688,325.781 329.688 C 327.949 329.688,330.711 328.995,332.797 327.930 C 347.489 320.423,342.213 297.656,325.781 297.656 C 323.614 297.656,320.851 298.348,318.766 299.414" fill-rule="evenodd"></path></svg>
                 </a>
             </li>
-            {{ if ne .EventType "khitan" }}
+            {{ end }}
+            {{ if and (ne .EventType "khitan") .LoveStory }}
             <li class="pn4-nav-item" data-target="cerita">
                 <span class="pn4-nav-tooltip">Love Story</span>
                 <a href="#cerita" class="pn4-nav-link" aria-label="Love Story">
@@ -3013,47 +3017,36 @@
                         stories.push({ date: 'Bagian ' + (idx + 1), title: '', body: blk });
                     }
                 });
-            } else {
-                stories = [
-                    {
-                        date: 'Awal Pertemuan',
-                        title: 'Awal Bertemu',
-                        body: 'Tidak ada yang kebetulan di dunia ini, semua telah tersusun rapi oleh Sang Maha Kuasa. Pertemuan pertama kami menjadi awal dari kisah indah yang tak pernah kami duga sebelumnya.'
-                    },
-                    {
-                        date: 'Menjalin Kasih',
-                        title: 'Komitmen Bersama',
-                        body: 'Seiring berjalannya waktu, kami saling mengenal, memahami, dan menguatkan dalam doa hingga tumbuh keyakinan untuk melangkah ke jenjang yang lebih serius.'
-                    },
-                    {
-                        date: 'Ikatan Suci',
-                        title: 'Lamaran & Menikah',
-                        body: 'Dengan restu kedua orang tua dan keluarga besar, kami memantapkan hati untuk menyempurnakan separuh agama dalam ikatan suci pernikahan.'
-                    }
-                ];
             }
 
-            stories.forEach(function(st) {
-                var card = document.createElement('div');
-                card.className = 'pn4-story-card pn-anim anim-zoomIn';
-                if (st.date) {
-                    var dEl = document.createElement('span');
-                    dEl.className = 'pn4-story-date';
-                    dEl.textContent = st.date;
-                    card.appendChild(dEl);
-                }
-                if (st.title) {
-                    var tEl = document.createElement('span');
-                    tEl.className = 'pn4-story-title';
-                    tEl.textContent = st.title;
-                    card.appendChild(tEl);
-                }
-                var bEl = document.createElement('p');
-                bEl.className = 'pn4-story-body';
-                bEl.textContent = st.body;
-                card.appendChild(bEl);
-                storyWrap.appendChild(card);
-            });
+            if (!stories.length) {
+                var ceritaEl = document.getElementById('cerita');
+                if (ceritaEl) ceritaEl.style.display = 'none';
+                var navCerita = document.querySelector('.pn4-nav-item[data-target="cerita"]');
+                if (navCerita) navCerita.style.display = 'none';
+            } else {
+                stories.forEach(function(st) {
+                    var card = document.createElement('div');
+                    card.className = 'pn4-story-card pn-anim anim-zoomIn';
+                    if (st.date) {
+                        var dEl = document.createElement('span');
+                        dEl.className = 'pn4-story-date';
+                        dEl.textContent = st.date;
+                        card.appendChild(dEl);
+                    }
+                    if (st.title) {
+                        var tEl = document.createElement('span');
+                        tEl.className = 'pn4-story-title';
+                        tEl.textContent = st.title;
+                        card.appendChild(tEl);
+                    }
+                    var bEl = document.createElement('p');
+                    bEl.className = 'pn4-story-body';
+                    bEl.textContent = st.body;
+                    card.appendChild(bEl);
+                    storyWrap.appendChild(card);
+                });
+            }
         }
 
         // 8. Bank Logo Resolver + #btnAmplop Toggle + Clipboard Copy + WA Confirmation
