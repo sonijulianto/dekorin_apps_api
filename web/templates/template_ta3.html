@@ -2099,39 +2099,58 @@
             var rawStory = (ds.loveStory || '').trim();
             var stories = [];
             if (rawStory) {
-                var blocks = rawStory.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
-                if (blocks.length === 1) {
-                    var lines = rawStory.split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
-                    if (lines.length > 1) blocks = lines;
-                }
-                blocks.forEach(function(blk, idx) {
-                    var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
-                    if (pipeParts.length >= 3) {
-                        stories.push({ date: pipeParts[0], title: pipeParts[1], body: pipeParts.slice(2).join(' ') });
-                        return;
-                    }
-                    var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
-                    if (colonMatch) {
-                        var rest = colonMatch[2].trim();
-                        var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
-                        if (dashMatch) {
-                            stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), body: dashMatch[2].trim() });
-                        } else {
-                            stories.push({ date: rest.length <= 28 ? rest : colonMatch[1].trim(), title: colonMatch[1].trim(), body: rest });
+                // Support structured JSON format
+                if (rawStory.charAt(0) === '[' || rawStory.charAt(0) === '{') {
+                    try {
+                        var parsed = JSON.parse(rawStory);
+                        if (Array.isArray(parsed)) {
+                            parsed.forEach(function(item) {
+                                var d = (item.date || item.tanggal || '').trim();
+                                var t = (item.title || item.judul || '').trim();
+                                var b = (item.description || item.desc || item.body || item.cerita || '').trim();
+                                if (d || t || b) {
+                                    stories.push({ date: d, title: t, body: b });
+                                }
+                            });
                         }
-                        return;
+                    } catch(e) {}
+                }
+
+                if (!stories.length && rawStory.charAt(0) !== '[') {
+                    var blocks = rawStory.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
+                    if (blocks.length === 1) {
+                        var lines = rawStory.split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
+                        if (lines.length > 1) blocks = lines;
                     }
-                    // Extract Indonesian date inside sentence if present
-                    var idDateMatch = blk.match(/(\d{1,2}\s+(?:januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)(?:\s+\d{4})?)/i);
-                    var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
-                    if (subLines.length >= 3) {
-                        stories.push({ date: subLines[0], title: subLines[1], body: subLines.slice(2).join(' ') });
-                    } else if (idDateMatch) {
-                        stories.push({ date: idDateMatch[1], title: 'Momen Spesial ' + (idx + 1), body: blk });
-                    } else {
-                        stories.push({ date: 'Kisah ' + (idx + 1), title: 'Perjalanan Cinta', body: blk });
-                    }
-                });
+                    blocks.forEach(function(blk, idx) {
+                        var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
+                        if (pipeParts.length >= 3) {
+                            stories.push({ date: pipeParts[0], title: pipeParts[1], body: pipeParts.slice(2).join(' ') });
+                            return;
+                        }
+                        var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
+                        if (colonMatch) {
+                            var rest = colonMatch[2].trim();
+                            var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
+                            if (dashMatch) {
+                                stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), body: dashMatch[2].trim() });
+                            } else {
+                                stories.push({ date: rest.length <= 28 ? rest : colonMatch[1].trim(), title: colonMatch[1].trim(), body: rest });
+                            }
+                            return;
+                        }
+                        // Extract Indonesian date inside sentence if present
+                        var idDateMatch = blk.match(/(\d{1,2}\s+(?:januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)(?:\s+\d{4})?)/i);
+                        var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+                        if (subLines.length >= 3) {
+                            stories.push({ date: subLines[0], title: subLines[1], body: subLines.slice(2).join(' ') });
+                        } else if (idDateMatch) {
+                            stories.push({ date: idDateMatch[1], title: 'Momen Spesial ' + (idx + 1), body: blk });
+                        } else {
+                            stories.push({ date: 'Kisah ' + (idx + 1), title: 'Perjalanan Cinta', body: blk });
+                        }
+                    });
+                }
             }
 
             if (!stories.length) {

@@ -732,9 +732,11 @@
 
       <div class="w-full max-w-md relative z-10" data-aos="fade-up">
         <div class="relative bg-gradient-to-br from-white to-gray-50/90 rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-200">
-          <p class="whitespace-pre-line font-sans text-xs sm:text-sm leading-relaxed text-gray-700 text-left">
-            {{ .LoveStory }}
-          </p>
+          <div id="luxuryLoveStoryWrap" class="space-y-4 text-left">
+            <p class="whitespace-pre-line font-sans text-xs sm:text-sm leading-relaxed text-gray-700">
+              {{ .LoveStory }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -1249,6 +1251,32 @@
         btn.innerHTML = '<i class="fa-regular fa-paper-plane mr-2"></i> Kirim Ucapan';
       }
     }
+
+    // Love Story Smart Formatter for Structured JSON
+    (function() {
+      var wrap = document.getElementById('luxuryLoveStoryWrap');
+      if (!wrap) return;
+      var raw = wrap.textContent.trim();
+      if (raw.charAt(0) === '[' || raw.charAt(0) === '{') {
+        try {
+          var list = JSON.parse(raw);
+          if (Array.isArray(list) && list.length) {
+            wrap.innerHTML = '';
+            list.forEach(function(item) {
+              var d = (item.date || item.tanggal || '').trim();
+              var t = (item.title || item.judul || '').trim();
+              var b = (item.description || item.desc || item.body || item.cerita || '').trim();
+              var box = document.createElement('div');
+              box.className = 'border-l-2 border-[#D4A574] pl-4 py-1.5 mb-3';
+              box.innerHTML = (d ? '<span class="block text-xs font-bold text-[#C59563] tracking-wider uppercase mb-1">' + d + '</span>' : '') +
+                              (t ? '<h4 class="font-serif text-sm font-semibold text-gray-800 mb-1">' + t + '</h4>' : '') +
+                              (b ? '<p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">' + b + '</p>' : '');
+              wrap.appendChild(box);
+            });
+          }
+        } catch(e) {}
+      }
+    })();
   </script>
 </body>
 </html>

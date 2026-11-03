@@ -702,10 +702,27 @@
             </div>
 
             <div class="pt-3 border-t border-slate-100">
-              <label class="block text-sm font-bold text-[#2C2C2C] mb-1">Kisah Cinta / Perjalanan Momen (Opsional)</label>
-              <p class="text-xs text-slate-500 mb-2">Ceritakan awal pertemuan, lamaran, hingga menuju hari bahagia. Kosongkan jika tidak ingin ditampilkan.</p>
-              <textarea id="f_love_story" rows="5" placeholder="2022 — Awal Pertemuan&#10;Pertama kali bertemu di bangku kuliah...&#10;&#10;2025 — Lamaran&#10;Memutuskan mengikat janji suci..."
-                class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm leading-relaxed"></textarea>
+              <div class="flex items-center justify-between mb-1">
+                <div>
+                  <label class="block text-sm font-bold text-[#2C2C2C]">Kisah Cinta / Perjalanan Momen (Opsional)</label>
+                  <p class="text-xs text-slate-500">Isi tanggal, judul momen, dan cerita kisah perjalanan Anda. Kosongkan jika tidak ingin ditampilkan.</p>
+                </div>
+                <button type="button" onclick="addLoveStoryItem()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#D4A574]/15 text-[#C59563] hover:bg-[#D4A574]/25 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                  <span>Tambah Momen</span>
+                </button>
+              </div>
+
+              <!-- List container for dynamic love story items -->
+              <div id="loveStoryContainer" class="space-y-3 mt-3"></div>
+
+              <!-- Button "+ Tambah Momen Kisah Cinta" -->
+              <button type="button" onclick="addLoveStoryItem()" class="mt-3 w-full py-2.5 border-2 border-dashed border-slate-200 rounded-xl text-xs font-semibold text-slate-500 hover:border-[#D4A574] hover:text-[#C59563] hover:bg-[#D4A574]/5 transition-all flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span>+ Tambah Momen Kisah Cinta</span>
+              </button>
+
+              <textarea id="f_love_story" class="hidden"></textarea>
             </div>
 
             <div class="pt-3 border-t border-slate-100">
@@ -1339,6 +1356,7 @@
       setVal('f_slug', inv.slug);
       setVal('f_quotes', inv.quotes);
       setVal('f_love_story', inv.love_story);
+      renderLoveStoryEditor(inv.love_story);
       setVal('f_turut_mengundang', inv.turut_mengundang);
 
       setVal('f_groom_name', inv.groom_name);
@@ -1840,6 +1858,155 @@
     }
 
     // =========================================================
+    // DYNAMIC LOVE STORY / PERJALANAN MOMEN EDITOR
+    // =========================================================
+    function parseLoveStoryString(raw) {
+      if (!raw || typeof raw !== 'string') return [];
+      var trimmed = raw.trim();
+      if (!trimmed) return [];
+
+      if (trimmed.charAt(0) === '[' || trimmed.charAt(0) === '{') {
+        try {
+          var parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) {
+            return parsed.map(function(item) {
+              return {
+                date: (item.date || item.tanggal || '').trim(),
+                title: (item.title || item.judul || '').trim(),
+                description: (item.description || item.desc || item.body || item.cerita || '').trim()
+              };
+            }).filter(function(s) { return s.date || s.title || s.description; });
+          }
+        } catch(e) {}
+      }
+
+      // Fallback: parse old format
+      var stories = [];
+      var blocks = trimmed.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
+      blocks.forEach(function(blk) {
+        var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
+        if (pipeParts.length >= 3) {
+          stories.push({ date: pipeParts[0], title: pipeParts[1], description: pipeParts.slice(2).join(' ') });
+          return;
+        }
+        var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
+        if (colonMatch) {
+          var rest = colonMatch[2].trim();
+          var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
+          if (dashMatch) {
+            stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), description: dashMatch[2].trim() });
+          } else {
+            stories.push({ date: colonMatch[1].trim(), title: 'Kisah Kami', description: rest });
+          }
+          return;
+        }
+        var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+        if (subLines.length >= 3) {
+          stories.push({ date: subLines[0], title: subLines[1], description: subLines.slice(2).join('\n') });
+        } else if (subLines.length === 2) {
+          stories.push({ date: subLines[0], title: '', description: subLines[1] });
+        } else {
+          stories.push({ date: '', title: '', description: blk });
+        }
+      });
+      return stories;
+    }
+
+    function renderLoveStoryEditor(raw) {
+      var container = document.getElementById('loveStoryContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      var items = parseLoveStoryString(raw);
+      if (!items.length) {
+        addLoveStoryCard('', '', '');
+      } else {
+        items.forEach(function(it) {
+          addLoveStoryCard(it.date, it.title, it.description);
+        });
+      }
+      renumberLoveStoryCards();
+    }
+
+    function addLoveStoryCard(date, title, desc) {
+      var container = document.getElementById('loveStoryContainer');
+      if (!container) return;
+      var card = document.createElement('div');
+      card.className = 'ls-card bg-slate-50/70 border border-slate-200 rounded-2xl p-4 space-y-3 relative transition-all hover:border-[#D4A574]/40';
+      card.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-slate-200/80">
+          <span class="ls-card-number text-xs font-bold text-[#C59563] uppercase tracking-wider flex items-center gap-1.5">
+            <span>✨</span> <span class="ls-card-label">Momen</span>
+          </span>
+          <button type="button" onclick="removeLoveStoryCard(this)" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus Momen">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Momen</label>
+            <input type="text" class="ls-date w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/40" placeholder="Contoh: 1 September 2025" value="${escapeHtml(date || '')}">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Momen / Title</label>
+            <input type="text" class="ls-title w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/40" placeholder="Contoh: The Beginning / Awal Bertemu" value="${escapeHtml(title || '')}">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi / Cerita</label>
+          <textarea class="ls-desc w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/40 leading-relaxed" rows="3" placeholder="Tuliskan kisah perjalanan momen ini secara lengkap...">${escapeHtml(desc || '')}</textarea>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addLoveStoryItem() {
+      addLoveStoryCard('', '', '');
+      renumberLoveStoryCards();
+      var container = document.getElementById('loveStoryContainer');
+      var last = container ? container.lastElementChild : null;
+      if (last) {
+        var inp = last.querySelector('.ls-date');
+        if (inp) inp.focus();
+      }
+    }
+
+    function removeLoveStoryCard(btn) {
+      var card = btn.closest('.ls-card');
+      if (card) {
+        card.remove();
+        renumberLoveStoryCards();
+        serializeLoveStoryFromUI();
+      }
+    }
+
+    function renumberLoveStoryCards() {
+      var cards = document.querySelectorAll('#loveStoryContainer .ls-card');
+      cards.forEach(function(c, idx) {
+        var lbl = c.querySelector('.ls-card-label');
+        if (lbl) lbl.textContent = 'Momen #' + (idx + 1);
+      });
+    }
+
+    function serializeLoveStoryFromUI() {
+      var cards = document.querySelectorAll('#loveStoryContainer .ls-card');
+      var items = [];
+      cards.forEach(function(c) {
+        var d = (c.querySelector('.ls-date') ? c.querySelector('.ls-date').value : '').trim();
+        var t = (c.querySelector('.ls-title') ? c.querySelector('.ls-title').value : '').trim();
+        var b = (c.querySelector('.ls-desc') ? c.querySelector('.ls-desc').value : '').trim();
+        if (d || t || b) {
+          items.push({ date: d, title: t, description: b });
+        }
+      });
+      var hidden = document.getElementById('f_love_story');
+      var result = items.length ? JSON.stringify(items) : '';
+      if (hidden) {
+        hidden.value = result;
+      }
+      return result;
+    }
+
+    // =========================================================
     // SAVE INVITATION CHANGES
     // =========================================================
     async function handleSaveInvitation(e) {
@@ -1953,7 +2120,7 @@
         audio_url: document.getElementById('f_audio_url').value.trim(),
         gallery_images: galleryUrls.join(','),
         youtube_url: document.getElementById('f_youtube_url').value.trim(),
-        love_story: document.getElementById('f_love_story').value.trim(),
+        love_story: serializeLoveStoryFromUI(),
         turut_mengundang: document.getElementById('f_turut_mengundang').value.trim(),
 
         sec1_photo: isSakura ? '' : (photoValues.sec1_photo || ''),

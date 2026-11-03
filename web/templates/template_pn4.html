@@ -3006,38 +3006,57 @@
             var rawStory = (ds.loveStory || '').trim();
             var stories = [];
             if (rawStory) {
-                var blocks = rawStory.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
-                if (blocks.length === 1) {
-                    var lines = rawStory.split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
-                    if (lines.length > 1) blocks = lines;
-                }
-                blocks.forEach(function(blk, idx) {
-                    // Format support: "Maret 2021 | Awal Bertemu | Cerita..." or "2021: Awal Bertemu - Cerita..." or multi-line
-                    var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
-                    if (pipeParts.length >= 3) {
-                        stories.push({ date: pipeParts[0], title: pipeParts[1], body: pipeParts.slice(2).join(' ') });
-                        return;
-                    }
-                    var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
-                    if (colonMatch) {
-                        var rest = colonMatch[2];
-                        var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
-                        if (dashMatch) {
-                            stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), body: dashMatch[2].trim() });
-                        } else {
-                            stories.push({ date: colonMatch[1].trim(), title: 'Kisah Kami', body: rest.trim() });
+                // Support structured JSON format
+                if (rawStory.charAt(0) === '[' || rawStory.charAt(0) === '{') {
+                    try {
+                        var parsed = JSON.parse(rawStory);
+                        if (Array.isArray(parsed)) {
+                            parsed.forEach(function(item) {
+                                var d = (item.date || item.tanggal || '').trim();
+                                var t = (item.title || item.judul || '').trim();
+                                var b = (item.description || item.desc || item.body || item.cerita || '').trim();
+                                if (d || t || b) {
+                                    stories.push({ date: d, title: t, body: b });
+                                }
+                            });
                         }
-                        return;
+                    } catch(e) {}
+                }
+
+                if (!stories.length && rawStory.charAt(0) !== '[') {
+                    var blocks = rawStory.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
+                    if (blocks.length === 1) {
+                        var lines = rawStory.split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
+                        if (lines.length > 1) blocks = lines;
                     }
-                    var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
-                    if (subLines.length >= 3) {
-                        stories.push({ date: subLines[0], title: subLines[1], body: subLines.slice(2).join(' ') });
-                    } else if (subLines.length === 2) {
-                        stories.push({ date: subLines[0], title: '', body: subLines[1] });
-                    } else {
-                        stories.push({ date: 'Bagian ' + (idx + 1), title: '', body: blk });
-                    }
-                });
+                    blocks.forEach(function(blk, idx) {
+                        // Format support: "Maret 2021 | Awal Bertemu | Cerita..." or "2021: Awal Bertemu - Cerita..." or multi-line
+                        var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
+                        if (pipeParts.length >= 3) {
+                            stories.push({ date: pipeParts[0], title: pipeParts[1], body: pipeParts.slice(2).join(' ') });
+                            return;
+                        }
+                        var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
+                        if (colonMatch) {
+                            var rest = colonMatch[2];
+                            var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
+                            if (dashMatch) {
+                                stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), body: dashMatch[2].trim() });
+                            } else {
+                                stories.push({ date: colonMatch[1].trim(), title: 'Kisah Kami', body: rest.trim() });
+                            }
+                            return;
+                        }
+                        var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+                        if (subLines.length >= 3) {
+                            stories.push({ date: subLines[0], title: subLines[1], body: subLines.slice(2).join(' ') });
+                        } else if (subLines.length === 2) {
+                            stories.push({ date: subLines[0], title: '', body: subLines[1] });
+                        } else {
+                            stories.push({ date: 'Bagian ' + (idx + 1), title: '', body: blk });
+                        }
+                    });
+                }
             }
 
             if (!stories.length) {
