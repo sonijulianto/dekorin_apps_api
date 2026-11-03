@@ -25,6 +25,7 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		"template_green_leaves.html",
 		"template_khitan_green.html",
 		"template_luxury_grey.html",
+		"template_pn4.html",
 		"wedding_invitation.html",
 	}
 

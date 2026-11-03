@@ -43,9 +43,22 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in landing superadmin client_form invitation_portal wedding_invitation template_floral template_luxury_grey template_khitan_green template_creamy_latte template_green_leaves; do
+for t in landing superadmin client_form invitation_portal wedding_invitation template_floral template_luxury_grey template_pn4 template_khitan_green template_creamy_latte template_green_leaves; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
+done
+
+# 4b. Unduh Aset Template Monochrome PN4 (Fonts, Ornamen, Tekstur, Foto Default, Audio)
+echo "⬇️  Mengunduh aset template Monochrome PN4..."
+mkdir -p web/assets/templates/pn4/fonts web/assets/templates/pn4/photos
+for f in ARROW-UP-PN.json akad-pn1-2.png bg-teksture-pn4.png default-song.mp3 flower-pn1.png logo_bca.png logo_mandiri.png resepsi-pn1.png video-pn1.png; do
+    curl -s -f -L -o "web/assets/templates/pn4/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/pn4/${f}?v=$TIMESTAMP" || true
+done
+for fn in 2989Trajan.woff2 ArslanWessam.ttf BrittanySignature.ttf Gistesy.ttf NewYork.ttf Oranienbaum.ttf Saudagar.ttf; do
+    curl -s -f -L -o "web/assets/templates/pn4/fonts/${fn}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/pn4/fonts/${fn}?v=$TIMESTAMP" || true
+done
+for n in 1 2 3 4 5 6 7 8 10 12 13 14 15 16 17 18; do
+    curl -s -f -L -o "web/assets/templates/pn4/photos/LeniArdi${n}.jpeg" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/pn4/photos/LeniArdi${n}.jpeg?v=$TIMESTAMP" || true
 done
 
 # 5. Icons

@@ -1,0 +1,3393 @@
+<!DOCTYPE html>
+<html lang="id" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <meta name="format-detection" content="telephone=no">
+    <title>{{ if .Title }}{{ .Title }}{{ else if eq .EventType "khitan" }}Tasyakuran Khitan {{ .ChildNickname }}{{ else }}The Wedding of {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}Putra{{ end }} & {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}Putri{{ end }}{{ end }}</title>
+
+    <!-- Open Graph / WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}The Wedding of {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}Putra{{ end }} & {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}Putri{{ end }}{{ end }}">
+    <meta property="og:description" content="Kepada Yth. {{ .GuestTo }} — Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di acara bahagia kami.">
+    {{ if .CoverImage }}<meta property="og:image" content="{{ .CoverImage }}">{{ else }}<meta property="og:image" content="/assets/templates/pn4/photos/LeniArdi2.jpeg">{{ end }}
+
+    <!-- Google Fonts used in PN4 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600&family=Cormorant+Upright:wght@300;400;600;700&family=Cormorant:wght@300;400;500;600&family=EB+Garamond:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lottie Player for ARROW-UP-PN.json -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer></script>
+
+    <style>
+        /* =========================================================
+           CUSTOM PN4 @FONT-FACE DECLARATIONS (SERVED LOCALLY)
+           ========================================================= */
+        @font-face {
+            font-family: 'Oranienbaum';
+            src: url('/assets/templates/pn4/fonts/Oranienbaum.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'NewYork';
+            src: url('/assets/templates/pn4/fonts/NewYork.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Trajan';
+            src: url('/assets/templates/pn4/fonts/2989Trajan.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Arslan Wessam';
+            src: url('/assets/templates/pn4/fonts/ArslanWessam.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Gistesy';
+            src: url('/assets/templates/pn4/fonts/Gistesy.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Saudagar';
+            src: url('/assets/templates/pn4/fonts/Saudagar.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'BrittanySignature';
+            src: url('/assets/templates/pn4/fonts/BrittanySignature.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* =========================================================
+           BASE & RESET
+           ========================================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html {
+            scroll-behavior: smooth;
+            background-color: #343434;
+        }
+        body {
+            font-family: 'Lora', serif;
+            color: #FFFFFF;
+            background-color: transparent;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+        body.scroll-locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
+        /* =========================================================
+           KEYFRAME ANIMATIONS (MATCHING ELEMENTOR + PN4 CUSTOM)
+           ========================================================= */
+        @keyframes moveUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-9px); }
+        }
+        @keyframes pnZoomIn {
+            from { opacity: 0; transform: scale3d(0.86, 0.86, 0.86); }
+            to { opacity: 1; transform: scale3d(1, 1, 1); }
+        }
+        @keyframes pnFadeInUp {
+            from { opacity: 0; transform: translate3d(0, 28px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes pnFadeInDown {
+            from { opacity: 0; transform: translate3d(0, -28px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes pnFadeInLeft {
+            from { opacity: 0; transform: translate3d(-32px, 0, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes pnFadeInRight {
+            from { opacity: 0; transform: translate3d(32px, 0, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+
+        .pn-anim {
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        .pn-anim.is-visible.anim-zoomIn {
+            animation: pnZoomIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .pn-anim.is-visible.anim-fadeInUp {
+            animation: pnFadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .pn-anim.is-visible.anim-fadeInDown {
+            animation: pnFadeInDown 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .pn-anim.is-visible.anim-fadeInLeft {
+            animation: pnFadeInLeft 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .pn-anim.is-visible.anim-fadeInRight {
+            animation: pnFadeInRight 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* =========================================================
+           1. OPENING GATE COVER (#gate-cover / [el:588ad63e])
+           ========================================================= */
+        #gate-cover {
+            position: relative;
+            z-index: 9999;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 36px 20px;
+            background-color: #262627;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow: hidden;
+        }
+        #gate-cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+        .gate-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .gate-subtitle {
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+        }
+        .gate-couple {
+            font-family: 'Oranienbaum', serif;
+            font-size: 72px;
+            font-weight: 400;
+            line-height: 1.1;
+            color: #FFFFFF;
+        }
+        .gate-spacer {
+            height: 28vh;
+            width: 100%;
+        }
+        .gate-yth {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #FFFFFF;
+            margin-top: 4px;
+        }
+        .gate-guest {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFFFFF;
+            line-height: 1.35;
+            margin: 2px 0;
+            word-break: break-word;
+            max-width: 92%;
+        }
+        .gate-place {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #FFFFFF;
+            margin-bottom: 18px;
+        }
+        .pn4-btn-light {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #F1F1F1;
+            color: #363636;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            border: 1px solid #FFFFFF;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .pn4-btn-light svg {
+            width: 13px;
+            height: 13px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .pn4-btn-light:hover {
+            background-color: transparent;
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+        #tombol-buka {
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 11px 22px;
+        }
+
+        @media (max-width: 767px) {
+            .gate-subtitle {
+                font-size: 12px;
+                letter-spacing: 4.5px;
+            }
+            .gate-couple {
+                font-size: 42px;
+            }
+            .gate-spacer {
+                height: 40vh;
+            }
+            .gate-yth {
+                font-size: 12px;
+            }
+            .gate-guest {
+                font-size: 19px;
+            }
+            .gate-place {
+                font-size: 12px;
+            }
+        }
+
+        /* =========================================================
+           2. FIXED CROSSFADING SLIDESHOW ([el:1706cc4f] / [el:60a90989])
+           ========================================================= */
+        #fixed-bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: #262627;
+        }
+        .fixed-bg-left-spacer {
+            flex: 1 1 auto;
+            display: block;
+        }
+        .fixed-bg-slideshow {
+            position: relative;
+            width: 480px;
+            flex: 0 0 480px;
+            height: 100%;
+            overflow: hidden;
+            background-color: #2b2b2b;
+        }
+        .fixed-bg-slide {
+            position: absolute;
+            inset: 0;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: 0;
+            transition: opacity 600ms ease-in-out;
+        }
+        .fixed-bg-slide.active {
+            opacity: 1;
+        }
+        .fixed-bg-slideshow::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        @media (max-width: 1024px) {
+            .fixed-bg-left-spacer {
+                display: none;
+            }
+            .fixed-bg-slideshow {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+        }
+
+        /* =========================================================
+           3. MAIN SPLIT LAYOUT (#cover / [el:328f84d3])
+           ========================================================= */
+        #cover {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+
+        /* Desktop Left Sticky Pane ([el:325154f9]) */
+        .pn4-left-sticky-col {
+            flex: 1 1 auto;
+            position: relative;
+        }
+        .pn4-left-sticky-inner {
+            position: sticky;
+            position: -webkit-sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            padding: 50px 56px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            background-color: #262627;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow: hidden;
+        }
+        .pn4-left-sticky-inner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.38);
+            z-index: 0;
+        }
+        .pn4-left-sticky-content {
+            position: relative;
+            z-index: 1;
+            max-width: 620px;
+        }
+        .sticky-kicker {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+        }
+        .sticky-couple {
+            font-family: 'Oranienbaum', serif;
+            font-size: 72px;
+            font-weight: 400;
+            line-height: 1.08;
+            color: #FFFFFF;
+            margin-bottom: 34px;
+        }
+        .sticky-yth {
+            font-family: 'NewYork', 'Lora', serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: #FFF7F7;
+            margin-bottom: 6px;
+        }
+        .sticky-guest {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFFFFF;
+            line-height: 1.3;
+        }
+
+        /* Right Scrollable Column ([el:4ade3a9d]) */
+        .pn4-right-col {
+            width: 480px;
+            flex: 0 0 480px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 1024px) {
+            .pn4-left-sticky-col {
+                display: none;
+            }
+            .pn4-right-col {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+        }
+
+        /* =========================================================
+           OVERLAPPING SCRIPT + TRAJAN SECTION HEADINGS
+           ========================================================= */
+        .pn4-dual-heading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .pn4-script-sub {
+            font-family: 'Gistesy', cursive;
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.3;
+            margin-bottom: -16px;
+            position: relative;
+            z-index: 2;
+        }
+        .pn4-trajan-main {
+            font-family: 'Trajan', 'Cinzel', serif;
+            font-size: 38px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            line-height: 1.15;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+        .pn4-cormorant-main {
+            font-family: 'Cormorant', serif;
+            font-size: 38px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            line-height: 1.15;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+        .pn4-dual-heading.dark .pn4-script-sub { color: #343434; }
+        .pn4-dual-heading.dark .pn4-trajan-main,
+        .pn4-dual-heading.dark .pn4-cormorant-main { color: #6E6E6E; }
+        .pn4-dual-heading.light .pn4-script-sub,
+        .pn4-dual-heading.light .pn4-trajan-main { color: #FFFFFF; }
+
+        @media (max-width: 767px) {
+            .pn4-script-sub {
+                font-size: 25px;
+                margin-bottom: -14px;
+            }
+            .pn4-trajan-main,
+            .pn4-cormorant-main {
+                font-size: 34px;
+            }
+        }
+
+        /* =========================================================
+           SECTION 1: HERO ([el:495d3d4e])
+           ========================================================= */
+        .sec-hero {
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            text-align: center;
+            padding: 40px 24px 115px;
+        }
+        .hero-kicker {
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .hero-couple {
+            font-family: 'Oranienbaum', serif;
+            font-size: 46px;
+            font-weight: 400;
+            line-height: 1.12;
+            color: #FFFFFF;
+            margin-bottom: 14px;
+        }
+        .hero-date {
+            font-family: 'Assistant', 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 2.5px;
+            color: #FFFFFF;
+            margin-bottom: 13vh;
+        }
+        .hero-scroll-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #D9D9D9;
+            animation: moveUpDown 1.15s ease-in-out infinite;
+        }
+        .hero-scroll-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* =========================================================
+           SECTION 2: WHITE TEXTURED WAVE SECTION ([el:5ed05ab0])
+           Monogram + Quote Card + #COUPLE + Countdown
+           ========================================================= */
+        .sec-white-wave {
+            position: relative;
+            width: 100%;
+            background-color: #FFFFFF;
+            color: #343434;
+            padding: 64px 20px 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+        .sec-white-wave::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('/assets/templates/pn4/bg-teksture-pn4.png');
+            background-position: center center;
+            background-repeat: repeat;
+            background-size: 42% auto;
+            opacity: 0.74;
+            filter: brightness(63%) contrast(200%) saturate(0%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .sec-white-wave > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Monogram P|P */
+        .pn4-monogram {
+            font-family: 'Trajan', serif;
+            font-size: 50px;
+            font-weight: 400;
+            color: #6E6E6E;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 36px;
+            user-select: none;
+        }
+        .pn4-monogram-bar {
+            display: inline-block;
+            width: 2px;
+            height: 52px;
+            background-color: #6E6E6E;
+        }
+
+        /* Quote Card */
+        .pn4-quote-card {
+            width: 325px;
+            max-width: 92%;
+            background-color: #FFFFFF;
+            border-radius: 25px;
+            box-shadow: 0px 0px 39px -24px rgba(0, 0, 0, 0.5);
+            padding: 32px 24px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 58px;
+        }
+        .pn4-quote-flower {
+            width: 22%;
+            max-width: 68px;
+            filter: brightness(53%);
+            margin-bottom: 20px;
+        }
+        .pn4-quote-arabic {
+            font-family: 'Arslan Wessam', 'Traditional Arabic', serif;
+            font-size: 20px;
+            line-height: 1.95;
+            color: #6E6E6E;
+            text-align: center;
+            direction: rtl;
+            margin-bottom: 18px;
+        }
+        .pn4-quote-text {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: #6E6E6E;
+            text-align: justify;
+            width: 100%;
+            margin-bottom: 18px;
+        }
+        .pn4-quote-ref {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            color: #6E6E6E;
+            text-align: right;
+            width: 100%;
+        }
+
+        /* #COUPLE */
+        #COUPLE {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            scroll-margin-top: 24px;
+        }
+        .pn4-couple-intro {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.68;
+            color: #343434;
+            text-align: justify;
+            width: 350px;
+            max-width: 94%;
+            margin-bottom: 28px;
+        }
+        .pn4-person-frame {
+            width: 350px;
+            max-width: 94%;
+            background-color: #FFFFFF;
+            padding: 22px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+        }
+        .pn4-person-photo {
+            width: 100%;
+            min-height: 450px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 12px;
+        }
+        .pn4-person-glass {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.68);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            padding: 20px 12px 18px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pn4-person-name {
+            font-family: 'Cormorant Upright', serif;
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #262627;
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+        .pn4-person-meta {
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #262627;
+            margin-bottom: 12px;
+        }
+        .pn4-btn-dark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background-color: #6E6E6E;
+            color: #FFFFFF;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #6E6E6E;
+            border-radius: 4px;
+            padding: 7px 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .pn4-btn-dark svg {
+            width: 13px;
+            height: 13px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .pn4-btn-dark:hover {
+            background-color: #343434;
+            border-color: #343434;
+        }
+
+        /* Ampersand Divider between Bride & Groom */
+        .pn4-amp-divider {
+            width: 240px;
+            max-width: 70%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin: 22px 0;
+            color: #343434;
+        }
+        .pn4-amp-divider::before,
+        .pn4-amp-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #343434;
+        }
+        .pn4-amp-divider span {
+            font-family: 'Cormorant Upright', serif;
+            font-size: 46px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        /* Countdown Block */
+        .pn4-countdown-section {
+            margin-top: 56px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pn4-countdown-grid {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            margin: 14px 0 26px;
+        }
+        .pn4-cd-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 44px;
+        }
+        .pn4-cd-num {
+            font-family: 'Lora', serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: #343434;
+            line-height: 1.2;
+        }
+        .pn4-cd-lbl {
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            font-weight: 400;
+            color: #343434;
+            margin-top: 2px;
+        }
+
+        /* =========================================================
+           SECTION 3: #EVENT (Akad Arch + Resepsi Inverted Arch + Streaming)
+           ========================================================= */
+        #EVENT {
+            width: 100%;
+            padding: 64px 20px 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            scroll-margin-top: 16px;
+        }
+        .pn4-event-intro {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.68;
+            color: #FFFFFF;
+            text-align: justify;
+            width: 340px;
+            max-width: 94%;
+            margin-bottom: 34px;
+        }
+        .pn4-event-card {
+            width: 325px;
+            max-width: 94%;
+            border: 5px double #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.08);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #FFFFFF;
+            margin-bottom: 30px;
+        }
+        .pn4-event-card.arch-top {
+            border-radius: 250px 250px 15px 15px;
+            padding: 54px 22px 34px;
+        }
+        .pn4-event-card.arch-bottom {
+            border-radius: 15px 15px 250px 250px;
+            padding: 34px 22px 58px;
+        }
+        .pn4-event-ornament {
+            width: 52px;
+            height: auto;
+            filter: brightness(200%) contrast(200%) saturate(0%);
+            margin-bottom: 14px;
+        }
+        .pn4-event-title {
+            font-family: 'Saudagar', 'Cormorant Upright', serif;
+            font-size: 32px;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+        .pn4-icon-divider {
+            width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0 14px;
+            color: #FFFFFF;
+        }
+        .pn4-icon-divider::before,
+        .pn4-icon-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+        .pn4-icon-divider svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .pn4-ev-dayname {
+            font-family: 'Times New Roman', 'Lora', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+        .pn4-ev-daynum-row {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin: 2px 0 8px;
+        }
+        .pn4-ev-vbar {
+            width: 2.5px;
+            height: 54px;
+            background-color: #FFFFFF;
+            display: inline-block;
+        }
+        .pn4-ev-daynum {
+            font-family: 'EB Garamond', serif;
+            font-size: 56px;
+            font-weight: 400;
+            line-height: 1;
+            color: #FFFFFF;
+            min-width: 54px;
+        }
+        .pn4-ev-monthyear {
+            font-family: 'Times New Roman', 'Lora', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+        }
+        .pn4-ev-time {
+            font-family: 'Times New Roman', 'Lora', serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+        .pn4-ev-place-lbl {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+        }
+        .pn4-ev-venue {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            line-height: 1.45;
+        }
+        .pn4-ev-address {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            color: #FFFFFF;
+            line-height: 1.55;
+            margin-bottom: 18px;
+        }
+
+        /* Live Streaming Card ([el:38c88dbf]) */
+        .pn4-stream-card {
+            position: relative;
+            width: 325px;
+            max-width: 94%;
+            border: 5px double #FFFFFF;
+            border-radius: 15px;
+            box-shadow: 3px 3px 10px 2px rgba(0, 0, 0, 0.5);
+            padding: 28px 20px 26px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .pn4-stream-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.55);
+            z-index: 0;
+        }
+        .pn4-stream-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .pn4-stream-desc {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: #FFFFFF;
+            text-align: justify;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+        .pn4-stream-btns {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .pn4-stream-btns .pn4-btn-light {
+            width: 100%;
+            padding: 10px 14px;
+        }
+
+        /* =========================================================
+           SECTION 4: #GALLERY & #cerita (Solid #6E6E6E Background)
+           ========================================================= */
+        .sec-grey-solid {
+            width: 100%;
+            background-color: #6E6E6E;
+            padding: 60px 12px 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #GALLERY {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            scroll-margin-top: 20px;
+        }
+        .pn4-video-wrap {
+            width: 100%;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            background: #222;
+        }
+        .pn4-video-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        /* Justified Mosaic Gallery ([el:7b3566dc]) */
+        .pn4-justified-gallery {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .pn4-jg-row {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            width: 100%;
+        }
+        .pn4-jg-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #555;
+            display: block;
+        }
+        .pn4-jg-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .pn4-jg-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.32);
+            opacity: 0;
+            transition: opacity 400ms ease;
+        }
+        .pn4-jg-item:hover img {
+            transform: scale(1.08);
+        }
+        .pn4-jg-item:hover::after {
+            opacity: 1;
+        }
+
+        /* #cerita Love Story */
+        #cerita {
+            width: 100%;
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            scroll-margin-top: 20px;
+        }
+        .pn4-story-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 12px;
+        }
+        .pn4-story-card {
+            width: 90%;
+            max-width: 345px;
+            background-color: #F1F1F1;
+            border: 5px double #FFFFFF;
+            border-radius: 15px;
+            box-shadow: 2px 2px 20px 2px rgba(0, 0, 0, 0.5);
+            padding: 20px 20px;
+            color: #343434;
+            text-align: left;
+        }
+        .pn4-story-date {
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #6E6E6E;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .pn4-story-title {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #343434;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .pn4-story-body {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: #343434;
+            text-align: justify;
+        }
+
+        /* =========================================================
+           SECTION 5: #gift (Overlapping Polaroids + Gift Box + #amplop)
+           ========================================================= */
+        #gift {
+            width: 100%;
+            padding: 64px 20px 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            scroll-margin-top: 20px;
+        }
+        .pn4-gift-polaroids {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 36px;
+        }
+        .pn4-polaroid {
+            width: 185px;
+            height: 185px;
+            border: 5px solid #FFFFFF;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            flex-shrink: 0;
+        }
+        .pn4-polaroid.left {
+            margin: 0 -15px 15px 0;
+            z-index: 1;
+        }
+        .pn4-polaroid.right {
+            margin: 15px 0 0 -15px;
+            z-index: 2;
+        }
+        @media (max-width: 390px) {
+            .pn4-polaroid {
+                width: 155px;
+                height: 155px;
+            }
+        }
+        .pn4-gift-main-icon {
+            width: 52px;
+            height: 52px;
+            fill: #FFFFFF;
+            margin-bottom: 12px;
+        }
+        .pn4-cormorant-upright-title {
+            font-family: 'Cormorant Upright', serif;
+            font-size: 36px;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+        .pn4-gift-desc {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: #FFFFFF;
+            max-width: 345px;
+            margin-bottom: 22px;
+        }
+
+        /* Collapsible #amplop ([el:7476110a]) */
+        #amplop {
+            display: none;
+            width: 92%;
+            max-width: 360px;
+            background-color: #FFFFFF;
+            border: 5px double #343434;
+            border-radius: 15px;
+            padding: 34px 22px;
+            margin-top: 22px;
+            color: #343434;
+            text-align: left;
+            animation: pnZoomIn 0.4s ease forwards;
+        }
+        .pn4-bank-item {
+            margin-bottom: 24px;
+        }
+        .pn4-bank-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .pn4-bank-holder {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            color: #343434;
+            margin-bottom: 3px;
+        }
+        .pn4-bank-acc {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #343434;
+            letter-spacing: 0.4px;
+        }
+        .pn4-bank-logo {
+            width: 40%;
+            max-width: 112px;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .pn4-bank-badge-fallback {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: #343434;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border: 1.5px solid #343434;
+            border-radius: 6px;
+        }
+        .pn4-copy-btn {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background-color: #F1F1F1;
+            color: #343434;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #E5E5E5;
+            border-radius: 4px;
+            padding: 9px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .pn4-copy-btn svg {
+            width: 13px;
+            height: 13px;
+            fill: currentColor;
+        }
+        .pn4-copy-btn:hover {
+            background-color: #343434;
+            color: #FFFFFF;
+            border-color: #343434;
+        }
+
+        .pn4-phys-gift {
+            text-align: center;
+            margin: 26px 0 24px;
+            padding-top: 8px;
+        }
+        .pn4-phys-gift-icon {
+            width: 44px;
+            height: 44px;
+            fill: #343434;
+            margin: 0 auto 10px;
+        }
+        .pn4-phys-gift-lbl {
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            color: #343434;
+            margin-bottom: 6px;
+        }
+        .pn4-phys-gift-addr {
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #343434;
+            line-height: 1.55;
+            margin-bottom: 12px;
+        }
+
+        /* Gift WA Confirmation Form ([el:3c4b103d]) */
+        .pn4-gift-confirm-title {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #343434;
+            text-align: center;
+            margin: 22px 0 14px;
+        }
+        .pn4-gift-form .fg {
+            margin-bottom: 12px;
+        }
+        .pn4-gift-form input,
+        .pn4-gift-form select {
+            width: 100%;
+            background: #FFFFFF;
+            border: 0;
+            border-bottom: 1px solid #343434;
+            border-radius: 0;
+            padding: 8px 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            color: #343434;
+            outline: none;
+        }
+        .pn4-gift-form button[type="submit"] {
+            width: 100%;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background-color: #F1F1F1;
+            color: #343434;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #F1F1F1;
+            border-radius: 4px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .pn4-gift-form button[type="submit"] svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+        .pn4-gift-form button[type="submit"]:hover {
+            background-color: #343434;
+            color: #FFFFFF;
+            border-color: #343434;
+        }
+
+        /* =========================================================
+           SECTION 6: #WISHES (Framed Portrait + RSVP + Ucapan & Doa + Quote)
+           ========================================================= */
+        #WISHES {
+            width: 100%;
+            background-color: #6E6E6E;
+            padding: 60px 20px 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            scroll-margin-top: 20px;
+        }
+        .pn4-wishes-portrait {
+            width: 300px;
+            max-width: 90%;
+            min-height: 300px;
+            border: 5px double #FFFFFF;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 18px 14px;
+            position: relative;
+            margin-bottom: 36px;
+            overflow: hidden;
+        }
+        .pn4-wishes-portrait::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0) 100%);
+        }
+        .pn4-wishes-sig {
+            position: relative;
+            z-index: 1;
+            font-family: 'BrittanySignature', cursive;
+            font-size: 34px;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 1.3;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
+
+        .pn4-sec-note {
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #FFFFFF;
+            text-align: center;
+            max-width: 340px;
+            margin-bottom: 18px;
+        }
+
+        /* RSVP Form ([el:3abc923f]) */
+        .pn4-rsvp-form {
+            width: 100%;
+            max-width: 360px;
+            margin-bottom: 48px;
+        }
+        .pn4-rsvp-form .fg {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .pn4-rsvp-form label {
+            display: block;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+        }
+        .pn4-rsvp-form input,
+        .pn4-rsvp-form select,
+        .pn4-wish-form input,
+        .pn4-wish-form textarea,
+        .pn4-wish-form select {
+            width: 100%;
+            background-color: #FFFFFF;
+            border: 0;
+            border-radius: 4px;
+            padding: 10px 13px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            color: #343434;
+            outline: none;
+        }
+        .pn4-rsvp-form button[type="submit"],
+        .pn4-wish-form button[type="submit"] {
+            width: 100%;
+            margin-top: 6px;
+            background-color: #F1F1F1;
+            color: #343434;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #FFFFFF;
+            border-radius: 4px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .pn4-rsvp-form button[type="submit"]:hover,
+        .pn4-wish-form button[type="submit"]:hover {
+            background-color: #343434;
+            color: #FFFFFF;
+        }
+        .pn4-form-feedback {
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            color: #E8F5E9;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* Ucapan & Doa Box ([el:65a90f97]) */
+        .pn4-comments-wrap {
+            width: 100%;
+            max-width: 375px;
+        }
+        .pn4-comments-count {
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-align: center;
+            margin: 12px 0 18px;
+        }
+        .pn4-wish-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        .pn4-wish-form textarea {
+            min-height: 82px;
+            resize: vertical;
+        }
+        .pn4-wish-list {
+            list-style: none;
+            max-height: 430px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .pn4-wish-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .pn4-wish-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 4px;
+        }
+        .pn4-wish-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+            text-align: left;
+        }
+        .pn4-wish-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+        .pn4-wish-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .pn4-wish-head {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        .pn4-wish-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+        .pn4-att-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+        .pn4-att-badge svg {
+            width: 15px;
+            height: 15px;
+        }
+        .pn4-wish-msg {
+            font-family: 'Raleway', sans-serif;
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #FFFFFF;
+            word-break: break-word;
+            margin-bottom: 6px;
+        }
+        .pn4-wish-meta {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            color: #EAEAEA;
+        }
+        .pn4-wish-meta svg {
+            width: 11px;
+            height: 11px;
+            fill: currentColor;
+            opacity: 0.9;
+        }
+        .pn4-wish-reply {
+            font-family: 'Lora', serif;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-left: 4px;
+            cursor: pointer;
+        }
+
+        /* Optional Turut Mengundang */
+        .pn4-turut-box {
+            margin-top: 38px;
+            padding: 20px 18px;
+            width: 100%;
+            max-width: 360px;
+            border-top: 1px solid rgba(255,255,255,0.35);
+            border-bottom: 1px solid rgba(255,255,255,0.35);
+            text-align: center;
+        }
+        .pn4-turut-title {
+            font-family: 'Cormorant Upright', serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .pn4-turut-list {
+            list-style: none;
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            line-height: 1.75;
+            color: #FFFFFF;
+        }
+
+        /* Closing Hadith Quote in #WISHES */
+        .pn4-bottom-quote {
+            margin-top: 48px;
+            max-width: 345px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pn4-bottom-quote svg {
+            width: 28px;
+            height: 28px;
+            fill: #FFFFFF;
+            margin-bottom: 16px;
+        }
+        .pn4-bottom-quote p {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.68;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+        }
+        .pn4-bottom-quote strong {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            font-style: italic;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        /* =========================================================
+           SECTION 7: CLOSING SECTION ([el:88997ff])
+           ========================================================= */
+        .sec-closing {
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            text-align: center;
+            padding: 60px 24px 96px;
+        }
+        .closing-thanks {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            line-height: 1.68;
+            color: #FFFFFF;
+            max-width: 350px;
+            margin-bottom: 32px;
+        }
+        .closing-kami {
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .closing-couple {
+            font-family: 'Oranienbaum', serif;
+            font-size: 36px;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 1.15;
+            margin-bottom: 18px;
+        }
+        .closing-arrow-up {
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .closing-arrow-fallback {
+            width: 42px;
+            height: 42px;
+            border: 1.8px solid #FFFFFF;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            animation: moveUpDown 1.3s ease-in-out infinite;
+        }
+        .closing-arrow-fallback svg {
+            width: 18px;
+            height: 18px;
+            stroke: #FFFFFF;
+            fill: none;
+            stroke-width: 2.2;
+        }
+
+        /* =========================================================
+           8. FLOATING CONTROLS (Fullscreen + Audio + 7-Icon Pill Nav)
+           ========================================================= */
+        .pn4-float-circle {
+            position: fixed;
+            left: 40px;
+            z-index: 999;
+            width: 41px;
+            height: 41px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.59);
+            color: rgba(255, 255, 255, 0.96);
+            border: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .pn4-float-circle:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #FFFFFF;
+        }
+        .pn4-float-circle svg {
+            width: 17px;
+            height: 17px;
+            fill: currentColor;
+        }
+        #btnFullscreen {
+            bottom: 138px;
+        }
+        #audio-container {
+            bottom: 90px;
+        }
+        @media (max-width: 767px) {
+            .pn4-float-circle {
+                left: 13px;
+                width: 36px;
+                height: 36px;
+            }
+            .pn4-float-circle svg {
+                width: 13px;
+                height: 13px;
+            }
+            #btnFullscreen {
+                bottom: 132px;
+            }
+            #audio-container {
+                bottom: 90px;
+            }
+        }
+
+        /* Bottom 7-Icon Pill Nav ([el:5de33b89]) */
+        .pn4-bottom-nav-wrap {
+            position: fixed;
+            bottom: 13px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            background-color: rgba(0, 0, 0, 0.42);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            border-radius: 46px;
+            padding: 8px 10px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.18);
+        }
+        .pn4-bottom-nav {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pn4-nav-item {
+            position: relative;
+        }
+        .pn4-nav-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            color: #343434;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+        .pn4-nav-link svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        .pn4-nav-item.active .pn4-nav-link {
+            background-color: #343434;
+            color: #FFFFFF;
+        }
+        .pn4-nav-tooltip {
+            position: absolute;
+            bottom: calc(100% + 9px);
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #EBEBEB;
+            color: #343434;
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            padding: 3px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .pn4-nav-item:hover .pn4-nav-tooltip {
+            opacity: 1;
+        }
+        @media (max-width: 390px) {
+            .pn4-bottom-nav-wrap {
+                padding: 7px 8px;
+            }
+            .pn4-bottom-nav {
+                gap: 6px;
+            }
+            .pn4-nav-link {
+                width: 33px;
+                height: 33px;
+            }
+            .pn4-nav-link svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        /* =========================================================
+           LIGHTBOX MODAL & COPY TOAST
+           ========================================================= */
+        #pn4-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 10050;
+            background-color: rgba(0, 0, 0, 0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #pn4-lightbox.open {
+            display: flex;
+        }
+        #pn4-lightbox img {
+            max-width: 92vw;
+            max-height: 86vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .lb-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.14);
+            color: #FFFFFF;
+            border: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lb-close { top: 18px; right: 18px; }
+        .lb-prev { left: 14px; top: 50%; transform: translateY(-50%); }
+        .lb-next { right: 14px; top: 50%; transform: translateY(-50%); }
+
+        #pn4-toast {
+            position: fixed;
+            bottom: 78px;
+            left: 50%;
+            transform: translateX(-50%) translateY(12px);
+            background-color: #262627;
+            color: #FFFFFF;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            padding: 8px 18px;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 10060;
+        }
+        #pn4-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body class="scroll-locked"
+      data-slug="{{ .Slug }}"
+      data-event-type="{{ .EventType }}"
+      data-groom-nick="{{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}Putra{{ end }}"
+      data-bride-nick="{{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}Putri{{ end }}"
+      data-child-nick="{{ .ChildNickname }}"
+      data-akad-date="{{ .AkadDate }}"
+      data-akad-time="{{ .AkadTime }}"
+      data-akad-venue="{{ .AkadVenue }}"
+      data-akad-address="{{ .AkadAddress }}"
+      data-resepsi-date="{{ .ResepsiDate }}"
+      data-resepsi-time="{{ .ResepsiTime }}"
+      data-resepsi-venue="{{ .ResepsiVenue }}"
+      data-wa="{{ .WaConfirmation }}"
+      data-love-story="{{ .LoveStory }}">
+
+    {{/* Resolve Couple Display Label */}}
+    {{ $groomNick := "Putra" }}{{ if .GroomNickname }}{{ $groomNick = .GroomNickname }}{{ end }}
+    {{ $brideNick := "Putri" }}{{ if .BrideNickname }}{{ $brideNick = .BrideNickname }}{{ end }}
+    {{ $coupleLabel := printf "%s & %s" $groomNick $brideNick }}
+    {{ if eq .EventType "khitan" }}
+        {{ if .ChildNickname }}{{ $coupleLabel = .ChildNickname }}{{ else if .ChildName }}{{ $coupleLabel = .ChildName }}{{ end }}
+    {{ end }}
+
+    {{ $customCover := .CoverImage }}
+    {{ if eq $customCover "/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg" }}{{ $customCover = "" }}{{ end }}
+
+    {{ $coverPhoto := "/assets/templates/pn4/photos/LeniArdi2.jpeg" }}
+    {{ if $customCover }}{{ $coverPhoto = $customCover }}{{ end }}
+
+    {{ $stickyPhoto := "/assets/templates/pn4/photos/LeniArdi14.jpeg" }}
+    {{ if .Sec1Photo }}{{ $stickyPhoto = .Sec1Photo }}{{ else if $customCover }}{{ $stickyPhoto = $customCover }}{{ end }}
+
+    {{ $bridePhoto := "/assets/templates/pn4/photos/LeniArdi16.jpeg" }}
+    {{ if .BridePhoto }}{{ $bridePhoto = .BridePhoto }}{{ end }}
+
+    {{ $groomPhoto := "/assets/templates/pn4/photos/LeniArdi15.jpeg" }}
+    {{ if .GroomPhoto }}{{ $groomPhoto = .GroomPhoto }}{{ end }}
+
+    {{ $streamPhoto := "/assets/templates/pn4/photos/LeniArdi2.jpeg" }}
+    {{ if .EventPhoto }}{{ $streamPhoto = .EventPhoto }}{{ else if $customCover }}{{ $streamPhoto = $customCover }}{{ end }}
+
+    {{ $wishesPhoto := "/assets/templates/pn4/photos/LeniArdi8.jpeg" }}
+    {{ if .ClosingPhoto }}{{ $wishesPhoto = .ClosingPhoto }}{{ else if $customCover }}{{ $wishesPhoto = $customCover }}{{ end }}
+
+    <!-- =========================================================
+         1. OPENING GATE COVER
+         ========================================================= -->
+    <section id="gate-cover" style="background-image: url('{{ $coverPhoto }}');">
+        <div class="gate-inner">
+            <p class="gate-subtitle">{{ if eq .EventType "khitan" }}TASYAKURAN KHITANAN{{ else }}THE WEDDING OF{{ end }}</p>
+            <h1 class="gate-couple">{{ $coupleLabel }}</h1>
+
+            <div class="gate-spacer"></div>
+
+            <p class="gate-yth">Kepada Yth:</p>
+            <h2 class="gate-guest" id="gateGuestName">{{ .GuestTo }}</h2>
+            <p class="gate-place">Di Tempat</p>
+
+            <a id="tombol-buka" href="#cover" class="pn4-btn-light" role="button">
+                <svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M494.586 164.516c-4.697-3.883-111.723-89.95-135.251-108.657C337.231 38.191 299.437 0 256 0c-43.205 0-80.636 37.717-103.335 55.859-24.463 19.45-131.07 105.195-135.15 108.549A48.004 48.004 0 0 0 0 201.485V464c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V201.509a48 48 0 0 0-17.414-36.993zM464 458a6 6 0 0 1-6 6H54a6 6 0 0 1-6-6V204.347c0-1.813.816-3.526 2.226-4.665 15.87-12.814 108.793-87.554 132.364-106.293C200.755 78.88 232.398 48 256 48c23.693 0 55.857 31.369 73.41 45.389 23.573 18.741 116.503 93.493 132.366 106.316a5.99 5.99 0 0 1 2.224 4.663V458zm-31.991-187.704c4.249 5.159 3.465 12.795-1.745 16.981-28.975 23.283-59.274 47.597-70.929 56.863C336.636 362.283 299.205 400 256 400c-43.452 0-81.287-38.237-103.335-55.86-11.279-8.967-41.744-33.413-70.927-56.865-5.21-4.187-5.993-11.822-1.745-16.981l15.258-18.528c4.178-5.073 11.657-5.843 16.779-1.726 28.618 23.001 58.566 47.035 70.56 56.571C200.143 320.631 232.307 352 256 352c23.602 0 55.246-30.88 73.41-45.389 11.994-9.535 41.944-33.57 70.563-56.568 5.122-4.116 12.601-3.346 16.778 1.727l15.258 18.526z"></path></svg>
+                <span>BUKA UNDANGAN</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         2. FIXED BACKGROUND SLIDESHOW LAYER
+         ========================================================= -->
+    <div id="fixed-bg-layer" aria-hidden="true">
+        <div class="fixed-bg-left-spacer"></div>
+        <div class="fixed-bg-slideshow" id="bgSlideshow">
+            {{ if .GalleryList }}
+                {{ range $idx, $img := .GalleryList }}
+                    {{ if lt $idx 6 }}
+                    <div class="fixed-bg-slide{{ if eq $idx 0 }} active{{ end }}" style="background-image: url('{{ $img }}');"></div>
+                    {{ end }}
+                {{ end }}
+            {{ else if $customCover }}
+                <div class="fixed-bg-slide active" style="background-image: url('{{ $customCover }}');"></div>
+                {{ if .Sec1Photo }}<div class="fixed-bg-slide" style="background-image: url('{{ .Sec1Photo }}');"></div>{{ end }}
+                {{ if .EventPhoto }}<div class="fixed-bg-slide" style="background-image: url('{{ .EventPhoto }}');"></div>{{ end }}
+                {{ if .ClosingPhoto }}<div class="fixed-bg-slide" style="background-image: url('{{ .ClosingPhoto }}');"></div>{{ end }}
+            {{ else }}
+                <div class="fixed-bg-slide active" style="background-image: url('/assets/templates/pn4/photos/LeniArdi8.jpeg');"></div>
+                <div class="fixed-bg-slide" style="background-image: url('/assets/templates/pn4/photos/LeniArdi10.jpeg');"></div>
+                <div class="fixed-bg-slide" style="background-image: url('/assets/templates/pn4/photos/LeniArdi6.jpeg');"></div>
+                <div class="fixed-bg-slide" style="background-image: url('/assets/templates/pn4/photos/LeniArdi13.jpeg');"></div>
+                <div class="fixed-bg-slide" style="background-image: url('/assets/templates/pn4/photos/LeniArdi5.jpeg');"></div>
+            {{ end }}
+        </div>
+    </div>
+
+    <!-- =========================================================
+         3. MAIN SPLIT CONTAINER (#cover)
+         ========================================================= -->
+    <main id="cover">
+        <!-- Desktop Left Sticky Pane -->
+        <aside class="pn4-left-sticky-col">
+            <div class="pn4-left-sticky-inner" style="background-image: url('{{ $stickyPhoto }}');">
+                <div class="pn4-left-sticky-content">
+                    <p class="sticky-kicker">{{ if eq .EventType "khitan" }}UNDANGAN TASYAKURAN KHITAN{{ else }}OUR WEDDING INVITATION{{ end }}</p>
+                    <h2 class="sticky-couple">{{ $coupleLabel }}</h2>
+                    <p class="sticky-yth">Kepada Yth. Bapak / Ibu /Saudara/i</p>
+                    <p class="sticky-guest" id="stickyGuestName">{{ .GuestTo }}</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Scrollable Invitation Content -->
+        <div class="pn4-right-col">
+
+            <!-- SECTION 1: HERO -->
+            <section class="sec-hero">
+                <p class="hero-kicker pn-anim anim-fadeInDown">{{ if eq .EventType "khitan" }}TASYAKURAN KHITANAN{{ else }}THE WEDDING OF{{ end }}</p>
+                <h2 class="hero-couple pn-anim anim-zoomIn">{{ $coupleLabel }}</h2>
+                <p class="hero-date pn-anim anim-fadeInUp" id="heroDateDots">{{ if .AkadDate }}{{ .AkadDate }}{{ else if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}23 . 08 . 2025{{ end }}</p>
+
+                <a href="#COUPLE" class="hero-scroll-icon" aria-label="Scroll ke bawah">
+                    <svg viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg"><path d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"></path></svg>
+                </a>
+            </section>
+
+            <!-- SECTION 2: WHITE WAVE PATTERN (Monogram + Quote + #COUPLE + Countdown) -->
+            <section class="sec-white-wave">
+                <div class="pn4-monogram pn-anim anim-zoomIn" id="pn4Monogram">
+                    <span id="monoLeft">P</span>
+                    <span class="pn4-monogram-bar"></span>
+                    <span id="monoRight">P</span>
+                </div>
+
+                <!-- Rounded White Quote Card -->
+                <div class="pn4-quote-card pn-anim anim-zoomIn">
+                    <img src="/assets/templates/pn4/flower-pn1.png" alt="" class="pn4-quote-flower">
+                    {{ if ne .EventType "khitan" }}
+                    <p class="pn4-quote-arabic">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ مِنْ أَنْفُسِكُمْ أَزْوَاجًا لِتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُمْ مَوَدَّةً وَرَحْمَةً إِنَّ فِي ذَلِكَ لَآيَاتٍ لِقَوْمٍ يَتَفَكَّرُونَ</p>
+                    {{ end }}
+                    {{ if .Quotes }}
+                        <p class="pn4-quote-text">{{ .Quotes }}</p>
+                    {{ else }}
+                        <p class="pn4-quote-text">"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya. Dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir."</p>
+                        <p class="pn4-quote-ref">( Q.S. Ar-Rum: 21 )</p>
+                    {{ end }}
+                </div>
+
+                <!-- #COUPLE -->
+                <div id="COUPLE">
+                    {{ if eq .EventType "khitan" }}
+                        <div class="pn4-dual-heading dark pn-anim anim-zoomIn">
+                            <span class="pn4-script-sub">Putra</span>
+                            <h2 class="pn4-trajan-main"> tercinta</h2>
+                        </div>
+                        <p class="pn4-couple-intro pn-anim anim-zoomIn">Dengan memohon rahmat dan ridho Allah Subhanahu Wa Ta’ala, insyaaAllah kami bermaksud menyelenggarakan acara Tasyakuran Khitanan putra kami:</p>
+
+                        <div class="pn4-person-frame pn-anim anim-fadeInUp">
+                            <div class="pn4-person-photo" style="background-image: url('{{ $groomPhoto }}');">
+                                <div class="pn4-person-glass">
+                                    <h3 class="pn4-person-name">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h3>
+                                    <p class="pn4-person-meta">
+                                        {{ if .ChildOrder }}{{ .ChildOrder }} dari<br>{{ end }}
+                                        {{ if .GroomParents }}<strong>{{ .GroomParents }}</strong>{{ end }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {{ else }}
+                        <div class="pn4-dual-heading dark pn-anim anim-zoomIn">
+                            <span class="pn4-script-sub">Wedding</span>
+                            <h2 class="pn4-trajan-main">COUPLE</h2>
+                        </div>
+                        <p class="pn4-couple-intro pn-anim anim-zoomIn">Dengan memohon rahmat dan ridho Allah Subhanahu Wa Ta’ala, insyaaAllah kami akan menyelenggarakan acara pernikahan kami:</p>
+
+                        <!-- Bride Card -->
+                        <div class="pn4-person-frame pn-anim anim-fadeInUp">
+                            <div class="pn4-person-photo" style="background-image: url('{{ $bridePhoto }}');">
+                                <div class="pn4-person-glass">
+                                    <h3 class="pn4-person-name">{{ if .BrideName }}{{ .BrideName }}{{ else }}Putri Pratiwi{{ end }}</h3>
+                                    <p class="pn4-person-meta">
+                                        {{ if .BrideChildOrder }}{{ .BrideChildOrder }} dari<br>{{ else }}Putri tercinta dari<br>{{ end }}
+                                        {{ if .BrideParents }}{{ .BrideParents }}{{ else }}Bapak Mempelai Wanita &amp; Ibu Mempelai Wanita{{ end }}
+                                    </p>
+                                    {{ if .BrideInstagram }}
+                                    <a href="https://www.instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="pn4-btn-dark">
+                                        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                                        <span class="ig-handle-txt">{{ .BrideInstagram }}</span>
+                                    </a>
+                                    {{ end }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pn4-amp-divider pn-anim anim-zoomIn"><span>&amp;</span></div>
+
+                        <!-- Groom Card -->
+                        <div class="pn4-person-frame pn-anim anim-fadeInUp">
+                            <div class="pn4-person-photo" style="background-image: url('{{ $groomPhoto }}');">
+                                <div class="pn4-person-glass">
+                                    <h3 class="pn4-person-name">{{ if .GroomName }}{{ .GroomName }}{{ else }}Putra Pratama{{ end }}</h3>
+                                    <p class="pn4-person-meta">
+                                        {{ if .GroomChildOrder }}{{ .GroomChildOrder }} dari<br>{{ else }}Putra tercinta dari<br>{{ end }}
+                                        {{ if .GroomParents }}{{ .GroomParents }}{{ else }}Bapak Mempelai Pria &amp; Ibu Mempelai Pria{{ end }}
+                                    </p>
+                                    {{ if .GroomInstagram }}
+                                    <a href="https://www.instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="pn4-btn-dark">
+                                        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                                        <span class="ig-handle-txt">{{ .GroomInstagram }}</span>
+                                    </a>
+                                    {{ end }}
+                                </div>
+                            </div>
+                        </div>
+                    {{ end }}
+                </div>
+
+                <!-- Countdown Menuju Hari BAHAGIA -->
+                <div class="pn4-countdown-section pn-anim anim-zoomIn">
+                    <div class="pn4-dual-heading dark">
+                        <span class="pn4-script-sub">Menuju Hari</span>
+                        <h3 class="pn4-cormorant-main">BAHAGIA</h3>
+                    </div>
+
+                    <div class="pn4-countdown-grid" id="pn4Countdown">
+                        <div class="pn4-cd-item"><span class="pn4-cd-num" id="cdDays">0</span><span class="pn4-cd-lbl">Hari</span></div>
+                        <div class="pn4-cd-item"><span class="pn4-cd-num" id="cdHours">0</span><span class="pn4-cd-lbl">Jam</span></div>
+                        <div class="pn4-cd-item"><span class="pn4-cd-num" id="cdMins">0</span><span class="pn4-cd-lbl">Menit</span></div>
+                        <div class="pn4-cd-item"><span class="pn4-cd-num" id="cdSecs">0</span><span class="pn4-cd-lbl">Detik</span></div>
+                    </div>
+
+                    <a id="btnSaveCalendar" href="#" target="_blank" rel="noopener" class="pn4-btn-dark">
+                        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"></path></svg>
+                        <span>Simpan tanggal</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- SECTION 3: #EVENT -->
+            <section id="EVENT">
+                <div class="pn4-dual-heading light pn-anim anim-zoomIn">
+                    <span class="pn4-script-sub">{{ if eq .EventType "khitan" }}Jadwal{{ else }}Wedding{{ end }}</span>
+                    <h2 class="pn4-trajan-main">EVENT</h2>
+                </div>
+
+                <p class="pn4-event-intro pn-anim anim-zoomIn">Dengan segala kerendahan hati kami berharap kehadiran Bapak/Ibu/Saudara/i dalam acara {{ if eq .EventType "khitan" }}tasyakuran khitanan{{ else }}pernikahan{{ end }} kami yang akan diselenggarakan pada:</p>
+
+                <!-- Akad Nikah / Acara Utama Arch-Top Card -->
+                <div class="pn4-event-card arch-top pn-anim anim-fadeInUp">
+                    <img src="/assets/templates/pn4/akad-pn1-2.png" alt="" class="pn4-event-ornament">
+                    <h3 class="pn4-event-title">{{ if eq .EventType "khitan" }}Tasyakuran Khitan{{ else }}Akad Nikah{{ end }}</h3>
+
+                    <div class="pn4-icon-divider">
+                        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg>
+                    </div>
+
+                    <p class="pn4-ev-dayname" id="akadDayName">Minggu</p>
+                    <div class="pn4-ev-daynum-row">
+                        <span class="pn4-ev-vbar"></span>
+                        <span class="pn4-ev-daynum" id="akadDayNum" data-target="23">23</span>
+                        <span class="pn4-ev-vbar"></span>
+                    </div>
+                    <p class="pn4-ev-monthyear" id="akadMonthYear">September 2025</p>
+                    <p class="pn4-ev-time">{{ if .AkadTime }}{{ .AkadTime }}{{ else }}07.00 WIB - Selesai{{ end }}</p>
+
+                    <div class="pn4-icon-divider">
+                        <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
+                    </div>
+
+                    <p class="pn4-ev-place-lbl">Bertempat Di,</p>
+                    <p class="pn4-ev-venue">{{ if .AkadVenue }}{{ .AkadVenue }}{{ else }}Kediaman Mempelai Wanita{{ end }}</p>
+                    <p class="pn4-ev-address">{{ if .AkadAddress }}{{ .AkadAddress }}{{ else }}Lokasi Acara{{ end }}</p>
+
+                    {{ if .AkadMapsURL }}
+                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                        <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
+                        <span>Lihat Lokasi</span>
+                    </a>
+                    {{ end }}
+                </div>
+
+                <!-- Resepsi Inverted-Arch Bottom Card -->
+                {{ if or .ResepsiDate .ResepsiVenue .ResepsiTime (ne .EventType "khitan") }}
+                <div class="pn4-event-card arch-bottom pn-anim anim-fadeInUp">
+                    <img src="/assets/templates/pn4/resepsi-pn1.png" alt="" class="pn4-event-ornament">
+                    <h3 class="pn4-event-title">{{ if eq .EventType "khitan" }}Walimatul Khitan{{ else }}Resepsi{{ end }}</h3>
+
+                    <div class="pn4-icon-divider">
+                        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg>
+                    </div>
+
+                    <p class="pn4-ev-dayname" id="resepsiDayName">Minggu</p>
+                    <div class="pn4-ev-daynum-row">
+                        <span class="pn4-ev-vbar"></span>
+                        <span class="pn4-ev-daynum" id="resepsiDayNum" data-target="23">23</span>
+                        <span class="pn4-ev-vbar"></span>
+                    </div>
+                    <p class="pn4-ev-monthyear" id="resepsiMonthYear">September 2025</p>
+                    <p class="pn4-ev-time">{{ if .ResepsiTime }}{{ .ResepsiTime }}{{ else }}10.00 WIB - Selesai{{ end }}</p>
+
+                    <div class="pn4-icon-divider">
+                        <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
+                    </div>
+
+                    <p class="pn4-ev-place-lbl">Bertempat Di,</p>
+                    <p class="pn4-ev-venue">{{ if .ResepsiVenue }}{{ .ResepsiVenue }}{{ else if .AkadVenue }}{{ .AkadVenue }}{{ else }}Kediaman Mempelai Wanita{{ end }}</p>
+                    <p class="pn4-ev-address">{{ if .ResepsiAddress }}{{ .ResepsiAddress }}{{ else if .AkadAddress }}{{ .AkadAddress }}{{ else }}Lokasi Acara{{ end }}</p>
+
+                    {{ if .ResepsiMapsURL }}
+                    <a href="{{ .ResepsiMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                        <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
+                        <span>Lihat Lokasi</span>
+                    </a>
+                    {{ else if .AkadMapsURL }}
+                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                        <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
+                        <span>Lihat Lokasi</span>
+                    </a>
+                    {{ end }}
+                </div>
+                {{ end }}
+
+                <!-- Live Streaming Card -->
+                {{ if or .BrideInstagram .GroomInstagram .YoutubeURL }}
+                <div class="pn4-stream-card pn-anim anim-fadeInUp" style="background-image: url('{{ $streamPhoto }}');">
+                    <img src="/assets/templates/pn4/video-pn1.png" alt="" class="pn4-event-ornament" style="margin-bottom: 4px;">
+                    <div class="pn4-dual-heading light" style="margin-bottom: 4px;">
+                        <span class="pn4-script-sub">Live</span>
+                        <h3 class="pn4-trajan-main" style="font-size: 30px;">STREAMING</h3>
+                    </div>
+                    <p class="pn4-stream-desc">Bagi tamu undangan yang berhalangan hadir dan ingin menyaksikan acara {{ if eq .EventType "khitan" }}kami{{ else }}pernikahan kami{{ end }} silahkan ikuti live streaming acara kami dengan klik tombol di bawah.</p>
+                    <div class="pn4-stream-btns">
+                        {{ if .BrideInstagram }}
+                        <a href="https://www.instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                            <span>Instagram Live</span>
+                        </a>
+                        {{ else if .GroomInstagram }}
+                        <a href="https://www.instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                            <span>Instagram Live</span>
+                        </a>
+                        {{ end }}
+                        {{ if .YoutubeURL }}
+                        <a href="{{ .YoutubeURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                            <svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg>
+                            <span>Youtube Live</span>
+                        </a>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+            </section>
+
+            <!-- SECTION 4: #GALLERY & #cerita (Solid #6E6E6E) -->
+            <section class="sec-grey-solid">
+                <div id="GALLERY">
+                    <div class="pn4-dual-heading light pn-anim anim-zoomIn">
+                        <span class="pn4-script-sub">Our</span>
+                        <h2 class="pn4-trajan-main">GALLERY</h2>
+                    </div>
+
+                    {{ if .YoutubeEmbedURL }}
+                    <div class="pn4-video-wrap pn-anim anim-fadeInUp">
+                        <iframe src="{{ .YoutubeEmbedURL }}?rel=0" title="Wedding Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    {{ end }}
+
+                    <!-- Source photos for Justified Mosaic Gallery -->
+                    <div id="pn4GallerySource" style="display:none;">
+                        {{ if .GalleryList }}
+                            {{ range .GalleryList }}
+                            <span data-src="{{ . }}"></span>
+                            {{ end }}
+                        {{ else }}
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi18.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi12.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi2.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi17.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi14.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi13.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi1.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi10.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi8.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi7.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi6.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi5.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi4.jpeg"></span>
+                            <span data-src="/assets/templates/pn4/photos/LeniArdi3.jpeg"></span>
+                        {{ end }}
+                    </div>
+                    <div class="pn4-justified-gallery" id="pn4JustifiedGallery"></div>
+                </div>
+
+                <!-- #cerita Love Story -->
+                {{ if ne .EventType "khitan" }}
+                <div id="cerita">
+                    <div class="pn4-dual-heading light pn-anim anim-zoomIn">
+                        <span class="pn4-script-sub">Our</span>
+                        <h2 class="pn4-trajan-main">LOVE STORY</h2>
+                    </div>
+                    <div class="pn4-icon-divider" style="width: 140px;">
+                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M458.4 64.3C400.6 15.7 311.3 23 256 79.3 200.7 23 111.4 15.6 53.6 64.3-21.6 127.6-10.6 230.8 43 285.5l175.4 178.7c10 10.2 23.4 15.9 37.6 15.9 14.3 0 27.6-5.6 37.6-15.8L469 285.6c53.5-54.7 64.7-157.9-10.6-221.3zm-23.6 187.5L259.4 430.5c-2.4 2.4-4.4 2.4-6.8 0L77.2 251.8c-36.5-37.2-43.9-107.6 7.3-150.7 38.9-32.7 98.9-27.8 136.5 10.5l35 35.7 35-35.7c37.8-38.5 97.8-43.2 136.5-10.6 51.1 43.1 43.5 113.9 7.3 150.8z"></path></svg>
+                    </div>
+                    <div class="pn4-story-list" id="pn4StoryList"></div>
+                </div>
+                {{ end }}
+            </section>
+
+            <!-- SECTION 5: #gift -->
+            <section id="gift">
+                <div class="pn4-gift-polaroids">
+                    <div class="pn4-polaroid left pn-anim anim-fadeInLeft" id="giftPolLeft"
+                         style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}/assets/templates/pn4/photos/LeniArdi5.jpeg{{ end }}');"></div>
+                    <div class="pn4-polaroid right pn-anim anim-fadeInRight" id="giftPolRight"
+                         style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else }}/assets/templates/pn4/photos/LeniArdi1.jpeg{{ end }}');"></div>
+                </div>
+
+                <svg class="pn4-gift-main-icon pn-anim anim-zoomIn" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg"><path d="M425.7,77.369H398.424A53.658,53.658,0,0,0,350.263,0a73.108,73.108,0,0,0-73.026,73.026v4.343H249.21V73.026A73.108,73.108,0,0,0,176.184,0a53.658,53.658,0,0,0-48.161,77.369H94.3a55.682,55.682,0,0,0-55.619,55.618V464.381A55.682,55.682,0,0,0,94.3,520H425.7a55.682,55.682,0,0,0,55.619-55.619V132.987A55.682,55.682,0,0,0,425.7,77.369ZM212.763,490H94.3a25.648,25.648,0,0,1-25.619-25.619V132.987A25.648,25.648,0,0,1,94.3,107.369h118.46ZM219.21,77.369H176.184a23.685,23.685,0,0,1,0-47.369A43.075,43.075,0,0,1,219.21,73.026ZM277.237,490H242.763V107.369h34.474Zm30-416.974A43.076,43.076,0,0,1,350.263,30a23.685,23.685,0,0,1,0,47.369H307.237ZM451.316,464.381A25.648,25.648,0,0,1,425.7,490H307.237V107.369H425.7a25.648,25.648,0,0,1,25.619,25.618Z"></path><path d="M426.189,349.915A40.339,40.339,0,0,0,380,342.265a40.221,40.221,0,0,0-48.023,62.574c.487.688,37.327,37.633,37.327,37.633a15.179,15.179,0,0,0,21.392,0s36.84-36.945,37.327-37.633a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.634L380,410.742l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M426.189,169.907A40.341,40.341,0,0,0,380,162.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.635L380,230.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M186.189,349.907A40.341,40.341,0,0,0,140,342.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.635L140,410.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M140,162.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924h0A40.341,40.341,0,0,0,140,162.258Zm25.012,43.284L140,230.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path></svg>
+
+                <h2 class="pn4-cormorant-upright-title pn-anim anim-zoomIn">Kirim Hadiah</h2>
+                <p class="pn4-gift-desc pn-anim anim-zoomIn">Doa Restu Anda merupakan karunia yang sangat berarti bagi kami. Namun jika memberi adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara cashless.</p>
+
+                <button type="button" id="btnAmplop" class="pn4-btn-light pn-anim anim-zoomIn">
+                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M461.2 128H80c-8.84 0-16-7.16-16-16s7.16-16 16-16h384c8.84 0 16-7.16 16-16 0-26.51-21.49-48-48-48H64C28.65 32 0 60.65 0 96v320c0 35.35 28.65 64 64 64h397.2c28.02 0 50.8-21.53 50.8-48V176c0-26.47-22.78-48-50.8-48zM416 336c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z"></path></svg>
+                    <span>Kirim Hadiah</span>
+                </button>
+
+                <div id="amplop">
+                    {{ if .BankAccount1 }}
+                    <div class="pn4-bank-item">
+                        <div class="pn4-bank-top">
+                            <div>
+                                <p class="pn4-bank-holder">{{ .BankHolder1 }}</p>
+                                <p class="pn4-bank-acc">{{ .BankAccount1 }}</p>
+                            </div>
+                            <div class="pn4-bank-logo-slot" data-bank="{{ .BankName1 }}"></div>
+                        </div>
+                        <button type="button" class="pn4-copy-btn" data-copy="{{ .BankAccount1 }}">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                            <span>Copy No.Rek</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if .BankAccount2 }}
+                    <div class="pn4-bank-item">
+                        <div class="pn4-bank-top">
+                            <div>
+                                <p class="pn4-bank-holder">{{ .BankHolder2 }}</p>
+                                <p class="pn4-bank-acc">{{ .BankAccount2 }}</p>
+                            </div>
+                            <div class="pn4-bank-logo-slot" data-bank="{{ .BankName2 }}"></div>
+                        </div>
+                        <button type="button" class="pn4-copy-btn" data-copy="{{ .BankAccount2 }}">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                            <span>Copy No.Rek</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if and (not .BankAccount1) (not .BankAccount2) (not .GiftAddress) }}
+                    <div class="pn4-bank-item">
+                        <div class="pn4-bank-top">
+                            <div>
+                                <p class="pn4-bank-holder">{{ if .BrideName }}{{ .BrideName }}{{ else }}Putri Pratiwi{{ end }}</p>
+                                <p class="pn4-bank-acc">1234XXXX</p>
+                            </div>
+                            <img src="/assets/templates/pn4/logo_bca.png" alt="BCA" class="pn4-bank-logo">
+                        </div>
+                        <button type="button" class="pn4-copy-btn" data-copy="1234XXXX">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                            <span>Copy No.Rek</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if .GiftAddress }}
+                    <div class="pn4-phys-gift">
+                        <svg class="pn4-phys-gift-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20,7H18.262A5.137,5.137,0,0,0,20,3a1,1,0,0,0-2,0c0,2.622-2.371,3.53-4.174,3.841A9.332,9.332,0,0,0,15,3,3,3,0,0,0,9,3a9.332,9.332,0,0,0,1.174,3.841C8.371,6.53,6,5.622,6,3A1,1,0,0,0,4,3,5.137,5.137,0,0,0,5.738,7H4a4,4,0,0,0-4,4v1a2,2,0,0,0,2,2v5a5.006,5.006,0,0,0,5,5H17a5.006,5.006,0,0,0,5-5V14a2,2,0,0,0,2-2V11A4,4,0,0,0,20,7ZM12,2a1,1,0,0,1,1,1,7.71,7.71,0,0,1-1,3.013A7.71,7.71,0,0,1,11,3,1,1,0,0,1,12,2ZM2,11A2,2,0,0,1,4,9h7v3H2Zm2,8V14h7v8H7A3,3,0,0,1,4,19Zm16,0a3,3,0,0,1-3,3H13V14h7Zm-7-7V9h7a2,2,0,0,1,2,2v1Z"></path></svg>
+                        <p class="pn4-phys-gift-lbl">Anda Juga Bisa Mengirim Kado Fisik Ke Alamat Berikut :</p>
+                        <p class="pn4-phys-gift-addr">{{ .GiftAddress }}</p>
+                        <button type="button" class="pn4-copy-btn" data-copy="{{ .GiftAddress }}">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                            <span>Copy Alamat</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    <p class="pn4-gift-confirm-title">Konfirmasi Pengiriman Hadiah:</p>
+                    <form class="pn4-gift-form" id="giftWaForm">
+                        <div class="fg">
+                            <input type="text" id="giftSenderName" value="{{ .GuestTo }}" placeholder="Nama" required>
+                        </div>
+                        <div class="fg">
+                            <input type="text" id="giftAmount" placeholder="Nominal/Kado" required>
+                        </div>
+                        <div class="fg">
+                            <select id="giftTarget">
+                                <option value="">Rekening/Alamat Tujuan</option>
+                                {{ if .BankAccount1 }}<option value="{{ .BankName1 }} - {{ .BankHolder1 }}">{{ .BankName1 }} ({{ .BankHolder1 }})</option>{{ end }}
+                                {{ if .BankAccount2 }}<option value="{{ .BankName2 }} - {{ .BankHolder2 }}">{{ .BankName2 }} ({{ .BankHolder2 }})</option>{{ end }}
+                                {{ if .GiftAddress }}<option value="Alamat Rumah">Alamat Rumah</option>{{ end }}
+                            </select>
+                        </div>
+                        <button type="submit">
+                            <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+                            <span>Konfirmasi via Whatsapp</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- SECTION 6: #WISHES (Portrait + RSVP + Ucapan & Doa + Quote) -->
+            <section id="WISHES">
+                <div class="pn4-wishes-portrait pn-anim anim-zoomIn" style="background-image: url('{{ $wishesPhoto }}');">
+                    <span class="pn4-wishes-sig">{{ $coupleLabel }}</span>
+                </div>
+
+                <!-- RSVP Form -->
+                <h2 class="pn4-cormorant-upright-title pn-anim anim-zoomIn">RSVP</h2>
+                <p class="pn4-sec-note pn-anim anim-zoomIn">*Kepada tamu undangan diharapkan untuk mengisi form kehadiran di bawah ini</p>
+
+                <form class="pn4-rsvp-form pn-anim anim-fadeInUp" id="pn4RsvpForm">
+                    <div class="fg">
+                        <label for="rsvpName">Nama</label>
+                        <input type="text" id="rsvpName" value="{{ .GuestTo }}" placeholder="Nama" required>
+                    </div>
+                    <div class="fg">
+                        <label for="rsvpCount">Jumlah *</label>
+                        <input type="number" id="rsvpCount" min="1" max="10" value="1" placeholder="Jumlah Tamu" required>
+                    </div>
+                    <div class="fg">
+                        <label for="rsvpAtt">Konfirmasi</label>
+                        <select id="rsvpAtt">
+                            <option value="hadir">Saya Akan Datang</option>
+                            <option value="tidak_hadir">Maaf, Saya Tidak Bisa Datang</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="rsvpSubmitBtn">Kirim</button>
+                    <p class="pn4-form-feedback" id="rsvpFeedback">Terima kasih! Konfirmasi kehadiran Anda telah tercatat.</p>
+                </form>
+
+                <!-- Ucapan & Doa -->
+                <h2 class="pn4-cormorant-upright-title pn-anim anim-zoomIn">Ucapan &amp; Doa</h2>
+                <p class="pn4-sec-note pn-anim anim-zoomIn">Kirimkan ucapan dan doa untuk {{ if eq .EventType "khitan" }}putra kami{{ else }}kedua mempelai{{ end }}</p>
+
+                <div class="pn4-comments-wrap pn-anim anim-fadeInUp">
+                    <p class="pn4-comments-count"><span id="wishCountNum">{{ len .Wishes }}</span> Comments</p>
+
+                    <form class="pn4-wish-form" id="pn4WishForm">
+                        <input type="text" id="wishName" value="{{ .GuestTo }}" placeholder="Nama" required>
+                        <textarea id="wishMsg" placeholder="Ucapan" required></textarea>
+                        <select id="wishAtt">
+                            <option value="hadir">Konfirmasi Kehadiran</option>
+                            <option value="hadir">Datang</option>
+                            <option value="tidak_hadir">Absen</option>
+                            <option value="ragu">Mungkin</option>
+                        </select>
+                        <button type="submit" id="wishSubmitBtn">Kirim</button>
+                        <p class="pn4-form-feedback" id="wishFeedback">Ucapan &amp; doa berhasil dikirim!</p>
+                    </form>
+
+                    <ul class="pn4-wish-list" id="pn4WishList">
+                        {{ range .Wishes }}
+                        <li class="pn4-wish-item"
+                            data-name="{{ .GuestName }}"
+                            data-att="{{ .Attendance }}"
+                            data-time="{{ .CreatedAt.Format "2006-01-02T15:04:05Z07:00" }}">
+                            <div class="pn4-wish-avatar"></div>
+                            <div class="pn4-wish-body">
+                                <div class="pn4-wish-head">
+                                    <span class="pn4-wish-name">{{ .GuestName }}</span>
+                                    <span class="pn4-att-badge"></span>
+                                </div>
+                                <p class="pn4-wish-msg">{{ .Message }}</p>
+                                <div class="pn4-wish-meta">
+                                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg>
+                                    <span class="pn4-rel-time">baru saja</span>
+                                    <span class="pn4-wish-reply">Reply</span>
+                                </div>
+                            </div>
+                        </li>
+                        {{ end }}
+                    </ul>
+                </div>
+
+                {{ if .TurutMengundangList }}
+                <div class="pn4-turut-box pn-anim anim-fadeInUp">
+                    <h3 class="pn4-turut-title">Turut Mengundang</h3>
+                    <ul class="pn4-turut-list">
+                        {{ range .TurutMengundangList }}
+                        <li>{{ . }}</li>
+                        {{ end }}
+                    </ul>
+                </div>
+                {{ end }}
+
+                {{ if ne .EventType "khitan" }}
+                <div class="pn4-bottom-quote pn-anim anim-zoomIn">
+                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M464 256h-80v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8c-88.4 0-160 71.6-160 160v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48zm-288 0H96v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8C71.6 32 0 103.6 0 192v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48z"></path></svg>
+                    <p>“Tidak ada solusi yang lebih sempurna dari pernikahan untuk dua orang yang saling mencintai”.</p>
+                    <strong>(HR. Ibnu Majah)</strong>
+                </div>
+                {{ end }}
+            </section>
+
+            <!-- SECTION 7: CLOSING -->
+            <section class="sec-closing">
+                <p class="closing-thanks pn-anim anim-zoomIn">Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i, berkenan hadir dan memberikan do’a restu kepada Kami.</p>
+                <p class="closing-kami">Kami yang berbahagia</p>
+                <h2 class="closing-couple">{{ $coupleLabel }}</h2>
+
+                <a href="#cover" class="closing-arrow-up" id="closingArrowUp" aria-label="Kembali ke atas">
+                    <span class="closing-arrow-fallback" id="closingArrowFallback">
+                        <svg viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"></polyline></svg>
+                    </span>
+                </a>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- =========================================================
+         8. FLOATING CONTROLS (Fullscreen + Audio + 7-Icon Pill Nav)
+         ========================================================= -->
+    <button type="button" id="btnFullscreen" class="pn4-float-circle" aria-label="Layar Penuh">
+        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M448 344v112a23.94 23.94 0 0 1-24 24H312c-21.39 0-32.09-25.9-17-41l36.2-36.2L224 295.6 116.77 402.9 153 439c15.09 15.1 4.39 41-17 41H24a23.94 23.94 0 0 1-24-24V344c0-21.4 25.89-32.1 41-17l36.19 36.2L184.46 256 77.18 148.7 41 185c-15.1 15.1-41 4.4-41-17V56a23.94 23.94 0 0 1 24-24h112c21.39 0 32.09 25.9 17 41l-36.2 36.2L224 216.4l107.23-107.3L295 73c-15.09-15.1-4.39-41 17-41h112a23.94 23.94 0 0 1 24 24v112c0 21.4-25.89 32.1-41 17l-36.19-36.2L263.54 256l107.28 107.3L407 327.1c15.1-15.2 41-4.5 41 16.9z"></path></svg>
+    </button>
+
+    <button type="button" id="audio-container" class="pn4-float-circle" aria-label="Musik Latar">
+        <audio id="song" loop preload="auto" playsinline webkit-playsinline>
+            <source src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/templates/pn4/default-song.mp3{{ end }}">
+        </audio>
+        <!-- Filled speaker (shown when paused/muted) -->
+        <span id="unmute-sound" style="display:inline-flex;">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.8,4.293A1,1,0,0,0,19.39,5.707a8.911,8.911,0,0,1,0,12.586A1,1,0,1,0,20.8,19.707,10.911,10.911,0,0,0,20.8,4.293Z"></path><path d="M18.093,7.293a1,1,0,1,0-1.414,1.414,4.664,4.664,0,0,1,0,6.586,1,1,0,1,0,1.414,1.414A6.665,6.665,0,0,0,18.093,7.293Z"></path><path d="M13.819.207A12.055,12.055,0,0,0,6.268,5H5a5.006,5.006,0,0,0-5,5v4a5.006,5.006,0,0,0,5,5H6.269a12.051,12.051,0,0,0,7.55,4.793A1,1,0,0,0,15,22.81V1.19A1,1,0,0,0,13.819.207Z"></path></svg>
+        </span>
+        <!-- Outline speaker (shown when playing, matching PN4) -->
+        <span id="mute-sound" style="display:none;">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.807,4.29a1,1,0,0,0-1.415,1.415,8.913,8.913,0,0,1,0,12.59,1,1,0,0,0,1.415,1.415A10.916,10.916,0,0,0,20.807,4.29Z"></path><path d="M18.1,7.291A1,1,0,0,0,16.68,8.706a4.662,4.662,0,0,1,0,6.588A1,1,0,0,0,18.1,16.709,6.666,6.666,0,0,0,18.1,7.291Z"></path><path d="M13.82.2A12.054,12.054,0,0,0,6.266,5H5a5.008,5.008,0,0,0-5,5v4a5.008,5.008,0,0,0,5,5H6.266A12.059,12.059,0,0,0,13.82,23.8a.917.917,0,0,0,.181.017,1,1,0,0,0,1-1V1.186A1,1,0,0,0,13.82.2ZM13,21.535a10.083,10.083,0,0,1-5.371-4.08A1,1,0,0,0,6.792,17H5a3,3,0,0,1-3-3V10A3,3,0,0,1,5,7h1.8a1,1,0,0,0,.837-.453A10.079,10.079,0,0,1,13,2.465Z"></path></svg>
+        </span>
+    </button>
+
+    <!-- Bottom 7-Icon Pill Navigation -->
+    <nav class="pn4-bottom-nav-wrap" aria-label="Navigasi Undangan">
+        <ul class="pn4-bottom-nav">
+            <li class="pn4-nav-item active" data-target="cover">
+                <span class="pn4-nav-tooltip">Home</span>
+                <a href="#cover" class="pn4-nav-link" aria-label="Home">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.121,9.069,15.536,1.483a5.008,5.008,0,0,0-7.072,0L.879,9.069A2.978,2.978,0,0,0,0,11.19v9.817a3,3,0,0,0,3,3H21a3,3,0,0,0,3-3V11.19A2.978,2.978,0,0,0,23.121,9.069ZM15,22.007H9V18.073a3,3,0,0,1,6,0Zm7-1a1,1,0,0,1-1,1H17V18.073a5,5,0,0,0-10,0v3.934H3a1,1,0,0,1-1-1V11.19a1.008,1.008,0,0,1,.293-.707L9.878,2.9a3.008,3.008,0,0,1,4.244,0l7.585,7.586A1.008,1.008,0,0,1,22,11.19Z"></path></svg>
+                </a>
+            </li>
+            <li class="pn4-nav-item" data-target="COUPLE">
+                <span class="pn4-nav-tooltip">Couple</span>
+                <a href="#COUPLE" class="pn4-nav-link" aria-label="Couple">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16,8a7.974,7.974,0,0,0-5.974,2.7,6.882,6.882,0,0,0-1.495-.524L9.9,7.447a1,1,0,0,0-.043-.971A3.4,3.4,0,0,0,7,5,3.4,3.4,0,0,0,4.148,6.476a1,1,0,0,0-.043.971l1.364,2.727a7,7,0,1,0,5.866,12.312A8,8,0,1,0,16,8ZM11.234,19.63a5.946,5.946,0,0,1-.678-6.137,4.946,4.946,0,0,1,.678,6.137ZM2,17a4.987,4.987,0,0,1,6.879-4.627,7.957,7.957,0,0,0,.966,8.73A4.99,4.99,0,0,1,2,17Zm14,5a5.961,5.961,0,0,1-3.278-.981A6.963,6.963,0,0,0,11.7,11.826,6,6,0,1,1,16,22ZM10.105,3.553l1-2a1,1,0,1,1,1.79.894l-1,2a1,1,0,0,1-1.79-.894Zm-9-1.106A1,1,0,0,1,2.9,1.553l1,2a1,1,0,0,1-1.79.894ZM6,3V1A1,1,0,0,1,8,1V3A1,1,0,0,1,6,3Z"></path></svg>
+                </a>
+            </li>
+            <li class="pn4-nav-item" data-target="EVENT">
+                <span class="pn4-nav-tooltip">Event</span>
+                <a href="#EVENT" class="pn4-nav-link" aria-label="Event">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V7A5.006,5.006,0,0,0,19,2ZM2,7A3,3,0,0,1,5,4H19a3,3,0,0,1,3,3V8H2ZM19,22H5a3,3,0,0,1-3-3V10H22v9A3,3,0,0,1,19,22Z"></path><circle cx="12" cy="15" r="1.5"></circle><circle cx="7" cy="15" r="1.5"></circle><circle cx="17" cy="15" r="1.5"></circle></svg>
+                </a>
+            </li>
+            <li class="pn4-nav-item" data-target="GALLERY">
+                <span class="pn4-nav-tooltip">Gallery</span>
+                <a href="#GALLERY" class="pn4-nav-link" aria-label="Gallery">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"><path d="M322.266 8.494 C 307.022 12.478,299.934 30.132,307.503 45.262 C 311.134 52.520,317.724 59.124,331.774 69.586 C 337.716 74.010,344.775 79.731,347.461 82.298 L 352.344 86.966 357.227 82.303 C 359.912 79.738,367.195 73.815,373.411 69.140 C 397.481 51.039,404.135 38.977,398.756 23.191 C 392.142 3.779,359.497 2.906,353.780 21.988 C 352.644 25.778,352.043 25.778,350.907 21.988 C 348.009 12.314,333.607 5.529,322.266 8.494 M52.212 25.018 C 29.296 28.885,10.865 44.558,2.831 67.008 L 0.391 73.828 0.166 205.078 C 0.007 298.025,0.192 337.798,0.801 341.365 C 4.704 364.206,22.927 383.585,46.875 390.360 C 54.778 392.596,345.222 392.596,353.125 390.360 C 381.037 382.464,399.315 359.751,399.531 332.696 L 399.609 322.813 397.220 319.805 C 386.690 306.547,370.326 313.084,368.080 331.446 C 366.429 344.949,358.521 354.819,346.340 358.582 C 338.323 361.058,61.677 361.058,53.660 358.582 C 41.966 354.970,33.638 344.964,32.031 332.596 C 31.056 325.092,31.056 91.315,32.031 83.811 C 33.638 71.442,41.966 61.437,53.660 57.825 C 58.661 56.280,60.703 56.250,160.854 56.250 L 262.950 56.250 266.391 54.492 C 278.002 48.560,278.002 31.909,266.391 25.977 L 262.950 24.219 159.405 24.311 C 102.455 24.361,54.218 24.680,52.212 25.018 M68.766 88.477 C 54.073 95.983,59.349 118.750,75.781 118.750 C 77.949 118.750,80.711 118.058,82.797 116.992 C 97.489 109.486,92.213 86.719,75.781 86.719 C 73.614 86.719,70.851 87.411,68.766 88.477 M131.266 88.477 C 116.573 95.983,121.849 118.750,138.281 118.750 C 140.449 118.750,143.211 118.058,145.297 116.992 C 159.989 109.486,154.713 86.719,138.281 86.719 C 136.114 86.719,133.351 87.411,131.266 88.477 M215.007 96.452 C 194.440 101.136,181.586 117.245,180.676 139.479 C 179.734 162.508,188.628 176.078,220.313 199.951 C 227.402 205.293,236.024 212.396,239.472 215.735 C 246.226 222.278,249.707 224.219,254.688 224.219 C 259.668 224.219,263.149 222.278,269.903 215.735 C 273.351 212.396,281.973 205.293,289.063 199.951 C 324.846 172.989,335.334 152.256,326.664 125.620 C 317.895 98.682,283.913 86.744,259.280 101.949 L 254.688 104.783 250.095 101.949 C 240.800 96.212,226.144 93.916,215.007 96.452 M377.359 105.664 C 375.467 106.631,372.844 108.773,371.530 110.424 L 369.141 113.426 369.141 185.547 L 369.141 257.667 371.530 260.670 C 378.326 269.211,390.424 269.211,397.220 260.670 L 399.609 257.667 399.609 185.547 L 399.609 113.426 397.220 110.424 C 394.113 106.519,388.964 103.906,384.375 103.906 C 382.208 103.906,379.445 104.598,377.359 105.664 M231.976 128.712 C 235.441 130.479,237.229 133.049,238.360 137.891 C 240.339 146.357,242.095 149.119,247.144 151.708 C 256.889 156.704,268.384 150.970,270.415 140.101 C 272.110 131.026,275.618 127.734,283.594 127.734 C 299.912 127.734,301.893 145.325,287.199 159.766 C 281.784 165.088,256.080 185.156,254.678 185.156 C 250.613 185.156,217.739 156.532,214.556 150.221 C 207.578 136.388,219.109 122.151,231.976 128.712 M68.766 299.414 C 54.073 306.921,59.349 329.688,75.781 329.688 C 77.949 329.688,80.711 328.995,82.797 327.930 C 97.489 320.423,92.213 297.656,75.781 297.656 C 73.614 297.656,70.851 298.348,68.766 299.414 M131.266 299.414 C 116.573 306.921,121.849 329.688,138.281 329.688 C 140.449 329.688,143.211 328.995,145.297 327.930 C 159.989 320.423,154.713 297.656,138.281 297.656 C 136.114 297.656,133.351 298.348,131.266 299.414 M193.766 299.414 C 179.073 306.921,184.349 329.688,200.781 329.688 C 202.949 329.688,205.711 328.995,207.797 327.930 C 222.489 320.423,217.213 297.656,200.781 297.656 C 198.614 297.656,195.851 298.348,193.766 299.414 M256.266 299.414 C 241.573 306.921,246.849 329.688,263.281 329.688 C 265.449 329.688,268.211 328.995,270.297 327.930 C 284.989 320.423,279.713 297.656,263.281 297.656 C 261.114 297.656,258.351 298.348,256.266 299.414 M318.766 299.414 C 304.073 306.921,309.349 329.688,325.781 329.688 C 327.949 329.688,330.711 328.995,332.797 327.930 C 347.489 320.423,342.213 297.656,325.781 297.656 C 323.614 297.656,320.851 298.348,318.766 299.414" fill-rule="evenodd"></path></svg>
+                </a>
+            </li>
+            {{ if ne .EventType "khitan" }}
+            <li class="pn4-nav-item" data-target="cerita">
+                <span class="pn4-nav-tooltip">Love Story</span>
+                <a href="#cerita" class="pn4-nav-link" aria-label="Love Story">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path></svg>
+                </a>
+            </li>
+            {{ end }}
+            <li class="pn4-nav-item" data-target="gift">
+                <span class="pn4-nav-tooltip">Gift</span>
+                <a href="#gift" class="pn4-nav-link" aria-label="Gift">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20,7H18.262A5.137,5.137,0,0,0,20,3a1,1,0,0,0-2,0c0,2.622-2.371,3.53-4.174,3.841A9.332,9.332,0,0,0,15,3,3,3,0,0,0,9,3a9.332,9.332,0,0,0,1.174,3.841C8.371,6.53,6,5.622,6,3A1,1,0,0,0,4,3,5.137,5.137,0,0,0,5.738,7H4a4,4,0,0,0-4,4v1a2,2,0,0,0,2,2v5a5.006,5.006,0,0,0,5,5H17a5.006,5.006,0,0,0,5-5V14a2,2,0,0,0,2-2V11A4,4,0,0,0,20,7ZM12,2a1,1,0,0,1,1,1,7.71,7.71,0,0,1-1,3.013A7.71,7.71,0,0,1,11,3,1,1,0,0,1,12,2ZM2,11A2,2,0,0,1,4,9h7v3H2Zm2,8V14h7v8H7A3,3,0,0,1,4,19Zm16,0a3,3,0,0,1-3,3H13V14h7Zm-7-7V9h7a2,2,0,0,1,2,2v1Z"></path></svg>
+                </a>
+            </li>
+            <li class="pn4-nav-item" data-target="WISHES">
+                <span class="pn4-nav-tooltip">RSVP</span>
+                <a href="#WISHES" class="pn4-nav-link" aria-label="RSVP">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24,11.247A12.012,12.012,0,1,0,12.017,24H19a5.005,5.005,0,0,0,5-5V11.247ZM22,19a3,3,0,0,1-3,3H12.017a10.041,10.041,0,0,1-7.476-3.343,9.917,9.917,0,0,1-2.476-7.814,10.043,10.043,0,0,1,8.656-8.761A10.564,10.564,0,0,1,12.021,2,9.921,9.921,0,0,1,18.4,4.3,10.041,10.041,0,0,1,22,11.342Z"></path><path d="M8,9h4a1,1,0,0,0,0-2H8A1,1,0,0,0,8,9Z"></path><path d="M16,11H8a1,1,0,0,0,0,2h8a1,1,0,0,0,0-2Z"></path><path d="M16,15H8a1,1,0,0,0,0,2h8a1,1,0,0,0,0-2Z"></path></svg>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Lightbox Modal -->
+    <div id="pn4-lightbox" role="dialog" aria-modal="true">
+        <button type="button" class="lb-btn lb-close" id="lbClose" aria-label="Tutup">&times;</button>
+        <button type="button" class="lb-btn lb-prev" id="lbPrev" aria-label="Sebelumnya">&#10094;</button>
+        <img id="lbImage" src="" alt="Foto Galeri">
+        <button type="button" class="lb-btn lb-next" id="lbNext" aria-label="Berikutnya">&#10095;</button>
+    </div>
+
+    <!-- Copy Toast -->
+    <div id="pn4-toast">Berhasil disalin</div>
+
+    <script>
+    (function() {
+        var ds = document.body.dataset;
+        var slug = ds.slug || '';
+        var eventType = ds.eventType || 'wedding';
+        var groomNick = (ds.groomNick || 'Putra').trim();
+        var brideNick = (ds.brideNick || 'Putri').trim();
+        var childNick = (ds.childNick || '').trim();
+
+        // 0. Always start at top Gate Cover until Buka Undangan is clicked
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        // Normalize @handle labels on Instagram buttons
+        document.querySelectorAll('.ig-handle-txt').forEach(function(el) {
+            var t = (el.textContent || '').trim();
+            if (t && t.charAt(0) !== '@') el.textContent = '@' + t.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/$/, '');
+        });
+
+        // 1. Monogram Initials (G | B)
+        var monoL = document.getElementById('monoLeft');
+        var monoR = document.getElementById('monoRight');
+        if (monoL && monoR) {
+            if (eventType === 'khitan' && childNick) {
+                var parts = childNick.split(/\s+/);
+                monoL.textContent = (parts[0] || 'A').charAt(0).toUpperCase();
+                monoR.textContent = (parts[1] || parts[0] || 'A').charAt(0).toUpperCase();
+            } else {
+                monoL.textContent = (groomNick || 'P').charAt(0).toUpperCase();
+                monoR.textContent = (brideNick || 'P').charAt(0).toUpperCase();
+            }
+        }
+
+        // 2. Audio & Opening Gate Cover
+        var audioEl = document.getElementById('song');
+        var unmuteIcon = document.getElementById('unmute-sound');
+        var muteIcon = document.getElementById('mute-sound');
+        var userPaused = false;
+        var wasPlayingBeforeHidden = false;
+
+        function syncAudioUI() {
+            if (!audioEl) return;
+            if (!audioEl.paused) {
+                if (unmuteIcon) unmuteIcon.style.display = 'none';
+                if (muteIcon) muteIcon.style.display = 'inline-flex';
+            } else {
+                if (muteIcon) muteIcon.style.display = 'none';
+                if (unmuteIcon) unmuteIcon.style.display = 'inline-flex';
+            }
+        }
+        if (audioEl) {
+            audioEl.addEventListener('play', syncAudioUI);
+            audioEl.addEventListener('pause', syncAudioUI);
+        }
+
+        var btnOpen = document.getElementById('tombol-buka');
+        if (btnOpen) {
+            btnOpen.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.remove('scroll-locked');
+                var target = document.getElementById('cover');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+                if (audioEl && !userPaused) {
+                    audioEl.play().catch(function() {});
+                }
+            });
+        }
+
+        var audioBtn = document.getElementById('audio-container');
+        if (audioBtn && audioEl) {
+            audioBtn.addEventListener('click', function() {
+                if (!audioEl.paused) {
+                    userPaused = true;
+                    audioEl.pause();
+                } else {
+                    userPaused = false;
+                    audioEl.play().catch(function() {});
+                }
+            });
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (!audioEl) return;
+            if (document.visibilityState === 'hidden') {
+                if (!audioEl.paused) {
+                    wasPlayingBeforeHidden = true;
+                    audioEl.pause();
+                } else {
+                    wasPlayingBeforeHidden = false;
+                }
+            } else if (document.visibilityState === 'visible' && wasPlayingBeforeHidden && !userPaused) {
+                audioEl.play().catch(function() {});
+            }
+        });
+
+        // 3. Fullscreen Button
+        var btnFs = document.getElementById('btnFullscreen');
+        if (btnFs) {
+            btnFs.addEventListener('click', function() {
+                var docEl = document.documentElement;
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    if (docEl.requestFullscreen) docEl.requestFullscreen();
+                    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                }
+            });
+        }
+
+        // 4. Fixed Background Slideshow (5000ms interval, 600ms fade)
+        var slides = document.querySelectorAll('#bgSlideshow .fixed-bg-slide');
+        if (slides.length > 1) {
+            var curSlide = 0;
+            setInterval(function() {
+                slides[curSlide].classList.remove('active');
+                curSlide = (curSlide + 1) % slides.length;
+                slides[curSlide].classList.add('active');
+            }, 5000);
+        }
+
+        // 5. Indonesian Date Parser & Formatter + Countdown + Google Calendar
+        var DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        var MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        function parseFlexDate(raw) {
+            if (!raw) return null;
+            var s = raw.trim();
+            // ISO YYYY-MM-DD
+            var mIso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (mIso) {
+                return new Date(parseInt(mIso[1], 10), parseInt(mIso[2], 10) - 1, parseInt(mIso[3], 10), 8, 0, 0);
+            }
+            // DD/MM/YYYY or DD-MM-YYYY
+            var mDmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+            if (mDmy) {
+                return new Date(parseInt(mDmy[3], 10), parseInt(mDmy[2], 10) - 1, parseInt(mDmy[1], 10), 8, 0, 0);
+            }
+            // Indonesian month name e.g. "Sabtu, 23 Agustus 2025"
+            for (var i = 0; i < MONTHS_ID.length; i++) {
+                var rx = new RegExp('(\\d{1,2})\\s+' + MONTHS_ID[i] + '\\s+(\\d{4})', 'i');
+                var mm = s.match(rx);
+                if (mm) {
+                    return new Date(parseInt(mm[2], 10), i, parseInt(mm[1], 10), 8, 0, 0);
+                }
+            }
+            var d = new Date(s);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+        var akadDateObj = parseFlexDate(ds.akadDate) || parseFlexDate(ds.resepsiDate);
+        var resepsiDateObj = parseFlexDate(ds.resepsiDate) || akadDateObj;
+
+        var heroDots = document.getElementById('heroDateDots');
+        if (heroDots && akadDateObj) {
+            heroDots.textContent = pad2(akadDateObj.getDate()) + ' . ' + pad2(akadDateObj.getMonth() + 1) + ' . ' + akadDateObj.getFullYear();
+        }
+
+        function hydrateEventCard(dateObj, dayNameId, dayNumId, monthYearId) {
+            if (!dateObj) return;
+            var dn = document.getElementById(dayNameId);
+            var dnum = document.getElementById(dayNumId);
+            var my = document.getElementById(monthYearId);
+            if (dn) dn.textContent = DAYS_ID[dateObj.getDay()];
+            if (dnum) {
+                dnum.dataset.target = String(dateObj.getDate());
+                dnum.textContent = String(dateObj.getDate());
+            }
+            if (my) my.textContent = MONTHS_ID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+        }
+        hydrateEventCard(akadDateObj, 'akadDayName', 'akadDayNum', 'akadMonthYear');
+        hydrateEventCard(resepsiDateObj, 'resepsiDayName', 'resepsiDayNum', 'resepsiMonthYear');
+
+        // Countdown timer
+        var targetTime = akadDateObj ? akadDateObj.getTime() : 0;
+        function tickCountdown() {
+            if (!targetTime) return;
+            var diff = targetTime - Date.now();
+            if (diff <= 0) {
+                document.getElementById('cdDays').textContent = '0';
+                document.getElementById('cdHours').textContent = '0';
+                document.getElementById('cdMins').textContent = '0';
+                document.getElementById('cdSecs').textContent = '0';
+                return;
+            }
+            var days = Math.floor(diff / 86400000);
+            var hours = Math.floor((diff % 86400000) / 3600000);
+            var mins = Math.floor((diff % 3600000) / 60000);
+            var secs = Math.floor((diff % 60000) / 1000);
+            document.getElementById('cdDays').textContent = String(days);
+            document.getElementById('cdHours').textContent = String(hours);
+            document.getElementById('cdMins').textContent = String(mins);
+            document.getElementById('cdSecs').textContent = String(secs);
+        }
+        tickCountdown();
+        setInterval(tickCountdown, 1000);
+
+        // Google Calendar Link
+        var btnCal = document.getElementById('btnSaveCalendar');
+        if (btnCal) {
+            var calDate = akadDateObj || new Date();
+            var y = calDate.getFullYear();
+            var m = pad2(calDate.getMonth() + 1);
+            var d = pad2(calDate.getDate());
+            var startStr = '' + y + m + d + 'T080000';
+            var endStr = '' + y + m + d + 'T140000';
+            var calTitle = document.title || ('The Wedding of ' + groomNick + ' & ' + brideNick);
+            var calLoc = ((ds.akadVenue || '') + (ds.akadAddress ? ', ' + ds.akadAddress : '')).trim();
+            btnCal.href = 'https://www.google.com/calendar/render?action=TEMPLATE'
+                + '&text=' + encodeURIComponent(calTitle)
+                + '&dates=' + startStr + '/' + endStr
+                + '&details=' + encodeURIComponent('Mohon doa restu dan kehadiran Bapak/Ibu/Saudara/i.')
+                + '&location=' + encodeURIComponent(calLoc);
+        }
+
+        // 6. Justified Multi-Row Photo Mosaic + Lightbox
+        var srcNodes = document.querySelectorAll('#pn4GallerySource span[data-src]');
+        var galleryUrls = [];
+        srcNodes.forEach(function(n) {
+            if (n.dataset.src) galleryUrls.push(n.dataset.src);
+        });
+
+        // Also update Gift Polaroids from GalleryList if custom gallery exists and Sec1/Closing weren't set
+        if (galleryUrls.length >= 2) {
+            var polL = document.getElementById('giftPolLeft');
+            var polR = document.getElementById('giftPolRight');
+            if (polL && polL.style.backgroundImage.indexOf('LeniArdi5') !== -1) {
+                polL.style.backgroundImage = "url('" + galleryUrls[0] + "')";
+            }
+            if (polR && polR.style.backgroundImage.indexOf('LeniArdi1') !== -1) {
+                polR.style.backgroundImage = "url('" + galleryUrls[1] + "')";
+            }
+        }
+
+        var galleryContainer = document.getElementById('pn4JustifiedGallery');
+        var loadedMeta = [];
+
+        function buildJustifiedRows() {
+            if (!galleryContainer || !loadedMeta.length) return;
+            var containerW = galleryContainer.clientWidth || 360;
+            var idealH = window.innerWidth <= 767 ? 175 : 190;
+            var gap = 5;
+            galleryContainer.innerHTML = '';
+
+            var row = [];
+            var rowAspectSum = 0;
+
+            function flushRow(items, aspectSum, isLast) {
+                var rowEl = document.createElement('div');
+                rowEl.className = 'pn4-jg-row';
+                var totalGap = gap * (items.length - 1);
+                var rowH = (containerW - totalGap) / aspectSum;
+                if (isLast && rowH > idealH * 1.45) {
+                    rowH = idealH;
+                }
+                items.forEach(function(it) {
+                    var a = document.createElement('a');
+                    a.className = 'pn4-jg-item';
+                    a.href = it.src;
+                    var w = rowH * it.aspect;
+                    a.style.height = Math.round(rowH) + 'px';
+                    if (isLast && items.length === 1) {
+                        a.style.width = '100%';
+                        a.style.height = Math.round(Math.min(340, containerW / it.aspect)) + 'px';
+                    } else {
+                        a.style.flex = it.aspect + ' 1 0%';
+                    }
+                    var img = document.createElement('img');
+                    img.src = it.src;
+                    img.alt = 'Galeri';
+                    img.loading = 'lazy';
+                    a.appendChild(img);
+                    a.addEventListener('click', function(ev) {
+                        ev.preventDefault();
+                        openLightbox(it.index);
+                    });
+                    rowEl.appendChild(a);
+                });
+                galleryContainer.appendChild(rowEl);
+            }
+
+            loadedMeta.forEach(function(meta) {
+                row.push(meta);
+                rowAspectSum += meta.aspect;
+                var projectedW = rowAspectSum * idealH + gap * (row.length - 1);
+                if (projectedW >= containerW * 0.92 || row.length >= 3) {
+                    flushRow(row, rowAspectSum, false);
+                    row = [];
+                    rowAspectSum = 0;
+                }
+            });
+            if (row.length > 0) {
+                flushRow(row, rowAspectSum, true);
+            }
+        }
+
+        if (galleryUrls.length && galleryContainer) {
+            var remaining = galleryUrls.length;
+            galleryUrls.forEach(function(url, idx) {
+                var probe = new Image();
+                probe.onload = function() {
+                    var ar = (probe.naturalWidth && probe.naturalHeight) ? (probe.naturalWidth / probe.naturalHeight) : 0.75;
+                    loadedMeta[idx] = { src: url, aspect: Math.max(0.45, Math.min(2.2, ar)), index: idx };
+                    remaining--;
+                    if (remaining === 0) buildJustifiedRows();
+                };
+                probe.onerror = function() {
+                    loadedMeta[idx] = { src: url, aspect: 0.75, index: idx };
+                    remaining--;
+                    if (remaining === 0) buildJustifiedRows();
+                };
+                probe.src = url;
+            });
+            var resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(buildJustifiedRows, 180);
+            });
+        }
+
+        // Lightbox logic
+        var lb = document.getElementById('pn4-lightbox');
+        var lbImg = document.getElementById('lbImage');
+        var curLbIdx = 0;
+        function openLightbox(idx) {
+            if (!lb || !galleryUrls.length) return;
+            curLbIdx = (idx + galleryUrls.length) % galleryUrls.length;
+            lbImg.src = galleryUrls[curLbIdx];
+            lb.classList.add('open');
+        }
+        function closeLightbox() { if (lb) lb.classList.remove('open'); }
+        var lbClose = document.getElementById('lbClose');
+        var lbPrev = document.getElementById('lbPrev');
+        var lbNext = document.getElementById('lbNext');
+        if (lbClose) lbClose.addEventListener('click', closeLightbox);
+        if (lbPrev) lbPrev.addEventListener('click', function(e) { e.stopPropagation(); openLightbox(curLbIdx - 1); });
+        if (lbNext) lbNext.addEventListener('click', function(e) { e.stopPropagation(); openLightbox(curLbIdx + 1); });
+        if (lb) lb.addEventListener('click', function(e) { if (e.target === lb) closeLightbox(); });
+        document.addEventListener('keydown', function(e) {
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') openLightbox(curLbIdx - 1);
+            if (e.key === 'ArrowRight') openLightbox(curLbIdx + 1);
+        });
+
+        // 7. Love Story Smart Parser (#cerita)
+        var storyWrap = document.getElementById('pn4StoryList');
+        if (storyWrap) {
+            var rawStory = (ds.loveStory || '').trim();
+            var stories = [];
+            if (rawStory) {
+                var blocks = rawStory.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
+                if (blocks.length === 1) {
+                    var lines = rawStory.split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
+                    if (lines.length > 1) blocks = lines;
+                }
+                blocks.forEach(function(blk, idx) {
+                    // Format support: "Maret 2021 | Awal Bertemu | Cerita..." or "2021: Awal Bertemu - Cerita..." or multi-line
+                    var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
+                    if (pipeParts.length >= 3) {
+                        stories.push({ date: pipeParts[0], title: pipeParts[1], body: pipeParts.slice(2).join(' ') });
+                        return;
+                    }
+                    var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
+                    if (colonMatch) {
+                        var rest = colonMatch[2];
+                        var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
+                        if (dashMatch) {
+                            stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), body: dashMatch[2].trim() });
+                        } else {
+                            stories.push({ date: colonMatch[1].trim(), title: 'Kisah Kami', body: rest.trim() });
+                        }
+                        return;
+                    }
+                    var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+                    if (subLines.length >= 3) {
+                        stories.push({ date: subLines[0], title: subLines[1], body: subLines.slice(2).join(' ') });
+                    } else if (subLines.length === 2) {
+                        stories.push({ date: subLines[0], title: '', body: subLines[1] });
+                    } else {
+                        stories.push({ date: 'Bagian ' + (idx + 1), title: '', body: blk });
+                    }
+                });
+            } else {
+                stories = [
+                    {
+                        date: 'Awal Pertemuan',
+                        title: 'Awal Bertemu',
+                        body: 'Tidak ada yang kebetulan di dunia ini, semua telah tersusun rapi oleh Sang Maha Kuasa. Pertemuan pertama kami menjadi awal dari kisah indah yang tak pernah kami duga sebelumnya.'
+                    },
+                    {
+                        date: 'Menjalin Kasih',
+                        title: 'Komitmen Bersama',
+                        body: 'Seiring berjalannya waktu, kami saling mengenal, memahami, dan menguatkan dalam doa hingga tumbuh keyakinan untuk melangkah ke jenjang yang lebih serius.'
+                    },
+                    {
+                        date: 'Ikatan Suci',
+                        title: 'Lamaran & Menikah',
+                        body: 'Dengan restu kedua orang tua dan keluarga besar, kami memantapkan hati untuk menyempurnakan separuh agama dalam ikatan suci pernikahan.'
+                    }
+                ];
+            }
+
+            stories.forEach(function(st) {
+                var card = document.createElement('div');
+                card.className = 'pn4-story-card pn-anim anim-zoomIn';
+                if (st.date) {
+                    var dEl = document.createElement('span');
+                    dEl.className = 'pn4-story-date';
+                    dEl.textContent = st.date;
+                    card.appendChild(dEl);
+                }
+                if (st.title) {
+                    var tEl = document.createElement('span');
+                    tEl.className = 'pn4-story-title';
+                    tEl.textContent = st.title;
+                    card.appendChild(tEl);
+                }
+                var bEl = document.createElement('p');
+                bEl.className = 'pn4-story-body';
+                bEl.textContent = st.body;
+                card.appendChild(bEl);
+                storyWrap.appendChild(card);
+            });
+        }
+
+        // 8. Bank Logo Resolver + #btnAmplop Toggle + Clipboard Copy + WA Confirmation
+        document.querySelectorAll('.pn4-bank-logo-slot').forEach(function(slot) {
+            var name = (slot.dataset.bank || '').trim();
+            var low = name.toLowerCase();
+            if (low.indexOf('bca') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/pn4/logo_bca.png" alt="BCA" class="pn4-bank-logo" style="width:105px;">';
+            } else if (low.indexOf('mandiri') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/pn4/logo_mandiri.png" alt="Mandiri" class="pn4-bank-logo" style="width:110px;">';
+            } else if (name) {
+                var span = document.createElement('span');
+                span.className = 'pn4-bank-badge-fallback';
+                span.textContent = name;
+                slot.appendChild(span);
+            }
+        });
+
+        var btnAmplop = document.getElementById('btnAmplop');
+        var amplop = document.getElementById('amplop');
+        if (btnAmplop && amplop) {
+            btnAmplop.addEventListener('click', function() {
+                amplop.style.display = (amplop.style.display === 'block') ? 'none' : 'block';
+            });
+        }
+
+        var toastEl = document.getElementById('pn4-toast');
+        var toastTimer;
+        function showToast(msg) {
+            if (!toastEl) return;
+            toastEl.textContent = msg || 'Berhasil disalin';
+            toastEl.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() { toastEl.classList.remove('show'); }, 2200);
+        }
+
+        document.querySelectorAll('.pn4-copy-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var txt = btn.dataset.copy || '';
+                if (!txt) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(txt).then(function() { showToast('Berhasil disalin'); });
+                } else {
+                    var ta = document.createElement('textarea');
+                    ta.value = txt;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showToast('Berhasil disalin');
+                }
+            });
+        });
+
+        var giftWaForm = document.getElementById('giftWaForm');
+        if (giftWaForm) {
+            giftWaForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var sender = (document.getElementById('giftSenderName').value || '').trim();
+                var amount = (document.getElementById('giftAmount').value || '').trim();
+                var target = (document.getElementById('giftTarget').value || '').trim();
+                var rawWa = (ds.wa || '').replace(/[^0-9]/g, '');
+                if (rawWa.indexOf('0') === 0) rawWa = '62' + rawWa.slice(1);
+                var msg = 'Halo, saya *' + sender + '* ingin mengonfirmasi pengiriman tanda kasih sebesar/berupa *' + amount + '*'
+                    + (target ? ' melalui *' + target + '*' : '') + '. Terima kasih & selamat berbahagia!';
+                if (rawWa) {
+                    window.open('https://wa.me/' + rawWa + '?text=' + encodeURIComponent(msg), '_blank');
+                } else {
+                    showToast('Terima kasih atas konfirmasi tanda kasih Anda!');
+                }
+            });
+        }
+
+        // 9. Wishes Avatar, Scalloped Attendance Badge, Relative Time, & Live Submit
+        var AVATAR_PALETTE = [
+            { bg: '#2E3B42', fg: '#FFFFFF' },
+            { bg: '#EEFF41', fg: '#1B1B1B' },
+            { bg: '#8BC34A', fg: '#1B1B1B' },
+            { bg: '#0D47A1', fg: '#FFFFFF' },
+            { bg: '#AEEA00', fg: '#1B1B1B' },
+            { bg: '#00BFA5', fg: '#1B1B1B' },
+            { bg: '#5C6BC0', fg: '#FFFFFF' }
+        ];
+
+        function badgeSvg(att) {
+            var a = (att || '').toLowerCase().trim();
+            if (!a || a === 'none' || a === '-') return '';
+            var rosette = 'M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z';
+            if (a === 'tidak_hadir' || a === 'absen' || a === 'tidak hadir') {
+                return '<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#D63939" d="' + rosette + '"/><path d="M13.6 8.4l-5.2 5.2M8.4 8.4l5.2 5.2" stroke="#5D5D5D" stroke-width="2.2" stroke-linecap="round"/></svg>';
+            }
+            if (a === 'ragu' || a === 'mungkin' || a === 'masih ragu') {
+                return '<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#F5C542" d="' + rosette + '"/><text x="11" y="14.8" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5D5D5D" font-family="Poppins,sans-serif">?</text></svg>';
+            }
+            return '<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#2FB344" d="' + rosette + '"/><path d="M7.6 11.3l2.2 2.2 4.7-4.8" fill="none" stroke="#5D5D5D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        }
+
+        function relativeTimeId(iso) {
+            if (!iso) return 'baru saja';
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return 'baru saja';
+            var sec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+            if (sec < 60) return 'baru saja';
+            var min = Math.floor(sec / 60);
+            if (min < 60) return min + ' menit lalu';
+            var hr = Math.floor(min / 60);
+            if (hr < 24) return hr + ' jam lalu';
+            var day = Math.floor(hr / 24);
+            if (day < 7) return day + ' hari lalu';
+            var wk = Math.floor(day / 7);
+            if (day < 30) return wk + ' minggu lalu';
+            var mo = Math.floor(day / 30);
+            if (mo < 12) return mo + ' bulan lalu';
+            var yr = Math.floor(day / 365);
+            return yr + ' tahun lalu';
+        }
+
+        function decorateWishItem(li) {
+            var name = (li.dataset.name || 'Tamu').trim();
+            var att = li.dataset.att || 'hadir';
+            var iso = li.dataset.time || '';
+            var initials = name.replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/).map(function(w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+            if (initials.length < 2) initials = name.slice(0, 2).toUpperCase() || 'TM';
+            var hash = 0;
+            for (var i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+            var pal = AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+
+            var av = li.querySelector('.pn4-wish-avatar');
+            if (av) {
+                av.textContent = initials;
+                av.style.backgroundColor = pal.bg;
+                av.style.color = pal.fg;
+            }
+            var badge = li.querySelector('.pn4-att-badge');
+            if (badge) badge.innerHTML = badgeSvg(att);
+            var rt = li.querySelector('.pn4-rel-time');
+            if (rt) rt.textContent = relativeTimeId(iso);
+            var rep = li.querySelector('.pn4-wish-reply');
+            if (rep) {
+                rep.addEventListener('click', function() {
+                    var msgBox = document.getElementById('wishMsg');
+                    if (msgBox) {
+                        msgBox.value = '@' + name + ' ';
+                        msgBox.focus();
+                    }
+                });
+            }
+        }
+        document.querySelectorAll('#pn4WishList .pn4-wish-item').forEach(decorateWishItem);
+
+        function prependNewWish(w) {
+            var list = document.getElementById('pn4WishList');
+            if (!list) return;
+            var li = document.createElement('li');
+            li.className = 'pn4-wish-item';
+            li.dataset.name = w.guest_name || 'Tamu';
+            li.dataset.att = w.attendance || 'hadir';
+            li.dataset.time = w.created_at || new Date().toISOString();
+
+            var av = document.createElement('div');
+            av.className = 'pn4-wish-avatar';
+            var body = document.createElement('div');
+            body.className = 'pn4-wish-body';
+
+            var head = document.createElement('div');
+            head.className = 'pn4-wish-head';
+            var nm = document.createElement('span');
+            nm.className = 'pn4-wish-name';
+            nm.textContent = w.guest_name || 'Tamu';
+            var bd = document.createElement('span');
+            bd.className = 'pn4-att-badge';
+            head.appendChild(nm);
+            head.appendChild(bd);
+
+            var msg = document.createElement('p');
+            msg.className = 'pn4-wish-msg';
+            msg.textContent = w.message || '';
+
+            var meta = document.createElement('div');
+            meta.className = 'pn4-wish-meta';
+            meta.innerHTML = '<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg>'
+                + '<span class="pn4-rel-time">baru saja</span><span class="pn4-wish-reply">Reply</span>';
+
+            body.appendChild(head);
+            body.appendChild(msg);
+            body.appendChild(meta);
+            li.appendChild(av);
+            li.appendChild(body);
+
+            list.insertBefore(li, list.firstChild);
+            decorateWishItem(li);
+
+            var countEl = document.getElementById('wishCountNum');
+            if (countEl) countEl.textContent = String((parseInt(countEl.textContent, 10) || 0) + 1);
+        }
+
+        function postWishPayload(payload, btn, feedbackEl, onDone) {
+            if (!slug) return;
+            var origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Mengirim...';
+            fetch('/api/invitations/' + encodeURIComponent(slug) + '/wishes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, body: j }; }); })
+            .then(function(res) {
+                btn.disabled = false;
+                btn.textContent = origText;
+                if (res.ok && res.body && res.body.data) {
+                    if (feedbackEl) {
+                        feedbackEl.style.display = 'block';
+                        setTimeout(function() { feedbackEl.style.display = 'none'; }, 4000);
+                    }
+                    if (onDone) onDone(res.body.data);
+                } else {
+                    showToast((res.body && res.body.error) || 'Gagal mengirim, silakan coba lagi');
+                }
+            })
+            .catch(function() {
+                btn.disabled = false;
+                btn.textContent = origText;
+                showToast('Gagal terhubung ke server');
+            });
+        }
+
+        var rsvpForm = document.getElementById('pn4RsvpForm');
+        if (rsvpForm) {
+            rsvpForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = (document.getElementById('rsvpName').value || '').trim();
+                var cnt = parseInt(document.getElementById('rsvpCount').value, 10) || 1;
+                var att = document.getElementById('rsvpAtt').value || 'hadir';
+                var label = att === 'hadir' ? ('InsyaaAllah hadir (' + cnt + ' orang)') : 'Mohon maaf belum bisa hadir';
+                postWishPayload(
+                    { guest_name: name, guest_count: cnt, attendance: att, message: label },
+                    document.getElementById('rsvpSubmitBtn'),
+                    document.getElementById('rsvpFeedback'),
+                    prependNewWish
+                );
+            });
+        }
+
+        var wishForm = document.getElementById('pn4WishForm');
+        if (wishForm) {
+            wishForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = (document.getElementById('wishName').value || '').trim();
+                var msg = (document.getElementById('wishMsg').value || '').trim();
+                var att = document.getElementById('wishAtt').value || 'hadir';
+                if (!name || !msg) return;
+                postWishPayload(
+                    { guest_name: name, guest_count: 1, attendance: att, message: msg },
+                    document.getElementById('wishSubmitBtn'),
+                    document.getElementById('wishFeedback'),
+                    function(saved) {
+                        prependNewWish(saved);
+                        document.getElementById('wishMsg').value = '';
+                    }
+                );
+            });
+        }
+
+        // 10. Lottie Arrow-Up Initialization
+        window.addEventListener('load', function() {
+            var arrowWrap = document.getElementById('closingArrowUp');
+            var fallback = document.getElementById('closingArrowFallback');
+            if (window.lottie && arrowWrap) {
+                try {
+                    var anim = window.lottie.loadAnimation({
+                        container: arrowWrap,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: '/assets/templates/pn4/ARROW-UP-PN.json'
+                    });
+                    anim.addEventListener('DOMLoaded', function() {
+                        if (fallback) fallback.style.display = 'none';
+                    });
+                } catch (err) {}
+            }
+        });
+
+        // 11. Scroll Entrance Animations + Animated Event Day Counter + Bottom Pill ScrollSpy
+        if ('IntersectionObserver' in window) {
+            var animObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(en) {
+                    if (en.isIntersecting) {
+                        en.target.classList.add('is-visible');
+                        animObs.unobserve(en.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+
+            document.querySelectorAll('.pn-anim').forEach(function(el) {
+                animObs.observe(el);
+            });
+
+            // Day number count-up animation (matching Elementor counter widget)
+            var counterObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(en) {
+                    if (!en.isIntersecting) return;
+                    var el = en.target;
+                    counterObs.unobserve(el);
+                    var target = parseInt(el.dataset.target, 10) || 1;
+                    var start = 0;
+                    var dur = 1100;
+                    var t0 = performance.now();
+                    function step(now) {
+                        var p = Math.min(1, (now - t0) / dur);
+                        el.textContent = String(Math.max(1, Math.round(start + (target - start) * p)));
+                        if (p < 1) requestAnimationFrame(step);
+                    }
+                    requestAnimationFrame(step);
+                });
+            }, { threshold: 0.4 });
+
+            ['akadDayNum', 'resepsiDayNum'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) counterObs.observe(el);
+            });
+
+            // ScrollSpy for 7-icon pill navigation
+            var navItems = document.querySelectorAll('.pn4-nav-item');
+            var spyIds = ['cover', 'COUPLE', 'EVENT', 'GALLERY', 'cerita', 'gift', 'WISHES'];
+            window.addEventListener('scroll', function() {
+                var scrollPos = window.scrollY + window.innerHeight * 0.38;
+                var currentId = 'cover';
+                spyIds.forEach(function(id) {
+                    var sec = document.getElementById(id);
+                    if (sec) {
+                        var top = sec.getBoundingClientRect().top + window.scrollY;
+                        if (scrollPos >= top) currentId = id;
+                    }
+                });
+                navItems.forEach(function(item) {
+                    if (item.dataset.target === currentId) item.classList.add('active');
+                    else item.classList.remove('active');
+                });
+            }, { passive: true });
+        } else {
+            document.querySelectorAll('.pn-anim').forEach(function(el) { el.classList.add('is-visible'); });
+        }
+    })();
+    </script>
+</body>
+</html>
