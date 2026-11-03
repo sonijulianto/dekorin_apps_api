@@ -378,7 +378,7 @@
 
     <p class="opening-subtitle" data-aos="fade-up">The Wedding Of</p>
     <h1 class="opening-couple" data-aos="zoom-in">
-      {{ .GroomNickname }}<br>&amp;<br>{{ .BrideNickname }}
+      {{ .BrideNickname }}<br>&amp;<br>{{ .GroomNickname }}
     </h1>
 
     <img src="/assets/templates/green-leaves/divider-rustic.webp" alt="" class="rustic-divider" data-aos="fade-up">
@@ -414,21 +414,6 @@
       <h2 class="leaves-heading" data-aos="fade-up">Kedua Mempelai</h2>
       <p class="leaves-sub" data-aos="fade-up">Dengan Rahmat Allah SWT</p>
 
-      <!-- Groom -->
-      <div class="rustic-card" data-aos="fade-up">
-        <div class="couple-photo-wrap">
-          <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg{{ end }}" alt="{{ .GroomName }}">
-        </div>
-        <h3 class="person-name">{{ .GroomName }}</h3>
-        <p style="font-size: 12px; color: var(--green-leaf); font-weight: 600;">{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</p>
-        <p style="font-size: 13px; color: #555; margin-top: 2px;">{{ .GroomParents }}</p>
-        {{ if .GroomInstagram }}
-        <p style="margin-top: 6px;"><a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" style="color: var(--green-dark); font-size: 12px; text-decoration: none;"><i class="fa-brands fa-instagram"></i> @{{ .GroomInstagram }}</a></p>
-        {{ end }}
-      </div>
-
-      <div style="font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--green-leaf); margin: 6px 0;" data-aos="zoom-in">&amp;</div>
-
       <!-- Bride -->
       <div class="rustic-card" data-aos="fade-up">
         <div class="couple-photo-wrap">
@@ -439,6 +424,21 @@
         <p style="font-size: 13px; color: #555; margin-top: 2px;">{{ .BrideParents }}</p>
         {{ if .BrideInstagram }}
         <p style="margin-top: 6px;"><a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" style="color: var(--green-dark); font-size: 12px; text-decoration: none;"><i class="fa-brands fa-instagram"></i> @{{ .BrideInstagram }}</a></p>
+        {{ end }}
+      </div>
+
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--green-leaf); margin: 6px 0;" data-aos="zoom-in">&amp;</div>
+
+      <!-- Groom -->
+      <div class="rustic-card" data-aos="fade-up">
+        <div class="couple-photo-wrap">
+          <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/owlink/c3417bd0-dba9-11f0-9466-0332306b9343.jpg{{ end }}" alt="{{ .GroomName }}">
+        </div>
+        <h3 class="person-name">{{ .GroomName }}</h3>
+        <p style="font-size: 12px; color: var(--green-leaf); font-weight: 600;">{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</p>
+        <p style="font-size: 13px; color: #555; margin-top: 2px;">{{ .GroomParents }}</p>
+        {{ if .GroomInstagram }}
+        <p style="margin-top: 6px;"><a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" style="color: var(--green-dark); font-size: 12px; text-decoration: none;"><i class="fa-brands fa-instagram"></i> @{{ .GroomInstagram }}</a></p>
         {{ end }}
       </div>
     </section>
@@ -636,7 +636,7 @@
     <footer style="padding: 30px 20px 80px; text-align: center;">
       <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--green-dark); margin-bottom: 6px;">Terima Kasih</h2>
       <p style="font-size: 12px; color: #666; max-width: 300px; margin: 0 auto; line-height: 1.6;">Atas kehadiran dan doa restunya kami ucapkan terima kasih.</p>
-      <h4 style="font-family: 'Josefin Sans', sans-serif; font-size: 15px; margin-top: 14px; color: var(--green-leaf); letter-spacing: 1px;">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h4>
+      <h4 style="font-family: 'Josefin Sans', sans-serif; font-size: 15px; margin-top: 14px; color: var(--green-leaf); letter-spacing: 1px;">{{ .BrideNickname }} &amp; {{ .GroomNickname }}</h4>
     </footer>
 
   </div>

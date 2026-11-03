@@ -551,13 +551,13 @@
     <div class="monogram-box" data-aos="zoom-in">
       <img src="/assets/templates/floral/frame.png" alt="" class="monogram-frame">
       <div class="monogram-text">
-        {{ if .GroomNickname }}{{ slice .GroomNickname 0 1 }}&{{ slice .BrideNickname 0 1 }}{{ else }}W{{ end }}
+        {{ if .BrideNickname }}{{ slice .BrideNickname 0 1 }}&{{ slice .GroomNickname 0 1 }}{{ else }}W{{ end }}
       </div>
     </div>
 
     <p class="opening-subtitle" data-aos="fade-up">The Wedding Of</p>
     <h1 class="opening-couple" data-aos="zoom-in">
-      {{ .GroomNickname }}<br>&amp;<br>{{ .BrideNickname }}
+      {{ .BrideNickname }}<br>&amp;<br>{{ .GroomNickname }}
     </h1>
 
     <div style="margin: 10px 0;" data-aos="fade-up">
@@ -600,24 +600,6 @@
       <h2 class="heading-title" data-aos="fade-up">Kedua Mempelai</h2>
       <p class="heading-sub" data-aos="fade-up">Dengan memohon ridho Allah SWT</p>
 
-      <!-- Groom -->
-      <div class="couple-card" data-aos="fade-up">
-        <div class="avatar-wrapper">
-          <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/floral/avatar.png{{ end }}" alt="{{ .GroomName }}" class="avatar-img" onerror="this.src='/assets/templates/floral/avatar.png'">
-        </div>
-        <h3 class="person-name">{{ .GroomName }}</h3>
-        <p class="person-order">{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</p>
-        <p class="person-parents">{{ .GroomParents }}</p>
-        {{ if .GroomInstagram }}
-        <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" class="person-ig">
-          <i class="fa-brands fa-instagram"></i>
-          <span>@{{ .GroomInstagram }}</span>
-        </a>
-        {{ end }}
-      </div>
-
-      <div style="font-family: 'Dancing Script', cursive; font-size: 32px; color: var(--terracotta); margin: 10px 0;" data-aos="zoom-in">&amp;</div>
-
       <!-- Bride -->
       <div class="couple-card" data-aos="fade-up">
         <div class="avatar-wrapper">
@@ -630,6 +612,24 @@
         <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" class="person-ig">
           <i class="fa-brands fa-instagram"></i>
           <span>@{{ .BrideInstagram }}</span>
+        </a>
+        {{ end }}
+      </div>
+
+      <div style="font-family: 'Dancing Script', cursive; font-size: 32px; color: var(--terracotta); margin: 10px 0;" data-aos="zoom-in">&amp;</div>
+
+      <!-- Groom -->
+      <div class="couple-card" data-aos="fade-up">
+        <div class="avatar-wrapper">
+          <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/floral/avatar.png{{ end }}" alt="{{ .GroomName }}" class="avatar-img" onerror="this.src='/assets/templates/floral/avatar.png'">
+        </div>
+        <h3 class="person-name">{{ .GroomName }}</h3>
+        <p class="person-order">{{ if .GroomChildOrder }}{{ .GroomChildOrder }}{{ else }}Putra dari{{ end }}</p>
+        <p class="person-parents">{{ .GroomParents }}</p>
+        {{ if .GroomInstagram }}
+        <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" class="person-ig">
+          <i class="fa-brands fa-instagram"></i>
+          <span>@{{ .GroomInstagram }}</span>
         </a>
         {{ end }}
       </div>
@@ -858,7 +858,7 @@
       {{ end }}
       <h2 style="font-family: 'Dancing Script', cursive; font-size: 32px; color: var(--terracotta); margin-bottom: 8px;">Terima Kasih</h2>
       <p style="font-size: 12px; line-height: 1.6; max-width: 300px; margin: 0 auto;">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
-      <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; margin-top: 14px; color: var(--terracotta-dark);">{{ .GroomNickname }} &amp; {{ .BrideNickname }}</h4>
+      <h4 style="font-family: 'Playfair Display', serif; font-size: 16px; margin-top: 14px; color: var(--terracotta-dark);">{{ .BrideNickname }} &amp; {{ .GroomNickname }}</h4>
     </footer>
 
     <!-- Bottom Wave Divider -->
