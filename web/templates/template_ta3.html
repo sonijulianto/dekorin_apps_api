@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="id" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <meta name="format-detection" content="telephone=no">
+    <title>{{ if .Title }}{{ .Title }}{{ else if eq .EventType "khitan" }}Tasyakuran Khitan {{ if .ChildNickname }}{{ .ChildNickname }}{{ else }}Putra Kami{{ end }}{{ else }}The Wedding of {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}Fulanah{{ end }} & {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}Fulan{{ end }}{{ end }}</title>
+
+    <!-- Open Graph / WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}The Wedding of {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}Fulanah{{ end }} & {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}Fulan{{ end }}{{ end }}">
+    <meta property="og:description" content="Kpd Bpk/Ibu/Saudara/i {{ .GuestTo }} — Tanpa Mengurangi Rasa Hormat, Kami Mengundang Anda Untuk Berhadir Di Acara Pernikahan Kami.">
+    {{ if and .CoverImage (ne .CoverImage "/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg") }}<meta property="og:image" content="{{ .CoverImage }}">{{ else }}<meta property="og:image" content="/assets/templates/ta3/couple-welcome.png">{{ end }}
+
+    <!-- Google Fonts used in TA3 (Sakura Blossom) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alata&family=Dancing+Script:wght@500;600;700&family=Great+Vibes&family=MonteCarlo&family=Poppins:wght@300;400;500;600;700&family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================================
+           BASE & RESET
+           ========================================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html {
+            scroll-behavior: smooth;
+            background-color: #FFFFFF;
+        }
+        body {
+            font-family: 'Roboto Slab', serif;
+            color: #000000;
+            background-color: #FFFFFF;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+        body.scroll-locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
+        /* =========================================================
+           KEYFRAME ANIMATIONS (VERBATIM TA3 / ELEMENTOR)
+           ========================================================= */
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(202, 3, 3, 0.35);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(202, 3, 3, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(202, 3, 3, 0);
+            }
+        }
+        @keyframes wdpMP3-muter {
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes ta3ZoomIn {
+            from { opacity: 0; transform: scale(0.88); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes ta3FadeInUp {
+            from { opacity: 0; transform: translate3d(0, 26px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes ta3FadeInLeft {
+            from { opacity: 0; transform: translate3d(-26px, 0, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        .ta3-anim {
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        .ta3-anim.is-visible.anim-zoom { animation: ta3ZoomIn 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .ta3-anim.is-visible.anim-up { animation: ta3FadeInUp 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .ta3-anim.is-visible.anim-left { animation: ta3FadeInLeft 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+        /* =========================================================
+           WELCOME GATE MODAL (.modalx / [el:10cf8ec6])
+           ========================================================= */
+        .ta3-modalx {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-image: url('/assets/templates/ta3/bg-cover.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+            text-align: center;
+            transition: transform 850ms cubic-bezier(0.65, 0, 0.35, 1), opacity 700ms ease;
+        }
+        .ta3-modalx.closed {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .ta3-modalx-inner {
+            width: 100%;
+            max-width: 980px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ta3-welcome-illus {
+            width: 22%;
+            max-width: 240px;
+            min-width: 175px;
+            margin: 0 auto 6px;
+        }
+        .ta3-photo-circle {
+            width: 215px;
+            height: 215px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #FFABB8;
+            box-shadow: 0 8px 24px rgba(179, 50, 70, 0.22);
+            margin: 0 auto 10px;
+            background-color: #FFF5F7;
+        }
+        .ta3-welcome-couple {
+            font-family: 'Great Vibes', cursive;
+            font-size: 50px;
+            font-weight: 400;
+            color: #B33246;
+            line-height: 1.2;
+            margin-top: 4px;
+        }
+        .ta3-welcome-dear {
+            margin-top: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #000000;
+        }
+        .ta3-welcome-guest {
+            margin-top: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: #B33246;
+        }
+        .ta3-welcome-note {
+            margin-top: 14px;
+            max-width: 460px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-weight: 400;
+            line-height: 1.55;
+            color: #000000;
+        }
+        .ta3-open-btn {
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            fill: #FFFFFF;
+            border: 2px solid #CA0303;
+            border-radius: 21px;
+            padding: 10px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+            transition: background-color 0.25s ease;
+        }
+        .ta3-open-btn:hover {
+            background-color: #F78E9E;
+        }
+        .ta3-open-btn svg {
+            width: 15px;
+            height: 15px;
+            fill: #FFFFFF;
+            flex-shrink: 0;
+        }
+
+        /* =========================================================
+           SHARED BOXED COLUMN & SHAPE DIVIDERS
+           ========================================================= */
+        .ta3-sec-boxed {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background-color: #FFFFFF;
+        }
+        .ta3-col-500 {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .ta3-bg-cover {
+            background-image: url('/assets/templates/ta3/bg-cover.jpg');
+        }
+        .ta3-bg-arch {
+            background-image: url('/assets/templates/ta3/bg-floral-arch.jpg');
+        }
+        .ta3-bg-pink {
+            background-image: url('/assets/templates/ta3/bg-pink-floral.jpg');
+        }
+
+        /* Elementor Mountains Shape Divider */
+        .ta3-shape-bottom {
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: rotate(180deg);
+            z-index: 2;
+            pointer-events: none;
+        }
+        .ta3-shape-bottom svg {
+            display: block;
+            width: calc(112% + 1.3px);
+            height: 117px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .ta3-shape-bottom .elementor-shape-fill {
+            fill: #FFABB8;
+        }
+        .ta3-shape-top {
+            position: absolute;
+            left: 0;
+            top: -1px;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .ta3-shape-top svg {
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 46px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .ta3-shape-top .elementor-shape-fill {
+            fill: #FFABB8;
+        }
+
+        /* =========================================================
+           PINK PILL BUTTONS (SHARED ACROSS COUPLE, EVENT, STREAM)
+           ========================================================= */
+        .ta3-pink-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            fill: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            border-radius: 11px;
+            padding: 8px 18px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.2;
+            cursor: pointer;
+            transition: background-color 0.25s ease, transform 0.2s ease;
+        }
+        .ta3-pink-btn:hover {
+            background-color: #F78E9E;
+            color: #FFFFFF;
+        }
+        .ta3-pink-btn svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .ta3-pink-btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        .ta3-pink-btn-shadow {
+            box-shadow: 0px 0px 10px 0px #94B099;
+            padding: 10px 22px;
+        }
+
+        /* =========================================================
+           SECTION 1: #COVER HERO ([el:63878d3c])
+           ========================================================= */
+        #COVER .ta3-col-500 {
+            padding: 100px 40px 150px;
+        }
+        .ta3-hero-sub {
+            margin-top: 80px;
+            font-family: 'Roboto Slab', serif;
+            font-size: 28px;
+            font-weight: 500;
+            line-height: 1.3;
+            color: #000000;
+            margin-bottom: 18px;
+        }
+        .ta3-hero-illus {
+            width: 59%;
+            max-width: 250px;
+            margin: 0 auto 14px;
+        }
+        .ta3-hero-couple {
+            font-family: 'Great Vibes', cursive;
+            font-size: 39px;
+            font-weight: 500;
+            color: #B33246;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+        .ta3-hero-date {
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.35;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+        .ta3-countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto 40px;
+        }
+        .ta3-cd-box {
+            background-color: #FFABB8;
+            border-radius: 20px;
+            padding: 18px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+        }
+        .ta3-cd-num {
+            font-family: 'Abril Fatface', cursive;
+            font-size: 21px;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #FFFFFF;
+        }
+        .ta3-cd-lbl {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 4px;
+            color: #FFFFFF;
+        }
+
+        /* =========================================================
+           SECTION 2: AR-RUM QUOTE BAND ([el:6ad1980b])
+           ========================================================= */
+        .ta3-quote-band {
+            width: 100%;
+            background-color: #FFABB8;
+            padding: 85px 24px;
+            text-align: center;
+        }
+        .ta3-quote-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            font-family: 'Roboto Slab', serif;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.45;
+            color: #FFFFFF;
+        }
+
+        /* =========================================================
+           SECTION 3: #COUPLE ([el:4c45b9c3])
+           ========================================================= */
+        #COUPLE .ta3-col-500 {
+            padding: 100px 40px 100px;
+        }
+        .ta3-couple-intro {
+            margin: 140px 20px 24px;
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.35;
+            color: #000000;
+        }
+        .ta3-person-illus {
+            width: 59%;
+            max-width: 240px;
+            margin: 8px auto 12px;
+        }
+        .ta3-person-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 39px;
+            font-weight: 500;
+            color: #B33246;
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+        .ta3-person-ig {
+            margin-bottom: 14px;
+        }
+        .ta3-person-parents {
+            font-family: 'Roboto Slab', serif;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1.35;
+            color: #000000;
+            margin: 0 20px;
+        }
+        .ta3-couple-amp {
+            font-family: 'Great Vibes', cursive;
+            font-size: 39px;
+            font-weight: 500;
+            color: #B33246;
+            margin: 26px 0 18px;
+            line-height: 1;
+        }
+
+        /* =========================================================
+           SECTION 4: #EVENT ([el:305a9e72])
+           ========================================================= */
+        #EVENT .ta3-col-500 {
+            padding: 230px 40px 90px;
+        }
+        .ta3-event-intro {
+            margin: 0 30px 16px;
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.35;
+            color: #000000;
+        }
+        .ta3-event-icon {
+            width: 25%;
+            max-width: 105px;
+            margin: 6px auto 10px;
+            filter: brightness(0%) contrast(0%) saturate(100%) blur(0px) hue-rotate(0deg);
+        }
+        .ta3-event-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 50px;
+            font-weight: 600;
+            color: #B33246;
+            line-height: 1.2;
+            margin: 6px 0 12px;
+        }
+        .ta3-event-meta {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+        .ta3-event-meta li {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #000000;
+        }
+        .ta3-event-meta svg {
+            width: 22px;
+            height: 22px;
+            fill: #000000;
+            flex-shrink: 0;
+        }
+        .ta3-event-venue {
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.45;
+            color: #000000;
+            margin: 6px 0 22px;
+        }
+        .ta3-event-venue p + p {
+            margin-top: 4px;
+        }
+        .ta3-map-frame {
+            width: 100%;
+            border: 4px solid #FFABB8;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #F6F6F6;
+            margin-bottom: 28px;
+        }
+        .ta3-map-frame iframe {
+            width: 100%;
+            height: 270px;
+            border: 0;
+            display: block;
+        }
+        .ta3-turut-box {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px dashed #FFABB8;
+            width: 100%;
+        }
+        .ta3-turut-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 32px;
+            font-weight: 600;
+            color: #B33246;
+            margin-bottom: 8px;
+        }
+        .ta3-turut-list {
+            list-style: none;
+            font-family: 'Roboto Slab', serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #000000;
+        }
+
+        /* =========================================================
+           SECTION 5: LIVE STREAMING ([el:bd83f70])
+           ========================================================= */
+        .ta3-stream-col {
+            padding: 150px 40px 100px;
+        }
+        .ta3-stream-desc {
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.38;
+            color: #000000;
+            margin: 14px 0 28px;
+        }
+        .ta3-stream-btns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        /* =========================================================
+           SECTION 6: #cerita LOVE STORY TIMELINE ([el:1e85b2fc])
+           ========================================================= */
+        #cerita .ta3-col-500 {
+            padding: 100px 36px 90px;
+        }
+        .ta3-sec-script-heading {
+            font-family: 'Great Vibes', cursive;
+            font-size: 42px;
+            font-weight: 400;
+            line-height: 1.3;
+            color: #B33246;
+            margin-top: 75px;
+            margin-bottom: 24px;
+        }
+        .ta3-timeline {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            text-align: left;
+        }
+        .ta3-timeline-line {
+            position: absolute;
+            left: 18.5px;
+            top: 20px;
+            bottom: 24px;
+            width: 3px;
+            background-color: #73804F47;
+            z-index: 0;
+        }
+        .ta3-timeline-line-fill {
+            width: 100%;
+            height: 35%;
+            background-color: #FFABB8;
+            transition: height 0.25s ease;
+        }
+        .ta3-tl-item {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .ta3-tl-marker {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #FFABB8;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 24px;
+        }
+        .ta3-tl-marker svg {
+            width: 15px;
+            height: 15px;
+            fill: #FFFFFF;
+        }
+        .ta3-tl-card-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            filter: drop-shadow(0px 0px 2px #00000057);
+            -webkit-filter: drop-shadow(0px 0px 2px #00000057);
+        }
+        .ta3-tl-arrow {
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid #726063;
+            z-index: 2;
+        }
+        .ta3-tl-card {
+            background-color: #726063;
+            border: 4px solid #F8F8F8;
+            border-radius: 20px;
+            padding: 24px 22px;
+            color: #FFFFFF;
+            font-family: 'Poppins', sans-serif;
+        }
+        .ta3-tl-date {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2.4px;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+            display: block;
+        }
+        .ta3-tl-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2.4px;
+            padding-bottom: 10px;
+            color: #FFFFFF;
+            display: block;
+        }
+        .ta3-tl-body {
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.9em;
+            color: #FFFFFF;
+        }
+
+        /* =========================================================
+           SECTION 7: #GALLERY WEDDING GALLERY ([el:7259cbf6])
+           ========================================================= */
+        #GALLERY .ta3-col-500 {
+            padding: 100px 36px 90px;
+        }
+        #GALLERY .ta3-sec-script-heading {
+            margin-top: 95px;
+        }
+        .ta3-yt-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 2px solid #FFABB8;
+            margin-bottom: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+        .ta3-yt-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+        .ta3-masonry {
+            width: 100%;
+            column-count: 2;
+            column-gap: 10px;
+        }
+        .ta3-masonry-item {
+            break-inside: avoid;
+            margin-bottom: 10px;
+            position: relative;
+            border: 2px solid #FFABB8;
+            overflow: hidden;
+            cursor: pointer;
+            background-color: #FFF5F7;
+        }
+        .ta3-masonry-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 800ms ease;
+        }
+        .ta3-masonry-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.45);
+            opacity: 0;
+            transition: opacity 400ms ease;
+        }
+        .ta3-masonry-item:hover img {
+            transform: scale(1.05);
+        }
+        .ta3-masonry-item:hover::after {
+            opacity: 1;
+        }
+
+        /* =========================================================
+           SECTION 8: #gift WEDDING GIFT ([el:2fea7333])
+           ========================================================= */
+        #gift {
+            width: 100%;
+            background-image: url('/assets/templates/ta3/bg-pink-floral.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 90px 20px 90px;
+            text-align: center;
+        }
+        .ta3-gift-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ta3-gift-heading {
+            font-family: 'Great Vibes', cursive;
+            font-size: 40px;
+            font-weight: 400;
+            color: #B33246;
+            margin-bottom: 12px;
+        }
+        .ta3-gift-sub {
+            font-family: 'Alata', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.45;
+            color: #000000;
+            max-width: 700px;
+            margin-bottom: 24px;
+        }
+        .ta3-gift-block {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .ta3-bank-logo-wrap {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .ta3-bank-logo-wrap img {
+            width: 210px;
+            max-width: 48%;
+            height: auto;
+            object-fit: contain;
+        }
+        .ta3-bank-badge-text {
+            display: inline-block;
+            background: #FFFFFF;
+            border: 3px solid #FFABB8;
+            border-radius: 12px;
+            padding: 10px 26px;
+            font-family: 'Alata', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #B33246;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .ta3-gift-label {
+            font-family: 'Alata', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            color: #000000;
+            line-height: 1.4;
+        }
+        .ta3-gift-value {
+            font-family: 'Alata', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #000000;
+            line-height: 1.45;
+            margin-top: 2px;
+            margin-bottom: 14px;
+            max-width: 620px;
+        }
+        .ta3-copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            fill: #FFFFFF;
+            border: 3px solid #FFFFFF;
+            border-radius: 15px;
+            padding: 9px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+        .ta3-copy-btn:hover {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        .ta3-copy-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .ta3-wa-gift-btn {
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            fill: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+        .ta3-wa-gift-btn:hover {
+            background-color: #F78E9E;
+        }
+        .ta3-wa-gift-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* =========================================================
+           SECTION 9: CLOSING + #WISHES BUKU TAMU & UCAPAN ([el:1327e95f])
+           ========================================================= */
+        .ta3-closing-sec {
+            width: 100%;
+            background-image: url('/assets/templates/ta3/bg-floral-arch.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 60px 14px 100px;
+        }
+        .ta3-closing-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ta3-closing-thanks {
+            max-width: 780px;
+            margin: 40px 20px 24px;
+            text-align: center;
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.38;
+            color: #000000;
+        }
+        .ta3-closing-illus {
+            width: 23%;
+            max-width: 250px;
+            min-width: 190px;
+            margin: 0 auto 14px;
+        }
+        .ta3-closing-couple {
+            font-family: 'Great Vibes', cursive;
+            font-size: 60px;
+            font-weight: 500;
+            color: #B33246;
+            text-align: center;
+            line-height: 1.15;
+        }
+        .ta3-closing-date {
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #000000;
+            text-align: center;
+            margin: 6px 0 12px;
+        }
+        .ta3-wishes-ribbon {
+            width: 100%;
+            background-color: #FFABB8;
+            border-radius: 0 0 15px 15px;
+            padding: 12px 16px;
+            text-align: center;
+            font-family: 'Roboto Slab', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #FFFFFF;
+            margin-bottom: 42px;
+        }
+        .ta3-card-shell {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.24);
+            background-color: rgba(255, 255, 255, 0.35);
+            padding: 14px 14px 20px;
+            margin-bottom: 26px;
+        }
+        .ta3-montecarlo-title {
+            font-family: 'MonteCarlo', cursive;
+            font-size: 44px;
+            font-weight: 400;
+            color: #B33246;
+            text-align: center;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+        /* Buku Tamu Box */
+        .ta3-rsvp-box {
+            background-color: #8E28181C;
+            border: 1px solid #1A1A1A;
+            border-radius: 10px;
+            padding: 16px 15px;
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+        }
+        .ta3-field-group {
+            margin-bottom: 12px;
+        }
+        .ta3-field-group label.ta3-lbl {
+            display: block;
+            font-size: 15px;
+            font-weight: 400;
+            color: #000000;
+            margin-bottom: 4px;
+        }
+        .ta3-input {
+            width: 100%;
+            background-color: #FFFFFF;
+            border: 1px solid #1A1A1A;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            color: #311513;
+            outline: none;
+        }
+        .ta3-input::placeholder {
+            color: #999999;
+        }
+        .ta3-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            color: #1A1A1A;
+            margin: 6px 4px;
+            cursor: pointer;
+        }
+        .ta3-rsvp-submit {
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .ta3-rsvp-submit:hover {
+            background-color: #F78E9E;
+        }
+
+        /* Ucapan Comment Kit (.cui-golden) */
+        .ta3-cui-box {
+            background-color: #F2DFD4;
+            border: 1px solid #FFABB8;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            text-align: left;
+            overflow: hidden;
+        }
+        .ta3-cui-form {
+            padding: 16px 16px 14px;
+        }
+        .ta3-cui-input, .ta3-cui-textarea {
+            width: 100%;
+            background-color: #FFFFFF;
+            border: 1px solid #FFABB8;
+            border-radius: 3px;
+            padding: 9px 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            outline: none;
+            margin-bottom: 10px;
+        }
+        .ta3-cui-textarea {
+            min-height: 76px;
+            resize: vertical;
+        }
+        .ta3-cui-submit {
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 3px;
+            padding: 7px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .ta3-cui-submit:hover {
+            background-color: #F78E9E;
+        }
+        .ta3-form-feedback {
+            display: none;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #2E7D32;
+            font-weight: 500;
+        }
+        .ta3-cui-list {
+            list-style: none;
+            border-top: 1px solid #FFABB8;
+            max-height: 34vh;
+            overflow-y: auto;
+        }
+        .ta3-cui-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #FFABB8;
+        }
+        .ta3-cui-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .ta3-cui-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .ta3-cui-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #000000;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .ta3-cui-msg {
+            font-size: 13.5px;
+            line-height: 1.45;
+            color: #000000;
+            word-break: break-word;
+            margin-bottom: 4px;
+        }
+        .ta3-cui-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: #6B5E5E;
+        }
+        .ta3-cui-meta svg {
+            width: 11px;
+            height: 11px;
+            fill: #7A6B6B;
+        }
+        .ta3-cui-reply {
+            color: #000000;
+            cursor: pointer;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+
+        /* =========================================================
+           FOOTER + FLOATING DISC + STICKY 7-ICON NAVBAR
+           ========================================================= */
+        .ta3-footer {
+            width: 100%;
+            background-color: #FFABB8;
+            padding: 12px 16px 82px;
+            text-align: center;
+            font-family: 'Roboto Slab', serif;
+            font-size: 12px;
+            color: #FFFFFF;
+        }
+        .ta3-audio-btn {
+            position: fixed;
+            right: 14px;
+            bottom: 72px;
+            z-index: 998;
+            width: 37px;
+            height: 37px;
+            border-radius: 50%;
+            background-color: #FFABB8;
+            color: #FFFFFF;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+        }
+        .ta3-audio-btn.playing svg {
+            animation: wdpMP3-muter 4s linear infinite;
+        }
+        .ta3-audio-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #FFFFFF;
+        }
+
+        .ta3-bottom-nav {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 8px;
+            z-index: 997;
+            width: min(390px, calc(100vw - 36px));
+            background-color: #FFFFFF87;
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            border-radius: 8px;
+            box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.24);
+            padding: 5px 6px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .ta3-nav-link {
+            background-color: #FFABB8;
+            border-radius: 7px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .ta3-nav-link:hover, .ta3-nav-link.active {
+            background-color: #F78E9E;
+        }
+        .ta3-nav-link svg {
+            width: 20px;
+            height: 20px;
+            fill: #FFFFFF;
+        }
+
+        /* Lightbox & Toast */
+        .ta3-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.88);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .ta3-lightbox.open { display: flex; }
+        .ta3-lightbox img {
+            max-width: 92vw;
+            max-height: 86vh;
+            border: 3px solid #FFABB8;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+        .ta3-lb-btn {
+            position: absolute;
+            background: rgba(255, 171, 184, 0.9);
+            color: #FFF;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ta3-lb-close { top: 18px; right: 18px; }
+        .ta3-lb-prev { left: 14px; top: 50%; transform: translateY(-50%); }
+        .ta3-lb-next { right: 14px; top: 50%; transform: translateY(-50%); }
+
+        .ta3-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 68px;
+            transform: translateX(-50%) translateY(16px);
+            background: rgba(0, 0, 0, 0.84);
+            color: #FFFFFF;
+            padding: 9px 18px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10001;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .ta3-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* =========================================================
+           MOBILE RESPONSIVE OVERRIDES (MATCHING POST-2055 @767PX)
+           ========================================================= */
+        @media (max-width: 767px) {
+            .ta3-welcome-illus { width: 59%; max-width: 235px; }
+            .ta3-welcome-couple { font-size: 32px; }
+            .ta3-open-btn { border-width: 1px; }
+
+            #COVER .ta3-col-500 { padding: 50px 0 115px; }
+            .ta3-hero-sub { margin-top: 75px; font-size: 22px; }
+            .ta3-hero-illus { width: 58%; }
+            .ta3-hero-couple { font-size: 37px; }
+            .ta3-hero-date { font-size: 20px; }
+            .ta3-countdown-grid {
+                padding: 10px 42px 20px;
+                max-width: 100%;
+                gap: 6px;
+            }
+            .ta3-cd-box { padding: 18px 4px; }
+            .ta3-cd-num { font-size: 20px; }
+            .ta3-cd-lbl { font-size: 12px; }
+            .ta3-shape-bottom svg {
+                width: calc(197% + 1.3px);
+                height: 93px;
+            }
+
+            .ta3-quote-band { padding: 50px 15px; }
+            .ta3-quote-inner { font-size: 13px; line-height: 1.45; }
+
+            #COUPLE .ta3-col-500 { padding: 50px 0 90px; }
+            .ta3-couple-intro { margin: 165px 25px 20px; font-size: 15px; }
+            .ta3-person-illus { width: 58%; }
+            .ta3-person-name { font-size: 37px; }
+            .ta3-person-parents { font-size: 16px; }
+            .ta3-couple-amp { font-size: 37px; }
+
+            #EVENT .ta3-col-500 { padding: 170px 0 95px; }
+            .ta3-event-intro { margin: 40px 55px 12px; font-size: 17px; }
+            .ta3-event-icon { width: 27%; }
+            .ta3-event-title { font-size: 36px; }
+            .ta3-event-meta li { font-size: 17px; }
+            .ta3-event-meta svg { width: 19px; height: 19px; }
+            .ta3-event-venue { font-size: 17px; padding: 0 20px; }
+            .ta3-map-frame {
+                width: calc(100% - 50px);
+                margin: 0 25px 24px;
+                border-width: 3px;
+            }
+
+            .ta3-stream-col { padding: 165px 20px 110px; }
+            .ta3-stream-desc { font-size: 17px; margin: 10px 12px 24px; }
+
+            #cerita .ta3-col-500 { padding: 15px 20px 80px; }
+            .ta3-sec-script-heading { margin-top: 105px; font-size: 39px; }
+            .ta3-timeline { gap: 23px; }
+            .ta3-timeline-line { left: 16.5px; }
+            .ta3-tl-marker { width: 36px; height: 36px; margin-right: 12px; }
+            .ta3-tl-marker svg { width: 14px; height: 14px; }
+            .ta3-tl-card { padding: 20px; }
+            .ta3-tl-date { font-size: 12px; }
+            .ta3-tl-title { font-size: 11px; }
+
+            #GALLERY .ta3-col-500 { padding: 15px 20px 85px; }
+            #GALLERY .ta3-sec-script-heading { margin-top: 150px; }
+            .ta3-masonry { column-gap: 5px; }
+            .ta3-masonry-item { margin-bottom: 5px; }
+
+            #gift { padding: 45px 15px 55px; }
+            .ta3-gift-heading { margin-top: 30px; }
+            .ta3-gift-sub { font-size: 14px; }
+            .ta3-bank-logo-wrap img { width: 62%; max-width: 45%; }
+            .ta3-gift-label { font-size: 13px; }
+            .ta3-gift-value { font-size: 12px; }
+            .ta3-copy-btn { border-width: 2px; font-size: 12.5px; }
+
+            .ta3-closing-sec { padding: 35px 10px 85px; }
+            .ta3-closing-thanks { margin: 145px 15px 20px; font-size: 15px; }
+            .ta3-closing-illus { width: 58%; }
+            .ta3-closing-couple { font-size: 35px; }
+            .ta3-closing-date { font-size: 15px; }
+            .ta3-wishes-ribbon { font-size: 15px; margin-bottom: 24px; }
+            .ta3-montecarlo-title { font-size: 40px; }
+
+            .ta3-audio-btn { width: 30px; height: 30px; right: 10px; bottom: 66px; }
+            .ta3-audio-btn svg { width: 15px; height: 15px; }
+            .ta3-nav-link { height: 35px; }
+            .ta3-nav-link svg { width: 18px; height: 18px; }
+        }
+    </style>
+</head>
+<body class="scroll-locked"
+      data-slug="{{ .Slug }}"
+      data-akad-date="{{ .AkadDate }}"
+      data-resepsi-date="{{ .ResepsiDate }}"
+      data-love-story="{{ .LoveStory }}"
+      data-wa="{{ .WaConfirmation }}"
+      data-bride-order="{{ .BrideChildOrder }}"
+      data-groom-order="{{ .GroomChildOrder }}"
+      data-gallery="{{ range $i, $img := .GalleryList }}{{ if $i }}||{{ end }}{{ $img }}{{ end }}">
+
+    {{ $brideNick := "Fulanah" }}{{ if .BrideNickname }}{{ $brideNick = .BrideNickname }}{{ end }}
+    {{ $groomNick := "Fulan" }}{{ if .GroomNickname }}{{ $groomNick = .GroomNickname }}{{ end }}
+    {{ $coupleNick := printf "%s & %s" $brideNick $groomNick }}
+    {{ if eq .EventType "khitan" }}
+        {{ if .ChildNickname }}{{ $coupleNick = .ChildNickname }}{{ else if .ChildName }}{{ $coupleNick = .ChildName }}{{ end }}
+    {{ end }}
+    {{ $hasCustomCover := and .CoverImage (ne .CoverImage "/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg") }}
+
+    <!-- =========================================================
+         WELCOME GATE OVERLAY (.modalx / [el:10cf8ec6])
+         ========================================================= -->
+    <div id="ta3ModalGate" class="ta3-modalx">
+        <div class="ta3-modalx-inner">
+            {{ if $hasCustomCover }}
+                <img src="{{ .CoverImage }}" alt="{{ $coupleNick }}" class="ta3-photo-circle">
+            {{ else }}
+                <img src="/assets/templates/ta3/couple-welcome.png" alt="{{ $coupleNick }}" class="ta3-welcome-illus">
+            {{ end }}
+
+            <div class="ta3-welcome-couple">{{ $coupleNick }}</div>
+            <div class="ta3-welcome-dear">Kpd Bpk/Ibu/Saudara/i</div>
+            <div class="ta3-welcome-guest">{{ .GuestTo }}</div>
+            <div class="ta3-welcome-note">
+                {{ if eq .EventType "khitan" }}
+                    Tanpa Mengurangi Rasa Hormat, Kami Mengundang Anda Untuk Berhadir Di Acara Tasyakuran Khitan Putra Kami.
+                {{ else }}
+                    Tanpa Mengurangi Rasa Hormat, Kami Mengundang Anda Untuk Berhadir Di Acara Pernikahan Kami.
+                {{ end }}
+            </div>
+            <button type="button" id="ta3OpenBtn" class="ta3-open-btn">
+                <svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M494.586 164.516c-4.697-3.883-111.723-89.95-135.251-108.657C337.231 38.191 299.437 0 256 0c-43.205 0-80.636 37.717-103.335 55.859-24.463 19.45-131.07 105.195-135.15 108.549A48.004 48.004 0 0 0 0 201.485V464c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V201.509a48 48 0 0 0-17.414-36.993zM464 458a6 6 0 0 1-6 6H54a6 6 0 0 1-6-6V204.347c0-1.813.816-3.526 2.226-4.665 15.87-12.814 108.793-87.554 132.364-106.293C200.755 78.88 232.398 48 256 48c23.693 0 55.857 31.369 73.41 45.389 23.573 18.741 116.503 93.493 132.366 106.316a5.99 5.99 0 0 1 2.224 4.663V458zm-31.991-187.704c4.249 5.159 3.465 12.795-1.745 16.981-28.975 23.283-59.274 47.597-70.929 56.863C336.636 362.283 299.205 400 256 400c-43.452 0-81.287-38.237-103.335-55.86-11.279-8.967-41.744-33.413-70.927-56.865-5.21-4.187-5.993-11.822-1.745-16.981l15.258-18.528c4.178-5.073 11.657-5.843 16.779-1.726 28.618 23.001 58.566 47.035 70.56 56.571C200.143 320.631 232.307 352 256 352c23.602 0 55.246-30.88 73.41-45.389 11.994-9.535 41.944-33.57 70.563-56.568 5.122-4.116 12.601-3.346 16.778 1.727l15.258 18.526z"></path></svg>
+                <span>Buka Undangan</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         SECTION 1: #COVER HERO ([el:63878d3c])
+         ========================================================= -->
+    <section id="COVER" class="ta3-sec-boxed">
+        <div class="ta3-col-500 ta3-bg-cover">
+            <h2 class="ta3-hero-sub ta3-anim anim-left">
+                {{ if eq .EventType "khitan" }}
+                    You Are Invited To<br>Tasyakuran Khitan Of
+                {{ else }}
+                    You Are invited To<br>The Wedding Of
+                {{ end }}
+            </h2>
+
+            {{ if .Sec1Photo }}
+                <img src="{{ .Sec1Photo }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-zoom">
+            {{ else if $hasCustomCover }}
+                <img src="{{ .CoverImage }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-zoom">
+            {{ else }}
+                <img src="/assets/templates/ta3/couple-hero.png" alt="{{ $coupleNick }}" class="ta3-hero-illus ta3-anim anim-zoom">
+            {{ end }}
+
+            <h2 class="ta3-hero-couple ta3-anim anim-zoom">{{ $coupleNick }}</h2>
+            <h2 class="ta3-hero-date ta3-anim anim-left" id="ta3HeroDate">
+                {{ if .AkadDate }}{{ .AkadDate }}{{ else if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}Selasa,<br>22 Februari 2025{{ end }}
+            </h2>
+
+            <div class="ta3-countdown-grid ta3-anim anim-up" id="ta3Countdown">
+                <div class="ta3-cd-box">
+                    <span class="ta3-cd-num" id="cdDays">00</span>
+                    <span class="ta3-cd-lbl">Hari</span>
+                </div>
+                <div class="ta3-cd-box">
+                    <span class="ta3-cd-num" id="cdHours">00</span>
+                    <span class="ta3-cd-lbl">Jam</span>
+                </div>
+                <div class="ta3-cd-box">
+                    <span class="ta3-cd-num" id="cdMins">00</span>
+                    <span class="ta3-cd-lbl">Menit</span>
+                </div>
+                <div class="ta3-cd-box">
+                    <span class="ta3-cd-num" id="cdSecs">00</span>
+                    <span class="ta3-cd-lbl">Detik</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Mountains SVG Shape Divider -->
+        <div class="ta3-shape-bottom" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
+                <path class="elementor-shape-fill" opacity="0.33" d="M473,67.3c-203.9,88.3-263.1-34-320.3,0C66,119.1,0,59.7,0,59.7V0h1000v59.7 c0,0-62.1,26.1-94.9,29.3c-32.8,3.3-62.8-12.3-75.8-22.1C806,49.6,745.3,8.7,694.9,4.7S492.4,59,473,67.3z"/>
+                <path class="elementor-shape-fill" opacity="0.66" d="M734,67.3c-45.5,0-77.2-23.2-129.1-39.1c-28.6-8.7-150.3-10.1-254,39.1 s-91.7-34.4-149.2,0C115.7,118.3,0,39.8,0,39.8V0h1000v36.5c0,0-28.2-18.5-92.1-18.5C810.2,18.1,775.7,67.3,734,67.3z"/>
+                <path class="elementor-shape-fill" d="M766.1,28.9c-200-57.5-266,65.5-395.1,19.5C242,1.8,242,5.4,184.8,20.6C128,35.8,132.3,44.9,89.9,52.5C28.6,63.7,0,0,0,0 h1000c0,0-9.9,40.9-83.6,48.1S829.6,47,766.1,28.9z"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 2: AR-RUM QUOTE BAND ([el:6ad1980b])
+         ========================================================= -->
+    <section class="ta3-quote-band">
+        <div class="ta3-quote-inner ta3-anim anim-up">
+            {{ if .Quotes }}
+                <p>{{ .Quotes }}</p>
+            {{ else if eq .EventType "khitan" }}
+                <p>“Ya Tuhanku, jadikanlah aku dan anak cucuku orang-orang yang tetap mendirikan shalat, ya Tuhan kami, perkenankanlah doaku.”<br>{ Q.S : Ibrahim (14) : 40 }</p>
+            {{ else }}
+                <p>“Dan Diantara Tanda-tanda (Kebesaran) -Nya Ialah Dia Menciptakan Pasangan-pasangan Untukmu Dari Jenismu Sendiri, Agar Kamu Cenderung Dan Merasa Teteram Kepadanya, Dan Dia Menjadikan Diantaramu Rasa Kasih Dan Sayang. Sungguh, Pada Yang Demuikian Itu Benar-benar Terdapat Tanda-tanda (Kebesaran Allah) Bagi Kaum Yang Berfikir”<br>{ Q.S : Ar-Rum (30) : 21 }</p>
+            {{ end }}
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 3: #COUPLE ([el:4c45b9c3])
+         ========================================================= -->
+    <section id="COUPLE" class="ta3-sec-boxed">
+        <div class="ta3-col-500 ta3-bg-arch">
+            {{ if eq .EventType "khitan" }}
+                <p class="ta3-couple-intro ta3-anim anim-up">
+                    Dengan Memohon Rahmat Dan Ridho Dari Allah SWT. Kami Bermaksud Menyelenggarakan Tasyakuran Khitan Putra Kami
+                </p>
+                {{ if .GroomPhoto }}
+                    <img src="{{ .GroomPhoto }}" alt="{{ .ChildName }}" class="ta3-photo-circle ta3-anim anim-left">
+                {{ else }}
+                    <img src="/assets/templates/ta3/groom-default.png" alt="{{ .ChildName }}" class="ta3-person-illus ta3-anim anim-left">
+                {{ end }}
+                <h2 class="ta3-person-name ta3-anim anim-zoom">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h2>
+                <p class="ta3-person-parents ta3-anim anim-up">
+                    {{ if .ChildOrder }}Putra ke-{{ .ChildOrder }} Dari :{{ else }}Putra Tercinta Dari :{{ end }}<br>
+                    {{ if .GroomParents }}{{ .GroomParents }}{{ else }}Bapak &amp; Ibu{{ end }}
+                </p>
+            {{ else }}
+                <p class="ta3-couple-intro ta3-anim anim-up">
+                    Dengan Memohon Rahmat Dan Ridho Dari Allah SWT. Kami Bermaksud Menyelenggarakan Syukuran Pernikahan Kami
+                </p>
+
+                <!-- Mempelai Wanita -->
+                {{ if .BridePhoto }}
+                    <img src="{{ .BridePhoto }}" alt="{{ .BrideName }}" class="ta3-photo-circle ta3-anim anim-left">
+                {{ else }}
+                    <img src="/assets/templates/ta3/bride-default.png" alt="{{ .BrideName }}" class="ta3-person-illus ta3-anim anim-left">
+                {{ end }}
+                <h2 class="ta3-person-name ta3-anim anim-zoom">{{ if .BrideName }}{{ .BrideName }}{{ else }}Fulanah Fatimah{{ end }}</h2>
+                {{ if .BrideInstagram }}
+                <div class="ta3-person-ig ta3-anim anim-zoom">
+                    <a href="https://www.instagram.com/{{ .BrideInstagram }}/" target="_blank" rel="noopener noreferrer" class="ta3-pink-btn ta3-pink-btn-sm">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                        <span>@{{ .BrideInstagram }}</span>
+                    </a>
+                </div>
+                {{ else if not .BrideName }}
+                <div class="ta3-person-ig ta3-anim anim-zoom">
+                    <a href="#COUPLE" class="ta3-pink-btn ta3-pink-btn-sm">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                        <span>@igmempelai</span>
+                    </a>
+                </div>
+                {{ end }}
+                <p class="ta3-person-parents ta3-anim anim-up">
+                    <span id="ta3BrideOrderText">Putri Pertama Dari :</span><br>
+                    {{ if .BrideParents }}{{ .BrideParents }}{{ else }}Bapak Mempelai &amp; Ibu Mempelai{{ end }}
+                </p>
+
+                <div class="ta3-couple-amp ta3-anim anim-zoom">&amp;</div>
+
+                <!-- Mempelai Pria -->
+                {{ if .GroomPhoto }}
+                    <img src="{{ .GroomPhoto }}" alt="{{ .GroomName }}" class="ta3-photo-circle ta3-anim anim-left">
+                {{ else }}
+                    <img src="/assets/templates/ta3/groom-default.png" alt="{{ .GroomName }}" class="ta3-person-illus ta3-anim anim-left">
+                {{ end }}
+                <h2 class="ta3-person-name ta3-anim anim-zoom">{{ if .GroomName }}{{ .GroomName }}{{ else }}Fulan Ali{{ end }}</h2>
+                {{ if .GroomInstagram }}
+                <div class="ta3-person-ig ta3-anim anim-zoom">
+                    <a href="https://www.instagram.com/{{ .GroomInstagram }}/" target="_blank" rel="noopener noreferrer" class="ta3-pink-btn ta3-pink-btn-sm">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                        <span>@{{ .GroomInstagram }}</span>
+                    </a>
+                </div>
+                {{ else if not .GroomName }}
+                <div class="ta3-person-ig ta3-anim anim-zoom">
+                    <a href="#COUPLE" class="ta3-pink-btn ta3-pink-btn-sm">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                        <span>@igmempelai</span>
+                    </a>
+                </div>
+                {{ end }}
+                <p class="ta3-person-parents ta3-anim anim-up">
+                    <span id="ta3GroomOrderText">Putra Pertama Dari :</span><br>
+                    {{ if .GroomParents }}{{ .GroomParents }}{{ else }}Bapak Mempelai &amp; Ibu Mempelai{{ end }}
+                </p>
+            {{ end }}
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 4: #EVENT ([el:305a9e72])
+         ========================================================= -->
+    <section id="EVENT" class="ta3-sec-boxed">
+        <div class="ta3-col-500 ta3-bg-arch">
+            <p class="ta3-event-intro ta3-anim anim-zoom">Insya Allah Acara Akan Dilaksanakan Pada :</p>
+            <img src="/assets/templates/ta3/event-icon.png" alt="Event Icon" class="ta3-event-icon ta3-anim anim-up">
+
+            <!-- Akad Nikah / Acara Utama -->
+            <h2 class="ta3-event-title ta3-anim anim-up">{{ if eq .EventType "khitan" }}Tasyakuran Khitan{{ else }}Akad Nikah{{ end }}</h2>
+            <ul class="ta3-event-meta ta3-anim anim-up">
+                <li>
+                    <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm320-196c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM192 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM64 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"></path></svg>
+                    <span>{{ if .AkadDate }}{{ .AkadDate }}{{ else }}Selasa, 22 Februari 2022{{ end }}</span>
+                </li>
+                <li>
+                    <svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256,8C119,8,8,119,8,256S119,504,256,504,504,393,504,256,393,8,256,8Zm92.49,313h0l-20,25a16,16,0,0,1-22.49,2.5h0l-67-49.72a40,40,0,0,1-15-31.23V112a16,16,0,0,1,16-16h32a16,16,0,0,1,16,16V256l58,42.5A16,16,0,0,1,348.49,321Z"></path></svg>
+                    <span>Pukul : {{ if .AkadTime }}{{ .AkadTime }}{{ else }}09.00 WIB - Selesai{{ end }}</span>
+                </li>
+            </ul>
+
+            <!-- Resepsi -->
+            {{ if or .ResepsiDate .ResepsiTime (and (not .AkadDate) (not .AkadVenue)) }}
+            <h2 class="ta3-event-title ta3-anim anim-up">Resepsi</h2>
+            <ul class="ta3-event-meta ta3-anim anim-up">
+                <li>
+                    <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm320-196c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM192 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-40zM64 268c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zm0 128c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12v-40zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"></path></svg>
+                    <span>{{ if .ResepsiDate }}{{ .ResepsiDate }}{{ else if .AkadDate }}{{ .AkadDate }}{{ else }}Selasa, 22 Februari 2022{{ end }}</span>
+                </li>
+                <li>
+                    <svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256,8C119,8,8,119,8,256S119,504,256,504,504,393,504,256,393,8,256,8Zm92.49,313h0l-20,25a16,16,0,0,1-22.49,2.5h0l-67-49.72a40,40,0,0,1-15-31.23V112a16,16,0,0,1,16-16h32a16,16,0,0,1,16,16V256l58,42.5A16,16,0,0,1,348.49,321Z"></path></svg>
+                    <span>Pukul : {{ if .ResepsiTime }}{{ .ResepsiTime }}{{ else }}11.00 WIB - Selesai{{ end }}</span>
+                </li>
+            </ul>
+            {{ end }}
+
+            <!-- Venue & Address -->
+            <div class="ta3-event-venue ta3-anim anim-up">
+                {{ if or .AkadVenue .AkadAddress }}
+                    {{ if .AkadVenue }}<p>{{ .AkadVenue }}</p>{{ end }}
+                    {{ if .AkadAddress }}<p>{{ .AkadAddress }}</p>{{ end }}
+                    {{ if and .ResepsiVenue (ne .ResepsiVenue .AkadVenue) }}
+                        <p style="margin-top:10px;font-weight:600;">Lokasi Resepsi :</p>
+                        <p>{{ .ResepsiVenue }}</p>
+                        {{ if .ResepsiAddress }}<p>{{ .ResepsiAddress }}</p>{{ end }}
+                    {{ end }}
+                {{ else }}
+                    <p>Di Kediaman Mempelai Wanita</p>
+                    <p>Perumahan Sumput Asri,</p>
+                    <p>Jalan Bogenvil III,</p>
+                    <p>RT 25 / RW 07, Blok P. 06,</p>
+                    <p>Driyorejo Gresik</p>
+                {{ end }}
+            </div>
+
+            <!-- Google Maps Embed & View Location -->
+            {{ $mapQuery := "Perum Sumput Asri Driyorejo Gresik" }}
+            {{ if and .AkadVenue .AkadAddress }}{{ $mapQuery = printf "%s %s" .AkadVenue .AkadAddress }}{{ else if .AkadVenue }}{{ $mapQuery = .AkadVenue }}{{ else if .AkadAddress }}{{ $mapQuery = .AkadAddress }}{{ end }}
+            <div class="ta3-map-frame ta3-anim anim-up">
+                <iframe loading="lazy" src="https://maps.google.com/maps?q={{ urlquery $mapQuery }}&t=m&z=15&output=embed&iwloc=near" title="{{ $mapQuery }}"></iframe>
+            </div>
+
+            {{ $mapLink := printf "https://www.google.com/maps/search/?api=1&query=%s" (urlquery $mapQuery) }}
+            {{ if .AkadMapsURL }}{{ $mapLink = .AkadMapsURL }}{{ else if .ResepsiMapsURL }}{{ $mapLink = .ResepsiMapsURL }}{{ end }}
+            <a href="{{ $mapLink }}" target="_blank" rel="noopener noreferrer" class="ta3-pink-btn ta3-pink-btn-shadow ta3-anim anim-zoom">
+                <svg aria-hidden="true" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg"><path d="M288 0c-69.59 0-126 56.41-126 126 0 56.26 82.35 158.8 113.9 196.02 6.39 7.54 17.82 7.54 24.2 0C331.65 284.8 414 182.26 414 126 414 56.41 357.59 0 288 0zm0 168c-23.2 0-42-18.8-42-42s18.8-42 42-42 42 18.8 42 42-18.8 42-42 42zM20.12 215.95A32.006 32.006 0 0 0 0 245.66v250.32c0 11.32 11.43 19.06 21.94 14.86L160 448V214.92c-8.84-15.98-16.07-31.54-21.25-46.42L20.12 215.95zM288 359.67c-14.07 0-27.38-6.18-36.51-16.96-19.66-23.2-40.57-49.62-59.49-76.72v182l192 64V266c-18.92 27.09-39.82 53.52-59.49 76.72-9.13 10.77-22.44 16.95-36.51 16.95zm266.06-198.51L416 224v288l139.88-55.95A31.996 31.996 0 0 0 576 426.34V176.02c0-11.32-11.43-19.06-21.94-14.86z"></path></svg>
+                <span>View location</span>
+            </a>
+
+            {{ if .TurutMengundangList }}
+            <div class="ta3-turut-box ta3-anim anim-up">
+                <div class="ta3-turut-title">Turut Mengundang</div>
+                <ul class="ta3-turut-list">
+                    {{ range .TurutMengundangList }}
+                        <li>{{ . }}</li>
+                    {{ end }}
+                </ul>
+            </div>
+            {{ end }}
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 5: LIVE STREAMING ([el:bd83f70])
+         ========================================================= -->
+    <section class="ta3-sec-boxed">
+        <div class="ta3-col-500 ta3-bg-arch ta3-stream-col">
+            <h2 class="ta3-event-title ta3-anim anim-up">Live Streaming</h2>
+            <p class="ta3-stream-desc ta3-anim anim-up">
+                Temui kami secara virtual untuk menyaksikan acara pernikahan kami yang insya allah akan disiarkan langsung melalui akun Instagram kami
+            </p>
+            {{ $liveIg := "https://www.instagram.com/" }}
+            {{ if .BrideInstagram }}{{ $liveIg = printf "https://www.instagram.com/%s/" .BrideInstagram }}{{ else if .GroomInstagram }}{{ $liveIg = printf "https://www.instagram.com/%s/" .GroomInstagram }}{{ end }}
+            <div class="ta3-stream-btns ta3-anim anim-zoom">
+                <a href="{{ $liveIg }}" target="_blank" rel="noopener noreferrer" class="ta3-pink-btn">
+                    <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
+                    <span>Live Instagram</span>
+                </a>
+                {{ if .YoutubeURL }}
+                <a href="{{ .YoutubeURL }}" target="_blank" rel="noopener noreferrer" class="ta3-pink-btn">
+                    <span>Live Youtube</span>
+                </a>
+                {{ end }}
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 6: #cerita LOVE STORY TIMELINE ([el:1e85b2fc])
+         ========================================================= -->
+    {{ if ne .EventType "khitan" }}
+    <section id="cerita" class="ta3-sec-boxed">
+        <div class="ta3-col-500 ta3-bg-pink">
+            <h2 class="ta3-sec-script-heading ta3-anim anim-zoom">Love Story</h2>
+            <div class="ta3-timeline" id="ta3Timeline">
+                <div class="ta3-timeline-line"><div class="ta3-timeline-line-fill" id="ta3TimelineFill"></div></div>
+                <!-- Populated dynamically by LoveStory Smart Parser in JS -->
+            </div>
+        </div>
+    </section>
+    {{ end }}
+
+    <!-- =========================================================
+         SECTION 7: #GALLERY WEDDING GALLERY ([el:7259cbf6])
+         ========================================================= -->
+    <section id="GALLERY" class="ta3-sec-boxed">
+        <div class="ta3-col-500 ta3-bg-cover">
+            <h2 class="ta3-sec-script-heading ta3-anim anim-zoom">{{ if eq .EventType "khitan" }}Our Gallery{{ else }}Wedding Gallery{{ end }}</h2>
+
+            {{ if .YoutubeEmbedURL }}
+            <div class="ta3-yt-wrap ta3-anim anim-up">
+                <iframe src="{{ .YoutubeEmbedURL }}" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+            {{ end }}
+
+            <div class="ta3-masonry" id="ta3GalleryGrid">
+                {{ if .GalleryList }}
+                    {{ range $idx, $img := .GalleryList }}
+                    <div class="ta3-masonry-item" data-idx="{{ $idx }}">
+                        <img src="{{ $img }}" alt="Gallery {{ $idx }}" loading="lazy">
+                    </div>
+                    {{ end }}
+                {{ else }}
+                    <div class="ta3-masonry-item" data-idx="0"><img src="/assets/templates/ta3/photos/gallery-1.jpg" alt="Gallery 1" loading="lazy"></div>
+                    <div class="ta3-masonry-item" data-idx="1"><img src="/assets/templates/ta3/photos/gallery-2.jpg" alt="Gallery 2" loading="lazy"></div>
+                    <div class="ta3-masonry-item" data-idx="2"><img src="/assets/templates/ta3/photos/gallery-3.jpg" alt="Gallery 3" loading="lazy"></div>
+                    <div class="ta3-masonry-item" data-idx="3"><img src="/assets/templates/ta3/photos/gallery-4.jpg" alt="Gallery 4" loading="lazy"></div>
+                    <div class="ta3-masonry-item" data-idx="4"><img src="/assets/templates/ta3/photos/gallery-5.jpg" alt="Gallery 5" loading="lazy"></div>
+                    <div class="ta3-masonry-item" data-idx="5"><img src="/assets/templates/ta3/photos/gallery-6.jpg" alt="Gallery 6" loading="lazy"></div>
+                {{ end }}
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 8: #gift WEDDING GIFT ([el:2fea7333])
+         ========================================================= -->
+    <section id="gift">
+        <div class="ta3-gift-container">
+            <h1 class="ta3-gift-heading ta3-anim anim-up">Wedding Gift</h1>
+            <p class="ta3-gift-sub ta3-anim anim-up">
+                Doa Restu Anda merupakan karunia yang sangat berarti bagi kami.<br>
+                Dan jika memberi adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara cashless.
+            </p>
+
+            {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
+                {{ if .BankAccount1 }}
+                <div class="ta3-gift-block ta3-anim anim-up">
+                    <div class="ta3-bank-logo-wrap" data-bank="{{ .BankName1 }}"></div>
+                    <div class="ta3-gift-label">transfer ke rekening {{ .BankName1 }} a.n {{ .BankHolder1 }}</div>
+                    <div class="ta3-gift-value">{{ .BankAccount1 }}</div>
+                    <button type="button" class="ta3-copy-btn" data-copy="{{ .BankAccount1 }}">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                        <span>Copy No. Rekening</span>
+                    </button>
+                </div>
+                {{ end }}
+
+                {{ if .BankAccount2 }}
+                <div class="ta3-gift-block ta3-anim anim-up">
+                    <div class="ta3-bank-logo-wrap" data-bank="{{ .BankName2 }}"></div>
+                    <div class="ta3-gift-label">transfer ke rekening {{ .BankName2 }} a.n {{ .BankHolder2 }}</div>
+                    <div class="ta3-gift-value">{{ .BankAccount2 }}</div>
+                    <button type="button" class="ta3-copy-btn" data-copy="{{ .BankAccount2 }}">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                        <span>Copy No. Rekening</span>
+                    </button>
+                </div>
+                {{ end }}
+
+                {{ if .GiftAddress }}
+                <p class="ta3-gift-sub ta3-anim anim-up" style="margin-bottom:10px;">
+                    Anda Juga Bisa Mengirim Kado Fisik Ke Alamat Berikut
+                </p>
+                <div class="ta3-gift-block ta3-anim anim-up">
+                    <div class="ta3-gift-value">{{ .GiftAddress }}</div>
+                    <button type="button" class="ta3-copy-btn" data-copy="{{ .GiftAddress }}">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                        <span>Copy Alamat</span>
+                    </button>
+                </div>
+                {{ end }}
+            {{ else }}
+                <!-- Default Demo Gift Blocks matching TA3 -->
+                <div class="ta3-gift-block ta3-anim anim-up">
+                    <div class="ta3-bank-logo-wrap" data-bank="BNI"></div>
+                    <div class="ta3-gift-label">transfer ke rekening BNI a.n Shashita Vinskalery</div>
+                    <div class="ta3-gift-value">8630245908</div>
+                    <button type="button" class="ta3-copy-btn" data-copy="8630245908">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                        <span>Copy No. Rekening</span>
+                    </button>
+                </div>
+
+                <div class="ta3-gift-block ta3-anim anim-up">
+                    <div class="ta3-bank-logo-wrap" data-bank="BNI"></div>
+                    <div class="ta3-gift-label">transfer ke rekening BNI a.n Shashita Vinskalery</div>
+                    <div class="ta3-gift-value">8630245908</div>
+                    <button type="button" class="ta3-copy-btn" data-copy="8630245908">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                        <span>Copy No. Rekening</span>
+                    </button>
+                </div>
+
+                <p class="ta3-gift-sub ta3-anim anim-up" style="margin-bottom:10px;">
+                    Anda Juga Bisa Mengirim Kado Fisik Ke Alamat Berikut
+                </p>
+                <div class="ta3-gift-block ta3-anim anim-up">
+                    <div class="ta3-gift-value">Perumahan Sumput Asri, Jalan Bogenvil III, RT 25 / RW 07, Blok P. 06, Driyorejo Gresik</div>
+                    <button type="button" class="ta3-copy-btn" data-copy="Perumahan Sumput Asri, Jalan Bogenvil III, RT 25 / RW 07, Blok P. 06, Driyorejo Gresik">
+                        <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
+                        <span>Copy Alamat</span>
+                    </button>
+                </div>
+            {{ end }}
+
+            <button type="button" id="ta3WaGiftBtn" class="ta3-wa-gift-btn ta3-anim anim-up">
+                <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+                <span>Konfirmasi Via WA Mempelai</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 9: CLOSING + #WISHES BUKU TAMU & UCAPAN ([el:1327e95f])
+         ========================================================= -->
+    <section class="ta3-closing-sec">
+        <div class="ta3-closing-container">
+            <p class="ta3-closing-thanks ta3-anim anim-zoom">
+                Tiada Yang Dapat Kami Ungkapkan Selain Rasa Terimakasih Dari Hati Yang Tulus Apabila Bapak/ Ibu/ Saudara/i Berkenan Hadir Untuk Memberikan Do’a Restu Kepada Kami
+            </p>
+
+            {{ if .ClosingPhoto }}
+                <img src="{{ .ClosingPhoto }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-left">
+            {{ else if $hasCustomCover }}
+                <img src="{{ .CoverImage }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-left">
+            {{ else }}
+                <img src="/assets/templates/ta3/couple-hero.png" alt="{{ $coupleNick }}" class="ta3-closing-illus ta3-anim anim-left">
+            {{ end }}
+
+            <h2 id="WISHES" class="ta3-closing-couple ta3-anim anim-up">{{ $coupleNick }}</h2>
+            <h2 class="ta3-closing-date ta3-anim anim-zoom">{{ if .AkadDate }}{{ .AkadDate }}{{ else if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}22 Februari 2022{{ end }}</h2>
+
+            <div class="ta3-wishes-ribbon">Berikan Ucapan Spesial Anda Disini :</div>
+
+            <!-- Buku Tamu Card -->
+            <div class="ta3-card-shell">
+                <h2 class="ta3-montecarlo-title ta3-anim anim-zoom">Buku Tamu</h2>
+                <form id="ta3RsvpForm" class="ta3-rsvp-box">
+                    <div class="ta3-field-group">
+                        <label class="ta3-lbl" for="rsvpName">Nama</label>
+                        <input type="text" id="rsvpName" class="ta3-input" placeholder="Nama" required>
+                    </div>
+                    <div class="ta3-field-group">
+                        <label class="ta3-lbl" for="rsvpCount">Jumlah Tamu</label>
+                        <input type="number" id="rsvpCount" min="1" max="10" class="ta3-input" placeholder="Jumlah Tamu">
+                    </div>
+                    <div class="ta3-field-group">
+                        <label class="ta3-lbl">Konfirmasi</label>
+                        <label class="ta3-radio-label">
+                            <input type="radio" name="rsvpAtt" value="hadir" checked>
+                            <span>Saya akan datang</span>
+                        </label>
+                        <label class="ta3-radio-label">
+                            <input type="radio" name="rsvpAtt" value="tidak_hadir">
+                            <span>Saya tidak bisa datang</span>
+                        </label>
+                    </div>
+                    <button type="submit" id="rsvpSubmitBtn" class="ta3-rsvp-submit">Kirim</button>
+                    <div id="rsvpFeedback" class="ta3-form-feedback">Terima kasih! Konfirmasi kehadiran Anda telah tersimpan.</div>
+                </form>
+            </div>
+
+            <!-- Ucapan Card -->
+            <div class="ta3-card-shell" style="margin-bottom:0;">
+                <h2 class="ta3-montecarlo-title ta3-anim anim-zoom">Ucapan</h2>
+                <div class="ta3-cui-box">
+                    <form id="ta3WishForm" class="ta3-cui-form">
+                        <input type="text" id="wishName" class="ta3-cui-input" placeholder="Nama" value="{{ if ne .GuestTo "Tamu Undangan" }}{{ .GuestTo }}{{ end }}" required>
+                        <textarea id="wishMsg" class="ta3-cui-textarea" placeholder="Ucapan" required></textarea>
+                        <button type="submit" id="wishSubmitBtn" class="ta3-cui-submit">Kirim</button>
+                        <div id="wishFeedback" class="ta3-form-feedback">Ucapan berhasil dikirim!</div>
+                    </form>
+
+                    <ul id="ta3WishList" class="ta3-cui-list">
+                        {{ if .Wishes }}
+                            {{ range .Wishes }}
+                            <li class="ta3-cui-item" data-name="{{ .GuestName }}" data-time="{{ .CreatedAt.Format "2006-01-02T15:04:05Z07:00" }}">
+                                <div class="ta3-cui-avatar"></div>
+                                <div class="ta3-cui-content">
+                                    <span class="ta3-cui-name">{{ .GuestName }}</span>
+                                    <p class="ta3-cui-msg">{{ .Message }}</p>
+                                    <div class="ta3-cui-meta">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg>
+                                        <span class="ta3-rel-time">baru saja</span>
+                                        <span class="ta3-cui-reply">Reply</span>
+                                    </div>
+                                </div>
+                            </li>
+                            {{ end }}
+                        {{ else }}
+                            <li class="ta3-cui-item" data-name="Sahabat Mempelai" data-time="">
+                                <div class="ta3-cui-avatar"></div>
+                                <div class="ta3-cui-content">
+                                    <span class="ta3-cui-name">Sahabat Mempelai</span>
+                                    <p class="ta3-cui-msg">Barakallahu lakuma wa baraka 'alaikuma wa jama'a bainakuma fii khair. Semoga menjadi keluarga sakinah, mawaddah, warahmah.</p>
+                                    <div class="ta3-cui-meta">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg>
+                                        <span class="ta3-rel-time">baru saja</span>
+                                        <span class="ta3-cui-reply">Reply</span>
+                                    </div>
+                                </div>
+                            </li>
+                        {{ end }}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         FOOTER + AUDIO + STICKY 7-ICON NAVBAR
+         ========================================================= -->
+    <footer class="ta3-footer">
+        Created With 💕 By Dekorin
+    </footer>
+
+    <audio id="ta3Song" loop preload="auto" src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/templates/ta3/default-song.mp3{{ end }}"></audio>
+
+    <button type="button" id="ta3AudioBtn" class="ta3-audio-btn" aria-label="Toggle Music">
+        <svg aria-hidden="true" viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zM88 256H56c0-105.9 86.1-192 192-192v32c-88.2 0-160 71.8-160 160zm160 96c-53 0-96-43-96-96s43-96 96-96 96 43 96 96-43 96-96 96zm0-128c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg>
+    </button>
+
+    <nav class="ta3-bottom-nav" aria-label="Section Navigation">
+        <!-- 1. #COVER (Envelope Heart) -->
+        <a href="#COVER" class="ta3-nav-link active" data-target="COVER" aria-label="Cover">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M100.391 1.479 C 84.376 6.152,71.698 19.073,67.568 34.930 C 66.713 38.213,66.406 43.854,66.406 56.290 L 66.406 73.190 45.117 86.768 C 15.995 105.342,9.253 112.282,2.816 130.314 L 0.391 137.109 0.179 241.756 C -0.029 344.128,0.001 346.539,1.528 352.693 C 6.993 374.714,25.180 392.937,47.195 398.452 C 56.883 400.879,343.117 400.879,352.805 398.452 C 379.792 391.692,400.000 366.489,400.000 339.592 C 400.000 327.779,394.793 321.875,384.375 321.875 C 374.495 321.875,369.585 327.138,368.076 339.346 C 366.110 355.267,356.191 365.736,340.991 367.932 C 333.538 369.009,66.462 369.009,59.009 367.932 C 44.509 365.837,34.163 355.491,32.068 340.991 C 31.279 335.532,30.858 171.875,31.633 171.875 C 31.844 171.875,63.186 191.254,101.283 214.939 C 183.605 266.120,181.047 264.826,199.903 264.838 C 219.096 264.851,216.543 266.144,300.605 213.825 C 337.676 190.753,368.174 171.875,368.379 171.875 C 368.583 171.875,368.750 192.674,368.750 218.095 L 368.750 264.316 370.724 267.684 C 376.554 277.632,392.196 277.632,398.026 267.684 L 400.000 264.316 399.995 203.056 C 399.988 135.521,400.031 136.173,394.933 124.692 C 388.339 109.840,382.766 104.653,352.850 85.532 L 333.434 73.121 333.738 58.240 C 334.160 37.589,337.443 32.031,349.219 32.031 C 359.334 32.031,363.996 37.922,364.631 51.505 C 365.255 64.839,369.864 70.312,380.469 70.313 C 391.816 70.313,396.094 64.657,396.094 49.654 C 396.094 24.851,383.162 6.931,361.148 1.226 C 353.500 -0.755,107.230 -0.517,100.391 1.479 M303.401 35.327 C 302.552 38.602,302.344 52.704,302.344 107.065 L 302.344 174.726 259.212 201.543 C 207.930 233.428,209.860 232.422,200.000 232.422 C 190.156 232.422,192.176 233.476,140.795 201.531 L 97.606 174.679 97.826 109.019 C 98.078 34.100,97.654 38.072,105.858 33.765 C 110.166 31.502,113.243 31.430,209.065 31.340 L 304.459 31.250 303.401 35.327 M165.439 78.040 C 149.691 83.212,139.830 97.526,139.853 115.181 C 139.877 133.864,147.407 144.658,174.455 164.785 C 178.667 167.920,183.765 172.158,185.783 174.203 C 195.513 184.064,204.218 184.120,213.980 174.386 C 216.011 172.360,222.046 167.392,227.391 163.344 C 253.220 143.786,260.123 133.637,260.147 115.181 C 260.184 86.681,232.343 68.121,206.250 79.253 C 199.999 81.919,199.983 81.919,193.750 79.219 C 186.968 76.281,172.616 75.683,165.439 78.040 M183.437 109.711 C 184.598 110.326,186.558 112.121,187.795 113.700 C 193.647 121.176,206.496 121.294,211.946 113.922 C 215.756 108.768,223.245 106.839,226.563 110.156 C 230.382 113.976,227.971 120.688,220.240 127.759 C 215.453 132.138,201.040 142.969,200.000 142.969 C 197.564 142.969,177.784 126.623,174.096 121.562 C 168.131 113.378,174.679 105.071,183.437 109.711 M66.082 154.490 C 65.502 155.071,35.937 136.416,35.938 135.469 C 35.938 132.369,42.038 127.058,55.469 118.466 L 66.016 111.718 66.224 132.930 C 66.338 144.596,66.275 154.298,66.082 154.490 M346.736 119.944 C 355.754 125.688,364.063 133.114,364.063 135.429 C 364.063 136.241,335.342 154.688,334.078 154.688 C 333.812 154.688,333.594 144.979,333.594 133.113 L 333.594 111.539 335.352 112.676 C 336.318 113.301,341.441 116.572,346.736 119.944" fill-rule="evenodd"/></svg>
+        </a>
+        <!-- 2. #COUPLE (Couple Heart) -->
+        <a href="#COUPLE" class="ta3-nav-link" data-target="COUPLE" aria-label="Couple">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M136.719 1.544 C 107.573 9.243,91.000 32.485,91.026 65.625 L 91.037 79.297 93.855 87.314 C 101.393 108.765,115.659 124.532,152.344 151.956 C 168.585 164.098,178.567 172.421,184.295 178.596 C 191.252 186.097,193.714 187.492,200.000 187.492 C 206.286 187.492,208.748 186.097,215.705 178.596 C 221.519 172.327,231.286 164.206,248.943 150.956 C 278.014 129.142,290.053 117.331,299.876 100.987 C 318.454 70.077,309.011 25.608,280.281 8.707 C 256.243 -5.434,222.119 -2.418,203.711 15.475 L 200.000 19.082 196.289 15.475 C 182.854 2.416,156.632 -3.716,136.719 1.544 M164.094 33.285 C 174.775 36.457,181.043 44.339,183.911 58.206 C 188.295 79.408,212.227 78.648,216.341 57.177 C 222.711 23.924,268.936 22.681,276.516 55.558 C 281.789 78.430,271.015 93.869,226.172 127.708 C 218.867 133.220,209.996 140.152,206.458 143.112 L 200.026 148.494 193.176 142.802 C 189.408 139.671,180.525 132.739,173.436 127.398 C 132.580 96.614,123.067 84.877,123.053 65.234 C 123.036 40.643,141.215 26.491,164.094 33.285 M276.673 184.404 C 235.070 195.301,217.038 246.518,242.921 280.270 L 246.064 284.367 241.196 286.822 C 227.227 293.865,212.728 306.433,203.091 319.852 C 199.866 324.344,200.247 324.430,195.662 318.164 C 186.608 305.789,165.364 288.325,155.276 284.962 C 154.870 284.827,156.327 282.120,158.512 278.948 C 186.300 238.610,157.048 183.594,107.813 183.594 C 58.577 183.594,29.325 238.610,57.113 278.948 C 59.298 282.120,60.755 284.827,60.349 284.962 C 50.228 288.335,29.581 305.294,20.161 317.969 C -3.580 349.916,-6.342 381.690,13.488 394.743 C 22.205 400.482,5.581 400.033,201.194 399.810 L 376.953 399.609 382.033 397.202 C 404.645 386.486,407.051 350.589,385.240 349.356 C 374.822 348.768,367.989 355.283,367.973 365.820 L 367.969 368.750 292.188 368.750 C 219.352 368.750,216.406 368.695,216.406 367.324 C 216.406 358.191,228.205 337.949,239.807 327.181 C 266.623 302.289,303.355 299.539,336.180 319.967 C 348.788 327.813,361.622 322.277,362.345 308.680 C 362.825 299.661,357.980 294.112,343.202 286.757 L 338.335 284.335 341.466 280.254 C 376.012 235.209,331.892 169.942,276.673 184.404 M304.563 217.484 C 332.386 231.789,323.242 272.266,292.188 272.266 C 258.980 272.266,252.074 227.594,283.472 215.888 C 288.390 214.054,299.532 214.898,304.563 217.484 M120.188 218.265 C 148.011 232.571,138.867 273.047,107.813 273.047 C 74.605 273.047,67.699 228.375,99.097 216.669 C 104.015 214.836,115.157 215.679,120.188 218.265 M126.571 308.838 C 148.636 314.524,167.235 329.513,177.258 349.686 C 180.155 355.518,183.594 365.272,183.594 367.660 C 183.594 368.585,172.109 368.750,107.813 368.750 C 34.977 368.750,32.031 368.695,32.031 367.324 C 32.031 366.540,32.904 363.333,33.971 360.196 C 47.237 321.192,87.615 298.798,126.571 308.838" fill-rule="evenodd"/></svg>
+        </a>
+        <!-- 3. #EVENT (Calendar Heart) -->
+        <a href="#EVENT" class="ta3-nav-link" data-target="EVENT" aria-label="Event">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M89.269 1.998 C 83.325 5.560,82.031 8.952,82.031 20.967 L 82.031 31.250 67.703 31.250 C 32.891 31.250,9.171 48.174,1.555 78.445 C -0.876 88.105,-0.882 343.104,1.548 352.805 C 7.050 374.771,25.229 392.950,47.195 398.452 C 56.883 400.879,343.117 400.879,352.805 398.452 C 379.792 391.692,400.000 366.489,400.000 339.592 C 400.000 327.779,394.793 321.875,384.375 321.875 C 374.495 321.875,369.585 327.138,368.076 339.346 C 366.110 355.267,356.191 365.736,340.991 367.932 C 333.538 369.009,66.462 369.009,59.009 367.932 C 44.509 365.837,34.163 355.491,32.068 340.991 C 30.993 333.555,30.993 97.695,32.068 90.259 C 34.829 71.154,47.583 62.561,73.242 62.515 L 82.031 62.500 82.031 72.783 C 82.031 88.123,86.224 93.750,97.656 93.750 C 109.088 93.750,113.281 88.123,113.281 72.783 L 113.281 62.500 148.438 62.500 L 183.594 62.500 183.594 72.783 C 183.594 88.123,187.787 93.750,199.219 93.750 C 210.651 93.750,214.844 88.123,214.844 72.783 L 214.844 62.500 250.391 62.500 L 285.938 62.500 285.938 72.783 C 285.938 88.123,290.131 93.750,301.562 93.750 C 312.994 93.750,317.188 88.123,317.188 72.783 L 317.188 62.500 326.367 62.515 C 344.161 62.545,351.564 64.743,359.035 72.215 C 369.018 82.197,368.716 78.842,368.735 180.009 L 368.750 264.316 370.724 267.684 C 376.554 277.632,392.196 277.632,398.026 267.684 L 400.000 264.316 400.000 174.470 C 400.000 72.481,400.416 79.377,393.404 65.234 C 381.969 42.171,362.207 31.250,331.906 31.250 L 317.188 31.250 317.188 20.967 C 317.187 5.627,312.994 -0.000,301.562 -0.000 C 290.131 0.000,285.938 5.627,285.938 20.967 L 285.938 31.250 250.391 31.250 L 214.844 31.250 214.844 20.967 C 214.844 5.627,210.651 -0.000,199.219 -0.000 C 187.787 0.000,183.594 5.627,183.594 20.967 L 183.594 31.250 148.438 31.250 L 113.281 31.250 113.281 20.967 C 113.281 11.379,113.148 10.456,111.307 7.316 C 107.091 0.122,96.617 -2.406,89.269 1.998 M89.269 150.436 C 79.395 156.353,79.440 171.908,89.347 177.714 C 103.534 186.028,119.621 169.940,111.307 155.753 C 107.091 148.559,96.617 146.032,89.269 150.436 M157.237 150.436 C 147.364 156.353,147.409 171.908,157.316 177.714 C 164.743 182.066,175.066 179.555,179.276 172.372 C 187.600 158.169,171.339 141.984,157.237 150.436 M225.206 150.436 C 215.333 156.353,215.378 171.908,225.285 177.714 C 232.712 182.066,243.035 179.555,247.245 172.372 C 255.568 158.169,239.308 141.984,225.206 150.436 M293.175 150.436 C 283.302 156.353,283.346 171.908,293.253 177.714 C 300.680 182.066,311.004 179.555,315.214 172.372 C 323.537 158.169,307.276 141.984,293.175 150.436 M232.627 217.103 C 216.828 222.291,207.017 236.532,207.041 254.243 C 207.065 272.926,214.594 283.720,241.643 303.848 C 245.855 306.982,250.952 311.220,252.971 313.266 C 262.736 323.162,271.630 323.172,281.375 313.295 C 283.377 311.266,288.475 307.036,292.703 303.894 C 319.610 283.904,327.310 272.865,327.334 254.243 C 327.372 225.743,299.530 207.184,273.438 218.315 C 267.187 220.982,267.170 220.982,260.938 218.282 C 254.156 215.343,239.804 214.746,232.627 217.103 M89.269 218.405 C 79.395 224.322,79.440 239.876,89.347 245.682 C 103.534 253.996,119.621 237.909,111.307 223.722 C 107.091 216.528,96.617 214.001,89.269 218.405 M157.237 218.405 C 147.364 224.322,147.409 239.876,157.316 245.682 C 171.503 253.996,187.590 237.909,179.276 223.722 C 175.060 216.528,164.585 214.001,157.237 218.405 M250.625 248.774 C 251.785 249.389,253.746 251.184,254.982 252.763 C 260.834 260.239,273.683 260.356,279.134 252.984 C 282.944 247.831,290.433 245.902,293.750 249.219 C 297.569 253.038,295.159 259.750,287.428 266.821 C 282.640 271.201,268.227 282.031,267.188 282.031 C 264.752 282.031,244.971 265.686,241.283 260.625 C 235.318 252.441,241.866 244.134,250.625 248.774 M89.269 286.373 C 79.395 292.291,79.440 307.845,89.347 313.651 C 103.534 321.965,119.621 305.878,111.307 291.691 C 107.091 284.497,96.617 281.969,89.269 286.373 M157.237 286.373 C 147.364 292.291,147.409 307.845,157.316 313.651 C 171.503 321.965,187.590 305.878,179.276 291.691 C 175.060 284.497,164.585 281.969,157.237 286.373" fill-rule="evenodd"/></svg>
+        </a>
+        <!-- 4. #cerita (Rose / Love Story) -->
+        <a href="{{ if eq .EventType "khitan" }}#EVENT{{ else }}#cerita{{ end }}" class="ta3-nav-link" data-target="cerita" aria-label="Love Story">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 371.137 371.137"><path d="M278.71,257.014c-1.209-2.154-3.4-3.574-5.861-3.797c-7.23-0.658-14.15-0.992-20.563-0.992c-26.504,0-46.094,5.623-58.395,16.725v-69.205c1.643,0.094,3.301,0.148,4.973,0.148c21.566,0,40.996-7.604,53.303-20.859c11.082-11.936,16.197-28.24,14.793-47.152c-1.668-22.441-7.867-33.361-13.336-42.996c-2.457-4.326-4.777-8.414-6.533-13.359c-8.797-24.748,9.123-48.604,9.293-48.826c2.01-2.596,2.096-6.197,0.213-8.889c-1.883-2.689-5.297-3.842-8.424-2.846c-1.029,0.328-8.627,2.801-19.43,7.52L205.548,1.891c-1.879-1.668-4.471-2.283-6.896-1.643c-34.541,9.127-50.49,19.084-56.113,23.295c-1.664-0.685-16.861-6.146-20.303-7.141c-6.756-1.951-8.365-2.416-11.193-0.967c-2.092,1.072-3.559,3.062-3.967,5.375c-0.406,2.314,0.295,4.686,1.895,6.406c0.172,0.186,17.047,18.717,8.842,42.725c-0.912,2.67-2.262,5.783-3.824,9.391c-5.393,12.449-12.779,29.498-12.832,52.51c-0.043,18.402,5.838,33.604,17.475,45.18c18.912,18.813,46.525,21.932,60.262,22.225v46.678c-12.164-12.135-32.324-18.279-60.039-18.279c-6.414,0-13.332,0.334-20.564,0.992c-2.459,0.225-4.65,1.644-5.859,3.799c-1.209,2.152-1.281,4.764-0.191,6.98c19.918,40.506,42.416,61.045,66.871,61.049c0.004,0,0.006,0,0.008,0c8.037,0,14.775-2.352,19.775-4.953v68.125c0,4.142,3.357,7.5,7.5,7.5c4.143,0,7.5-3.358,7.5-7.5v-42.729c4.797,2.256,10.947,4.137,18.135,4.137c24.455,0,46.955-20.541,66.873-61.051C279.989,261.778,279.919,259.168,278.71,257.014z M176.307,279.493c-2.834,2.133-9.061,5.973-17.191,5.973c-0.002,0-0.004,0-0.004,0c-16.17-0.002-32.715-14.695-48.191-42.648c2.727-0.113,5.375-0.172,7.932-0.172c25.262,0,43.123,5.656,51.648,16.357C176.714,266.799,176.714,275.532,176.307,279.493z M198.618,15.797l15.391,13.664c-9.154,4.684-19.225,10.527-29.018,17.564c-0.121-0.098-0.238-0.199-0.367-0.293c-8.836-6.357-17.699-11.539-25.816-15.693 M129.208,166.387c-8.693-8.649-13.086-20.26-13.053-34.51c0.045-19.92,6.449-34.703,11.596-46.582c1.619-3.738,3.148-7.268,4.254-10.502c5.365-15.697,2.928-29.51-1.121-39.693c11.277,4.219,26.525,11.098,41.82,21.592c-14.566,12.596-27.182,28.147-33.248,46.799c-10.314,31.723-4.131,53.391,2.873,65.98c1.926,3.465,4.021,6.436,6.094,8.979C141.575,175.793,134.804,171.954,129.208,166.387z M169.18,177.329c-0.156-0.107-0.27-0.18-0.434-0.275c-1.279-0.768-31.145-19.352-15.025-68.924c11.875-36.523,55.395-60.484,80.609-71.627c-4.385,11.609-7.295,27.391-1.375,44.047c2.197,6.184,4.955,11.043,7.623,15.742c5.145,9.063,10.004,17.621,11.422,36.701c1.104,14.854-2.539,26.91-10.826,35.836c-9.479,10.209-24.9,16.064-42.311,16.064C187.184,184.893,176.089,182.065,169.18,177.329z M212.026,310.045c-8.143,0-14.379-3.852-17.191-5.969c-0.412-3.992-0.4-12.709,5.803-20.494c8.525-10.701,26.385-16.357,51.648-16.357c2.557,0,5.205,0.057,7.932,0.172C244.739,295.352,228.194,310.045,212.026,310.045z"/></svg>
+        </a>
+        <!-- 5. #GALLERY (Film Frame Heart) -->
+        <a href="#GALLERY" class="ta3-nav-link" data-target="GALLERY" aria-label="Gallery">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M322.266 8.494 C 307.022 12.478,299.934 30.132,307.503 45.262 C 311.134 52.520,317.724 59.124,331.774 69.586 C 337.716 74.010,344.775 79.731,347.461 82.298 L 352.344 86.966 357.227 82.303 C 359.912 79.738,367.195 73.815,373.411 69.140 C 397.481 51.039,404.135 38.977,398.756 23.191 C 392.142 3.779,359.497 2.906,353.780 21.988 C 352.644 25.778,352.043 25.778,350.907 21.988 C 348.009 12.314,333.607 5.529,322.266 8.494 M52.212 25.018 C 29.296 28.885,10.865 44.558,2.831 67.008 L 0.391 73.828 0.166 205.078 C 0.007 298.025,0.192 337.798,0.801 341.365 C 4.704 364.206,22.927 383.585,46.875 390.360 C 54.778 392.596,345.222 392.596,353.125 390.360 C 381.037 382.464,399.315 359.751,399.531 332.696 L 399.609 322.813 397.220 319.805 C 386.690 306.547,370.326 313.084,368.080 331.446 C 366.429 344.949,358.521 354.819,346.340 358.582 C 338.323 361.058,61.677 361.058,53.660 358.582 C 41.966 354.970,33.638 344.964,32.031 332.596 C 31.056 325.092,31.056 91.315,32.031 83.811 C 33.638 71.442,41.966 61.437,53.660 57.825 C 58.661 56.280,60.703 56.250,160.854 56.250 L 262.950 56.250 266.391 54.492 C 278.002 48.560,278.002 31.909,266.391 25.977 L 262.950 24.219 159.405 24.311 C 102.455 24.361,54.218 24.680,52.212 25.018 M68.766 88.477 C 54.073 95.983,59.349 118.750,75.781 118.750 C 77.949 118.750,80.711 118.058,82.797 116.992 C 97.489 109.486,92.213 86.719,75.781 86.719 C 73.614 86.719,70.851 87.411,68.766 88.477 M131.266 88.477 C 116.573 95.983,121.849 118.750,138.281 118.750 C 140.449 118.750,143.211 118.058,145.297 116.992 C 159.989 109.486,154.713 86.719,138.281 86.719 C 136.114 86.719,133.351 87.411,131.266 88.477 M215.007 96.452 C 194.440 101.136,181.586 117.245,180.676 139.479 C 179.734 162.508,188.628 176.078,220.313 199.951 C 227.402 205.293,236.024 212.396,239.472 215.735 C 246.226 222.278,249.707 224.219,254.688 224.219 C 259.668 224.219,263.149 222.278,269.903 215.735 C 273.351 212.396,281.973 205.293,289.063 199.951 C 324.846 172.989,335.334 152.256,326.664 125.620 C 317.895 98.682,283.913 86.744,259.280 101.949 L 254.688 104.783 250.095 101.949 C 240.800 96.212,226.144 93.916,215.007 96.452 M377.359 105.664 C 375.467 106.631,372.844 108.773,371.530 110.424 L 369.141 113.426 369.141 185.547 L 369.141 257.667 371.530 260.670 C 378.326 269.211,390.424 269.211,397.220 260.670 L 399.609 257.667 399.609 185.547 L 399.609 113.426 397.220 110.424 C 394.113 106.519,388.964 103.906,384.375 103.906 C 382.208 103.906,379.445 104.598,377.359 105.664 M231.976 128.712 C 235.441 130.479,237.229 133.049,238.360 137.891 C 240.339 146.357,242.095 149.119,247.144 151.708 C 256.889 156.704,268.384 150.970,270.415 140.101 C 272.110 131.026,275.618 127.734,283.594 127.734 C 299.912 127.734,301.893 145.325,287.199 159.766 C 281.784 165.088,256.080 185.156,254.678 185.156 C 250.613 185.156,217.739 156.532,214.556 150.221 C 207.578 136.388,219.109 122.151,231.976 128.712 M68.766 299.414 C 54.073 306.921,59.349 329.688,75.781 329.688 C 77.949 329.688,80.711 328.995,82.797 327.930 C 97.489 320.423,92.213 297.656,75.781 297.656 C 73.614 297.656,70.851 298.348,68.766 299.414 M131.266 299.414 C 116.573 306.921,121.849 329.688,138.281 329.688 C 140.449 329.688,143.211 328.995,145.297 327.930 C 159.989 320.423,154.713 297.656,138.281 297.656 C 136.114 297.656,133.351 298.348,131.266 299.414 M193.766 299.414 C 179.073 306.921,184.349 329.688,200.781 329.688 C 202.949 329.688,205.711 328.995,207.797 327.930 C 222.489 320.423,217.213 297.656,200.781 297.656 C 198.614 297.656,195.851 298.348,193.766 299.414 M256.266 299.414 C 241.573 306.921,246.849 329.688,263.281 329.688 C 265.449 329.688,268.211 328.995,270.297 327.930 C 284.989 320.423,279.713 297.656,263.281 297.656 C 261.114 297.656,258.351 298.348,256.266 299.414 M318.766 299.414 C 304.073 306.921,309.349 329.688,325.781 329.688 C 327.949 329.688,330.711 328.995,332.797 327.930 C 347.489 320.423,342.213 297.656,325.781 297.656 C 323.614 297.656,320.851 298.348,318.766 299.414" fill-rule="evenodd"/></svg>
+        </a>
+        <!-- 6. #gift (Ticket / Gift Heart) -->
+        <a href="#gift" class="ta3-nav-link" data-target="gift" aria-label="Wedding Gift">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M296.094 16.371 C 294.160 16.740,282.207 19.378,269.531 22.234 C 256.855 25.091,202.539 37.263,148.828 49.284 C 40.889 73.442,41.774 73.229,34.923 76.663 C 17.537 85.375,5.958 99.803,1.531 118.271 C -0.818 128.065,-0.820 207.831,1.528 212.433 C 3.732 216.752,7.131 219.262,13.242 221.082 C 36.242 227.932,36.242 258.787,13.242 265.637 C 7.131 267.457,3.732 269.967,1.528 274.286 C -0.470 278.203,-0.781 326.265,1.134 335.299 C 5.887 357.727,23.519 375.940,46.875 382.548 C 54.778 384.783,345.222 384.783,353.125 382.548 C 374.556 376.485,390.187 361.816,397.381 341.016 L 399.543 334.766 399.823 306.124 C 400.170 270.595,399.826 269.529,386.758 265.637 C 363.758 258.787,363.758 227.932,386.758 221.082 C 392.869 219.262,396.268 216.752,398.472 212.433 C 400.470 208.515,400.781 160.454,398.866 151.419 C 394.217 129.484,377.267 111.544,354.554 104.519 L 348.828 102.748 204.775 102.350 L 60.722 101.953 98.135 93.579 C 118.711 88.973,173.340 76.725,219.531 66.361 C 311.669 45.689,308.059 46.290,316.591 50.196 C 322.378 52.845,326.084 56.330,329.702 62.524 C 337.611 76.067,353.713 77.161,359.443 64.544 C 369.689 41.981,328.012 10.288,296.094 16.371 M346.237 135.918 C 363.218 141.163,368.686 152.000,368.715 180.469 L 368.727 193.359 365.028 195.402 C 328.334 215.664,328.488 271.998,365.292 291.522 L 368.750 293.357 368.724 306.249 C 368.668 334.529,363.107 345.590,346.340 350.769 C 338.323 353.245,61.677 353.245,53.660 350.769 C 36.849 345.577,31.327 334.596,31.274 306.249 L 31.250 293.357 34.708 291.522 C 71.512 271.998,71.666 215.664,34.972 195.402 L 31.273 193.359 31.285 180.469 C 31.314 152.075,36.697 141.328,53.591 135.932 C 60.983 133.571,338.596 133.558,346.237 135.918 M160.319 181.608 C 139.752 186.292,126.899 202.402,125.989 224.635 C 125.046 247.664,133.940 261.234,165.625 285.107 C 172.715 290.449,181.336 297.552,184.784 300.891 C 191.539 307.434,195.020 309.375,200.000 309.375 C 204.980 309.375,208.461 307.434,215.216 300.891 C 218.664 297.552,227.285 290.449,234.375 285.107 C 270.159 258.146,280.647 237.412,271.976 210.777 C 263.207 183.838,229.225 171.901,204.592 187.105 L 200.000 189.939 195.408 187.105 C 186.113 181.368,171.457 179.072,160.319 181.608 M178.721 214.554 C 181.330 216.460,183.361 220.376,184.273 225.257 C 187.597 243.053,212.403 243.053,215.727 225.257 C 217.423 216.182,220.931 212.891,228.906 212.891 C 245.235 212.891,247.209 230.505,232.495 244.922 C 227.012 250.293,201.392 270.313,200.000 270.313 C 195.928 270.313,163.056 241.697,159.868 235.378 C 152.646 221.058,166.572 205.676,178.721 214.554" fill-rule="evenodd"/></svg>
+        </a>
+        <!-- 7. #WISHES (Guestbook Pen Heart) -->
+        <a href="#WISHES" class="ta3-nav-link" data-target="WISHES" aria-label="Wishes">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><path d="M67.622 1.629 C 44.918 7.235,26.584 26.345,21.836 49.355 C 19.491 60.719,19.491 339.281,21.836 350.645 C 26.650 373.975,45.114 392.961,68.355 398.480 C 74.517 399.944,77.190 400.034,108.500 399.829 L 142.044 399.609 145.045 397.220 C 153.585 390.423,153.585 378.329,145.046 371.530 L 142.046 369.141 109.890 368.696 C 83.194 368.327,77.191 368.042,74.533 367.015 C 63.052 362.579,56.296 355.474,53.556 344.953 C 51.714 337.878,51.714 62.122,53.556 55.047 C 56.740 42.822,66.962 33.856,79.839 31.994 C 86.622 31.013,272.315 31.062,279.124 32.047 C 288.403 33.388,297.337 39.334,301.991 47.266 C 306.174 54.393,306.250 55.535,306.250 110.936 L 306.250 162.169 308.008 165.609 C 311.182 171.822,314.662 173.828,322.266 173.828 C 329.870 173.828,333.349 171.822,336.523 165.609 L 338.281 162.169 338.271 109.405 C 338.259 48.747,338.203 48.100,331.749 34.902 C 324.209 19.481,311.669 8.478,294.922 2.589 L 288.672 0.391 181.250 0.244 C 76.900 0.101,73.651 0.141,67.622 1.629 M138.496 66.002 C 119.448 71.337,106.892 87.477,105.698 108.165 C 104.435 130.032,115.176 146.354,146.094 169.553 C 153.184 174.873,161.857 181.964,165.368 185.312 C 176.836 196.245,183.482 196.229,194.850 185.240 C 198.327 181.880,206.953 174.773,214.018 169.448 C 245.618 145.631,255.790 130.204,254.401 108.203 C 252.144 72.474,214.970 52.899,184.328 71.304 L 180.078 73.857 175.798 71.293 C 165.782 65.293,149.351 62.962,138.496 66.002 M158.452 98.461 C 161.280 100.186,163.574 104.580,164.439 109.932 C 167.106 126.428,191.512 126.903,195.354 110.533 C 197.799 100.112,201.041 96.883,209.064 96.878 C 225.040 96.868,227.173 114.349,212.924 128.519 C 207.465 133.948,181.583 154.149,180.071 154.161 C 176.271 154.190,144.106 126.662,140.294 120.117 C 132.168 106.165,145.333 90.463,158.452 98.461 M320.313 213.731 C 307.624 217.064,308.617 216.220,257.948 266.708 C 232.456 292.108,211.129 313.780,210.556 314.866 C 208.486 318.790,189.844 381.758,189.844 384.827 C 189.844 392.608,196.267 399.347,204.162 399.850 C 209.957 400.219,271.742 383.650,277.667 380.138 C 285.835 375.295,370.675 288.322,374.129 281.250 C 392.303 244.034,359.870 203.342,320.313 213.731 M91.797 223.878 C 81.040 229.504,79.771 243.520,89.330 251.127 L 92.333 253.516 162.109 253.516 L 231.886 253.516 234.888 251.127 C 243.429 244.330,243.429 232.233,234.889 225.436 L 231.887 223.047 163.014 222.849 C 101.710 222.674,93.883 222.787,91.797 223.878 M338.449 245.294 C 339.870 245.341,344.922 250.696,346.199 253.509 C 348.813 259.263,347.350 265.900,342.455 270.492 L 340.181 272.625 329.673 262.095 L 319.164 251.565 322.000 248.729 C 325.363 245.366,330.876 243.644,335.120 244.631 C 336.644 244.985,338.142 245.284,338.449 245.294 M288.853 324.023 L 260.136 352.734 245.186 356.850 C 236.963 359.113,230.150 360.871,230.044 360.756 C 229.939 360.641,231.880 353.867,234.358 345.703 L 238.863 330.859 267.626 302.495 L 296.388 274.130 306.980 284.721 L 317.571 295.312 288.853 324.023 M91.797 286.373 C 81.038 292.022,79.771 306.019,89.330 313.627 L 92.333 316.016 132.031 316.016 L 171.730 316.016 174.732 313.627 C 183.273 306.830,183.273 294.733,174.733 287.936 L 171.731 285.547 132.936 285.345 C 98.881 285.167,93.854 285.293,91.797 286.373" fill-rule="evenodd"/></svg>
+        </a>
+    </nav>
+
+    <!-- Lightbox Modal -->
+    <div id="ta3Lightbox" class="ta3-lightbox">
+        <button type="button" id="lbClose" class="ta3-lb-btn ta3-lb-close" aria-label="Close">&times;</button>
+        <button type="button" id="lbPrev" class="ta3-lb-btn ta3-lb-prev" aria-label="Previous">&#10094;</button>
+        <img id="lbImage" src="" alt="Gallery Preview">
+        <button type="button" id="lbNext" class="ta3-lb-btn ta3-lb-next" aria-label="Next">&#10095;</button>
+    </div>
+
+    <!-- Clipboard Toast -->
+    <div id="ta3Toast" class="ta3-toast">Berhasil disalin</div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        var body = document.body;
+        var ds = body.dataset;
+        var slug = ds.slug || '';
+
+        // 1. Format Bride & Groom Child Order smartly
+        function formatChildOrder(raw, roleWord) {
+            var s = (raw || '').trim();
+            if (!s) return roleWord + ' Pertama Dari :';
+            if (/^\d+$/.test(s)) {
+                var ordMap = { '1': 'Pertama', '2': 'Kedua', '3': 'Ketiga', '4': 'Keempat', '5': 'Kelima' };
+                return roleWord + ' ' + (ordMap[s] || ('ke-' + s)) + ' Dari :';
+            }
+            if (/dari\s*:?$/i.test(s)) return s;
+            if (/^(putra|putri|anak)/i.test(s)) return s + ' Dari :';
+            return roleWord + ' ' + s + ' Dari :';
+        }
+        var brideOrderEl = document.getElementById('ta3BrideOrderText');
+        if (brideOrderEl) brideOrderEl.textContent = formatChildOrder(ds.brideOrder, 'Putri');
+        var groomOrderEl = document.getElementById('ta3GroomOrderText');
+        if (groomOrderEl) groomOrderEl.textContent = formatChildOrder(ds.groomOrder, 'Putra');
+
+        // 2. Welcome Gate + Audio Control
+        var gate = document.getElementById('ta3ModalGate');
+        var openBtn = document.getElementById('ta3OpenBtn');
+        var song = document.getElementById('ta3Song');
+        var audioBtn = document.getElementById('ta3AudioBtn');
+        var isPlaying = false;
+
+        function setAudioState(play) {
+            if (!song) return;
+            if (play) {
+                var p = song.play();
+                if (p && typeof p.then === 'function') {
+                    p.then(function() {
+                        isPlaying = true;
+                        if (audioBtn) audioBtn.classList.add('playing');
+                    }).catch(function() {
+                        isPlaying = false;
+                        if (audioBtn) audioBtn.classList.remove('playing');
+                    });
+                } else {
+                    isPlaying = true;
+                    if (audioBtn) audioBtn.classList.add('playing');
+                }
+            } else {
+                song.pause();
+                isPlaying = false;
+                if (audioBtn) audioBtn.classList.remove('playing');
+            }
+        }
+
+        if (openBtn && gate) {
+            openBtn.addEventListener('click', function() {
+                gate.classList.add('closed');
+                body.classList.remove('scroll-locked');
+                setAudioState(true);
+            });
+        }
+        if (audioBtn) {
+            audioBtn.addEventListener('click', function() {
+                setAudioState(!isPlaying);
+            });
+        }
+        document.addEventListener('visibilitychange', function() {
+            if (!song) return;
+            if (document.hidden && isPlaying) {
+                song.pause();
+            } else if (!document.hidden && isPlaying) {
+                song.play().catch(function() {});
+            }
+        });
+
+        // 3. Indonesian & ISO Date Parser + Live Countdown
+        var MONTHS_ID = {
+            januari: 0, jan: 0, februari: 1, pebruari: 1, feb: 1, maret: 2, mar: 2,
+            april: 3, apr: 3, mei: 4, juni: 5, jun: 5, juli: 6, jul: 6,
+            agustus: 7, agu: 7, agt: 7, september: 8, sep: 8, sept: 8,
+            oktober: 9, okt: 9, november: 10, nov: 10, desember: 11, des: 11
+        };
+        function parseWeddingDate(raw) {
+            if (!raw) return null;
+            var clean = raw.trim();
+            var iso = new Date(clean);
+            if (!isNaN(iso.getTime()) && /\d{4}/.test(clean)) return iso;
+            var m = clean.toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+            if (m && MONTHS_ID[m[2]] !== undefined) {
+                return new Date(parseInt(m[3], 10), MONTHS_ID[m[2]], parseInt(m[1], 10), 9, 0, 0);
+            }
+            return null;
+        }
+        var targetDate = parseWeddingDate(ds.akadDate) || parseWeddingDate(ds.resepsiDate);
+        function pad2(n) { return n < 10 ? '0' + n : String(n); }
+        function tickCountdown() {
+            var dEl = document.getElementById('cdDays');
+            var hEl = document.getElementById('cdHours');
+            var mEl = document.getElementById('cdMins');
+            var sEl = document.getElementById('cdSecs');
+            if (!dEl) return;
+            if (!targetDate) {
+                dEl.textContent = '00'; hEl.textContent = '00'; mEl.textContent = '00'; sEl.textContent = '00';
+                return;
+            }
+            var diff = Math.max(0, targetDate.getTime() - Date.now());
+            var days = Math.floor(diff / 86400000);
+            var hrs = Math.floor((diff % 86400000) / 3600000);
+            var mins = Math.floor((diff % 3600000) / 60000);
+            var secs = Math.floor((diff % 60000) / 1000);
+            dEl.textContent = pad2(days);
+            hEl.textContent = pad2(hrs);
+            mEl.textContent = pad2(mins);
+            sEl.textContent = pad2(secs);
+        }
+        tickCountdown();
+        setInterval(tickCountdown, 1000);
+
+        // 4. Love Story Timeline Smart Parser (#cerita)
+        var tlWrap = document.getElementById('ta3Timeline');
+        if (tlWrap) {
+            var rawStory = (ds.loveStory || '').trim();
+            var stories = [];
+            if (rawStory) {
+                var blocks = rawStory.split(/\n\s*\n/).map(function(b) { return b.trim(); }).filter(Boolean);
+                if (blocks.length === 1) {
+                    var lines = rawStory.split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
+                    if (lines.length > 1) blocks = lines;
+                }
+                blocks.forEach(function(blk, idx) {
+                    var pipeParts = blk.split('|').map(function(p) { return p.trim(); });
+                    if (pipeParts.length >= 3) {
+                        stories.push({ date: pipeParts[0], title: pipeParts[1], body: pipeParts.slice(2).join(' ') });
+                        return;
+                    }
+                    var colonMatch = blk.match(/^([^:\n]{2,28}):\s*(.+)$/);
+                    if (colonMatch) {
+                        var rest = colonMatch[2].trim();
+                        var dashMatch = rest.match(/^([^\-–]{2,32})[\-–]\s*(.+)$/);
+                        if (dashMatch) {
+                            stories.push({ date: colonMatch[1].trim(), title: dashMatch[1].trim(), body: dashMatch[2].trim() });
+                        } else {
+                            stories.push({ date: rest.length <= 28 ? rest : colonMatch[1].trim(), title: colonMatch[1].trim(), body: rest });
+                        }
+                        return;
+                    }
+                    // Extract Indonesian date inside sentence if present
+                    var idDateMatch = blk.match(/(\d{1,2}\s+(?:januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)(?:\s+\d{4})?)/i);
+                    var subLines = blk.split(/\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+                    if (subLines.length >= 3) {
+                        stories.push({ date: subLines[0], title: subLines[1], body: subLines.slice(2).join(' ') });
+                    } else if (idDateMatch) {
+                        stories.push({ date: idDateMatch[1], title: 'Momen Spesial ' + (idx + 1), body: blk });
+                    } else {
+                        stories.push({ date: 'Kisah ' + (idx + 1), title: 'Perjalanan Cinta', body: blk });
+                    }
+                });
+            } else {
+                stories = [
+                    {
+                        date: '14 Januari 2015',
+                        title: 'PERKENALAN',
+                        body: 'Tahun 2015 Kami dipertemukan saat menjadi Mahasiswa Baru, kami berada di satu Jurusan dan Kelas yang sama, pada saat itu kami hanya teman biasa.'
+                    },
+                    {
+                        date: '14 Januari 2016',
+                        title: 'AWAL HUBUNGAN',
+                        body: 'Setahun kemudian kami menjadi sahabat dekat, hingga di akhir Tahun 2016 dia menyatakan perasaannya kepada saya dan perjalanan hubungan kami hingga saat ini sudah berjalan 5 Tahun.'
+                    },
+                    {
+                        date: '14 Januari 2021',
+                        title: 'LAMARAN',
+                        body: 'Setelah waktu yg lama kami menjalin hubungan, dia mengajak untuk serius dan pada Tanggal 17 Januari 2021 dia membawa kedua orangtuanya ke keluarga saya untuk melamar.'
+                    },
+                    {
+                        date: '14 Januari 2021',
+                        title: 'PERNIKAHAN',
+                        body: 'Minggu, 25 Juli 2021 Kami melangsungkan akad nikah secara sederhana. Dengan Ridha Allah SWT dan kedua orangtua, Kami memulai lembaran baru dengan berbagai cerita indah.'
+                    }
+                ];
+            }
+
+            var heartSvg = '<svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>';
+            stories.forEach(function(st) {
+                var item = document.createElement('div');
+                item.className = 'ta3-tl-item ta3-anim anim-up';
+
+                var marker = document.createElement('div');
+                marker.className = 'ta3-tl-marker';
+                marker.innerHTML = heartSvg;
+
+                var cardWrap = document.createElement('div');
+                cardWrap.className = 'ta3-tl-card-wrap';
+
+                var arrow = document.createElement('div');
+                arrow.className = 'ta3-tl-arrow';
+
+                var card = document.createElement('div');
+                card.className = 'ta3-tl-card';
+
+                if (st.date) {
+                    var dEl = document.createElement('span');
+                    dEl.className = 'ta3-tl-date';
+                    dEl.textContent = st.date;
+                    card.appendChild(dEl);
+                }
+                if (st.title) {
+                    var tEl = document.createElement('span');
+                    tEl.className = 'ta3-tl-title';
+                    tEl.textContent = st.title;
+                    card.appendChild(tEl);
+                }
+                var bEl = document.createElement('div');
+                bEl.className = 'ta3-tl-body';
+                bEl.textContent = st.body;
+                card.appendChild(bEl);
+
+                cardWrap.appendChild(arrow);
+                cardWrap.appendChild(card);
+                item.appendChild(marker);
+                item.appendChild(cardWrap);
+                tlWrap.appendChild(item);
+            });
+
+            var tlFill = document.getElementById('ta3TimelineFill');
+            if (tlFill) {
+                window.addEventListener('scroll', function() {
+                    var rect = tlWrap.getBoundingClientRect();
+                    var vh = window.innerHeight || 800;
+                    var prog = Math.max(0.15, Math.min(1, (vh * 0.65 - rect.top) / Math.max(1, rect.height)));
+                    tlFill.style.height = Math.round(prog * 100) + '%';
+                }, { passive: true });
+            }
+        }
+
+        // 5. Gallery Lightbox
+        var galleryItems = Array.prototype.slice.call(document.querySelectorAll('#ta3GalleryGrid .ta3-masonry-item img'));
+        var galleryUrls = galleryItems.map(function(img) { return img.getAttribute('src'); });
+        var lb = document.getElementById('ta3Lightbox');
+        var lbImg = document.getElementById('lbImage');
+        var curLb = 0;
+
+        function openLb(idx) {
+            if (!lb || !galleryUrls.length) return;
+            curLb = (idx + galleryUrls.length) % galleryUrls.length;
+            lbImg.src = galleryUrls[curLb];
+            lb.classList.add('open');
+        }
+        function closeLb() { if (lb) lb.classList.remove('open'); }
+
+        document.querySelectorAll('#ta3GalleryGrid .ta3-masonry-item').forEach(function(item, i) {
+            item.addEventListener('click', function() { openLb(i); });
+        });
+        var lbClose = document.getElementById('lbClose');
+        var lbPrev = document.getElementById('lbPrev');
+        var lbNext = document.getElementById('lbNext');
+        if (lbClose) lbClose.addEventListener('click', closeLb);
+        if (lbPrev) lbPrev.addEventListener('click', function(e) { e.stopPropagation(); openLb(curLb - 1); });
+        if (lbNext) lbNext.addEventListener('click', function(e) { e.stopPropagation(); openLb(curLb + 1); });
+        if (lb) lb.addEventListener('click', function(e) { if (e.target === lb) closeLb(); });
+
+        // 6. Bank Logo Resolver + Copy Buttons + WA Confirmation
+        document.querySelectorAll('.ta3-bank-logo-wrap').forEach(function(slot) {
+            var name = (slot.dataset.bank || '').trim();
+            var low = name.toLowerCase();
+            if (low.indexOf('bni') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/ta3/logo_bni.png" alt="BNI">';
+            } else if (low.indexOf('bca') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/ta3/logo_bca.png" alt="' + name + '">';
+            } else if (low.indexOf('mandiri') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/ta3/logo_mandiri.png" alt="Mandiri">';
+            } else if (name) {
+                var badge = document.createElement('span');
+                badge.className = 'ta3-bank-badge-text';
+                badge.textContent = name;
+                slot.appendChild(badge);
+            }
+        });
+
+        var toastEl = document.getElementById('ta3Toast');
+        var toastTimer;
+        function showToast(msg) {
+            if (!toastEl) return;
+            toastEl.textContent = msg || 'Berhasil disalin';
+            toastEl.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() { toastEl.classList.remove('show'); }, 2200);
+        }
+
+        document.querySelectorAll('.ta3-copy-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var txt = btn.dataset.copy || '';
+                if (!txt) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(txt).then(function() { showToast('Berhasil disalin'); });
+                } else {
+                    var ta = document.createElement('textarea');
+                    ta.value = txt;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showToast('Berhasil disalin');
+                }
+            });
+        });
+
+        var waGiftBtn = document.getElementById('ta3WaGiftBtn');
+        if (waGiftBtn) {
+            waGiftBtn.addEventListener('click', function() {
+                var rawWa = (ds.wa || '').replace(/[^0-9]/g, '');
+                if (rawWa.indexOf('0') === 0) rawWa = '62' + rawWa.slice(1);
+                if (rawWa) {
+                    var msg = 'Hai, saya ingin mengkonfirmasi pengiriman tanda kasih pernikahan. Selamat berbahagia!';
+                    window.open('https://api.whatsapp.com/send?phone=' + rawWa + '&text=' + encodeURIComponent(msg), '_blank');
+                } else {
+                    var wishesSec = document.getElementById('WISHES');
+                    if (wishesSec) wishesSec.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
+
+        // 7. Wishes Avatar, Relative Time, & Live Submit (Buku Tamu + Ucapan)
+        var AVATAR_PALETTE = [
+            { bg: '#E57373', fg: '#FFFFFF' },
+            { bg: '#F06292', fg: '#FFFFFF' },
+            { bg: '#BA68C8', fg: '#FFFFFF' },
+            { bg: '#4DB6AC', fg: '#FFFFFF' },
+            { bg: '#64B5F6', fg: '#FFFFFF' },
+            { bg: '#FFB74D', fg: '#FFFFFF' },
+            { bg: '#81C784', fg: '#FFFFFF' }
+        ];
+
+        function relativeTimeId(iso) {
+            if (!iso) return 'baru saja';
+            var d = new Date(iso);
+            if (isNaN(d.getTime())) return 'baru saja';
+            var sec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+            if (sec < 60) return 'baru saja';
+            var min = Math.floor(sec / 60);
+            if (min < 60) return min + ' menit lalu';
+            var hr = Math.floor(min / 60);
+            if (hr < 24) return hr + ' jam lalu';
+            var day = Math.floor(hr / 24);
+            if (day < 7) return day + ' hari lalu';
+            var wk = Math.floor(day / 7);
+            if (day < 30) return wk + ' minggu lalu';
+            var mo = Math.floor(day / 30);
+            if (mo < 12) return mo + ' bulan lalu';
+            return Math.floor(day / 365) + ' tahun lalu';
+        }
+
+        function decorateComment(li) {
+            var name = (li.dataset.name || 'Tamu').trim();
+            var iso = li.dataset.time || '';
+            var initials = name.replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/).map(function(w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+            if (initials.length < 2) initials = name.slice(0, 2).toUpperCase() || 'TM';
+            var hash = 0;
+            for (var i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+            var pal = AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+
+            var av = li.querySelector('.ta3-cui-avatar');
+            if (av) {
+                av.textContent = initials;
+                av.style.backgroundColor = pal.bg;
+                av.style.color = pal.fg;
+            }
+            var rt = li.querySelector('.ta3-rel-time');
+            if (rt) rt.textContent = relativeTimeId(iso);
+            var rep = li.querySelector('.ta3-cui-reply');
+            if (rep) {
+                rep.addEventListener('click', function() {
+                    var msgBox = document.getElementById('wishMsg');
+                    if (msgBox) {
+                        msgBox.value = '@' + name + ' ';
+                        msgBox.focus();
+                    }
+                });
+            }
+        }
+        document.querySelectorAll('#ta3WishList .ta3-cui-item').forEach(decorateComment);
+
+        function prependComment(w) {
+            var list = document.getElementById('ta3WishList');
+            if (!list) return;
+            var li = document.createElement('li');
+            li.className = 'ta3-cui-item';
+            li.dataset.name = w.guest_name || 'Tamu';
+            li.dataset.time = w.created_at || new Date().toISOString();
+
+            var av = document.createElement('div');
+            av.className = 'ta3-cui-avatar';
+            var content = document.createElement('div');
+            content.className = 'ta3-cui-content';
+
+            var nm = document.createElement('span');
+            nm.className = 'ta3-cui-name';
+            nm.textContent = w.guest_name || 'Tamu';
+
+            var msg = document.createElement('p');
+            msg.className = 'ta3-cui-msg';
+            msg.textContent = w.message || '';
+
+            var meta = document.createElement('div');
+            meta.className = 'ta3-cui-meta';
+            meta.innerHTML = '<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg>'
+                + '<span class="ta3-rel-time">baru saja</span><span class="ta3-cui-reply">Reply</span>';
+
+            content.appendChild(nm);
+            content.appendChild(msg);
+            content.appendChild(meta);
+            li.appendChild(av);
+            li.appendChild(content);
+            list.insertBefore(li, list.firstChild);
+            decorateComment(li);
+        }
+
+        function postWish(payload, btn, feedbackEl, onDone) {
+            if (!slug) return;
+            var orig = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Mengirim...';
+            fetch('/api/invitations/' + encodeURIComponent(slug) + '/wishes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, body: j }; }); })
+            .then(function(res) {
+                btn.disabled = false;
+                btn.textContent = orig;
+                if (res.ok && res.body && res.body.data) {
+                    if (feedbackEl) {
+                        feedbackEl.style.display = 'block';
+                        setTimeout(function() { feedbackEl.style.display = 'none'; }, 4000);
+                    }
+                    if (onDone) onDone(res.body.data);
+                } else {
+                    showToast((res.body && res.body.error) || 'Gagal mengirim ucapan');
+                }
+            })
+            .catch(function() {
+                btn.disabled = false;
+                btn.textContent = orig;
+                showToast('Gagal terhubung ke server');
+            });
+        }
+
+        var rsvpForm = document.getElementById('ta3RsvpForm');
+        if (rsvpForm) {
+            rsvpForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = (document.getElementById('rsvpName').value || '').trim();
+                var cnt = parseInt(document.getElementById('rsvpCount').value, 10) || 1;
+                var checked = rsvpForm.querySelector('input[name="rsvpAtt"]:checked');
+                var att = checked ? checked.value : 'hadir';
+                if (!name) return;
+                var msgText = att === 'hadir'
+                    ? ('Konfirmasi Buku Tamu: Saya akan datang (' + cnt + ' orang)')
+                    : 'Konfirmasi Buku Tamu: Mohon maaf tidak bisa datang';
+                postWish(
+                    { guest_name: name, guest_count: cnt, attendance: att, message: msgText },
+                    document.getElementById('rsvpSubmitBtn'),
+                    document.getElementById('rsvpFeedback'),
+                    function(saved) {
+                        prependComment(saved);
+                        document.getElementById('rsvpName').value = '';
+                        document.getElementById('rsvpCount').value = '';
+                    }
+                );
+            });
+        }
+
+        var wishForm = document.getElementById('ta3WishForm');
+        if (wishForm) {
+            wishForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = (document.getElementById('wishName').value || '').trim();
+                var msg = (document.getElementById('wishMsg').value || '').trim();
+                if (!name || !msg) return;
+                postWish(
+                    { guest_name: name, guest_count: 1, attendance: 'hadir', message: msg },
+                    document.getElementById('wishSubmitBtn'),
+                    document.getElementById('wishFeedback'),
+                    function(saved) {
+                        prependComment(saved);
+                        document.getElementById('wishMsg').value = '';
+                    }
+                );
+            });
+        }
+
+        // 8. Scroll Animations + Sticky Bottom Nav ScrollSpy
+        if ('IntersectionObserver' in window) {
+            var obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(en) {
+                    if (en.isIntersecting) {
+                        en.target.classList.add('is-visible');
+                        obs.unobserve(en.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.ta3-anim').forEach(function(el) { obs.observe(el); });
+
+            var navLinks = document.querySelectorAll('.ta3-nav-link');
+            var spyIds = ['COVER', 'COUPLE', 'EVENT', 'cerita', 'GALLERY', 'gift', 'WISHES'];
+            window.addEventListener('scroll', function() {
+                var pos = window.scrollY + window.innerHeight * 0.35;
+                var activeId = 'COVER';
+                spyIds.forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) {
+                        var top = el.getBoundingClientRect().top + window.scrollY;
+                        if (pos >= top) activeId = id;
+                    }
+                });
+                navLinks.forEach(function(lnk) {
+                    if (lnk.dataset.target === activeId) lnk.classList.add('active');
+                    else lnk.classList.remove('active');
+                });
+            }, { passive: true });
+        } else {
+            document.querySelectorAll('.ta3-anim').forEach(function(el) { el.classList.add('is-visible'); });
+        }
+    })();
+    </script>
+</body>
+</html>

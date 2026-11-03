@@ -679,6 +679,7 @@
                             <select id="filterInvitationTemplate" onchange="filterInvitations()"
                                 class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 <option value="all">Semua Template Desain</option>
+                                <option value="ta3">Sakura Blossom TA3</option>
                                 <option value="pn4">Monochrome PN4</option>
                                 <option value="luxury-grey">Luxury Grey</option>
                                 <option value="green-leaves">Green Leaves</option>
@@ -1718,7 +1719,14 @@
                 <div id="tabInvDesign" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">1. Pilihan Template Desain Visual *</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+                            <!-- Sakura Blossom TA3 -->
+                            <div id="tmplCard_ta3" onclick="selectInvTemplate('ta3')" 
+                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                <div class="w-8 h-8 rounded-full bg-rose-400 text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🌸</div>
+                                <div class="font-bold text-xs text-slate-800 mt-2">Sakura TA3</div>
+                                <div class="text-[10px] text-rose-500 font-semibold">Romantic Floral</div>
+                            </div>
                             <!-- Green Leaves -->
                             <div id="tmplCard_green-leaves" onclick="selectInvTemplate('green-leaves')" 
                                 class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-[#D4A574] bg-[#F9F3EC]/50 ring-2 ring-[#D4A574]/30 transition hover:shadow-md text-center">
@@ -5142,6 +5150,7 @@
 
             const tmplBadges = {
                 'green-leaves': { name: 'Green Leaves', bg: 'bg-[#588157]/15 text-[#3A5A40] border-[#588157]/30', dot: 'bg-[#588157]' },
+                'ta3': { name: 'Sakura TA3', bg: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-400' },
                 'pn4': { name: 'Monochrome PN4', bg: 'bg-[#343434] text-white border-[#262627]', dot: 'bg-white' },
                 'luxury-grey': { name: 'Luxury Grey', bg: 'bg-stone-800 text-[#D4A574] border-stone-700', dot: 'bg-[#D4A574]' },
                 'creamy-latte': { name: 'Creamy Latte', bg: 'bg-[#B4846C]/15 text-[#7D5A50] border-[#B4846C]/30', dot: 'bg-[#B4846C]' },

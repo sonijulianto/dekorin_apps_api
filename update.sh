@@ -43,7 +43,7 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in landing superadmin client_form invitation_portal wedding_invitation template_floral template_luxury_grey template_pn4 template_khitan_green template_creamy_latte template_green_leaves; do
+for t in landing superadmin client_form invitation_portal wedding_invitation template_floral template_luxury_grey template_pn4 template_ta3 template_khitan_green template_creamy_latte template_green_leaves; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
 done
@@ -59,6 +59,16 @@ for fn in 2989Trajan.woff2 ArslanWessam.ttf BrittanySignature.ttf Gistesy.ttf Ne
 done
 for n in 1 2 3 4 5 6 7 8 10 12 13 14 15 16 17 18; do
     curl -s -f -L -o "web/assets/templates/pn4/photos/LeniArdi${n}.jpeg" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/pn4/photos/LeniArdi${n}.jpeg?v=$TIMESTAMP" || true
+done
+
+# 4c. Unduh Aset Template Sakura Blossom TA3 (Backgrounds, Pasangan Default, Audio, Foto Galeri Default)
+echo "⬇️  Mengunduh aset template Sakura Blossom TA3..."
+mkdir -p web/assets/templates/ta3/photos
+for f in bg-cover.jpg bg-floral-arch.jpg bg-pink-floral.jpg bride-default.png couple-hero.png couple-welcome.png default-song.mp3 event-icon.png groom-default.png logo_bca.png logo_bni.png logo_mandiri.png; do
+    curl -s -f -L -o "web/assets/templates/ta3/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ta3/${f}?v=$TIMESTAMP" || true
+done
+for n in 1 2 3 4 5 6; do
+    curl -s -f -L -o "web/assets/templates/ta3/photos/gallery-${n}.jpg" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ta3/photos/gallery-${n}.jpg?v=$TIMESTAMP" || true
 done
 
 # 5. Icons
