@@ -155,13 +155,14 @@
             margin: 0 auto 6px;
         }
         .ta3-photo-circle {
+            display: block;
             width: 215px;
             height: 215px;
             border-radius: 50%;
             object-fit: cover;
             border: 5px solid #FFABB8;
             box-shadow: 0 8px 24px rgba(179, 50, 70, 0.22);
-            margin: 0 auto 10px;
+            margin: 0 auto 14px;
             background-color: #FFF5F7;
         }
         .ta3-welcome-couple {
@@ -1296,6 +1297,7 @@
            ========================================================= */
         @media (max-width: 767px) {
             .ta3-welcome-illus { width: 59%; max-width: 235px; }
+            .ta3-photo-circle { width: 195px; height: 195px; }
             .ta3-welcome-couple { font-size: 32px; }
             .ta3-open-btn { border-width: 1px; }
 
@@ -1440,10 +1442,10 @@
                 {{ end }}
             </h2>
 
-            {{ if .Sec1Photo }}
-                <img src="{{ .Sec1Photo }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-zoom">
-            {{ else if $hasCustomCover }}
+            {{ if $hasCustomCover }}
                 <img src="{{ .CoverImage }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-zoom">
+            {{ else if .Sec1Photo }}
+                <img src="{{ .Sec1Photo }}" alt="{{ $coupleNick }}" class="ta3-photo-circle ta3-anim anim-zoom">
             {{ else }}
                 <img src="/assets/templates/ta3/couple-hero.png" alt="{{ $coupleNick }}" class="ta3-hero-illus ta3-anim anim-zoom">
             {{ end }}

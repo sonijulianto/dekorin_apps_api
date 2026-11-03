@@ -423,10 +423,10 @@
             <div id="sakuraBlossomNoticeBox" class="hidden p-4 rounded-2xl border border-rose-200 bg-rose-50/70 space-y-2">
               <div class="flex items-center gap-2 text-rose-700 font-bold text-xs">
                 <span class="text-base">🌸</span>
-                <span>Template Sakura Blossom TA3 (Ilustrasi Eksklusif Bawaan)</span>
+                <span>Template Sakura Blossom TA3</span>
               </div>
               <p class="text-xs text-rose-800/90 leading-relaxed">
-                Template ini menggunakan ilustrasi anime aesthetic pasangan bawaan tema. Foto cover, foto profil mempelai, banner akad/resepsi, hero, countdown, dan foto closing otomatis dinonaktifkan. Silakan unggah foto momen kebersamaan di menu <strong>Galeri &amp; Musik</strong> tanpa batasan jumlah.
+                Template ini memiliki ilustrasi karakter bawaan (<code>couple-hero.png</code>). Anda dapat mengunggah <strong>Foto Sampul Utama (Cover)</strong> di bawah ini jika ingin menggantinya dengan foto Anda sendiri (opsional). Jika tidak diisi, ilustrasi bawaan tetap ditampilkan.
               </p>
             </div>
 
@@ -1624,9 +1624,17 @@
       const mainPhotosBox = document.getElementById('sectionPhotoSlotsMain');
       const sakuraNotice = document.getElementById('sakuraBlossomNoticeBox');
       const monoNotice = document.getElementById('monochromeNoticeBox');
-      if (mainPhotosBox) mainPhotosBox.classList.toggle('hidden', isSakura);
+      if (mainPhotosBox) mainPhotosBox.classList.remove('hidden');
       if (sakuraNotice) sakuraNotice.classList.toggle('hidden', !isSakura);
       if (monoNotice) monoNotice.classList.toggle('hidden', !isMonochrome);
+
+      // Hide extra decorative slots for Sakura Blossom, only keep cover_image visible
+      const sec1Slot = document.getElementById('photoSlot_sec1_photo');
+      const eventSlot = document.getElementById('photoSlot_event_photo');
+      const closingSlot = document.getElementById('photoSlot_closing_photo');
+      if (sec1Slot) sec1Slot.classList.toggle('hidden', isSakura);
+      if (eventSlot) eventSlot.classList.toggle('hidden', isSakura);
+      if (closingSlot) closingSlot.classList.toggle('hidden', isSakura);
 
       // 3. Foto Mempelai Pria & Wanita
       const groomSlot = document.getElementById('photoSlot_groom_photo');
@@ -2075,7 +2083,7 @@
         title: document.getElementById('f_title').value.trim(),
         template: selectedTemplateId,
         event_type: eventType,
-        cover_image: isSakura ? '' : (photoValues.cover_image || ''),
+        cover_image: (photoValues.cover_image === '/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg' ? '' : (photoValues.cover_image || '')),
         quotes: document.getElementById('f_quotes').value.trim(),
 
         groom_name: isKhitan ? (childName || document.getElementById('f_groom_name').value.trim()) : document.getElementById('f_groom_name').value.trim(),

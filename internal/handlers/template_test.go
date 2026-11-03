@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -331,5 +332,88 @@ func TestInvitationPortalHelpers(t *testing.T) {
 
 	if !isReservedInvitationSlug("kelola") || !isReservedInvitationSlug("api") {
 		t.Errorf("Expected reserved slugs to be blocked")
+	}
+}
+
+func TestSakuraBlossomCoverReplacement(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	ta3Path := filepath.Join(wd, "..", "..", "web", "templates", "template_ta3.html")
+	tmpl, err := template.ParseFiles(ta3Path)
+	if err != nil {
+		t.Fatalf("Failed to parse template_ta3.html: %v", err)
+	}
+
+	type TemplateData struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}
+
+	// Case 1: Without CoverImage -> uses couple-hero.png
+	dataNoCover := TemplateData{
+		Invitation: models.Invitation{
+			ID:         "inv_no_cover",
+			Title:      "Umay & Irfan",
+			Slug:       "umay-irfan",
+			EventType:  "wedding",
+			CoverImage: "",
+			IsActive:   true,
+		},
+		GuestTo: "Soni",
+	}
+
+	var bufNoCover bytes.Buffer
+	if err := tmpl.Execute(&bufNoCover, dataNoCover); err != nil {
+		t.Fatalf("Failed to render without cover: %v", err)
+	}
+	renderedNoCover := bufNoCover.String()
+	if !strings.Contains(renderedNoCover, "/assets/templates/ta3/couple-hero.png") {
+		t.Errorf("Expected couple-hero.png when CoverImage is empty!")
+	}
+
+	// Case 2: With Custom CoverImage -> replaces couple-hero.png in Section 1
+	dataWithCover := TemplateData{
+		Invitation: models.Invitation{
+			ID:         "inv_with_cover",
+			Title:      "Umay & Irfan",
+			Slug:       "umay-irfan",
+			EventType:  "wedding",
+			CoverImage: "https://dekorin.my.id/uploads/custom-couple-cover.jpg",
+			IsActive:   true,
+		},
+		GuestTo: "Soni",
+	}
+
+	var bufWithCover bytes.Buffer
+	if err := tmpl.Execute(&bufWithCover, dataWithCover); err != nil {
+		t.Fatalf("Failed to render with cover: %v", err)
+	}
+	renderedWithCover := bufWithCover.String()
+	if !strings.Contains(renderedWithCover, "https://dekorin.my.id/uploads/custom-couple-cover.jpg") {
+		t.Errorf("Expected custom cover photo to be rendered!")
+	}
+	// Specifically check section #COVER
+	coverSectionIdx := strings.Index(renderedWithCover, `id="COVER"`)
+	if coverSectionIdx == -1 {
+		t.Fatalf("Could not find section id=\"COVER\" in rendered template")
+	}
+	subSlice := renderedWithCover[coverSectionIdx : coverSectionIdx+1500]
+	if !strings.Contains(subSlice, "https://dekorin.my.id/uploads/custom-couple-cover.jpg") {
+		t.Errorf("Section #COVER should contain the custom cover photo!")
+	}
+	if strings.Contains(subSlice, "couple-hero.png") {
+		t.Errorf("Section #COVER should NOT contain couple-hero.png when custom cover is provided!")
 	}
 }
