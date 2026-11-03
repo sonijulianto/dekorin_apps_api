@@ -33,6 +33,7 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 	testData := struct {
 		models.Invitation
 		GuestTo             string
+		HasGuestTo          bool
 		GalleryList         []string
 		Wishes              []models.InvitationWish
 		YoutubeEmbedURL     string
@@ -136,6 +137,7 @@ func TestLoveStoryHiddenWhenEmpty(t *testing.T) {
 	testDataWithoutStory := struct {
 		models.Invitation
 		GuestTo             string
+		HasGuestTo          bool
 		GalleryList         []string
 		Wishes              []models.InvitationWish
 		YoutubeEmbedURL     string
@@ -175,6 +177,120 @@ func TestLoveStoryHiddenWhenEmpty(t *testing.T) {
 			}
 			if bytes.Contains([]byte(rendered), []byte("id=\"cerita\"")) {
 				t.Errorf("%s still contains id=\"cerita\" section when LoveStory is empty!", file)
+			}
+		})
+	}
+}
+
+func TestGuestToLockedWhenProvided(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
+	allTemplates := []string{
+		"template_creamy_latte.html",
+		"template_floral.html",
+		"template_green_leaves.html",
+		"template_khitan_green.html",
+		"template_luxury_grey.html",
+		"template_pn4.html",
+		"template_ta3.html",
+		"wedding_invitation.html",
+	}
+
+	// 1. With GuestTo = "Soni"
+	dataWithGuest := struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:        "inv_guest",
+			Title:     "Pernikahan Test",
+			Slug:      "test-guest",
+			EventType: "wedding",
+			IsActive:  true,
+		},
+		GuestTo:    "Soni",
+		HasGuestTo: true,
+		OGTitle:    "Pernikahan Test",
+	}
+
+	for _, file := range allTemplates {
+		t.Run(file+"/WithGuest", func(t *testing.T) {
+			filePath := filepath.Join(templatesDir, file)
+			tmpl, err := template.ParseFiles(filePath)
+			if err != nil {
+				t.Fatalf("Failed to parse %s: %v", file, err)
+			}
+
+			var buf bytes.Buffer
+			if err := tmpl.Execute(&buf, dataWithGuest); err != nil {
+				t.Fatalf("Failed to execute %s: %v", file, err)
+			}
+
+			rendered := buf.String()
+			if !bytes.Contains([]byte(rendered), []byte("value=\"Soni\"")) {
+				t.Errorf("%s does not contain value=\"Soni\"!", file)
+			}
+			if !bytes.Contains([]byte(rendered), []byte("readonly")) {
+				t.Errorf("%s does not contain readonly for locked guest name!", file)
+			}
+		})
+	}
+
+	// 2. Without Guest (GuestTo = "Tamu Undangan")
+	dataWithoutGuest := struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:        "inv_no_guest",
+			Title:     "Pernikahan Test",
+			Slug:      "test-no-guest",
+			EventType: "wedding",
+			IsActive:  true,
+		},
+		GuestTo:    "Tamu Undangan",
+		HasGuestTo: false,
+		OGTitle:    "Pernikahan Test",
+	}
+
+	for _, file := range allTemplates {
+		t.Run(file+"/WithoutGuest", func(t *testing.T) {
+			filePath := filepath.Join(templatesDir, file)
+			tmpl, err := template.ParseFiles(filePath)
+			if err != nil {
+				t.Fatalf("Failed to parse %s: %v", file, err)
+			}
+
+			var buf bytes.Buffer
+			if err := tmpl.Execute(&buf, dataWithoutGuest); err != nil {
+				t.Fatalf("Failed to execute %s: %v", file, err)
+			}
+
+			rendered := buf.String()
+			if !bytes.Contains([]byte(rendered), []byte("placeholder=\"Nama")) {
+				t.Errorf("%s missing editable placeholder when guest is not locked!", file)
 			}
 		})
 	}

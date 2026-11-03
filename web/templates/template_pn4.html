@@ -2413,7 +2413,14 @@
                     <p class="pn4-gift-confirm-title">Konfirmasi Pengiriman Hadiah:</p>
                     <form class="pn4-gift-form" id="giftWaForm">
                         <div class="fg">
-                            <input type="text" id="giftSenderName" value="{{ .GuestTo }}" placeholder="Nama" required>
+                            {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+                            <div style="position:relative; width: 100%;">
+                                <input type="text" id="giftSenderName" value="{{ .GuestTo }}" placeholder="Nama" readonly style="background-color: #f1f1f1; cursor: not-allowed; color: #555; padding-right: 32px;" title="Nama terkunci sesuai undangan" required>
+                                <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:#888;" title="Nama terkunci">🔒</span>
+                            </div>
+                            {{ else }}
+                            <input type="text" id="giftSenderName" value="" placeholder="Nama" required>
+                            {{ end }}
                         </div>
                         <div class="fg">
                             <input type="text" id="giftAmount" placeholder="Nominal/Kado" required>
@@ -2446,8 +2453,15 @@
 
                 <form class="pn4-rsvp-form pn-anim anim-fadeInUp" id="pn4RsvpForm">
                     <div class="fg">
-                        <label for="rsvpName">Nama</label>
-                        <input type="text" id="rsvpName" value="{{ .GuestTo }}" placeholder="Nama" required>
+                        <label for="rsvpName">Nama {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}<span style="font-size:10px;color:#888;font-weight:normal;">(Terkunci)</span>{{ end }}</label>
+                        {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+                        <div style="position:relative; width: 100%;">
+                            <input type="text" id="rsvpName" value="{{ .GuestTo }}" placeholder="Nama" readonly style="background-color: #f1f1f1; cursor: not-allowed; color: #555; padding-right: 32px;" title="Nama terkunci sesuai undangan" required>
+                            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:#888;" title="Nama terkunci">🔒</span>
+                        </div>
+                        {{ else }}
+                        <input type="text" id="rsvpName" value="" placeholder="Nama" required>
+                        {{ end }}
                     </div>
                     <div class="fg">
                         <label for="rsvpCount">Jumlah *</label>
@@ -2472,7 +2486,14 @@
                     <p class="pn4-comments-count"><span id="wishCountNum">{{ len .Wishes }}</span> Comments</p>
 
                     <form class="pn4-wish-form" id="pn4WishForm">
-                        <input type="text" id="wishName" value="{{ .GuestTo }}" placeholder="Nama" required>
+                        {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+                        <div style="position:relative; width: 100%; margin-bottom: 12px;">
+                            <input type="text" id="wishName" value="{{ .GuestTo }}" placeholder="Nama" readonly style="background-color: #f1f1f1; cursor: not-allowed; color: #555; padding-right: 32px; width: 100%;" title="Nama terkunci sesuai undangan" required>
+                            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:#888;" title="Nama terkunci">🔒</span>
+                        </div>
+                        {{ else }}
+                        <input type="text" id="wishName" value="" placeholder="Nama" required>
+                        {{ end }}
                         <textarea id="wishMsg" placeholder="Ucapan" required></textarea>
                         <select id="wishAtt">
                             <option value="hadir">Konfirmasi Kehadiran</option>

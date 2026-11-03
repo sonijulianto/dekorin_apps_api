@@ -530,8 +530,15 @@
 
       <div class="islamic-card" style="text-align: left;" data-aos="fade-up">
         <form onsubmit="postWish(event)">
-          <label style="font-size: 12px; color: var(--gold-islamic);">Nama Anda</label>
-          <input type="text" id="wName" class="form-input" value="{{ .GuestTo }}" required>
+          <label style="font-size: 12px; color: var(--gold-islamic);">Nama Anda {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}<span style="font-size:10px;color:#ccc;font-weight:normal;">(Terkunci)</span>{{ end }}</label>
+          {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+          <div style="position:relative; width: 100%; margin-bottom: 8px;">
+            <input type="text" id="wName" class="form-input" value="{{ .GuestTo }}" readonly style="background-color: rgba(255,255,255,0.1); cursor: not-allowed; color: #e0e0e0; padding-right: 32px;" title="Nama terkunci sesuai undangan" required>
+            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:#aaa;">🔒</span>
+          </div>
+          {{ else }}
+          <input type="text" id="wName" class="form-input" value="" placeholder="Nama Anda" required>
+          {{ end }}
 
           <label style="font-size: 12px; color: var(--gold-islamic);">Konfirmasi Kehadiran</label>
           <select id="wAtt" class="form-input">

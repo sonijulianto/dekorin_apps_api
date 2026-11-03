@@ -1846,8 +1846,15 @@
                 <h2 class="ta3-montecarlo-title ta3-anim anim-zoom">Buku Tamu</h2>
                 <form id="ta3RsvpForm" class="ta3-rsvp-box">
                     <div class="ta3-field-group">
-                        <label class="ta3-lbl" for="rsvpName">Nama</label>
+                        <label class="ta3-lbl" for="rsvpName">Nama {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}<span style="font-size:10px;color:#888;font-weight:normal;">(Terkunci)</span>{{ end }}</label>
+                        {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+                        <div style="position:relative; width: 100%;">
+                            <input type="text" id="rsvpName" class="ta3-input" placeholder="Nama" value="{{ .GuestTo }}" readonly style="background-color: #f1f1f1; cursor: not-allowed; color: #555; padding-right: 32px;" title="Nama terkunci sesuai undangan" required>
+                            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:#888;" title="Nama terkunci">🔒</span>
+                        </div>
+                        {{ else }}
                         <input type="text" id="rsvpName" class="ta3-input" placeholder="Nama" required>
+                        {{ end }}
                     </div>
                     <div class="ta3-field-group">
                         <label class="ta3-lbl" for="rsvpCount">Jumlah Tamu</label>
@@ -1874,7 +1881,14 @@
                 <h2 class="ta3-montecarlo-title ta3-anim anim-zoom">Ucapan</h2>
                 <div class="ta3-cui-box">
                     <form id="ta3WishForm" class="ta3-cui-form">
-                        <input type="text" id="wishName" class="ta3-cui-input" placeholder="Nama" value="{{ if ne .GuestTo "Tamu Undangan" }}{{ .GuestTo }}{{ end }}" required>
+                        {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+                        <div style="position:relative; width: 100%;">
+                            <input type="text" id="wishName" class="ta3-cui-input" placeholder="Nama" value="{{ .GuestTo }}" readonly style="background-color: #f1f1f1; cursor: not-allowed; color: #555; padding-right: 32px;" title="Nama terkunci sesuai undangan" required>
+                            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:#888;" title="Nama terkunci">🔒</span>
+                        </div>
+                        {{ else }}
+                        <input type="text" id="wishName" class="ta3-cui-input" placeholder="Nama" required>
+                        {{ end }}
                         <textarea id="wishMsg" class="ta3-cui-textarea" placeholder="Ucapan" required></textarea>
                         <button type="submit" id="wishSubmitBtn" class="ta3-cui-submit">Kirim</button>
                         <div id="wishFeedback" class="ta3-form-feedback">Ucapan berhasil dikirim!</div>
@@ -2411,7 +2425,8 @@
                     document.getElementById('rsvpFeedback'),
                     function(saved) {
                         prependComment(saved);
-                        document.getElementById('rsvpName').value = '';
+                        var rName = document.getElementById('rsvpName');
+                        if (rName && !rName.readOnly) rName.value = '';
                         document.getElementById('rsvpCount').value = '';
                     }
                 );

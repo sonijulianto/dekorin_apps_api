@@ -1900,8 +1900,15 @@
       <div class="rsvp-form-card" data-aos="fade-up">
         <form onsubmit="submitWish(event)">
           <div class="form-group">
-            <label>Nama Anda</label>
-            <input type="text" id="guestName" class="form-control" value="{{ .GuestTo }}" required>
+            <label>Nama Anda {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}<span style="font-size:10px;color:#888;font-weight:normal;">(Terkunci)</span>{{ end }}</label>
+            {{ if and .GuestTo (ne .GuestTo "Tamu Undangan") }}
+            <div style="position:relative; width: 100%;">
+              <input type="text" id="guestName" class="form-control" value="{{ .GuestTo }}" readonly style="background-color: #f1f1f1; cursor: not-allowed; color: #555; padding-right: 32px;" title="Nama terkunci sesuai undangan" required>
+              <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:#888;">🔒</span>
+            </div>
+            {{ else }}
+            <input type="text" id="guestName" class="form-control" value="" placeholder="Nama Anda" required>
+            {{ end }}
           </div>
           <div class="form-group">
             <label>Konfirmasi Kehadiran</label>

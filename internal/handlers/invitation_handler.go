@@ -487,8 +487,10 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 	}
 
 	// Ambil nama tamu dari query parameter ?to=...
-	guestTo := c.Query("to")
-	if strings.TrimSpace(guestTo) == "" {
+	rawGuestTo := strings.TrimSpace(c.Query("to"))
+	hasGuestTo := rawGuestTo != ""
+	guestTo := rawGuestTo
+	if !hasGuestTo {
 		guestTo = "Tamu Undangan"
 	} else {
 		// Rapikan format nama tamu jika ada tanda _ atau -
@@ -622,6 +624,7 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 	data := struct {
 		models.Invitation
 		GuestTo             string
+		HasGuestTo          bool
 		GalleryList         []string
 		Wishes              []models.InvitationWish
 		YoutubeEmbedURL     string
@@ -633,6 +636,7 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 	}{
 		Invitation:          invitation,
 		GuestTo:             guestTo,
+		HasGuestTo:          hasGuestTo,
 		GalleryList:         galleryList,
 		Wishes:              wishes,
 		YoutubeEmbedURL:     convertYoutubeToEmbed(invitation.YoutubeURL),
