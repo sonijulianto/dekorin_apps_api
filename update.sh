@@ -67,8 +67,8 @@ if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then
             fi
         fi
     done
-    # 6b. Pastikan virtual host subdomain undangan.dekorin.my.id terdaftar di Nginx
-    if ! grep -rq "undangan.dekorin.my.id" /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null; then
+    # 6b. Pastikan virtual host subdomain undangan.dekorin.my.id (atau wildcard *.dekorin.my.id) terdaftar di Nginx
+    if ! grep -rqE "(undangan\.dekorin\.my\.id|\*\.dekorin\.my\.id)" /etc/nginx/sites-enabled/ /etc/nginx/conf.d/ 2>/dev/null; then
         echo "🌐 Menambahkan konfigurasi Nginx untuk subdomain undangan.dekorin.my.id..."
         UNDANGAN_CONF="/etc/nginx/sites-available/undangan-dekorin"
         if [ ! -d "/etc/nginx/sites-available" ]; then
