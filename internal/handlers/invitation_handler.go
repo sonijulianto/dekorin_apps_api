@@ -524,13 +524,112 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		}
 	}
 
+	// Tentukan file template HTML berdasarkan pilihan template undangan
+	templateName := strings.TrimSpace(invitation.Template)
+	// Memungkinkan preview template via query param: ?template=luxury-grey
+	if overrideTemplate := strings.TrimSpace(c.Query("template")); overrideTemplate != "" {
+		templateName = overrideTemplate
+	}
+
+	// Format Open Graph metadata untuk WhatsApp / Social Sharing
+	baseURL := "https://" + c.Hostname()
+	if strings.Contains(c.Hostname(), "localhost") {
+		baseURL = "https://undangan.dekorin.my.id"
+	}
+
+	// 1. OG Title (The Wedding of Bride & Groom)
+	ogTitle := strings.TrimSpace(invitation.Title)
+	if ogTitle == "" {
+		if invitation.EventType == "khitan" {
+			child := strings.TrimSpace(invitation.ChildNickname)
+			if child == "" {
+				child = strings.TrimSpace(invitation.ChildName)
+			}
+			if child == "" {
+				child = "Putra Kami"
+			}
+			ogTitle = "Tasyakuran Khitan " + child
+		} else {
+			bride := strings.TrimSpace(invitation.BrideNickname)
+			if bride == "" {
+				bride = strings.TrimSpace(invitation.BrideName)
+			}
+			if bride == "" {
+				bride = "Mempelai Wanita"
+			}
+			groom := strings.TrimSpace(invitation.GroomNickname)
+			if groom == "" {
+				groom = strings.TrimSpace(invitation.GroomName)
+			}
+			if groom == "" {
+				groom = "Mempelai Pria"
+			}
+			ogTitle = "The Wedding of " + bride + " & " + groom
+		}
+	}
+
+	// 2. OG Description (Tanggal Acara Utama)
+	ogDate := strings.TrimSpace(invitation.AkadDate)
+	resepsiDate := strings.TrimSpace(invitation.ResepsiDate)
+	if ogDate == "" {
+		ogDate = resepsiDate
+	} else if resepsiDate != "" && resepsiDate != ogDate {
+		ogDate = ogDate + " & " + resepsiDate
+	}
+	if ogDate == "" {
+		if invitation.EventType == "khitan" {
+			ogDate = "Tasyakuran Khitan"
+		} else {
+			ogDate = "Acara Pernikahan"
+		}
+	}
+
+	// 3. OG Image (Gambar resolusi tinggi & absolute URL untuk WhatsApp)
+	ogImage := ""
+	if invitation.CoverImage != "" && !strings.Contains(invitation.CoverImage, "b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg") {
+		ogImage = invitation.CoverImage
+	} else if len(galleryList) > 0 && galleryList[0] != "" {
+		ogImage = galleryList[0]
+	} else if invitation.Sec1Photo != "" {
+		ogImage = invitation.Sec1Photo
+	} else if invitation.BridePhoto != "" {
+		ogImage = invitation.BridePhoto
+	} else if invitation.GroomPhoto != "" {
+		ogImage = invitation.GroomPhoto
+	}
+
+	if ogImage == "" {
+		switch templateName {
+		case "ta3", "sakura-ta3":
+			ogImage = "/assets/templates/ta3/couple-welcome.png"
+		case "pn4", "monochrome-pn4":
+			ogImage = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
+		default:
+			ogImage = "/assets/dekorin_logo_square.png"
+		}
+	}
+
+	// Pastikan ogImage selalu URL absolut (dimulai dengan https://)
+	if strings.HasPrefix(ogImage, "/") {
+		ogImage = baseURL + ogImage
+	} else if !strings.HasPrefix(ogImage, "http://") && !strings.HasPrefix(ogImage, "https://") {
+		ogImage = baseURL + "/" + ogImage
+	}
+
+	// 4. OG URL (Link utama undangan)
+	ogURL := baseURL + "/" + invitation.Slug
+
 	data := struct {
 		models.Invitation
-		GuestTo           string
-		GalleryList       []string
-		Wishes            []models.InvitationWish
-		YoutubeEmbedURL   string
+		GuestTo             string
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
 		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
 	}{
 		Invitation:          invitation,
 		GuestTo:             guestTo,
@@ -538,13 +637,10 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		Wishes:              wishes,
 		YoutubeEmbedURL:     convertYoutubeToEmbed(invitation.YoutubeURL),
 		TurutMengundangList: turutList,
-	}
-
-	// Tentukan file template HTML berdasarkan pilihan template undangan
-	templateName := strings.TrimSpace(invitation.Template)
-	// Memungkinkan preview template via query param: ?template=luxury-grey
-	if overrideTemplate := strings.TrimSpace(c.Query("template")); overrideTemplate != "" {
-		templateName = overrideTemplate
+		OGTitle:             ogTitle,
+		OGDescription:       ogDate,
+		OGImage:             ogImage,
+		OGURL:               ogURL,
 	}
 
 	var templateFile string

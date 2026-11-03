@@ -15,9 +15,22 @@
 
     <!-- Open Graph / WhatsApp Preview -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}The Wedding of {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}Fulanah{{ end }} & {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}Fulan{{ end }}{{ end }}">
-    <meta property="og:description" content="Kpd Bpk/Ibu/Saudara/i {{ .GuestTo }} — Tanpa Mengurangi Rasa Hormat, Kami Mengundang Anda Untuk Berhadir Di Acara Pernikahan Kami.">
-    {{ if and .CoverImage (ne .CoverImage "/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg") }}<meta property="og:image" content="{{ .CoverImage }}">{{ else }}<meta property="og:image" content="/assets/templates/ta3/couple-welcome.png">{{ end }}
+    <meta property="og:site_name" content="Dekorin">
+    <meta property="og:title" content="{{ if .OGTitle }}{{ .OGTitle }}{{ else }}{{ .Title }}{{ end }}">
+    <meta property="og:description" content="{{ if .OGDescription }}{{ .OGDescription }}{{ else }}{{ .AkadDate }}{{ end }}">
+    <meta name="description" content="{{ if .OGDescription }}{{ .OGDescription }}{{ else }}{{ .AkadDate }}{{ end }}">
+    <meta property="og:url" content="{{ .OGURL }}">
+    <meta property="og:image" content="{{ .OGImage }}">
+    <meta property="og:image:secure_url" content="{{ .OGImage }}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="600">
+    <meta property="og:image:height" content="600">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ if .OGTitle }}{{ .OGTitle }}{{ else }}{{ .Title }}{{ end }}">
+    <meta name="twitter:description" content="{{ if .OGDescription }}{{ .OGDescription }}{{ else }}{{ .AkadDate }}{{ end }}">
+    <meta name="twitter:image" content="{{ .OGImage }}">
 
     <!-- Google Fonts used in TA3 (Sakura Blossom) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
