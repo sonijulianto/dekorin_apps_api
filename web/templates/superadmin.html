@@ -1772,7 +1772,16 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div id="noticeInvSakura" class="hidden p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5 text-rose-700">
+                            <span>🌸</span> Template Sakura Blossom TA3
+                        </div>
+                        <p class="text-[11px] text-rose-700/90 leading-relaxed">
+                            Tema ini menggunakan ilustrasi anime aesthetic bawaan. Foto cover, foto profil mempelai, foto banner akad/resepsi, hero, countdown, dan closing otomatis dinonaktifkan. Galeri foto bersifat dinamis bebas jumlah.
+                        </p>
+                    </div>
+
+                    <div id="wrapperInvEventType">
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">2. Jenis Acara</label>
                         <div class="flex gap-2">
                             <button type="button" id="btnInvTypeWedding" onclick="selectInvEventType('wedding')"
@@ -1849,7 +1858,7 @@
                                     <input type="text" id="inputInvGroomIg" placeholder="bagaspratama"
                                         class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 </div>
-                                <div>
+                                <div id="boxInvGroomPhoto">
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Foto Mempelai Pria (man.jpeg)</label>
                                     <div class="flex items-center gap-2">
                                         <input type="file" accept="image/*" onchange="uploadInvImage(this, 'inputInvGroomPhoto', 'previewInvGroomPhoto')"
@@ -1896,7 +1905,7 @@
                                     <input type="text" id="inputInvBrideIg" placeholder="zuliamhr"
                                         class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 </div>
-                                <div>
+                                <div id="boxInvBridePhoto">
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Foto Mempelai Wanita (woman.jpeg)</label>
                                     <div class="flex items-center gap-2">
                                         <input type="file" accept="image/*" onchange="uploadInvImage(this, 'inputInvBridePhoto', 'previewInvBridePhoto')"
@@ -1977,7 +1986,7 @@
                             <textarea id="inputInvAkadAddress" rows="2" placeholder="Jl. Veteran No. 12, Bogor Tengah..."
                                 class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
                         </div>
-                        <div>
+                        <div id="boxInvAkadPhoto">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Foto Banner Kartu Akad (akad.jpeg)</label>
                             <div class="flex items-center gap-2">
                                 <input type="file" accept="image/*" onchange="uploadInvImage(this, 'inputInvAkadPhoto', 'previewInvAkadPhoto')"
@@ -2022,7 +2031,7 @@
                             <textarea id="inputInvResepsiAddress" rows="2" placeholder="Jl. Raya Tajur No. 59, Bogor..."
                                 class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
                         </div>
-                        <div>
+                        <div id="boxInvResepsiPhoto">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Foto Banner Kartu Resepsi (reception.jpeg)</label>
                             <div class="flex items-center gap-2">
                                 <input type="file" accept="image/*" onchange="uploadInvImage(this, 'inputInvResepsiPhoto', 'previewInvResepsiPhoto')"
@@ -2036,7 +2045,17 @@
 
                 <!-- TAB 4: FOTO DESAIN & GALERI -->
                 <div id="tabInvPhotos" class="hidden space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Sakura Notice on Photos Tab -->
+                    <div id="noticeInvPhotosSakura" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1.5">
+                        <div class="font-bold flex items-center gap-2 text-rose-700">
+                            <span>🌸</span> Template Sakura Blossom TA3
+                        </div>
+                        <p class="text-[11px] text-rose-700/90 leading-relaxed">
+                            Template ini menggunakan ilustrasi anime aesthetic bawaan untuk cover, hero, countdown, dan ucapan penutup. Anda tidak perlu mengunggah foto-foto tersebut. Silakan unggah foto momen kebersamaan di Galeri Foto di bawah ini (bebas berapa saja tanpa batasan).
+                        </p>
+                    </div>
+
+                    <div id="boxInvFourPhotos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Cover Opening (opening.jpeg) -->
                         <div class="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/70 space-y-2">
                             <label class="block text-xs font-bold text-slate-800">Foto Cover / Amplop Pembuka (opening.jpeg)</label>
@@ -2086,12 +2105,12 @@
                         </div>
                     </div>
 
-                    <!-- Galeri Momen (gallery1 .. gallery9) -->
+                    <!-- Galeri Momen -->
                     <div class="bg-slate-50/80 p-4 rounded-2xl border border-slate-200/70 space-y-3">
                         <div class="flex items-center justify-between">
                             <div>
-                                <label class="block text-xs font-bold text-slate-800">Galeri Foto Momen (gallery1 - gallery9)</label>
-                                <p class="text-[11px] text-slate-400">Pilih beberapa foto sekaligus untuk ditampilkan di galeri foto undangan</p>
+                                <label id="labelInvGalleryTitle" class="block text-xs font-bold text-slate-800">Galeri Foto Momen</label>
+                                <p id="labelInvGalleryHint" class="text-[11px] text-slate-400">Pilih foto prewedding/momen kebersamaan tanpa batasan jumlah</p>
                             </div>
                             <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white text-xs font-bold transition shadow-xs">
                                 <span>+ Upload Foto Galeri</span>
@@ -5284,6 +5303,52 @@
                 selected.classList.add('border-[#D4A574]', 'bg-[#F9F3EC]/50', 'ring-2', 'ring-[#D4A574]/30');
             }
             document.getElementById('inputInvTemplate').value = tmplId;
+            applyAdminTemplateRules(tmplId);
+        }
+
+        function applyAdminTemplateRules(tmplId) {
+            const isSakura = tmplId === 'ta3';
+
+            // 1. Jenis Acara
+            const wrapType = document.getElementById('wrapperInvEventType');
+            if (wrapType) wrapType.classList.toggle('hidden', isSakura);
+            if (isSakura) {
+                selectInvEventType('wedding');
+            }
+
+            // 2. Sakura Notice Boxes
+            const noticeSakura = document.getElementById('noticeInvSakura');
+            if (noticeSakura) noticeSakura.classList.toggle('hidden', !isSakura);
+            const noticePhotosSakura = document.getElementById('noticeInvPhotosSakura');
+            if (noticePhotosSakura) noticePhotosSakura.classList.toggle('hidden', !isSakura);
+
+            // 3. Groom & Bride Photos
+            const boxGroom = document.getElementById('boxInvGroomPhoto');
+            const boxBride = document.getElementById('boxInvBridePhoto');
+            if (boxGroom) boxGroom.classList.toggle('hidden', isSakura);
+            if (boxBride) boxBride.classList.toggle('hidden', isSakura);
+
+            // 4. Akad & Resepsi Photos
+            const boxAkad = document.getElementById('boxInvAkadPhoto');
+            const boxResepsi = document.getElementById('boxInvResepsiPhoto');
+            if (boxAkad) boxAkad.classList.toggle('hidden', isSakura);
+            if (boxResepsi) boxResepsi.classList.toggle('hidden', isSakura);
+
+            // 5. Four Photos Box (Cover, Sec1, Event, Closing)
+            const boxFourPhotos = document.getElementById('boxInvFourPhotos');
+            if (boxFourPhotos) boxFourPhotos.classList.toggle('hidden', isSakura);
+
+            // 6. Gallery Labels
+            const galleryTitle = document.getElementById('labelInvGalleryTitle');
+            const galleryHint = document.getElementById('labelInvGalleryHint');
+            if (galleryTitle) {
+                galleryTitle.textContent = isSakura ? 'Galeri Foto Momen (Dinamis Bebas Jumlah)' : 'Galeri Foto Momen (gallery1 - gallery9)';
+            }
+            if (galleryHint) {
+                galleryHint.textContent = isSakura
+                    ? 'Pilih foto momen kebersamaan tanpa batasan jumlah untuk ditampilkan di galeri Sakura Blossom'
+                    : 'Pilih beberapa foto sekaligus untuk ditampilkan di galeri foto undangan';
+            }
         }
 
         function selectInvEventType(type) {
@@ -5623,8 +5688,9 @@
             btn.disabled = true;
             btn.innerHTML = '<span>Menyimpan...</span>';
 
-            const eventType = document.getElementById('inputInvEventType').value;
-            const isKhitan = eventType === 'khitan';
+            const isSakura = document.getElementById('inputInvTemplate').value === 'ta3';
+            const eventType = isSakura ? 'wedding' : document.getElementById('inputInvEventType').value;
+            const isKhitan = !isSakura && eventType === 'khitan';
 
             const payload = {
                 title: document.getElementById('inputInvTitle').value.trim(),
@@ -5632,7 +5698,7 @@
                 template: document.getElementById('inputInvTemplate').value,
                 event_type: eventType,
                 quotes: document.getElementById('inputInvQuotes').value.trim(),
-                cover_image: document.getElementById('inputInvCoverImage').value,
+                cover_image: isSakura ? '' : document.getElementById('inputInvCoverImage').value,
                 
                 groom_name: isKhitan
                     ? (document.getElementById('inputInvChildName').value.trim() || 'Rayyan')
@@ -5645,36 +5711,36 @@
                     ? document.getElementById('inputInvKhitanParents').value.trim()
                     : document.getElementById('inputInvGroomParents').value.trim(),
                 groom_instagram: document.getElementById('inputInvGroomIg').value.trim(),
-                groom_photo: document.getElementById('inputInvGroomPhoto').value,
+                groom_photo: isSakura ? '' : document.getElementById('inputInvGroomPhoto').value,
 
                 bride_name: isKhitan ? '-' : document.getElementById('inputInvBrideName').value.trim(),
                 bride_nickname: isKhitan ? '-' : document.getElementById('inputInvBrideNickname').value.trim(),
                 bride_child_order: document.getElementById('inputInvBrideChildOrder').value.trim(),
                 bride_parents: document.getElementById('inputInvBrideParents').value.trim(),
                 bride_instagram: document.getElementById('inputInvBrideIg').value.trim(),
-                bride_photo: document.getElementById('inputInvBridePhoto').value,
+                bride_photo: isSakura ? '' : document.getElementById('inputInvBridePhoto').value,
 
-                child_name: document.getElementById('inputInvChildName').value.trim(),
-                child_nickname: document.getElementById('inputInvChildNickname').value.trim(),
-                child_order: document.getElementById('inputInvChildOrder').value.trim(),
+                child_name: isSakura ? '' : document.getElementById('inputInvChildName').value.trim(),
+                child_nickname: isSakura ? '' : document.getElementById('inputInvChildNickname').value.trim(),
+                child_order: isSakura ? '' : document.getElementById('inputInvChildOrder').value.trim(),
 
                 akad_date: document.getElementById('inputInvAkadDate').value.trim(),
                 akad_time: document.getElementById('inputInvAkadTime').value.trim(),
                 akad_venue: document.getElementById('inputInvAkadVenue').value.trim(),
                 akad_address: document.getElementById('inputInvAkadAddress').value.trim(),
                 akad_maps_url: document.getElementById('inputInvAkadMaps').value.trim(),
-                akad_photo: document.getElementById('inputInvAkadPhoto').value,
+                akad_photo: isSakura ? '' : document.getElementById('inputInvAkadPhoto').value,
 
                 resepsi_date: document.getElementById('inputInvResepsiDate').value.trim(),
                 resepsi_time: document.getElementById('inputInvResepsiTime').value.trim(),
                 resepsi_venue: document.getElementById('inputInvResepsiVenue').value.trim(),
                 resepsi_address: document.getElementById('inputInvResepsiAddress').value.trim(),
                 resepsi_maps_url: document.getElementById('inputInvResepsiMaps').value.trim(),
-                resepsi_photo: document.getElementById('inputInvResepsiPhoto').value,
+                resepsi_photo: isSakura ? '' : document.getElementById('inputInvResepsiPhoto').value,
 
-                sec1_photo: document.getElementById('inputInvSec1Photo').value,
-                event_photo: document.getElementById('inputInvEventPhoto').value,
-                closing_photo: document.getElementById('inputInvClosingPhoto').value,
+                sec1_photo: isSakura ? '' : document.getElementById('inputInvSec1Photo').value,
+                event_photo: isSakura ? '' : document.getElementById('inputInvEventPhoto').value,
+                closing_photo: isSakura ? '' : document.getElementById('inputInvClosingPhoto').value,
                 gallery_images: invGalleryList.join(','),
 
                 youtube_url: document.getElementById('inputInvYoutubeUrl').value.trim(),

@@ -373,21 +373,24 @@
             </div>
 
             <!-- JENIS ACARA -->
-            <div class="grid grid-cols-2 gap-3">
-              <label class="cursor-pointer">
-                <input type="radio" name="event_type" value="wedding" onchange="handleEventTypeChange()" class="sr-only peer" checked>
-                <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#D4A574] peer-checked:bg-[#F9F3EC]/60 transition text-center">
-                  <div class="text-xl mb-1">💒</div>
-                  <div class="text-xs font-bold text-[#2C2C2C]">Pernikahan (Wedding)</div>
-                </div>
-              </label>
-              <label class="cursor-pointer">
-                <input type="radio" name="event_type" value="khitan" onchange="handleEventTypeChange()" class="sr-only peer">
-                <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#2E8B57] peer-checked:bg-emerald-50/50 transition text-center">
-                  <div class="text-xl mb-1">🕌</div>
-                  <div class="text-xs font-bold text-[#2C2C2C]">Tasyakuran Khitan</div>
-                </div>
-              </label>
+            <div id="eventTypeSelectorSection" class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-700">Pilih Kategori Acara</label>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="cursor-pointer">
+                  <input type="radio" name="event_type" value="wedding" onchange="handleEventTypeChange()" class="sr-only peer" checked>
+                  <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#D4A574] peer-checked:bg-[#F9F3EC]/60 transition text-center">
+                    <div class="text-xl mb-1">💒</div>
+                    <div class="text-xs font-bold text-[#2C2C2C]">Pernikahan (Wedding)</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="event_type" value="khitan" onchange="handleEventTypeChange()" class="sr-only peer">
+                  <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#2E8B57] peer-checked:bg-emerald-50/50 transition text-center">
+                    <div class="text-xl mb-1">🕌</div>
+                    <div class="text-xs font-bold text-[#2C2C2C]">Tasyakuran Khitan</div>
+                  </div>
+                </label>
+              </div>
             </div>
 
             <!-- PILIHAN TEMPLATE CARDS -->
@@ -414,8 +417,19 @@
               </div>
             </div>
 
+            <!-- NOTICE SAKURA BLOSSOM -->
+            <div id="sakuraBlossomNoticeBox" class="hidden p-4 rounded-2xl border border-rose-200 bg-rose-50/70 space-y-2">
+              <div class="flex items-center gap-2 text-rose-700 font-bold text-xs">
+                <span class="text-base">🌸</span>
+                <span>Template Sakura Blossom TA3 (Ilustrasi Eksklusif Bawaan)</span>
+              </div>
+              <p class="text-xs text-rose-800/90 leading-relaxed">
+                Template ini menggunakan ilustrasi anime aesthetic pasangan bawaan tema. Foto cover, foto profil mempelai, banner akad/resepsi, hero, countdown, dan foto closing otomatis dinonaktifkan. Silakan unggah foto momen kebersamaan di menu <strong>Galeri &amp; Musik</strong> tanpa batasan jumlah.
+              </p>
+            </div>
+
             <!-- FOTO SAMPUL & BANNER UTAMA -->
-            <div class="pt-2 border-t border-slate-100 space-y-4">
+            <div id="sectionPhotoSlotsMain" class="pt-2 border-t border-slate-100 space-y-4">
               <div>
                 <h4 class="text-sm font-bold text-[#2C2C2C]">Foto Sampul &amp; Latar Bagian Undangan</h4>
                 <p class="text-xs text-slate-500">Unggah foto terbaik dari HP Anda (Format JPG/PNG/WebP, maks 8 MB per foto).</p>
@@ -696,8 +710,8 @@
             <div class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 space-y-4">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 class="text-base font-bold text-[#2C2C2C]">🖼️ Album Galeri Foto Momen</h3>
-                  <p class="text-xs text-slate-500">Unggah foto prewedding atau momen bahagia (bisa pilih banyak foto sekaligus).</p>
+                  <h3 id="galleryTitleLabel" class="text-base font-bold text-[#2C2C2C]">🖼️ Album Galeri Foto Momen</h3>
+                  <p id="gallerySubtitleLabel" class="text-xs text-slate-500">Unggah foto prewedding atau momen bahagia (bisa pilih banyak foto sekaligus).</p>
                 </div>
                 <label class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl gold-gradient text-white text-xs font-bold cursor-pointer shadow-xs hover:opacity-95 transition shrink-0">
                   <span>➕ Upload Foto Galeri</span>
@@ -1378,6 +1392,7 @@
       renderGalleryGrid();
 
       handleEventTypeChange();
+      applyTemplateFormRules(selectedTemplateId);
       renderTemplatePicker();
 
       // RSVP Tab
@@ -1554,7 +1569,56 @@
 
     function selectTemplateCard(templateId) {
       selectedTemplateId = templateId;
+      applyTemplateFormRules(templateId);
       renderTemplatePicker();
+    }
+
+    function applyTemplateFormRules(templateId) {
+      const isSakura = templateId === 'ta3';
+
+      // 1. Jenis Acara
+      const eventSec = document.getElementById('eventTypeSelectorSection');
+      if (eventSec) eventSec.classList.toggle('hidden', isSakura);
+
+      if (isSakura) {
+        const weddingRadio = document.querySelector('input[name="event_type"][value="wedding"]');
+        if (weddingRadio && !weddingRadio.checked) {
+          weddingRadio.checked = true;
+          handleEventTypeChange();
+        }
+      }
+
+      // 2. Foto Sampul & Notice Box Sakura
+      const mainPhotosBox = document.getElementById('sectionPhotoSlotsMain');
+      const sakuraNotice = document.getElementById('sakuraBlossomNoticeBox');
+      if (mainPhotosBox) mainPhotosBox.classList.toggle('hidden', isSakura);
+      if (sakuraNotice) sakuraNotice.classList.toggle('hidden', !isSakura);
+
+      // 3. Foto Mempelai Pria & Wanita
+      const groomSlot = document.getElementById('photoSlot_groom_photo');
+      const brideSlot = document.getElementById('photoSlot_bride_photo');
+      if (groomSlot) groomSlot.classList.toggle('hidden', isSakura);
+      if (brideSlot) brideSlot.classList.toggle('hidden', isSakura);
+
+      // 4. Foto Banner Kartu Akad & Resepsi
+      const akadSlot = document.getElementById('photoSlot_akad_photo');
+      const resepsiSlot = document.getElementById('photoSlot_resepsi_photo');
+      if (akadSlot) akadSlot.classList.toggle('hidden', isSakura);
+      if (resepsiSlot) resepsiSlot.classList.toggle('hidden', isSakura);
+
+      // 5. Galeri Foto Text
+      const galleryTitle = document.getElementById('galleryTitleLabel');
+      const gallerySub = document.getElementById('gallerySubtitleLabel');
+      if (galleryTitle) {
+        galleryTitle.textContent = isSakura 
+          ? '🖼️ Album Galeri Foto Momen (Dinamis)' 
+          : '🖼️ Album Galeri Foto Momen';
+      }
+      if (gallerySub) {
+        gallerySub.textContent = isSakura
+          ? 'Unggah foto momen kebersamaan Anda (bebas tambah foto sebanyak mungkin tanpa batasan).'
+          : 'Unggah foto prewedding atau momen bahagia (bisa pilih banyak foto sekaligus).';
+      }
     }
 
     // =========================================================
@@ -1764,8 +1828,9 @@
       btn.disabled = true;
       btn.textContent = '⏳ Menyimpan...';
 
-      const eventType = document.querySelector('input[name="event_type"]:checked')?.value || 'wedding';
-      const isKhitan = eventType === 'khitan';
+      const isSakura = selectedTemplateId === 'ta3';
+      const eventType = isSakura ? 'wedding' : (document.querySelector('input[name="event_type"]:checked')?.value || 'wedding');
+      const isKhitan = !isSakura && eventType === 'khitan';
 
       const childName = document.getElementById('f_child_name').value.trim();
       const childNickname = document.getElementById('f_child_nickname').value.trim();
@@ -1777,7 +1842,7 @@
         title: document.getElementById('f_title').value.trim(),
         template: selectedTemplateId,
         event_type: eventType,
-        cover_image: photoValues.cover_image || '',
+        cover_image: isSakura ? '' : (photoValues.cover_image || ''),
         quotes: document.getElementById('f_quotes').value.trim(),
 
         groom_name: isKhitan ? (childName || document.getElementById('f_groom_name').value.trim()) : document.getElementById('f_groom_name').value.trim(),
@@ -1785,18 +1850,18 @@
         groom_child_order: isKhitan ? childOrder : document.getElementById('f_groom_child_order').value.trim(),
         groom_parents: isKhitan ? khitanParents : document.getElementById('f_groom_parents').value.trim(),
         groom_instagram: document.getElementById('f_groom_instagram').value.trim(),
-        groom_photo: isKhitan ? (photoValues.child_photo || photoValues.groom_photo || '') : (photoValues.groom_photo || ''),
+        groom_photo: isSakura ? '' : (isKhitan ? (photoValues.child_photo || photoValues.groom_photo || '') : (photoValues.groom_photo || '')),
 
-        bride_name: document.getElementById('f_bride_name').value.trim(),
-        bride_nickname: document.getElementById('f_bride_nickname').value.trim(),
-        bride_child_order: document.getElementById('f_bride_child_order').value.trim(),
-        bride_parents: document.getElementById('f_bride_parents').value.trim(),
-        bride_instagram: document.getElementById('f_bride_instagram').value.trim(),
-        bride_photo: photoValues.bride_photo || '',
+        bride_name: isKhitan ? '' : document.getElementById('f_bride_name').value.trim(),
+        bride_nickname: isKhitan ? '' : document.getElementById('f_bride_nickname').value.trim(),
+        bride_child_order: isKhitan ? '' : document.getElementById('f_bride_child_order').value.trim(),
+        bride_parents: isKhitan ? '' : document.getElementById('f_bride_parents').value.trim(),
+        bride_instagram: isKhitan ? '' : document.getElementById('f_bride_instagram').value.trim(),
+        bride_photo: isSakura ? '' : (photoValues.bride_photo || ''),
 
-        child_name: childName,
-        child_nickname: childNickname,
-        child_order: childOrder,
+        child_name: isSakura ? '' : childName,
+        child_nickname: isSakura ? '' : childNickname,
+        child_order: isSakura ? '' : childOrder,
 
         akad_date: document.getElementById('f_akad_date').value.trim(),
         akad_time: document.getElementById('f_akad_time').value.trim(),
@@ -1825,11 +1890,11 @@
         love_story: document.getElementById('f_love_story').value.trim(),
         turut_mengundang: document.getElementById('f_turut_mengundang').value.trim(),
 
-        sec1_photo: photoValues.sec1_photo || '',
-        akad_photo: photoValues.akad_photo || '',
-        resepsi_photo: photoValues.resepsi_photo || '',
-        event_photo: photoValues.event_photo || '',
-        closing_photo: photoValues.closing_photo || '',
+        sec1_photo: isSakura ? '' : (photoValues.sec1_photo || ''),
+        akad_photo: isSakura ? '' : (photoValues.akad_photo || ''),
+        resepsi_photo: isSakura ? '' : (photoValues.resepsi_photo || ''),
+        event_photo: isSakura ? '' : (photoValues.event_photo || ''),
+        closing_photo: isSakura ? '' : (photoValues.closing_photo || ''),
         is_active: document.getElementById('dashActiveToggle').checked
       };
 
