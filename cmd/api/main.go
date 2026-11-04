@@ -144,6 +144,7 @@ func main() {
 
 	// AI routes (Smart OCR & Gemini Assistant)
 	api.Post("/ai/scan-receipt", middleware.Protected(), handlers.ScanReceiptAI)
+	api.Post("/ai/assistant", middleware.Protected(), handlers.HandleAIAssistant)
 
 	// Master Package routes
 	api.Get("/packages", middleware.Protected(), handlers.GetPackages)
