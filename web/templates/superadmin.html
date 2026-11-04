@@ -5363,6 +5363,23 @@
                     ? 'Pilih foto momen kebersamaan tanpa batasan jumlah untuk ditampilkan di galeri Sakura Blossom'
                     : 'Pilih beberapa foto sekaligus untuk ditampilkan di galeri foto undangan';
             }
+
+            // 7. Cover photo handling for Illustration vs Photo templates
+            const isNew = !document.getElementById('inputInvId').value;
+            if (isNew) {
+                const coverInput = document.getElementById('inputInvCoverImage');
+                if (isSakura) {
+                    if (coverInput.value === '/assets/templates/pn4/photos/LeniArdi2.jpeg') {
+                        coverInput.value = '';
+                        setImgPreview('previewInvCoverImage', '');
+                    }
+                } else {
+                    if (!coverInput.value) {
+                        coverInput.value = '/assets/templates/pn4/photos/LeniArdi2.jpeg';
+                        setImgPreview('previewInvCoverImage', '/assets/templates/pn4/photos/LeniArdi2.jpeg');
+                    }
+                }
+            }
         }
 
         function selectInvEventType(type) {
@@ -5371,6 +5388,11 @@
             const btnKhitan = document.getElementById('btnInvTypeKhitan');
             const secWedding = document.getElementById('secInvCoupleWedding');
             const secKhitan = document.getElementById('secInvCoupleKhitan');
+
+            const isNew = !document.getElementById('inputInvId').value;
+            const titleInput = document.getElementById('inputInvTitle');
+            const slugInput = document.getElementById('inputInvSlug');
+            const quotesInput = document.getElementById('inputInvQuotes');
 
             if (type === 'khitan') {
                 btnKhitan.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
@@ -5382,6 +5404,18 @@
                 if (document.getElementById('inputInvTemplate').value === 'green-leaves') {
                     selectInvTemplate('khitan-green');
                 }
+                if (isNew) {
+                    if (!titleInput.value || titleInput.value.startsWith('The Wedding of')) {
+                        titleInput.value = 'Tasyakuran Khitanan Rayyan';
+                    }
+                    if (!slugInput.value || slugInput.value.startsWith('bagas-zulia')) {
+                        const rand = Math.floor(1000 + Math.random() * 9000);
+                        slugInput.value = 'khitan-rayyan-' + rand;
+                    }
+                    if (!quotesInput.value || quotesInput.value.includes('Ar-Rum')) {
+                        quotesInput.value = '“Semoga menjadi anak yang sholeh, berbakti kepada kedua orang tua, serta berguna bagi nusa, bangsa, dan agama. Aamiin ya Rabbal \'Alamin.”';
+                    }
+                }
             } else {
                 btnWedding.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
                 btnWedding.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
@@ -5389,6 +5423,18 @@
                 btnKhitan.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
                 secWedding.classList.remove('hidden');
                 secKhitan.classList.add('hidden');
+                if (isNew) {
+                    if (!titleInput.value || titleInput.value.startsWith('Tasyakuran Khitanan')) {
+                        titleInput.value = 'The Wedding of Bagas & Zulia';
+                    }
+                    if (!slugInput.value || slugInput.value.startsWith('khitan-rayyan')) {
+                        const rand = Math.floor(1000 + Math.random() * 9000);
+                        slugInput.value = 'bagas-zulia-' + rand;
+                    }
+                    if (!quotesInput.value || quotesInput.value.includes('anak yang sholeh')) {
+                        quotesInput.value = '"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)';
+                    }
+                }
             }
         }
 
@@ -5401,8 +5447,8 @@
                 const child = (document.getElementById('inputInvChildNickname')?.value || document.getElementById('inputInvChildName')?.value || '').trim();
                 if (child) {
                     const clean = child.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-                    if (!slugInput.dataset.manual) slugInput.value = 'khitan-' + clean;
-                    if (!titleInput.dataset.manual) titleInput.value = 'Tasyakuran Khitanan ' + child;
+                    if (!slugInput.dataset.manual || slugInput.value.startsWith('khitan-rayyan-')) slugInput.value = 'khitan-' + clean;
+                    if (!titleInput.dataset.manual || titleInput.value.startsWith('Tasyakuran Khitanan Rayyan')) titleInput.value = 'Tasyakuran Khitanan ' + child;
                 }
             } else {
                 const g = (document.getElementById('inputInvGroomNickname')?.value || '').trim();
@@ -5410,8 +5456,8 @@
                 if (g && b) {
                     const cleanG = g.toLowerCase().replace(/[^a-z0-9]/g, '-');
                     const cleanB = b.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                    if (!slugInput.dataset.manual) slugInput.value = cleanB + '-' + cleanG;
-                    if (!titleInput.dataset.manual) titleInput.value = 'The Wedding of ' + b + ' & ' + g;
+                    if (!slugInput.dataset.manual || slugInput.value.startsWith('bagas-zulia-')) slugInput.value = cleanB + '-' + cleanG;
+                    if (!titleInput.dataset.manual || titleInput.value.startsWith('The Wedding of Bagas & Zulia')) titleInput.value = 'The Wedding of ' + b + ' & ' + g;
                 }
             }
         }
@@ -5509,81 +5555,92 @@
             document.getElementById('inputInvId').value = '';
             document.getElementById('invErrorBox').classList.add('hidden');
             
+            // Random 4 digit suffix so slug is guaranteed unique on instant publish
+            const randSuffix = Math.floor(1000 + Math.random() * 9000);
+
             // Default values
             selectInvTemplate('green-leaves');
             selectInvEventType('wedding');
             switchInvTab('Design');
 
-            document.getElementById('inputInvTitle').value = '';
+            document.getElementById('inputInvTitle').value = 'The Wedding of Bagas & Zulia';
             document.getElementById('inputInvTitle').dataset.manual = '';
-            document.getElementById('inputInvSlug').value = '';
+            document.getElementById('inputInvSlug').value = 'bagas-zulia-' + randSuffix;
             document.getElementById('inputInvSlug').dataset.manual = '';
             document.getElementById('inputInvQuotes').value = '"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)';
 
-            document.getElementById('inputInvGroomName').value = '';
-            document.getElementById('inputInvGroomNickname').value = '';
+            document.getElementById('inputInvGroomName').value = 'Bagas Pratama, S.Kom.';
+            document.getElementById('inputInvGroomNickname').value = 'Bagas';
             document.getElementById('inputInvGroomChildOrder').value = 'Putra pertama dari';
-            document.getElementById('inputInvGroomParents').value = '';
-            document.getElementById('inputInvGroomIg').value = '';
-            document.getElementById('inputInvGroomPhoto').value = '';
-            setImgPreview('previewInvGroomPhoto', '');
+            document.getElementById('inputInvGroomParents').value = 'Bpk. Bambang & Ibu Siti';
+            document.getElementById('inputInvGroomIg').value = 'bagaspratama';
+            document.getElementById('inputInvGroomPhoto').value = '/assets/templates/pn4/photos/LeniArdi15.jpeg';
+            setImgPreview('previewInvGroomPhoto', '/assets/templates/pn4/photos/LeniArdi15.jpeg');
 
-            document.getElementById('inputInvBrideName').value = '';
-            document.getElementById('inputInvBrideNickname').value = '';
+            document.getElementById('inputInvBrideName').value = 'Zulia Maharani, S.Pd.';
+            document.getElementById('inputInvBrideNickname').value = 'Zulia';
             document.getElementById('inputInvBrideChildOrder').value = 'Putri kedua dari';
-            document.getElementById('inputInvBrideParents').value = '';
-            document.getElementById('inputInvBrideIg').value = '';
-            document.getElementById('inputInvBridePhoto').value = '';
-            setImgPreview('previewInvBridePhoto', '');
+            document.getElementById('inputInvBrideParents').value = 'Bpk. Agus & Ibu Dewi';
+            document.getElementById('inputInvBrideIg').value = 'zuliamhr';
+            document.getElementById('inputInvBridePhoto').value = '/assets/templates/pn4/photos/LeniArdi16.jpeg';
+            setImgPreview('previewInvBridePhoto', '/assets/templates/pn4/photos/LeniArdi16.jpeg');
 
-            document.getElementById('inputInvChildName').value = '';
-            document.getElementById('inputInvChildNickname').value = '';
-            document.getElementById('inputInvChildOrder').value = 'Putra tercinta dari';
-            document.getElementById('inputInvKhitanParents').value = '';
+            document.getElementById('inputInvChildName').value = 'Rayyan Althaf Pratama';
+            document.getElementById('inputInvChildNickname').value = 'Rayyan';
+            document.getElementById('inputInvChildOrder').value = 'Putra pertama dari';
+            document.getElementById('inputInvKhitanParents').value = 'Bpk. Bambang & Ibu Siti';
 
             document.getElementById('inputInvAkadDate').value = 'Sabtu, 20 Desember 2026';
             document.getElementById('inputInvAkadTime').value = '08:00 - 10:00 WIB';
-            document.getElementById('inputInvAkadVenue').value = '';
-            document.getElementById('inputInvAkadAddress').value = '';
-            document.getElementById('inputInvAkadMaps').value = '';
-            document.getElementById('inputInvAkadPhoto').value = '';
-            setImgPreview('previewInvAkadPhoto', '');
+            document.getElementById('inputInvAkadVenue').value = 'Masjid Agung Al-Barkah';
+            document.getElementById('inputInvAkadAddress').value = 'Jl. Veteran No. 46, RT.004/RW.001, Marga Jaya, Bekasi Selatan';
+            document.getElementById('inputInvAkadMaps').value = 'https://maps.app.goo.gl/9bN52xXn';
+            document.getElementById('inputInvAkadPhoto').value = '/assets/templates/pn4/photos/LeniArdi15.jpeg';
+            setImgPreview('previewInvAkadPhoto', '/assets/templates/pn4/photos/LeniArdi15.jpeg');
 
             document.getElementById('inputInvResepsiDate').value = 'Sabtu, 20 Desember 2026';
             document.getElementById('inputInvResepsiTime').value = '11:00 - 14:00 WIB';
-            document.getElementById('inputInvResepsiVenue').value = '';
-            document.getElementById('inputInvResepsiAddress').value = '';
-            document.getElementById('inputInvResepsiMaps').value = '';
-            document.getElementById('inputInvResepsiPhoto').value = '';
-            setImgPreview('previewInvResepsiPhoto', '');
+            document.getElementById('inputInvResepsiVenue').value = 'Grand Ballroom Hotel Santika';
+            document.getElementById('inputInvResepsiAddress').value = 'Jl. Jend. Ahmad Yani No. 1, RT.001/RW.005, Margajaya, Bekasi Selatan';
+            document.getElementById('inputInvResepsiMaps').value = 'https://maps.app.goo.gl/9bN52xXn';
+            document.getElementById('inputInvResepsiPhoto').value = '/assets/templates/pn4/photos/LeniArdi16.jpeg';
+            setImgPreview('previewInvResepsiPhoto', '/assets/templates/pn4/photos/LeniArdi16.jpeg');
 
-            document.getElementById('inputInvCoverImage').value = '';
-            setImgPreview('previewInvCoverImage', '');
-            document.getElementById('inputInvSec1Photo').value = '';
-            setImgPreview('previewInvSec1Photo', '');
-            document.getElementById('inputInvEventPhoto').value = '';
-            setImgPreview('previewInvEventPhoto', '');
-            document.getElementById('inputInvClosingPhoto').value = '';
-            setImgPreview('previewInvClosingPhoto', '');
+            document.getElementById('inputInvCoverImage').value = '/assets/templates/pn4/photos/LeniArdi2.jpeg';
+            setImgPreview('previewInvCoverImage', '/assets/templates/pn4/photos/LeniArdi2.jpeg');
+            document.getElementById('inputInvSec1Photo').value = '/assets/templates/pn4/photos/LeniArdi15.jpeg';
+            setImgPreview('previewInvSec1Photo', '/assets/templates/pn4/photos/LeniArdi15.jpeg');
+            document.getElementById('inputInvEventPhoto').value = '/assets/templates/pn4/photos/LeniArdi16.jpeg';
+            setImgPreview('previewInvEventPhoto', '/assets/templates/pn4/photos/LeniArdi16.jpeg');
+            document.getElementById('inputInvClosingPhoto').value = '/assets/templates/pn4/photos/LeniArdi2.jpeg';
+            setImgPreview('previewInvClosingPhoto', '/assets/templates/pn4/photos/LeniArdi2.jpeg');
 
-            invGalleryList = [];
+            invGalleryList = [
+                '/assets/templates/pn4/photos/LeniArdi2.jpeg',
+                '/assets/templates/pn4/photos/LeniArdi15.jpeg',
+                '/assets/templates/pn4/photos/LeniArdi16.jpeg'
+            ];
             renderInvGalleryThumbnails();
 
             document.getElementById('inputInvYoutubeUrl').value = '';
             document.getElementById('inputInvAudioUrl').value = '';
-            document.getElementById('inputInvLoveStory').value = '';
-            document.getElementById('inputInvTurutMengundang').value = '';
+            document.getElementById('inputInvLoveStory').value = JSON.stringify([
+                { date: '1 September 2021', title: 'Pertama Kali Bertemu', description: 'Kami pertama kali bertemu di sebuah seminar kampus dan saling bertukar kontak.' },
+                { date: '14 Februari 2023', title: 'Komitmen Bersama', description: 'Setelah melewati berbagai suka dan duka bersama, kami memutuskan untuk berkomitmen melangkah ke jenjang yang lebih serius.' },
+                { date: '20 Oktober 2025', title: 'Lamaran', description: 'Dengan restu dari kedua keluarga besar, kami melangsungkan prosesi lamaran dan menyatukan tekad untuk menikah.' }
+            ], null, 2);
+            document.getElementById('inputInvTurutMengundang').value = 'Keluarga Besar Bpk. Bambang & Ibu Siti\nKeluarga Besar Bpk. Agus & Ibu Dewi';
 
             document.getElementById('inputInvBankName1').value = 'BCA';
-            document.getElementById('inputInvBankAccount1').value = '';
-            document.getElementById('inputInvBankHolder1').value = '';
+            document.getElementById('inputInvBankAccount1').value = '1234567890';
+            document.getElementById('inputInvBankHolder1').value = 'Bagas Pratama';
 
             document.getElementById('inputInvBankName2').value = 'Bank Mandiri';
-            document.getElementById('inputInvBankAccount2').value = '';
-            document.getElementById('inputInvBankHolder2').value = '';
+            document.getElementById('inputInvBankAccount2').value = '9876543210';
+            document.getElementById('inputInvBankHolder2').value = 'Zulia Maharani';
 
-            document.getElementById('inputInvGiftAddress').value = '';
-            document.getElementById('inputInvWaConfirmation').value = '';
+            document.getElementById('inputInvGiftAddress').value = 'Jl. Melati No. 12, RT.002/RW.005, Margajaya, Bekasi Selatan (Penerima: Bagas & Zulia)';
+            document.getElementById('inputInvWaConfirmation').value = '081234567890';
             document.getElementById('inputInvIsActive').checked = true;
 
             document.getElementById('modalInvitation').classList.remove('hidden');

@@ -419,3 +419,34 @@ func TestSakuraBlossomCoverReplacement(t *testing.T) {
 		t.Errorf("Section #COVER should NOT contain couple-hero.png when custom cover is provided!")
 	}
 }
+
+func TestSuperadminDefaultValues(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+	superadminPath := filepath.Join(wd, "..", "..", "web", "templates", "superadmin.html")
+	content, err := os.ReadFile(superadminPath)
+	if err != nil {
+		t.Fatalf("superadmin.html missing or unreadable: %v", err)
+	}
+	html := string(content)
+
+	// Ensure openCreateInvitationModal sets pre-filled defaults
+	requiredSubstrings := []string{
+		"The Wedding of Bagas & Zulia",
+		"Bagas Pratama, S.Kom.",
+		"Zulia Maharani, S.Pd.",
+		"Masjid Agung Al-Barkah",
+		"Grand Ballroom Hotel Santika",
+		"LeniArdi15.jpeg",
+		"LeniArdi16.jpeg",
+		"1 September 2021",
+	}
+
+	for _, sub := range requiredSubstrings {
+		if !strings.Contains(html, sub) {
+			t.Errorf("superadmin.html expected to contain default value %q in openCreateInvitationModal()", sub)
+		}
+	}
+}

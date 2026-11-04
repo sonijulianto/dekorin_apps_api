@@ -86,18 +86,139 @@ func CreateInvitation(c *fiber.Ctx) error {
 
 	if req.EventType == "khitan" {
 		if strings.TrimSpace(req.ChildName) == "" && strings.TrimSpace(req.GroomName) == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Nama anak khitan wajib diisi",
-			})
+			req.ChildName = "Rayyan Althaf Pratama"
+			req.GroomName = req.ChildName
 		}
 		if strings.TrimSpace(req.GroomName) == "" {
 			req.GroomName = req.ChildName
 		}
+		if strings.TrimSpace(req.ChildNickname) == "" {
+			req.ChildNickname = "Rayyan"
+		}
+		if strings.TrimSpace(req.ChildOrder) == "" {
+			req.ChildOrder = "Putra pertama dari"
+		}
 	} else {
-		if strings.TrimSpace(req.GroomName) == "" || strings.TrimSpace(req.BrideName) == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Nama mempelai pria dan wanita wajib diisi",
-			})
+		if strings.TrimSpace(req.GroomName) == "" {
+			req.GroomName = "Bagas Pratama, S.Kom."
+		}
+		if strings.TrimSpace(req.BrideName) == "" {
+			req.BrideName = "Zulia Maharani, S.Pd."
+		}
+		if strings.TrimSpace(req.GroomNickname) == "" {
+			req.GroomNickname = "Bagas"
+		}
+		if strings.TrimSpace(req.BrideNickname) == "" {
+			req.BrideNickname = "Zulia"
+		}
+		if strings.TrimSpace(req.GroomChildOrder) == "" {
+			req.GroomChildOrder = "Putra pertama dari"
+		}
+		if strings.TrimSpace(req.BrideChildOrder) == "" {
+			req.BrideChildOrder = "Putri kedua dari"
+		}
+		if strings.TrimSpace(req.GroomParents) == "" {
+			req.GroomParents = "Bpk. Bambang & Ibu Siti"
+		}
+		if strings.TrimSpace(req.BrideParents) == "" {
+			req.BrideParents = "Bpk. Agus & Ibu Dewi"
+		}
+	}
+
+	if strings.TrimSpace(req.AkadDate) == "" {
+		req.AkadDate = "Sabtu, 20 Desember 2026"
+	}
+	if strings.TrimSpace(req.AkadTime) == "" {
+		req.AkadTime = "08:00 - 10:00 WIB"
+	}
+	if strings.TrimSpace(req.AkadVenue) == "" {
+		req.AkadVenue = "Masjid Agung Al-Barkah"
+	}
+	if strings.TrimSpace(req.AkadAddress) == "" {
+		req.AkadAddress = "Jl. Veteran No. 46, RT.004/RW.001, Marga Jaya, Bekasi Selatan"
+	}
+	if strings.TrimSpace(req.AkadMapsURL) == "" {
+		req.AkadMapsURL = "https://maps.app.goo.gl/9bN52xXn"
+	}
+
+	if strings.TrimSpace(req.ResepsiDate) == "" {
+		req.ResepsiDate = "Sabtu, 20 Desember 2026"
+	}
+	if strings.TrimSpace(req.ResepsiTime) == "" {
+		req.ResepsiTime = "11:00 - 14:00 WIB"
+	}
+	if strings.TrimSpace(req.ResepsiVenue) == "" {
+		req.ResepsiVenue = "Grand Ballroom Hotel Santika"
+	}
+	if strings.TrimSpace(req.ResepsiAddress) == "" {
+		req.ResepsiAddress = "Jl. Jend. Ahmad Yani No. 1, RT.001/RW.005, Margajaya, Bekasi Selatan"
+	}
+	if strings.TrimSpace(req.ResepsiMapsURL) == "" {
+		req.ResepsiMapsURL = "https://maps.app.goo.gl/9bN52xXn"
+	}
+
+	if strings.TrimSpace(req.Quotes) == "" {
+		req.Quotes = `"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)`
+	}
+	if strings.TrimSpace(req.BankName1) == "" {
+		req.BankName1 = "BCA"
+	}
+	if strings.TrimSpace(req.BankAccount1) == "" {
+		req.BankAccount1 = "1234567890"
+	}
+	if strings.TrimSpace(req.BankHolder1) == "" {
+		req.BankHolder1 = "Bagas Pratama"
+	}
+	if strings.TrimSpace(req.BankName2) == "" {
+		req.BankName2 = "Bank Mandiri"
+	}
+	if strings.TrimSpace(req.BankAccount2) == "" {
+		req.BankAccount2 = "9876543210"
+	}
+	if strings.TrimSpace(req.BankHolder2) == "" {
+		req.BankHolder2 = "Zulia Maharani"
+	}
+	if strings.TrimSpace(req.GiftAddress) == "" {
+		req.GiftAddress = "Jl. Melati No. 12, RT.002/RW.005, Margajaya, Bekasi Selatan (Penerima: Bagas & Zulia)"
+	}
+	if strings.TrimSpace(req.WaConfirmation) == "" {
+		req.WaConfirmation = "081234567890"
+	}
+	if strings.TrimSpace(req.TurutMengundang) == "" {
+		req.TurutMengundang = "Keluarga Besar Bpk. Bambang & Ibu Siti\nKeluarga Besar Bpk. Agus & Ibu Dewi"
+	}
+	if strings.TrimSpace(req.LoveStory) == "" {
+		req.LoveStory = `[{"date":"1 September 2021","title":"Pertama Kali Bertemu","description":"Kami pertama kali bertemu di sebuah seminar kampus dan saling bertukar kontak."},{"date":"14 Februari 2023","title":"Komitmen Bersama","description":"Setelah melewati berbagai suka dan duka bersama, kami memutuskan untuk berkomitmen melangkah ke jenjang yang lebih serius."},{"date":"20 Oktober 2025","title":"Lamaran","description":"Dengan restu dari kedua keluarga besar, kami melangsungkan prosesi lamaran dan menyatukan tekad untuk menikah."}]`
+	}
+
+	isIllustration := req.Template == "ta3" || req.Template == "ta17" || req.Template == "ocean-ta17" || req.Template == "blue-ta17"
+	if !isIllustration {
+		if strings.TrimSpace(req.CoverImage) == "" {
+			req.CoverImage = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
+		}
+		if strings.TrimSpace(req.Sec1Photo) == "" {
+			req.Sec1Photo = "/assets/templates/pn4/photos/LeniArdi15.jpeg"
+		}
+		if strings.TrimSpace(req.GroomPhoto) == "" {
+			req.GroomPhoto = "/assets/templates/pn4/photos/LeniArdi15.jpeg"
+		}
+		if strings.TrimSpace(req.BridePhoto) == "" {
+			req.BridePhoto = "/assets/templates/pn4/photos/LeniArdi16.jpeg"
+		}
+		if strings.TrimSpace(req.AkadPhoto) == "" {
+			req.AkadPhoto = "/assets/templates/pn4/photos/LeniArdi15.jpeg"
+		}
+		if strings.TrimSpace(req.ResepsiPhoto) == "" {
+			req.ResepsiPhoto = "/assets/templates/pn4/photos/LeniArdi16.jpeg"
+		}
+		if strings.TrimSpace(req.EventPhoto) == "" {
+			req.EventPhoto = "/assets/templates/pn4/photos/LeniArdi16.jpeg"
+		}
+		if strings.TrimSpace(req.ClosingPhoto) == "" {
+			req.ClosingPhoto = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
+		}
+		if strings.TrimSpace(req.GalleryImages) == "" {
+			req.GalleryImages = "/assets/templates/pn4/photos/LeniArdi2.jpeg,/assets/templates/pn4/photos/LeniArdi15.jpeg,/assets/templates/pn4/photos/LeniArdi16.jpeg"
 		}
 	}
 
