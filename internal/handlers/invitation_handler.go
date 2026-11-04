@@ -3,19 +3,24 @@ package handlers
 import (
 	"fmt"
 	"html/template"
+	"math"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"dekorin_apps_api/internal/config"
 	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
+	"dekorin_apps_api/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
-// GetInvitations menangani GET /api/invitations (daftar undangan untuk admin)
+// GetInvitations menangani GET /api/invitations (daftar undangan untuk admin dengan pagination & filter)
 func GetInvitations(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
 	role, _ := c.Locals("user_role").(string)
@@ -23,8 +28,9 @@ func GetInvitations(c *fiber.Ctx) error {
 		role, _ = c.Locals("role").(string)
 	}
 
-	var invitations []models.Invitation
-	query := config.DB.Model(&models.Invitation{}).Preload("Wishes")
+	query := config.DB.Model(&models.Invitation{})
+
+	// 1. Filter Scope Perusahaan / Hak Akses
 	if strings.EqualFold(role, "superadmin") {
 		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
 			query = query.Where("company_id = ?", qComp)
@@ -33,7 +39,69 @@ func GetInvitations(c *fiber.Ctx) error {
 		query = query.Where("company_id = ?", companyID)
 	}
 
-	if err := query.Order("created_at DESC").Find(&invitations).Error; err != nil {
+	// 2. Filter Pencarian Teks (Judul, Slug, Nama Mempelai / Anak)
+	if search := strings.TrimSpace(c.Query("search")); search != "" {
+		pattern := "%" + strings.ToLower(search) + "%"
+		query = query.Where(
+			"LOWER(title) LIKE ? OR LOWER(slug) LIKE ? OR LOWER(groom_name) LIKE ? OR LOWER(bride_name) LIKE ? OR LOWER(child_name) LIKE ?",
+			pattern, pattern, pattern, pattern, pattern,
+		)
+	}
+
+	// 3. Filter Status (active / inactive)
+	if status := strings.TrimSpace(c.Query("status")); status != "" {
+		if status == "active" || status == "true" {
+			query = query.Where("is_active = ?", true)
+		} else if status == "inactive" || status == "false" {
+			query = query.Where("is_active = ?", false)
+		}
+	}
+
+	// 4. Hitung Total Data (untuk pagination metadata)
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal menghitung total undangan: " + err.Error(),
+		})
+	}
+
+	// 5. Parameter Paginasi
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+
+	page := 1
+	limit := 50 // default batas wajar agar aman dari memory leak
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+			if limit > 100 {
+				limit = 100 // Batas maksimal per halaman
+			}
+		}
+	}
+
+	// 6. Optimasi Query:
+	// - Omit 'guest_list_json' yang berukuran besar dan hanya dipakai di portal mandiri
+	// - Preload hanya kolom penting dari Wishes (hindari load teks pesan panjang berulang)
+	fetchQuery := query.
+		Omit("guest_list_json").
+		Preload("Wishes", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id, invitation_id, attendance, guest_count, created_at")
+		}).
+		Order("created_at DESC")
+
+	// Terapkan batas paginasi jika ada request page/limit atau data banyak
+	if pageStr != "" || limitStr != "" || total > 50 {
+		fetchQuery = fetchQuery.Limit(limit).Offset((page - 1) * limit)
+	}
+
+	var invitations []models.Invitation
+	if err := fetchQuery.Find(&invitations).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengambil daftar undangan: " + err.Error(),
 		})
@@ -41,11 +109,23 @@ func GetInvitations(c *fiber.Ctx) error {
 
 	for i := range invitations {
 		ensureInvitationAccessCredentials(&invitations[i])
+		invitations[i].WishesCount = len(invitations[i].Wishes)
+	}
+
+	totalPages := 1
+	if limit > 0 && total > 0 {
+		totalPages = int(math.Ceil(float64(total) / float64(limit)))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil data undangan",
 		"data":    invitations,
+		"meta": fiber.Map{
+			"page":        page,
+			"limit":       limit,
+			"total":       total,
+			"total_pages": totalPages,
+		},
 	})
 }
 
@@ -451,6 +531,9 @@ func UpdateInvitation(c *fiber.Ctx) error {
 		})
 	}
 
+	// Invalidate in-memory cache undangan
+	utils.GlobalInvitationCache.Invalidate(invitation.Slug)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Undangan digital berhasil diperbarui",
 		"data":    invitation,
@@ -484,24 +567,74 @@ func DeleteInvitation(c *fiber.Ctx) error {
 		})
 	}
 
+	// Invalidate in-memory cache undangan
+	utils.GlobalInvitationCache.Invalidate(invitation.Slug)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Undangan digital berhasil dihapus",
 	})
 }
 
-// GetInvitationWishes menangani GET /api/invitations/:id/wishes
+// GetInvitationWishes menangani GET /api/invitations/:id/wishes (dengan pagination & counter)
 func GetInvitationWishes(c *fiber.Ctx) error {
 	id := c.Params("id")
-	var wishes []models.InvitationWish
-	if err := config.DB.Where("invitation_id = ?", id).Order("created_at DESC").Find(&wishes).Error; err != nil {
+
+	query := config.DB.Model(&models.InvitationWish{}).Where("invitation_id = ?", id)
+
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal mengambil data ucapan",
+			"error": "Gagal menghitung ucapan: " + err.Error(),
 		})
+	}
+
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+
+	page := 1
+	limit := 50
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+			if limit > 200 {
+				limit = 200
+			}
+		}
+	}
+
+	var wishes []models.InvitationWish
+	fetchQuery := query.Order("created_at DESC")
+	if pageStr != "" || limitStr != "" {
+		fetchQuery = fetchQuery.Limit(limit).Offset((page - 1) * limit)
+	} else if total > 100 {
+		fetchQuery = fetchQuery.Limit(100)
+	}
+
+	if err := fetchQuery.Find(&wishes).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengambil data ucapan: " + err.Error(),
+		})
+	}
+
+	totalPages := 1
+	if limit > 0 && total > 0 {
+		totalPages = int(math.Ceil(float64(total) / float64(limit)))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil ucapan tamu",
 		"data":    wishes,
+		"meta": fiber.Map{
+			"page":        page,
+			"limit":       limit,
+			"total":       total,
+			"total_pages": totalPages,
+		},
 	})
 }
 
@@ -554,6 +687,9 @@ func SubmitInvitationWish(c *fiber.Ctx) error {
 		})
 	}
 
+	// Invalidate in-memory cache undangan agar ucapan baru langsung muncul saat reload
+	utils.GlobalInvitationCache.Invalidate(slug)
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Ucapan berhasil dikirim",
 		"data":    wish,
@@ -586,12 +722,65 @@ func convertYoutubeToEmbed(rawURL string) string {
 	return rawURL
 }
 
-// ShowPublicInvitation menangani GET /invitation/:slug (Render Halaman HTML Web Undangan)
+// In-memory cache untuk parsed HTML template agar tidak re-parse dari disk pada setiap HTTP request
+var (
+	tmplCacheMu sync.RWMutex
+	tmplCache   = make(map[string]*template.Template)
+)
+
+func getParsedTemplate(templateFile string) (*template.Template, error) {
+	tmplCacheMu.RLock()
+	tmpl, exists := tmplCache[templateFile]
+	tmplCacheMu.RUnlock()
+	if exists {
+		return tmpl, nil
+	}
+
+	tmplCacheMu.Lock()
+	defer tmplCacheMu.Unlock()
+
+	// Double check setelah write lock
+	if tmpl, exists = tmplCache[templateFile]; exists {
+		return tmpl, nil
+	}
+
+	templatePath := filepath.Join("web", "templates", templateFile)
+	parsedTmpl, err := template.ParseFiles(templatePath)
+	if err != nil {
+		fallbackPath := filepath.Join("web", "templates", "wedding_invitation.html")
+		var fallbackErr error
+		parsedTmpl, fallbackErr = template.ParseFiles(fallbackPath)
+		if fallbackErr != nil {
+			return nil, fmt.Errorf("gagal memuat template: %w (fallback: %v)", err, fallbackErr)
+		}
+	}
+
+	tmplCache[templateFile] = parsedTmpl
+	return parsedTmpl, nil
+}
+
+// ShowPublicInvitation menangani GET /invitation/:slug (Render Halaman HTML Web Undangan dengan In-Memory Caching)
 func ShowPublicInvitation(c *fiber.Ctx) error {
 	slug := c.Params("slug")
 	var invitation models.Invitation
-	if err := config.DB.Where("slug = ?", slug).First(&invitation).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).SendString("Undangan tidak ditemukan atau tautan salah.")
+	var wishes []models.InvitationWish
+
+	// Cek In-Memory Cache terlebih dahulu untuk kecepatan render instan (<1ms) & hemat koneksi PostgreSQL
+	if cachedInv, cachedWishes, found := utils.GlobalInvitationCache.Get(slug); found && c.Query("preview") != "1" {
+		invitation = *cachedInv
+		wishes = cachedWishes
+	} else {
+		if err := config.DB.Where("slug = ?", slug).First(&invitation).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).SendString("Undangan tidak ditemukan atau tautan salah.")
+		}
+
+		// Ambil daftar ucapan (dibatasi 50 ucapan terbaru pada initial render agar HTML tetap ringan)
+		config.DB.Where("invitation_id = ?", invitation.ID).Order("created_at DESC").Limit(50).Find(&wishes)
+
+		// Simpan ke memory cache jika bukan mode preview
+		if c.Query("preview") != "1" {
+			utils.GlobalInvitationCache.Set(slug, invitation, wishes)
+		}
 	}
 
 	// Jika undangan dinonaktifkan sementara (Draft) dan bukan mode preview portal
@@ -618,10 +807,6 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		guestTo = strings.ReplaceAll(guestTo, "_", " ")
 		guestTo = strings.ReplaceAll(guestTo, "-", " & ")
 	}
-
-	// Ambil daftar ucapan
-	var wishes []models.InvitationWish
-	config.DB.Where("invitation_id = ?", invitation.ID).Order("created_at DESC").Find(&wishes)
 
 	// Pisahkan gallery images
 	var galleryList []string
@@ -790,16 +975,9 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		templateFile = "template_green_leaves.html"
 	}
 
-	templatePath := filepath.Join("web", "templates", templateFile)
-	tmpl, err := template.ParseFiles(templatePath)
+	tmpl, err := getParsedTemplate(templateFile)
 	if err != nil {
-		// Fallback ke template default jika file spesifik tidak ditemukan
-		fallbackPath := filepath.Join("web", "templates", "wedding_invitation.html")
-		var fallbackErr error
-		tmpl, fallbackErr = template.ParseFiles(fallbackPath)
-		if fallbackErr != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString("Gagal memuat template undangan: " + err.Error())
-		}
+		return c.Status(fiber.StatusInternalServerError).SendString("Gagal memuat template undangan: " + err.Error())
 	}
 
 	c.Set("Cache-Control", "no-cache, no-store, must-revalidate")

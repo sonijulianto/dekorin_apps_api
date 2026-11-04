@@ -5098,18 +5098,18 @@
             if (countInfo) countInfo.innerText = 'Memuat data...';
 
             try {
-                let url = '/api/invitations';
-                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                let url = '/api/invitations?limit=100';
+                if (selectedCompanyId) url += '&company_id=' + selectedCompanyId;
                 const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
                 const json = await res.json();
                 invitationsCache = json.data || [];
                 
                 // Update KPI Cards
-                const total = invitationsCache.length;
+                const total = (json.meta && json.meta.total) ? json.meta.total : invitationsCache.length;
                 const active = invitationsCache.filter(i => i.is_active).length;
                 let totalWishes = 0;
                 invitationsCache.forEach(i => {
-                    if (i.wishes && Array.isArray(i.wishes)) totalWishes += i.wishes.length;
+                    totalWishes += (typeof i.wishes_count === 'number' ? i.wishes_count : (i.wishes && Array.isArray(i.wishes) ? i.wishes.length : 0));
                 });
 
                 const statTotal = document.getElementById('invStatTotal');
@@ -5198,7 +5198,7 @@
                     ? `<span class="font-bold text-slate-800">${escapeHtml(inv.child_name || inv.groom_name || 'Anak')}</span> <span class="text-[10px] text-emerald-600 font-semibold">(Khitan)</span>`
                     : `<span class="font-bold text-slate-800">${escapeHtml(inv.groom_nickname || inv.groom_name)}</span> &amp; <span class="font-bold text-slate-800">${escapeHtml(inv.bride_nickname || inv.bride_name)}</span>`;
                 
-                const wishCount = (inv.wishes && Array.isArray(inv.wishes)) ? inv.wishes.length : 0;
+                const wishCount = typeof inv.wishes_count === 'number' ? inv.wishes_count : ((inv.wishes && Array.isArray(inv.wishes)) ? inv.wishes.length : 0);
                 const statusBadge = inv.is_active
                     ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200/60">Aktif</span>`
                     : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-400 border border-slate-200">Nonaktif</span>`;

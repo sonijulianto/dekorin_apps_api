@@ -46,6 +46,15 @@ func ConnectDB() {
 	fmt.Println("✅ Koneksi Database PostgreSQL berhasil!")
 	DB = db
 
+	// Konfigurasi Database Connection Pooling untuk efisiensi & antisipasi lonjakan trafik
+	if sqlDB, err := db.DB(); err == nil {
+		sqlDB.SetMaxOpenConns(50)
+		sqlDB.SetMaxIdleConns(15)
+		sqlDB.SetConnMaxLifetime(30 * time.Minute)
+		sqlDB.SetConnMaxIdleTime(5 * time.Minute)
+		fmt.Println("⚡ PostgreSQL Connection Pool diaktifkan (MaxOpen: 50, MaxIdle: 15)")
+	}
+
 	// Menjalankan Auto Migration (membuat tabel jika belum ada)
 	err = DB.AutoMigrate(
 		&models.Company{},

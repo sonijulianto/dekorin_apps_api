@@ -79,22 +79,23 @@ type Invitation struct {
 	EditPin       string `gorm:"type:varchar(20);default:''" json:"edit_pin"`          // PIN 6 digit login manual
 	GuestListJSON string `gorm:"type:text" json:"guest_list_json"`                     // Daftar tamu generator WA tersimpan (JSON)
 
-	IsActive  bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt time.Time `json:"created_at"`
+	IsActive  bool      `gorm:"default:true;index" json:"is_active"`
+	CreatedAt time.Time `gorm:"index" json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	Wishes []InvitationWish `gorm:"foreignKey:InvitationID" json:"wishes,omitempty"`
+	Wishes      []InvitationWish `gorm:"foreignKey:InvitationID" json:"wishes,omitempty"`
+	WishesCount int              `gorm:"-" json:"wishes_count"`
 }
 
 // InvitationWish mewakili ucapan doa & konfirmasi kehadiran tamu (Buku Tamu / RSVP)
 type InvitationWish struct {
 	ID           string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
-	InvitationID string    `gorm:"type:varchar(50);index;not null" json:"invitation_id"`
+	InvitationID string    `gorm:"type:varchar(50);index:idx_wishes_invitation_created,priority:1;index;not null" json:"invitation_id"`
 	GuestName    string    `gorm:"type:varchar(150);not null" json:"guest_name"`
 	Attendance   string    `gorm:"type:varchar(50);default:'hadir'" json:"attendance"` // hadir, tidak_hadir, ragu
 	GuestCount   int       `gorm:"default:1" json:"guest_count"`
 	Message      string    `gorm:"type:text;not null" json:"message"`
-	CreatedAt    time.Time `json:"created_at"`
+	CreatedAt    time.Time `gorm:"index:idx_wishes_invitation_created,priority:2;index" json:"created_at"`
 }
 
 // CreateOrUpdateInvitationRequest payload pembuatan / perubahan undangan

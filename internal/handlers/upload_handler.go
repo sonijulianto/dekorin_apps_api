@@ -2,16 +2,15 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
-	"time"
+
+	"dekorin_apps_api/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
-// UploadFile menangani POST /api/upload (Upload gambar dari Admin app)
+// UploadFile menangani POST /api/upload (Upload gambar dari Admin app dengan auto-resize & kompresi)
 func UploadFile(c *fiber.Ctx) error {
 	file, err := c.FormFile("image")
 	if err != nil {
@@ -35,30 +34,20 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validasi ukuran file (maksimal 5MB untuk gambar)
-	const maxFileSize = 5 * 1024 * 1024 // 5 MB
+	// Validasi ukuran file (maksimal 8MB untuk gambar mentah sebelum dikompresi otomatis)
+	const maxFileSize = 8 * 1024 * 1024 // 8 MB
 	if file.Size > maxFileSize {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Ukuran file terlalu besar. Maksimal ukuran gambar adalah 5 MB",
+			"error": "Ukuran file terlalu besar. Maksimal ukuran gambar adalah 8 MB",
 		})
 	}
 
-	// Buat direktori ./uploads jika belum ada
+	// Simpan dan kompresi otomatis ke folder ./uploads (maksimal lebar 1600px & JPEG quality 82)
 	uploadsDir := "./uploads"
-	if err := os.MkdirAll(uploadsDir, os.ModePerm); err != nil {
+	filename, err := utils.ProcessAndSaveImage(file, uploadsDir, "img")
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal membuat direktori upload di server",
-		})
-	}
-
-	// Buat nama file unik
-	filename := fmt.Sprintf("img_%d_%s%s", time.Now().Unix(), uuid.New().String()[:8], ext)
-	savePath := filepath.Join(uploadsDir, filename)
-
-	// Simpan file ke disk
-	if err := c.SaveFile(file, savePath); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal menyimpan file gambar ke server",
+			"error": "Gagal mengoptimasi dan menyimpan gambar di server: " + err.Error(),
 		})
 	}
 
@@ -70,7 +59,7 @@ func UploadFile(c *fiber.Ctx) error {
 	fileURL := fmt.Sprintf("%s://%s/uploads/%s", proto, c.Hostname(), filename)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message":  "File gambar berhasil diunggah",
+		"message":  "File gambar berhasil diunggah dan dioptimasi",
 		"filename": filename,
 		"url":      fileURL,
 	})

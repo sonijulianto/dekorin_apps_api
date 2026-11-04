@@ -72,6 +72,18 @@ func main() {
 		},
 	})
 
+	// Rate Limiter untuk pengiriman ucapan / RSVP tamu (maksimal 15 ucapan per menit per IP anti-spam)
+	wishLimiter := limiter.New(limiter.Config{
+		Max:          15,
+		Expiration:   1 * time.Minute,
+		KeyGenerator: clientIP,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Terlalu banyak pengiriman ucapan dalam waktu singkat. Harap tunggu sebentar.",
+			})
+		},
+	})
+
 	// Group routes
 	api := app.Group("/api")
 	auth := api.Group("/auth")
@@ -130,6 +142,9 @@ func main() {
 	api.Post("/expenses", middleware.Protected(), handlers.CreateExpense)
 	api.Delete("/expenses/:id", middleware.Protected(), handlers.DeleteExpense)
 
+	// AI routes (Smart OCR & Gemini Assistant)
+	api.Post("/ai/scan-receipt", middleware.Protected(), handlers.ScanReceiptAI)
+
 	// Master Package routes
 	api.Get("/packages", middleware.Protected(), handlers.GetPackages)
 	api.Post("/packages", middleware.Protected(), handlers.CreatePackage)
@@ -184,10 +199,25 @@ func main() {
 	api.Post("/app/upload-apk", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UploadApkFile)
 	api.Delete("/app/version/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.DeleteAppVersion)
 
-	// Serve static upload directory
-	app.Static("/uploads", "./uploads")
-	app.Static("/assets", "./web/assets")
-	app.Static("/images", "./web/assets/images")
+	// Serve static upload directory dengan Cache-Control, Kompresi, dan ByteRange (Streaming Audio)
+	app.Static("/uploads", "./uploads", fiber.Static{
+		Compress:  true,
+		ByteRange: true,
+		Browse:    false,
+		MaxAge:    86400 * 30, // 30 hari cache browser & Cloudflare CDN untuk foto & musik
+	})
+	app.Static("/assets", "./web/assets", fiber.Static{
+		Compress:  true,
+		ByteRange: true,
+		Browse:    false,
+		MaxAge:    86400 * 7, // 7 hari cache untuk template static assets
+	})
+	app.Static("/images", "./web/assets/images", fiber.Static{
+		Compress:  true,
+		ByteRange: true,
+		Browse:    false,
+		MaxAge:    86400 * 7,
+	})
 
 	// Direct Favicon handlers for root domain queries with cache busting headers
 	app.Get("/favicon.ico", func(c *fiber.Ctx) error {
@@ -270,7 +300,7 @@ func main() {
 	api.Post("/invitations/:id/reset-access", middleware.Protected(), handlers.ResetInvitationAccess)
 	api.Delete("/invitations/:id", middleware.Protected(), handlers.DeleteInvitation)
 	api.Get("/invitations/:id/wishes", handlers.GetInvitationWishes)
-	api.Post("/invitations/:slug/wishes", handlers.SubmitInvitationWish)
+	api.Post("/invitations/:slug/wishes", wishLimiter, handlers.SubmitInvitationWish)
 
 	// Short-URL undangan publik khusus subdomain undangan.dekorin.my.id/:slug (wajib paling akhir)
 	app.Get("/:slug", handlers.ShowSubdomainPublicInvitation)

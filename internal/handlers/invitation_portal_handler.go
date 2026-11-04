@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"math/big"
 	"net/url"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -18,6 +17,7 @@ import (
 	"dekorin_apps_api/internal/config"
 	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
+	"dekorin_apps_api/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -402,6 +402,9 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 		})
 	}
 
+	// Invalidate in-memory cache undangan
+	utils.GlobalInvitationCache.Invalidate(invitation.Slug)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Perubahan data undangan berhasil disimpan!",
 		"data":    invitation,
@@ -485,22 +488,16 @@ func UploadPortalMedia(c *fiber.Ctx) error {
 	}
 
 	uploadsDir := "./uploads"
-	if err := os.MkdirAll(uploadsDir, os.ModePerm); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal menyiapkan folder penyimpanan server",
-		})
-	}
-
 	prefix := "inv_img"
 	if audioExts[ext] {
 		prefix = "inv_audio"
 	}
-	filename := fmt.Sprintf("%s_%d_%s%s", prefix, time.Now().Unix(), uuid.New().String()[:8], ext)
-	savePath := filepath.Join(uploadsDir, filename)
 
-	if err := c.SaveFile(file, savePath); err != nil {
+	// Kompresi & optimasi otomatis gambar (resize maksimal 1600px & JPEG quality 82)
+	filename, err := utils.ProcessAndSaveImage(file, uploadsDir, prefix)
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal menyimpan file ke server",
+			"error": "Gagal menyimpan file ke server: " + err.Error(),
 		})
 	}
 
@@ -616,6 +613,9 @@ func ResetInvitationAccess(c *fiber.Ctx) error {
 			"error": "Gagal memperbarui akses kelola undangan: " + err.Error(),
 		})
 	}
+
+	// Invalidate in-memory cache undangan
+	utils.GlobalInvitationCache.Invalidate(invitation.Slug)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Link akses & PIN pengantin berhasil diperbarui",
