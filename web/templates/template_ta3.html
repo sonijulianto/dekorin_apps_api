@@ -2251,6 +2251,8 @@
                 slot.innerHTML = '<img src="/assets/templates/ta3/logo_bca.png" alt="' + name + '">';
             } else if (low.indexOf('mandiri') !== -1) {
                 slot.innerHTML = '<img src="/assets/templates/ta3/logo_mandiri.png" alt="Mandiri">';
+            } else if (low.indexOf('bri') !== -1 || low.indexOf('rakyat indonesia') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/ta3/logo_bri.png" alt="BRI" style="width:220px; max-width:52%;">';
             } else if (name) {
                 var badge = document.createElement('span');
                 badge.className = 'ta3-bank-badge-text';

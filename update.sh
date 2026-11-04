@@ -51,7 +51,7 @@ done
 # 4b. Unduh Aset Template Monochrome PN4 (Fonts, Ornamen, Tekstur, Foto Default, Audio)
 echo "⬇️  Mengunduh aset template Monochrome PN4..."
 mkdir -p web/assets/templates/pn4/fonts web/assets/templates/pn4/photos
-for f in ARROW-UP-PN.json akad-pn1-2.png bg-teksture-pn4.png default-song.mp3 flower-pn1.png logo_bca.png logo_mandiri.png resepsi-pn1.png video-pn1.png; do
+for f in ARROW-UP-PN.json akad-pn1-2.png bg-teksture-pn4.png default-song.mp3 flower-pn1.png logo_bca.png logo_bri.png logo_mandiri.png resepsi-pn1.png video-pn1.png; do
     curl -s -f -L -o "web/assets/templates/pn4/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/pn4/${f}?v=$TIMESTAMP" || true
 done
 for fn in 2989Trajan.woff2 ArslanWessam.ttf BrittanySignature.ttf Gistesy.ttf NewYork.ttf Oranienbaum.ttf Saudagar.ttf; do
@@ -64,7 +64,7 @@ done
 # 4c. Unduh Aset Template Sakura Blossom TA3 (Backgrounds, Pasangan Default, Audio, Foto Galeri Default)
 echo "⬇️  Mengunduh aset template Sakura Blossom TA3..."
 mkdir -p web/assets/templates/ta3/photos
-for f in bg-cover.jpg bg-floral-arch.jpg bg-pink-floral.jpg bride-default.png couple-hero.png couple-welcome.png default-song.mp3 event-icon.png groom-default.png logo_bca.png logo_bni.png logo_mandiri.png; do
+for f in bg-cover.jpg bg-floral-arch.jpg bg-pink-floral.jpg bride-default.png couple-hero.png couple-welcome.png default-song.mp3 event-icon.png groom-default.png logo_bca.png logo_bni.png logo_bri.png logo_mandiri.png; do
     curl -s -f -L -o "web/assets/templates/ta3/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ta3/${f}?v=$TIMESTAMP" || true
 done
 for n in 1 2 3 4 5 6; do
@@ -74,7 +74,7 @@ done
 # 4d. Unduh Aset Template Ocean Blossom TA17 (Backgrounds, Pasangan Default, Audio, Foto Galeri Default)
 echo "⬇️  Mengunduh aset template Ocean Blossom TA17..."
 mkdir -p web/assets/templates/ta17/photos
-for f in bg-cover.jpg bg-arch.jpg bg-blue-floral.jpg bg-floral-texture.jpg bride-default.png couple-hero.png couple-welcome.png default-song.mp3 event-icon.png groom-default.png logo_bca.png logo_bni.png logo_mandiri.png; do
+for f in bg-cover.jpg bg-arch.jpg bg-blue-floral.jpg bg-floral-texture.jpg bride-default.png couple-hero.png couple-welcome.png default-song.mp3 event-icon.png groom-default.png logo_bca.png logo_bni.png logo_bri.png logo_mandiri.png; do
     curl -s -f -L -o "web/assets/templates/ta17/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ta17/${f}?v=$TIMESTAMP" || true
 done
 for n in 1 2 3 4 5 6; do
@@ -83,6 +83,7 @@ done
 
 # 5. Icons & Branding
 curl -s -f -L -o web/assets/icons/google-maps-icon.webp "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/google-maps-icon.webp?v=$TIMESTAMP"
+curl -s -f -L -o web/assets/icons/logo_bri.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/logo_bri.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/favicon.ico "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.ico?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/favicon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/apple-touch-icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/apple-touch-icon.png?v=$TIMESTAMP" || true

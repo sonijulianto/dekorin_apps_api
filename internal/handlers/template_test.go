@@ -450,3 +450,27 @@ func TestSuperadminDefaultValues(t *testing.T) {
 		}
 	}
 }
+
+func TestBankLogoBriResolution(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html"}
+	for _, target := range targets {
+		p := filepath.Join(wd, "..", "..", "web", "templates", target)
+		content, err := os.ReadFile(p)
+		if err != nil {
+			t.Fatalf("%s missing or unreadable: %v", target, err)
+		}
+		html := string(content)
+
+		if !strings.Contains(html, "logo_bri.png") {
+			t.Errorf("%s should contain logo_bri.png in bank resolver", target)
+		}
+		if !strings.Contains(html, "bri") {
+			t.Errorf("%s should check for bri bank name", target)
+		}
+	}
+}

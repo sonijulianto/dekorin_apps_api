@@ -3097,6 +3097,10 @@
                 slot.innerHTML = '<img src="/assets/templates/pn4/logo_bca.png" alt="BCA" class="pn4-bank-logo" style="width:105px;">';
             } else if (low.indexOf('mandiri') !== -1) {
                 slot.innerHTML = '<img src="/assets/templates/pn4/logo_mandiri.png" alt="Mandiri" class="pn4-bank-logo" style="width:110px;">';
+            } else if (low.indexOf('bni') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/ta3/logo_bni.png" alt="BNI" class="pn4-bank-logo" style="width:105px;">';
+            } else if (low.indexOf('bri') !== -1 || low.indexOf('rakyat indonesia') !== -1) {
+                slot.innerHTML = '<img src="/assets/templates/pn4/logo_bri.png" alt="BRI" class="pn4-bank-logo" style="width:120px;">';
             } else if (name) {
                 var span = document.createElement('span');
                 span.className = 'pn4-bank-badge-fallback';
