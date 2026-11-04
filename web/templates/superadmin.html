@@ -685,6 +685,7 @@
                                 class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 <option value="all">Semua Template Desain</option>
                                 <option value="ta3">Sakura Blossom TA3</option>
+                                <option value="ta17">Ocean Blossom TA17</option>
                                 <option value="pn4">Monochrome PN4</option>
                                 <option value="luxury-grey">Luxury Grey</option>
                                 <option value="green-leaves">Green Leaves</option>
@@ -1731,6 +1732,13 @@
                                 <div class="w-8 h-8 rounded-full bg-rose-400 text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🌸</div>
                                 <div class="font-bold text-xs text-slate-800 mt-2">Sakura TA3</div>
                                 <div class="text-[10px] text-rose-500 font-semibold">Romantic Floral</div>
+                            </div>
+                            <!-- Ocean Blossom TA17 -->
+                            <div id="tmplCard_ta17" onclick="selectInvTemplate('ta17')" 
+                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                <div class="w-8 h-8 rounded-full bg-[#4B8DCB] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">💙</div>
+                                <div class="font-bold text-xs text-slate-800 mt-2">Ocean TA17</div>
+                                <div class="text-[10px] text-[#4B8DCB] font-semibold">Pastel Blue & Floral</div>
                             </div>
                             <!-- Green Leaves -->
                             <div id="tmplCard_green-leaves" onclick="selectInvTemplate('green-leaves')" 
@@ -5175,6 +5183,7 @@
             const tmplBadges = {
                 'green-leaves': { name: 'Green Leaves', bg: 'bg-[#588157]/15 text-[#3A5A40] border-[#588157]/30', dot: 'bg-[#588157]' },
                 'ta3': { name: 'Sakura TA3', bg: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-400' },
+                'ta17': { name: 'Ocean TA17', bg: 'bg-[#4B8DCB]/15 text-[#295177] border-[#4B8DCB]/30', dot: 'bg-[#4B8DCB]' },
                 'pn4': { name: 'Monochrome PN4', bg: 'bg-[#343434] text-white border-[#262627]', dot: 'bg-white' },
                 'luxury-grey': { name: 'Luxury Grey', bg: 'bg-stone-800 text-[#D4A574] border-stone-700', dot: 'bg-[#D4A574]' },
                 'creamy-latte': { name: 'Creamy Latte', bg: 'bg-[#B4846C]/15 text-[#7D5A50] border-[#B4846C]/30', dot: 'bg-[#B4846C]' },
@@ -5312,7 +5321,7 @@
         }
 
         function applyAdminTemplateRules(tmplId) {
-            const isSakura = tmplId === 'ta3';
+            const isSakura = tmplId === 'ta3' || tmplId === 'ta17';
 
             // 1. Jenis Acara
             const wrapType = document.getElementById('wrapperInvEventType');
@@ -5693,7 +5702,7 @@
             btn.disabled = true;
             btn.innerHTML = '<span>Menyimpan...</span>';
 
-            const isSakura = document.getElementById('inputInvTemplate').value === 'ta3';
+            const isSakura = document.getElementById('inputInvTemplate').value === 'ta3' || document.getElementById('inputInvTemplate').value === 'ta17';
             const eventType = isSakura ? 'wedding' : document.getElementById('inputInvEventType').value;
             const isKhitan = !isSakura && eventType === 'khitan';
 
@@ -5703,7 +5712,7 @@
                 template: document.getElementById('inputInvTemplate').value,
                 event_type: eventType,
                 quotes: document.getElementById('inputInvQuotes').value.trim(),
-                cover_image: isSakura ? '' : document.getElementById('inputInvCoverImage').value,
+                cover_image: document.getElementById('inputInvCoverImage').value,
                 
                 groom_name: isKhitan
                     ? (document.getElementById('inputInvChildName').value.trim() || 'Rayyan')

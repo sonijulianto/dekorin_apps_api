@@ -28,6 +28,7 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		"template_luxury_grey.html",
 		"template_pn4.html",
 		"template_ta3.html",
+		"template_ta17.html",
 		"wedding_invitation.html",
 	}
 
@@ -133,7 +134,7 @@ func TestLoveStoryHiddenWhenEmpty(t *testing.T) {
 	}
 
 	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
-	targets := []string{"template_pn4.html", "template_ta3.html"}
+	targets := []string{"template_pn4.html", "template_ta3.html", "template_ta17.html"}
 
 	testDataWithoutStory := struct {
 		models.Invitation
@@ -198,6 +199,7 @@ func TestGuestToLockedWhenProvided(t *testing.T) {
 		"template_luxury_grey.html",
 		"template_pn4.html",
 		"template_ta3.html",
+		"template_ta17.html",
 		"wedding_invitation.html",
 	}
 

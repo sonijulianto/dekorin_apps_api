@@ -657,6 +657,8 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		templateFile = "template_pn4.html"
 	case "ta3", "sakura-ta3":
 		templateFile = "template_ta3.html"
+	case "ta17", "ocean-ta17", "blue-ta17":
+		templateFile = "template_ta17.html"
 	case "khitan-green":
 		templateFile = "template_khitan_green.html"
 	case "creamy-latte":

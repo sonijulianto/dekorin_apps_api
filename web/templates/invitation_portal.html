@@ -1087,6 +1087,7 @@
       { id: 'luxury-grey', name: 'Luxury Grey', tag: 'Modern Dark Gold', color: '#D4A574', bg: '#2C3333', type: 'wedding' },
       { id: 'pn4', name: 'Monochrome PN4', tag: 'Editorial Monochrome', color: '#343434', bg: '#F1F1F1', type: 'wedding' },
       { id: 'ta3', name: 'Sakura Blossom TA3', tag: 'Romantic Floral & Arch', color: '#D4A373', bg: '#FFF5F5', type: 'wedding' },
+      { id: 'ta17', name: 'Ocean Blossom TA17', tag: 'Pastel Blue & Floral', color: '#4B8DCB', bg: '#F0F6FC', type: 'wedding' },
       { id: 'khitan-green', name: 'Khitan Green', tag: 'Tasyakuran Islami', color: '#2E8B57', bg: '#F0F7F4', type: 'khitan' }
     ];
 
@@ -1605,7 +1606,7 @@
     }
 
     function applyTemplateFormRules(templateId) {
-      const isSakura = templateId === 'ta3';
+      const isSakura = templateId === 'ta3' || templateId === 'ta17';
       const isMonochrome = templateId === 'pn4';
 
       // 1. Jenis Acara
@@ -2023,7 +2024,7 @@
       btn.disabled = true;
       btn.textContent = '⏳ Menyimpan...';
 
-      const isSakura = selectedTemplateId === 'ta3';
+      const isSakura = selectedTemplateId === 'ta3' || selectedTemplateId === 'ta17';
       const isMonochrome = selectedTemplateId === 'pn4';
       const eventType = isSakura ? 'wedding' : (document.querySelector('input[name="event_type"]:checked')?.value || 'wedding');
       const isKhitan = !isSakura && eventType === 'khitan';
