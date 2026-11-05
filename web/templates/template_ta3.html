@@ -1211,19 +1211,23 @@
             backdrop-filter: blur(6px);
             border-radius: 8px;
             box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.24);
-            padding: 5px 6px;
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            padding: 5px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
         }
         .ta3-nav-link {
             background-color: #FFABB8;
             border-radius: 7px;
             height: 38px;
+            width: 44px;
+            min-width: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s ease, transform 0.2s ease;
+            flex-shrink: 1;
         }
         .ta3-nav-link:hover, .ta3-nav-link.active {
             background-color: #F78E9E;
