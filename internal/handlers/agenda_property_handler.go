@@ -17,10 +17,11 @@ import (
 func GetAgendaProperties(c *fiber.Ctx) error {
 	agendaID := c.Params("id")
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 
 	var agenda models.Agenda
 	query := config.DB.Where("id = ?", agendaID)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 	if err := query.First(&agenda).Error; err != nil {
@@ -81,10 +82,11 @@ type PopulateAgendaPropertiesRequest struct {
 func PopulateAgendaProperties(c *fiber.Ctx) error {
 	agendaID := c.Params("id")
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 
 	var agenda models.Agenda
 	query := config.DB.Where("id = ?", agendaID)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 	if err := query.First(&agenda).Error; err != nil {
@@ -169,10 +171,11 @@ func PopulateAgendaProperties(c *fiber.Ctx) error {
 func AddAgendaProperty(c *fiber.Ctx) error {
 	agendaID := c.Params("id")
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 
 	var agenda models.Agenda
 	query := config.DB.Where("id = ?", agendaID)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 	if err := query.First(&agenda).Error; err != nil {
@@ -317,10 +320,11 @@ type BatchAddAgendaPropertiesRequest struct {
 func BatchAddAgendaProperties(c *fiber.Ctx) error {
 	agendaID := c.Params("id")
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
 
 	var agenda models.Agenda
 	query := config.DB.Where("id = ?", agendaID)
-	if companyID != "" {
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
 	if err := query.First(&agenda).Error; err != nil {
