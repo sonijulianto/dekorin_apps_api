@@ -142,9 +142,10 @@ func main() {
 	api.Post("/expenses", middleware.Protected(), handlers.CreateExpense)
 	api.Delete("/expenses/:id", middleware.Protected(), handlers.DeleteExpense)
 
-	// AI routes (Smart OCR & Gemini Assistant)
+	// AI routes (Smart OCR, Gemini Assistant & Decor Color Simulation)
 	api.Post("/ai/scan-receipt", middleware.Protected(), handlers.ScanReceiptAI)
 	api.Post("/ai/assistant", middleware.Protected(), handlers.HandleAIAssistant)
+	api.Post("/ai/simulate-decor", middleware.Protected(), handlers.SimulateDecorAI)
 
 	// Master Package routes
 	api.Get("/packages", middleware.Protected(), handlers.GetPackages)

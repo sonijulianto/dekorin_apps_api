@@ -155,6 +155,94 @@ func ProcessAndSaveImage(fileHeader *multipart.FileHeader, targetDir string, pre
 	return filename, nil
 }
 
+// SaveOptimizedImageBytes mengoptimasi dan menyimpan byte gambar mentah (misal hasil generate Gemini AI) ke disk
+func SaveOptimizedImageBytes(rawBytes []byte, targetDir string, prefix string) (string, error) {
+	if len(rawBytes) == 0 {
+		return "", fmt.Errorf("data byte gambar kosong")
+	}
+	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+		return "", fmt.Errorf("gagal membuat direktori upload: %w", err)
+	}
+	if prefix == "" {
+		prefix = "sim"
+	}
+
+	img, format, err := image.Decode(bytes.NewReader(rawBytes))
+	if err != nil {
+		// Fallback aman: simpan apa adanya sebagai .jpg/.png sesuai deteksi sederhana
+		ext := ".jpg"
+		if len(rawBytes) > 8 && bytes.Equal(rawBytes[:8], []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'}) {
+			ext = ".png"
+		}
+		filename := fmt.Sprintf("%s_%d_%s%s", prefix, time.Now().Unix(), uuid.New().String()[:8], ext)
+		savePath := filepath.Join(targetDir, filename)
+		if err := os.WriteFile(savePath, rawBytes, 0644); err != nil {
+			return "", err
+		}
+		return filename, nil
+	}
+
+	bounds := img.Bounds()
+	origW := bounds.Dx()
+	origH := bounds.Dy()
+
+	targetW := origW
+	targetH := origH
+
+	if origW > MaxImageDimension || origH > MaxImageDimension {
+		if origW >= origH {
+			targetW = MaxImageDimension
+			targetH = int(float64(origH) * float64(MaxImageDimension) / float64(origW))
+		} else {
+			targetH = MaxImageDimension
+			targetW = int(float64(origW) * float64(MaxImageDimension) / float64(origH))
+		}
+		if targetW < 1 {
+			targetW = 1
+		}
+		if targetH < 1 {
+			targetH = 1
+		}
+	}
+
+	var processedImg image.Image = img
+	if targetW != origW || targetH != origH {
+		if format == "png" && hasTransparency(img) {
+			dst := image.NewNRGBA(image.Rect(0, 0, targetW, targetH))
+			xdraw.BiLinear.Scale(dst, dst.Rect, img, bounds, draw.Over, nil)
+			processedImg = dst
+		} else {
+			dst := image.NewRGBA(image.Rect(0, 0, targetW, targetH))
+			xdraw.BiLinear.Scale(dst, dst.Rect, img, bounds, draw.Over, nil)
+			processedImg = dst
+		}
+	}
+
+	var finalExt string
+	var outBuf bytes.Buffer
+	if format == "png" && hasTransparency(img) {
+		finalExt = ".png"
+		encoder := png.Encoder{CompressionLevel: png.BestCompression}
+		if err := encoder.Encode(&outBuf, processedImg); err != nil {
+			return "", fmt.Errorf("gagal encode PNG hasil AI: %w", err)
+		}
+	} else {
+		finalExt = ".jpg"
+		opts := &jpeg.Options{Quality: 86}
+		if err := jpeg.Encode(&outBuf, processedImg, opts); err != nil {
+			return "", fmt.Errorf("gagal encode JPEG hasil AI: %w", err)
+		}
+	}
+
+	filename := fmt.Sprintf("%s_%d_%s%s", prefix, time.Now().Unix(), uuid.New().String()[:8], finalExt)
+	savePath := filepath.Join(targetDir, filename)
+	if err := os.WriteFile(savePath, outBuf.Bytes(), 0644); err != nil {
+		return "", fmt.Errorf("gagal menyimpan gambar hasil AI ke disk: %w", err)
+	}
+
+	return filename, nil
+}
+
 // hasTransparency mengecek apakah gambar PNG memiliki pixel transparan (alpha < 255)
 func hasTransparency(img image.Image) bool {
 	bounds := img.Bounds()
