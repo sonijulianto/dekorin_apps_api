@@ -760,10 +760,15 @@
     </section>
 
     <!-- GIFT & REKENING -->
+    {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
     <section class="section-wrap" style="padding-top: 0;">
       <h2 class="heading-title" data-aos="fade-up">Tanda Kasih</h2>
       <p style="font-size: 13px; color: #666; margin-bottom: 20px;" data-aos="fade-up">
+        {{ if or .BankAccount1 .BankAccount2 }}
         Doa restu Anda merupakan karunia terindah bagi kami. Namun jika ingin memberi kado secara cashless, dapat melalui:
+        {{ else }}
+        Doa restu Anda merupakan karunia terindah bagi kami. Namun jika ingin mengirimkan kado fisik, dapat melalui:
+        {{ end }}
       </p>
 
       {{ if .BankAccount1 }}
@@ -780,7 +785,7 @@
 
       {{ if .BankAccount2 }}
       <div class="bank-box" data-aos="fade-up">
-        <div class="bank-title">{{ .BankName2 }}</div>
+        <div class="bank-name">{{ .BankName2 }}</div>
         <div class="bank-acc" id="acc2">{{ .BankAccount2 }}</div>
         <div class="bank-holder">a.n {{ .BankHolder2 }}</div>
         <button class="btn-copy" onclick="copyNum('acc2')">
@@ -797,6 +802,7 @@
       </div>
       {{ end }}
     </section>
+    {{ end }}
 
     <!-- PROTOKOL KESEHATAN (SECTION 6) -->
     <section class="section-wrap" style="padding-top: 0;">

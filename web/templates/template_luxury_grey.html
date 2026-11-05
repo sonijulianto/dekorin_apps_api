@@ -912,6 +912,7 @@
     <!-- ============================================== -->
     <!-- SECTION 8: WEDDING GIFT (REKENING / HADIAH)     -->
     <!-- ============================================== -->
+    {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
     <div
       class="flex justify-center items-center flex-col px-4 py-16 relative overflow-hidden"
       style="background-image: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);"
@@ -927,7 +928,11 @@
         </h2>
         <h2 class="text-gray-600 text-2xl font-cursive tracking-wider">Gift</h2>
         <p class="text-xs text-gray-500 mt-2 max-w-sm px-4">
+          {{ if or .BankAccount1 .BankAccount2 }}
           Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Apabila Anda ingin memberikan tanda kasih secara cashless:
+          {{ else }}
+          Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Apabila Anda ingin mengirimkan kado fisik:
+          {{ end }}
         </p>
       </div>
 
@@ -966,6 +971,7 @@
         {{ end }}
       </div>
     </div>
+    {{ end }}
 
     <!-- ============================================== -->
     <!-- SECTION: TURUT MENGUNDANG                       -->

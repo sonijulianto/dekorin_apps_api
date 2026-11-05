@@ -1495,10 +1495,12 @@
       <i class="fa-solid fa-images"></i>
       <span>Gallery</span>
     </a>
+    {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
     <a href="#paySection" class="nav-item">
       <i class="fa-solid fa-gift"></i>
       <span>Hadiah</span>
     </a>
+    {{ end }}
     <a href="#wishesSection" class="nav-item">
       <i class="fa-solid fa-envelope-open-text"></i>
       <span>Wishes</span>
@@ -1851,10 +1853,11 @@
     {{ end }}
 
     <!-- DIGITAL ENVELOPE / REKENING HADIAH SECTION -->
+    {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
     <section class="pay-stick" id="paySection">
       <div data-aos="fade-up">
         <h2>Kirim Hadiah</h2>
-        <p>Doa restu Anda merupakan karunia terindah bagi kami. Namun jika ingin memberi tanda kasih, dapat melalui rekening berikut:</p>
+        <p>Doa restu Anda merupakan karunia terindah bagi kami.{{ if or .BankAccount1 .BankAccount2 }} Namun jika ingin memberi tanda kasih, dapat melalui rekening berikut:{{ end }}</p>
 
         {{ if .BankAccount1 }}
         <div class="bank-card" data-aos="fade-up" data-aos-delay="100">
@@ -1892,6 +1895,7 @@
         {{ end }}
       </div>
     </section>
+    {{ end }}
 
     <!-- RSVP & WISHES SECTION -->
     <section id="wishesSection">

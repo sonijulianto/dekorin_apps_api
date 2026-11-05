@@ -240,27 +240,13 @@ func CreateInvitation(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.Quotes) == "" {
 		req.Quotes = `"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)`
 	}
-	if strings.TrimSpace(req.BankName1) == "" {
-		req.BankName1 = "BCA"
-	}
-	if strings.TrimSpace(req.BankAccount1) == "" {
-		req.BankAccount1 = "1234567890"
-	}
-	if strings.TrimSpace(req.BankHolder1) == "" {
-		req.BankHolder1 = "Bagas Pratama"
-	}
-	if strings.TrimSpace(req.BankName2) == "" {
-		req.BankName2 = "Bank Mandiri"
-	}
-	if strings.TrimSpace(req.BankAccount2) == "" {
-		req.BankAccount2 = "9876543210"
-	}
-	if strings.TrimSpace(req.BankHolder2) == "" {
-		req.BankHolder2 = "Zulia Maharani"
-	}
-	if strings.TrimSpace(req.GiftAddress) == "" {
-		req.GiftAddress = "Jl. Melati No. 12, RT.002/RW.005, Margajaya, Bekasi Selatan (Penerima: Bagas & Zulia)"
-	}
+	req.BankName1 = strings.TrimSpace(req.BankName1)
+	req.BankAccount1 = strings.TrimSpace(req.BankAccount1)
+	req.BankHolder1 = strings.TrimSpace(req.BankHolder1)
+	req.BankName2 = strings.TrimSpace(req.BankName2)
+	req.BankAccount2 = strings.TrimSpace(req.BankAccount2)
+	req.BankHolder2 = strings.TrimSpace(req.BankHolder2)
+	req.GiftAddress = strings.TrimSpace(req.GiftAddress)
 	if strings.TrimSpace(req.WaConfirmation) == "" {
 		req.WaConfirmation = "081234567890"
 	}

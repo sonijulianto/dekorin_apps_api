@@ -474,3 +474,129 @@ func TestBankLogoBriResolution(t *testing.T) {
 		}
 	}
 }
+
+func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
+	targets := []string{
+		"template_creamy_latte.html",
+		"template_floral.html",
+		"template_green_leaves.html",
+		"template_khitan_green.html",
+		"template_luxury_grey.html",
+		"template_pn4.html",
+		"template_ta3.html",
+		"template_ta17.html",
+		"wedding_invitation.html",
+	}
+
+	testDataWithoutGift := struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:           "inv_empty_bank",
+			Title:        "Pernikahan Tanpa Rekening",
+			Slug:         "tanpa-rekening",
+			EventType:    "wedding",
+			BankName1:    "",
+			BankAccount1: "",
+			BankHolder1:  "",
+			BankName2:    "",
+			BankAccount2: "",
+			BankHolder2:  "",
+			GiftAddress:  "",
+			IsActive:     true,
+		},
+		OGTitle: "Pernikahan Tanpa Rekening",
+	}
+
+	testDataWithGift := testDataWithoutGift
+	testDataWithGift.BankAccount1 = "987654321"
+	testDataWithGift.BankName1 = "BCA"
+	testDataWithGift.BankHolder1 = "Romeo"
+
+	for _, target := range targets {
+		t.Run(target, func(t *testing.T) {
+			filePath := filepath.Join(templatesDir, target)
+			tmpl, err := template.ParseFiles(filePath)
+			if err != nil {
+				t.Fatalf("Failed to parse template %s: %v", target, err)
+			}
+
+			// 1. Without gift: should NOT contain bank numbers or gift sections
+			var bufWithout bytes.Buffer
+			if err := tmpl.Execute(&bufWithout, testDataWithoutGift); err != nil {
+				t.Fatalf("Failed to execute template %s without gift: %v", target, err)
+			}
+			renderedWithout := bufWithout.String()
+
+			// Check that demo accounts are never shown
+			if strings.Contains(renderedWithout, "8630245908") {
+				t.Errorf("%s leaked demo BNI account 8630245908 when bank accounts are empty", target)
+			}
+			if strings.Contains(renderedWithout, "1234XXXX") {
+				t.Errorf("%s leaked demo account 1234XXXX when bank accounts are empty", target)
+			}
+			if strings.Contains(renderedWithout, "Shashita Vinskalery") {
+				t.Errorf("%s leaked demo name Shashita Vinskalery when bank accounts are empty", target)
+			}
+
+			// Specific section & navbar checks per template
+			switch target {
+			case "wedding_invitation.html":
+				if strings.Contains(renderedWithout, `id="paySection"`) {
+					t.Errorf("wedding_invitation.html rendered paySection when bank accounts are empty")
+				}
+				if strings.Contains(renderedWithout, `href="#paySection"`) {
+					t.Errorf("wedding_invitation.html rendered navbar link #paySection when bank accounts are empty")
+				}
+			case "template_ta3.html", "template_ta17.html":
+				if strings.Contains(renderedWithout, `<section id="gift">`) {
+					t.Errorf("%s rendered <section id=\"gift\"> when bank accounts are empty", target)
+				}
+				if strings.Contains(renderedWithout, `href="#gift"`) {
+					t.Errorf("%s rendered navbar link #gift when bank accounts are empty", target)
+				}
+			case "template_pn4.html":
+				if strings.Contains(renderedWithout, `<section id="gift"`) {
+					t.Errorf("template_pn4.html rendered <section id=\"gift\" when bank accounts are empty")
+				}
+				if strings.Contains(renderedWithout, `href="#gift"`) {
+					t.Errorf("template_pn4.html rendered navbar link #gift when bank accounts are empty")
+				}
+			case "template_green_leaves.html", "template_creamy_latte.html", "template_floral.html", "template_khitan_green.html":
+				if strings.Contains(renderedWithout, `Tanda Kasih`) {
+					t.Errorf("%s rendered 'Tanda Kasih' section when bank accounts are empty", target)
+				}
+			case "template_luxury_grey.html":
+				if strings.Contains(renderedWithout, `Wedding Gift`) {
+					t.Errorf("template_luxury_grey.html rendered 'Wedding Gift' section when bank accounts are empty")
+				}
+			}
+
+			// 2. With gift: should contain BankAccount1
+			var bufWith bytes.Buffer
+			if err := tmpl.Execute(&bufWith, testDataWithGift); err != nil {
+				t.Fatalf("Failed to execute template %s with gift: %v", target, err)
+			}
+			renderedWith := bufWith.String()
+			if !strings.Contains(renderedWith, "987654321") {
+				t.Errorf("%s did NOT render BankAccount1 (987654321) when provided", target)
+			}
+		})
+	}
+}
