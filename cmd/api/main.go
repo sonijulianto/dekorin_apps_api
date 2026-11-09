@@ -295,6 +295,8 @@ func main() {
 	portalApi.Get("/:token/export-csv", portalLimiter, handlers.ExportPortalWishesCSV)
 
 	// Digital Invitation routes
+	app.Get("/invitation/preview/:template", handlers.ShowTemplatePreview)
+	app.Get("/preview/:template", handlers.ShowTemplatePreview)
 	app.Get("/invitation/:slug", handlers.ShowPublicInvitation) // Public HTML wedding invitation
 	api.Get("/invitations", middleware.Protected(), handlers.GetInvitations)
 	api.Post("/invitations", middleware.Protected(), handlers.CreateInvitation)

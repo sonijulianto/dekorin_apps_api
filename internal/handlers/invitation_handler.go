@@ -858,6 +858,195 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		templateName = overrideTemplate
 	}
 
+	return renderInvitationHTML(c, invitation, wishes, templateName)
+}
+
+// ShowTemplatePreview menangani GET /invitation/preview/:template dan GET /preview/:template
+// Merender live interactive preview/demo template undangan digital langsung secara in-app
+func ShowTemplatePreview(c *fiber.Ctx) error {
+	rawTmpl := strings.TrimSpace(c.Params("template"))
+	if rawTmpl == "" {
+		rawTmpl = "ta17"
+	}
+	templateName := strings.ToLower(rawTmpl)
+
+	// Jika ada query slug (mis. user ingin melihat undangan miliknya pada template ini)
+	if slug := strings.TrimSpace(c.Query("slug")); slug != "" {
+		var invitation models.Invitation
+		if err := config.DB.Where("slug = ?", slug).First(&invitation).Error; err == nil {
+			var wishes []models.InvitationWish
+			config.DB.Where("invitation_id = ?", invitation.ID).Order("created_at DESC").Limit(50).Find(&wishes)
+			return renderInvitationHTML(c, invitation, wishes, templateName)
+		}
+	}
+
+	// Gunakan data sampel berkualitas tinggi sesuai tema template
+	sampleInv, sampleWishes := getSampleInvitationForTemplate(templateName)
+	return renderInvitationHTML(c, sampleInv, sampleWishes, templateName)
+}
+
+// getSampleInvitationForTemplate menghasilkan data undangan sampel realistis untuk preview template
+func getSampleInvitationForTemplate(templateName string) (models.Invitation, []models.InvitationWish) {
+	now := time.Now()
+	akadDate := now.AddDate(0, 1, 0)
+
+	indoDays := map[time.Weekday]string{
+		time.Sunday: "Minggu", time.Monday: "Senin", time.Tuesday: "Selasa",
+		time.Wednesday: "Rabu", time.Thursday: "Kamis", time.Friday: "Jumat", time.Saturday: "Sabtu",
+	}
+	indoMonths := map[time.Month]string{
+		time.January: "Januari", time.February: "Februari", time.March: "Maret",
+		time.April: "April", time.May: "Mei", time.June: "Juni",
+		time.July: "Juli", time.August: "Agustus", time.September: "September",
+		time.October: "Oktober", time.November: "November", time.December: "Desember",
+	}
+	formattedDate := fmt.Sprintf("%s, %d %s %d",
+		indoDays[akadDate.Weekday()],
+		akadDate.Day(),
+		indoMonths[akadDate.Month()],
+		akadDate.Year(),
+	)
+
+	inv := models.Invitation{
+		ID:              "preview_demo",
+		Slug:            "demo-" + templateName,
+		Template:        templateName,
+		EventType:       "wedding",
+		Title:           "The Wedding of Bagas & Zulia",
+		Quotes:          "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang. (QS. Ar-Rum: 21)",
+		GroomName:       "Bagas Pratama, S.Kom",
+		GroomNickname:   "Bagas",
+		GroomChildOrder: "Putra Pertama dari",
+		GroomParents:    "Bpk. Bambang & Ibu Sri Wahyuni",
+		GroomInstagram:  "bagaspratama",
+		BrideName:       "Zulia Rahmawati, S.E",
+		BrideNickname:   "Zulia",
+		BrideChildOrder: "Putri Kedua dari",
+		BrideParents:    "Bpk. Hartono & Ibu Rina Marlina",
+		BrideInstagram:  "zuliarahma",
+		AkadDate:        formattedDate,
+		AkadTime:        "08:00 - 10:00 WIB",
+		AkadVenue:       "Masjid Agung Al-Barkah",
+		AkadAddress:     "Jl. Veteran No. 1, Kota Bekasi, Jawa Barat",
+		AkadMapsURL:     "https://maps.google.com",
+		ResepsiDate:     formattedDate,
+		ResepsiTime:     "11:00 - 14:00 WIB",
+		ResepsiVenue:    "Grand Ballroom Balai Samudera",
+		ResepsiAddress:  "Jl. Boulevard Barat Raya No. 1, Kelapa Gading, Jakarta Utara",
+		ResepsiMapsURL:  "https://maps.google.com",
+		BankName1:       "BCA",
+		BankAccount1:    "1234567890",
+		BankHolder1:     "Bagas Pratama",
+		BankName2:       "Mandiri",
+		BankAccount2:    "9876543210",
+		BankHolder2:     "Zulia Rahmawati",
+		GiftAddress:     "Jl. Melati Indah Blok C2 No. 15, RT 03 / RW 05, Menteng, Jakarta Pusat (10310)",
+		WaConfirmation:  "6281234567890",
+		LoveStory:       "2021 - Pertemuan Pertama: Kami pertama kali bertemu saat kepanitiaan bersama di kampus.\n2023 - Menjalin Komitmen: Saling bertukar cerita dan mendukung perjalanan karir satu sama lain.\n2026 - Menuju Pernikahan: Dengan restu orang tua dan keluarga, kami melangkah ke jenjang suci.",
+		TurutMengundang: "Keluarga Besar Bpk. Bambang\nKeluarga Besar Bpk. Hartono\nSahabat & Rekan Kerja Kedua Mempelai",
+		IsActive:        true,
+	}
+
+	switch templateName {
+	case "pn4", "monochrome-pn4":
+		inv.CoverImage = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
+		inv.GroomPhoto = "/assets/templates/pn4/photos/LeniArdi15.jpeg"
+		inv.BridePhoto = "/assets/templates/pn4/photos/LeniArdi16.jpeg"
+		inv.Sec1Photo = "/assets/templates/pn4/photos/LeniArdi15.jpeg"
+		inv.AkadPhoto = "/assets/templates/pn4/photos/LeniArdi15.jpeg"
+		inv.ResepsiPhoto = "/assets/templates/pn4/photos/LeniArdi16.jpeg"
+		inv.ClosingPhoto = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
+		inv.GalleryImages = "/assets/templates/pn4/photos/LeniArdi1.jpeg, /assets/templates/pn4/photos/LeniArdi2.jpeg, /assets/templates/pn4/photos/LeniArdi3.jpeg, /assets/templates/pn4/photos/LeniArdi4.jpeg, /assets/templates/pn4/photos/LeniArdi5.jpeg, /assets/templates/pn4/photos/LeniArdi6.jpeg"
+		inv.AudioURL = "/assets/templates/pn4/default-song.mp3"
+	case "ta3", "sakura-ta3":
+		inv.CoverImage = "/assets/templates/ta3/couple-welcome.png"
+		inv.GroomPhoto = "/assets/templates/ta3/groom-default.png"
+		inv.BridePhoto = "/assets/templates/ta3/bride-default.png"
+		inv.GalleryImages = "/assets/templates/ta3/photos/gallery-1.jpg, /assets/templates/ta3/photos/gallery-2.jpg, /assets/templates/ta3/photos/gallery-3.jpg, /assets/templates/ta3/photos/gallery-4.jpg, /assets/templates/ta3/photos/gallery-5.jpg, /assets/templates/ta3/photos/gallery-6.jpg"
+		inv.AudioURL = "/assets/templates/ta3/default-song.mp3"
+	case "jawa3", "art-jawa-coklat-3", "jawa-coklat-3":
+		inv.Title = "Pawiwahan Ageng Bagas & Zulia"
+		inv.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
+		inv.GroomPhoto = "/assets/templates/ta17/groom-default.png"
+		inv.BridePhoto = "/assets/templates/ta17/bride-default.png"
+		inv.GalleryImages = "/assets/templates/ta17/photos/gallery1.jpg, /assets/templates/ta17/photos/gallery2.jpg, /assets/templates/ta17/photos/gallery3.jpg, /assets/templates/ta17/photos/gallery4.jpg"
+		inv.AudioURL = "/assets/templates/jawa3/default-song.mp3"
+	default: // ta17
+		inv.CoverImage = "/assets/templates/ta17/couple-welcome.png"
+		inv.GroomPhoto = "/assets/templates/ta17/groom-default.png"
+		inv.BridePhoto = "/assets/templates/ta17/bride-default.png"
+		inv.GalleryImages = "/assets/templates/ta17/photos/gallery1.jpg, /assets/templates/ta17/photos/gallery2.jpg, /assets/templates/ta17/photos/gallery3.jpg, /assets/templates/ta17/photos/gallery4.jpg, /assets/templates/ta17/photos/gallery5.jpg, /assets/templates/ta17/photos/gallery6.jpg"
+		inv.AudioURL = "/assets/templates/ta17/default-song.mp3"
+	}
+
+	wishes := []models.InvitationWish{
+		{
+			ID:         "demo_1",
+			GuestName:  "Bpk. Budi Santoso & Keluarga",
+			Attendance: "hadir",
+			GuestCount: 2,
+			Message:    "Selamat menempuh hidup baru untuk Bagas & Zulia. Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.",
+			CreatedAt:  now.Add(-2 * time.Hour),
+		},
+		{
+			ID:         "demo_2",
+			GuestName:  "Siti Rahmah",
+			Attendance: "hadir",
+			GuestCount: 1,
+			Message:    "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fii khair. Turut berbahagia untuk kedua mempelai!",
+			CreatedAt:  now.Add(-5 * time.Hour),
+		},
+		{
+			ID:         "demo_3",
+			GuestName:  "Andi Wijaya",
+			Attendance: "hadir",
+			GuestCount: 2,
+			Message:    "Selamat Bagas & Zulia! Semoga lancar dan berkah selalu pernikahannya.",
+			CreatedAt:  now.Add(-24 * time.Hour),
+		},
+	}
+
+	return inv, wishes
+}
+
+// renderInvitationHTML merender template undangan digital dengan format metadata OG dan data lengkap
+func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []models.InvitationWish, templateName string) error {
+	// Ambil nama tamu dari query parameter ?to=...
+	rawGuestTo := strings.TrimSpace(c.Query("to"))
+	hasGuestTo := rawGuestTo != ""
+	guestTo := rawGuestTo
+	if !hasGuestTo {
+		guestTo = "Tamu Undangan"
+	} else {
+		// Rapikan format nama tamu jika ada tanda _ atau -
+		guestTo = strings.ReplaceAll(guestTo, "_", " ")
+		guestTo = strings.ReplaceAll(guestTo, "-", " & ")
+	}
+
+	// Pisahkan gallery images
+	var galleryList []string
+	if strings.TrimSpace(invitation.GalleryImages) != "" {
+		rawImages := strings.Split(invitation.GalleryImages, ",")
+		for _, img := range rawImages {
+			trimmed := strings.TrimSpace(img)
+			if trimmed != "" {
+				galleryList = append(galleryList, trimmed)
+			}
+		}
+	}
+
+	// Pisahkan turut mengundang
+	var turutList []string
+	if strings.TrimSpace(invitation.TurutMengundang) != "" {
+		rawTurut := strings.Split(strings.ReplaceAll(invitation.TurutMengundang, "\r\n", "\n"), "\n")
+		for _, item := range rawTurut {
+			trimmed := strings.TrimSpace(item)
+			if trimmed != "" {
+				turutList = append(turutList, trimmed)
+			}
+		}
+	}
+
 	// Format Open Graph metadata untuk WhatsApp / Social Sharing
 	baseURL := "https://" + c.Hostname()
 	if strings.Contains(c.Hostname(), "localhost") {

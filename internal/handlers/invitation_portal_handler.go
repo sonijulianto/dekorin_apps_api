@@ -39,6 +39,7 @@ var reservedInvitationSlugs = map[string]bool{
 	"invitation":      true,
 	"invitations":     true,
 	"superadmin":      true,
+	"preview":         true,
 	"form":            true,
 	"download":        true,
 	"favicon.ico":     true,

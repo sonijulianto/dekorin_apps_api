@@ -570,3 +570,76 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 		})
 	}
 }
+
+func TestSampleInvitationForTemplate(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	templates := []struct {
+		id       string
+		fileName string
+	}{
+		{"ta17", "template_ta17.html"},
+		{"jawa3", "template_jawa3.html"},
+		{"ta3", "template_ta3.html"},
+		{"pn4", "template_pn4.html"},
+	}
+
+	for _, tc := range templates {
+		t.Run(tc.id, func(t *testing.T) {
+			inv, wishes := getSampleInvitationForTemplate(tc.id)
+			if inv.Title == "" {
+				t.Errorf("Title is empty for template %s", tc.id)
+			}
+			if inv.GroomName == "" || inv.BrideName == "" {
+				t.Errorf("Names are empty for template %s", tc.id)
+			}
+			if len(wishes) == 0 {
+				t.Errorf("Wishes list is empty for template %s", tc.id)
+			}
+
+			tmplPath := filepath.Join(wd, "..", "..", "web", "templates", tc.fileName)
+			tmpl, err := template.ParseFiles(tmplPath)
+			if err != nil {
+				t.Fatalf("Failed to parse %s: %v", tc.fileName, err)
+			}
+
+			data := struct {
+				models.Invitation
+				GuestTo             string
+				HasGuestTo          bool
+				GalleryList         []string
+				Wishes              []models.InvitationWish
+				YoutubeEmbedURL     string
+				TurutMengundangList []string
+				OGTitle             string
+				OGDescription       string
+				OGImage             string
+				OGURL               string
+			}{
+				Invitation:          inv,
+				GuestTo:             "Tamu Undangan",
+				HasGuestTo:          true,
+				GalleryList:         strings.Split(inv.GalleryImages, ","),
+				Wishes:              wishes,
+				YoutubeEmbedURL:     "",
+				TurutMengundangList: []string{"Keluarga Besar"},
+				OGTitle:             inv.Title,
+				OGDescription:       inv.AkadDate,
+				OGImage:             inv.CoverImage,
+				OGURL:               "https://undangan.dekorin.my.id/demo",
+			}
+
+			var buf bytes.Buffer
+			if err := tmpl.Execute(&buf, data); err != nil {
+				t.Fatalf("Failed to execute template %s with sample data: %v", tc.fileName, err)
+			}
+			html := buf.String()
+			if !strings.Contains(html, inv.GroomNickname) && !strings.Contains(html, inv.GroomName) {
+				t.Errorf("Groom name not rendered in %s", tc.fileName)
+			}
+		})
+	}
+}
