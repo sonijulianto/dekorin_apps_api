@@ -967,9 +967,9 @@ func getSampleInvitationForTemplate(templateName string) (models.Invitation, []m
 	case "jawa3", "art-jawa-coklat-3", "jawa-coklat-3":
 		inv.Title = "Pawiwahan Ageng Bagas & Zulia"
 		inv.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
-		inv.GroomPhoto = "/assets/templates/ta17/groom-default.png"
-		inv.BridePhoto = "/assets/templates/ta17/bride-default.png"
-		inv.GalleryImages = "/assets/templates/ta17/photos/gallery1.jpg, /assets/templates/ta17/photos/gallery2.jpg, /assets/templates/ta17/photos/gallery3.jpg, /assets/templates/ta17/photos/gallery4.jpg"
+		inv.GroomPhoto = "/assets/templates/jawa3/photos/groom-default.jpg"
+		inv.BridePhoto = "/assets/templates/jawa3/photos/bride-default.jpg"
+		inv.GalleryImages = "/assets/templates/jawa3/photos/gallery1.jpg, /assets/templates/jawa3/photos/gallery2.jpg, /assets/templates/jawa3/photos/gallery3.jpg, /assets/templates/jawa3/photos/gallery4.jpg"
 		inv.AudioURL = "/assets/templates/jawa3/default-song.mp3"
 	default: // ta17
 		inv.CoverImage = "/assets/templates/ta17/couple-welcome.png"

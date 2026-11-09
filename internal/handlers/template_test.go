@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"os"
 	"path/filepath"
@@ -641,5 +642,120 @@ func TestSampleInvitationForTemplate(t *testing.T) {
 				t.Errorf("Groom name not rendered in %s", tc.fileName)
 			}
 		})
+	}
+}
+
+// TestJawa3UserProvidedPhotos memverifikasi template_jawa3 mengambil foto pengantin dan galeri dari data yang diisi user
+func TestJawa3UserProvidedPhotos(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	tmplPath := filepath.Join(wd, "..", "..", "web", "templates", "template_jawa3.html")
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to parse template_jawa3.html: %v", err)
+	}
+
+	// 1. Uji dengan foto yang diisi oleh user
+	userBridePhoto := "https://dekorin.my.id/uploads/foto_pengantin_wanita.jpg"
+	userGroomPhoto := "https://dekorin.my.id/uploads/foto_pengantin_pria.jpg"
+	userGallery := []string{
+		"https://dekorin.my.id/uploads/galeri_user_1.jpg",
+		"https://dekorin.my.id/uploads/galeri_user_2.jpg",
+		"https://dekorin.my.id/uploads/galeri_user_3.jpg",
+	}
+
+	dataWithUserPhotos := struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:             "inv_user_photos",
+			Slug:           "user-wedding",
+			Title:          "The Wedding of Yogi & Ratna",
+			Template:       "jawa3",
+			EventType:      "wedding",
+			BrideName:      "Ratna Permata, S.Pd.",
+			BrideNickname:  "Ratna",
+			BridePhoto:     userBridePhoto,
+			GroomName:      "Yogi Pratama, S.T.",
+			GroomNickname:  "Yogi",
+			GroomPhoto:     userGroomPhoto,
+			AkadDate:       "Sabtu, 20 Desember 2026",
+			ResepsiDate:    "Sabtu, 20 Desember 2026",
+		},
+		GuestTo:     "Sahabat Tercinta",
+		HasGuestTo:  true,
+		GalleryList: userGallery,
+	}
+
+	var bufWith bytes.Buffer
+	if err := tmpl.Execute(&bufWith, dataWithUserPhotos); err != nil {
+		t.Fatalf("Failed to execute template_jawa3.html with user photos: %v", err)
+	}
+
+	rendered := bufWith.String()
+
+	// Pastikan foto mempelai wanita & pria menggunakan input dari user
+	if !strings.Contains(rendered, userBridePhoto) {
+		t.Errorf("template_jawa3.html did NOT render user bride photo: %s", userBridePhoto)
+	}
+	if !strings.Contains(rendered, userGroomPhoto) {
+		t.Errorf("template_jawa3.html did NOT render user groom photo: %s", userGroomPhoto)
+	}
+
+	// Pastikan foto default orang lain TIDAK muncul
+	if strings.Contains(rendered, "bride-default.jpg") {
+		t.Errorf("template_jawa3.html rendered bride-default.jpg when user provided their own photo")
+	}
+	if strings.Contains(rendered, "groom-default.jpg") {
+		t.Errorf("template_jawa3.html rendered groom-default.jpg when user provided their own photo")
+	}
+
+	// Pastikan semua foto galeri yang diisi user ditampilkan
+	for _, gImg := range userGallery {
+		if !strings.Contains(rendered, gImg) {
+			t.Errorf("template_jawa3.html did NOT render user gallery image: %s", gImg)
+		}
+	}
+
+	// Pastikan foto galeri dummy bawaan (gallery1 s/d gallery8) TIDAK muncul di dalam #galeri
+	galeriStart := strings.Index(rendered, `<section id="galeri">`)
+	if galeriStart != -1 {
+		galeriHTML := rendered[galeriStart:]
+		if galeriEndIdx := strings.Index(galeriHTML, `</section>`); galeriEndIdx != -1 {
+			galeriHTML = galeriHTML[:galeriEndIdx]
+		}
+		for i := 1; i <= 8; i++ {
+			dummyName := fmt.Sprintf("gallery%d.jpg", i)
+			if strings.Contains(galeriHTML, dummyName) {
+				t.Errorf("template_jawa3.html #galeri rendered dummy reference photo %s when user provided their own gallery", dummyName)
+			}
+		}
+	}
+
+	// 2. Uji jika galeri kosong: section galeri tidak boleh menampilkan foto orang lain
+	dataEmptyGallery := dataWithUserPhotos
+	dataEmptyGallery.GalleryList = nil
+
+	var bufEmpty bytes.Buffer
+	if err := tmpl.Execute(&bufEmpty, dataEmptyGallery); err != nil {
+		t.Fatalf("Failed to execute template_jawa3.html with empty gallery: %v", err)
+	}
+
+	renderedEmpty := bufEmpty.String()
+	if strings.Contains(renderedEmpty, `<section id="galeri"`) {
+		t.Errorf("template_jawa3.html rendered <section id=\"galeri\"> when GalleryList is empty")
 	}
 }

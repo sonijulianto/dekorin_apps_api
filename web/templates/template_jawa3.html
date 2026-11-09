@@ -1542,7 +1542,7 @@
                 <!-- Khitan Profile -->
                 <div class="couple-photo-stage">
                     <div class="oval-photo-frame">
-                        <img src="{{ if and .GroomPhoto (ne .GroomPhoto "/assets/templates/pn4/photos/LeniArdi15.jpeg") }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}">
+                        <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}">
                     </div>
                     <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
                 </div>
@@ -1556,7 +1556,7 @@
                 <!-- Bride Block -->
                 <div class="couple-photo-stage">
                     <div class="oval-photo-frame">
-                        <img src="{{ if and .BridePhoto (ne .BridePhoto "/assets/templates/pn4/photos/LeniArdi16.jpeg") }}{{ .BridePhoto }}{{ else }}/assets/templates/jawa3/photos/bride-default.jpg{{ end }}" alt="{{ .BrideName }}">
+                        <img src="{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/templates/jawa3/photos/bride-default.jpg{{ end }}" alt="{{ .BrideName }}">
                     </div>
                     <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
                 </div>
@@ -1579,7 +1579,7 @@
                 <!-- Groom Block -->
                 <div class="couple-photo-stage">
                     <div class="oval-photo-frame">
-                        <img src="{{ if and .GroomPhoto (ne .GroomPhoto "/assets/templates/pn4/photos/LeniArdi15.jpeg") }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}">
+                        <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}">
                     </div>
                     <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
                 </div>
@@ -1646,7 +1646,7 @@
     <!-- =====================================================
          5. WEDDING EVENT (#acara)
          ===================================================== -->
-    <section id="acara" style="background-image: url('{{ if and .EventPhoto (ne .EventPhoto "/assets/templates/pn4/photos/LeniArdi16.jpeg") }}{{ .EventPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery4.jpg{{ end }}');">
+    <section id="acara" style="background-image: url('{{ if .EventPhoto }}{{ .EventPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery4.jpg{{ end }}');">
         <div class="acara-overlay"></div>
         <div class="acara-inner">
             <div class="dual-title-wrap reveal-up">
@@ -1742,6 +1742,7 @@
     <!-- =====================================================
          7. GALERI FOTO (#galeri)
          ===================================================== -->
+    {{ if .GalleryList }}
     <section id="galeri">
         <div class="dual-title-wrap reveal-up">
             <span class="dual-title-script-gold">Galeri</span>
@@ -1749,30 +1750,20 @@
         </div>
 
         <div class="gallery-grid reveal-up">
-            {{ if .GalleryList }}
-                {{ range .GalleryList }}
-                <div class="gallery-item">
-                    <img src="{{ . }}" alt="Galeri Momen" loading="lazy">
-                </div>
-                {{ end }}
-            {{ else }}
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery1.jpg" alt="Galeri 1" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery2.jpg" alt="Galeri 2" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery3.jpg" alt="Galeri 3" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery4.jpg" alt="Galeri 4" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery5.jpg" alt="Galeri 5" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery6.jpg" alt="Galeri 6" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery7.jpg" alt="Galeri 7" loading="lazy"></div>
-                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery8.jpg" alt="Galeri 8" loading="lazy"></div>
+            {{ range .GalleryList }}
+            <div class="gallery-item">
+                <img src="{{ . }}" alt="Galeri Momen" loading="lazy">
+            </div>
             {{ end }}
         </div>
     </section>
+    {{ end }}
 
     <!-- =====================================================
          8. LOVE STORY (#cerita)
          ===================================================== -->
     {{ if and (ne .EventType "khitan") .LoveStory }}
-    <section id="cerita" style="background-image: url('{{ if and .Sec1Photo (ne .Sec1Photo "/assets/templates/pn4/photos/LeniArdi15.jpeg") }}{{ .Sec1Photo }}{{ else }}/assets/templates/jawa3/photos/gallery3.jpg{{ end }}');">
+    <section id="cerita" style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}/assets/templates/jawa3/photos/gallery3.jpg{{ end }}');">
         <div class="glass reveal-up">
             <h2 class="cerita-heading">LOVE STORY</h2>
             <div class="ls-carousel-wrap" id="loveStoryStage">
@@ -1881,7 +1872,7 @@
     <!-- =====================================================
          10. RSVP & UCAPAN DOA (#ucapan)
          ===================================================== -->
-    <section id="ucapan" style="background-image: url('{{ if and .ClosingPhoto (ne .ClosingPhoto "/assets/templates/pn4/photos/LeniArdi2.jpeg") }}{{ .ClosingPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery5.jpg{{ end }}');">
+    <section id="ucapan" style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery5.jpg{{ end }}');">
         <div class="ucapan-overlay"></div>
         <div class="ucapan-inner">
             <div class="rsvp-header-block reveal-up">
