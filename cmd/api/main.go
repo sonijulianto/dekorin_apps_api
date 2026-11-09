@@ -112,6 +112,11 @@ func main() {
 	api.Put("/company/brands/:id", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateCompanyBrand)
 	api.Delete("/company/brands/:id", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.DeleteCompanyBrand)
 
+	// Company Role Permissions routes (Pengaturan Hak Akses Role oleh Owner)
+	api.Get("/company/role-permissions", middleware.Protected(), handlers.GetCompanyRolePermissions)
+	api.Put("/company/role-permissions", middleware.Protected(), middleware.RequireRole("owner"), handlers.UpdateCompanyRolePermissions)
+	api.Post("/company/role-permissions/reset", middleware.Protected(), middleware.RequireRole("owner"), handlers.ResetCompanyRolePermissions)
+
 	// User routes
 	api.Get("/users", middleware.Protected(), handlers.GetAllUsers)
 	api.Post("/users", middleware.Protected(), handlers.CreateUser)

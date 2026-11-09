@@ -162,6 +162,7 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 			Phone:              user.Phone,
 			Email:              user.Email,
 			Role:               user.Role,
+			Permissions:        GetEffectiveUserPermissions(user.CompanyID, user.Role),
 		},
 	})
 }

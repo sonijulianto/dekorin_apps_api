@@ -74,6 +74,7 @@ func ConnectDB() {
 		&models.Property{},
 		&models.DecorationModelProperty{},
 		&models.AgendaProperty{},
+		&models.CompanyRolePermission{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)

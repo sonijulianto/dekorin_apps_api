@@ -32,7 +32,8 @@ type UserResponse struct {
 	FullName           string `json:"full_name"`
 	Phone              string `json:"phone"`
 	Email              string `json:"email"`
-	Role               string `json:"role"`
-	CreatedAt          string `json:"created_at,omitempty"`
+	Role               string   `json:"role"`
+	Permissions        []string `json:"permissions"`
+	CreatedAt          string   `json:"created_at,omitempty"`
 	UpdatedAt          string `json:"updated_at,omitempty"`
 }
