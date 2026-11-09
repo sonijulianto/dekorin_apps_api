@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ .OGTitle }}</title>
+    <meta name="description" content="{{ .OGDescription }}">
+
+    <!-- Open Graph / WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ .OGTitle }}">
+    <meta property="og:description" content="{{ .OGDescription }}">
+    <meta property="og:image" content="{{ .OGImage }}">
+    <meta property="og:url" content="{{ .OGURL }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ .OGTitle }}">
+    <meta name="twitter:description" content="{{ .OGDescription }}">
+    <meta name="twitter:image" content="{{ .OGImage }}">
+
+    <!-- Favicon Dekorin -->
+    <link rel="icon" type="image/png" href="/assets/dekorin-favicon.png">
+    <link rel="apple-touch-icon" href="/assets/dekorin-apple-touch-icon.png">
+
+    <!-- Google Fonts (Exact fonts from ART JAWA COKLAT 3) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;600;700&family=Abyssinica+SIL&family=Cormorant+Infant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Lora:ital,wght@0,400..700;1,400..700&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --jawa-gold: #AC9271;
+            --jawa-gold-light: #D7BB83;
+            --jawa-brown: #4F2323;
+            --jawa-maroon: #79110E;
+            --jawa-cream: #FFFCF3;
+            --jawa-card-bg: #FFFFFFDB;
+            --jawa-pill-bg: #FFFBF4C7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #160c08;
+            background-image: radial-gradient(circle at center, #2b1810 0%, #100805 100%);
+            color: var(--jawa-gold);
+            font-family: 'Cormorant', serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body.locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+        }
+
+        /* Mobile-first 450px frame (exact match to post-183200.css) */
+        .jawa-app-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            background-color: var(--jawa-cream);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 45px rgba(0, 0, 0, 0.65);
+            min-height: 100vh;
+        }
+
+        /* =====================================================
+           1. WELCOME GATE (#cover / #sec)
+           ===================================================== */
+        #cover {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            height: 100dvh;
+            margin: 0 auto;
+            z-index: 9999;
+            background-image: url('/assets/templates/jawa3/bg-cover.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            padding: 58px 22px 78px 22px;
+            transition: top 1.5s cubic-bezier(0.65, 0, 0.35, 1), opacity 1.5s ease;
+        }
+
+        #cover.closed {
+            top: -105%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cover-top {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cover-gunungan {
+            width: 34%;
+            max-width: 135px;
+            height: auto;
+            margin-bottom: 8px;
+            animation: gununganFloat 4s ease-in-out infinite;
+        }
+
+        .cover-sub {
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            margin-bottom: 6px;
+        }
+
+        .cover-couple {
+            font-family: 'Playfair Display', serif;
+            font-size: 25px;
+            font-weight: 600;
+            color: var(--jawa-gold);
+            line-height: 1.25;
+        }
+
+        .cover-bottom {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cover-kpd {
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            margin-bottom: 4px;
+        }
+
+        .cover-guest {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--jawa-gold);
+            margin: 4px 0 6px;
+            line-height: 1.3;
+            word-break: break-word;
+            max-width: 90%;
+        }
+
+        .cover-ditempat {
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--jawa-gold);
+            margin-bottom: 16px;
+        }
+
+        #tombolbuka {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            font-weight: 500;
+            background-color: var(--jawa-gold);
+            color: #FFFFFF;
+            border-style: solid;
+            border-width: 2px 0px 2px 0px;
+            border-color: #FFFFFF;
+            border-radius: 10px;
+            padding: 10px 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+            transition: transform 0.25s ease, background-color 0.25s ease;
+        }
+
+        #tombolbuka:hover {
+            transform: scale(0.96);
+            background-color: #967c5c;
+        }
+
+        /* =====================================================
+           2. HERO / VIDEO INTRO (#buka)
+           ===================================================== */
+        #buka {
+            position: relative;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            background-image: url('/assets/templates/jawa3/bg-hero.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+            overflow: hidden;
+        }
+
+        .hero-video-wrap {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .hero-video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .motionText {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 1.4s ease, transform 1.4s ease;
+        }
+
+        .motionText.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-gunungan {
+            width: 29%;
+            max-width: 118px;
+            height: auto;
+            margin-bottom: 12px;
+            animation: gununganFloat 4.5s ease-in-out infinite;
+        }
+
+        .hero-tag {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 15px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--jawa-gold);
+            margin-bottom: 10px;
+        }
+
+        .hero-couple-names {
+            font-family: 'Cormorant', serif;
+            font-size: 35px;
+            font-weight: 600;
+            text-transform: uppercase;
+            line-height: 1.25;
+            color: var(--jawa-gold);
+            margin: 4px 0 14px;
+        }
+
+        .hero-date {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--jawa-gold);
+        }
+
+        /* =====================================================
+           3. COUPLE SECTION (#mempelai)
+           ===================================================== */
+        #mempelai {
+            position: relative;
+            background-image: url('/assets/templates/jawa3/bg-couple.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 65px 25px;
+        }
+
+        .couple-card {
+            background-color: var(--jawa-card-bg);
+            border: 3px solid var(--jawa-brown);
+            border-radius: 25px;
+            padding: 28px 18px 36px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            position: relative;
+        }
+
+        .couple-gunungan {
+            width: 30%;
+            max-width: 110px;
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+            animation: gununganFloat 4s ease-in-out infinite;
+        }
+
+        .couple-heading-script {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 36px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1.15;
+            margin-bottom: 14px;
+        }
+
+        .couple-intro-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 12.5px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1.65;
+            margin: 0 auto 24px;
+            padding: 0 6px;
+        }
+
+        .couple-photo-stage {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 0;
+            margin-bottom: 10px;
+            background-image: url('/assets/templates/jawa3/floral-corner.png');
+            background-position: 16% 42%;
+            background-repeat: no-repeat;
+            background-size: 48% auto;
+        }
+
+        .oval-photo-frame {
+            width: 54%;
+            max-width: 190px;
+            height: 290px;
+            border-radius: 500px;
+            border: 3px solid var(--jawa-maroon);
+            box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            background-color: #eadfd3;
+        }
+
+        .oval-photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+        }
+
+        .oval-floral-Corner {
+            position: absolute;
+            right: 14%;
+            bottom: -6px;
+            width: 90px;
+            height: auto;
+            z-index: 3;
+            pointer-events: none;
+            animation: pulseGentle 3.5s ease-in-out infinite;
+        }
+
+        .person-nickname {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 46px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1.1;
+            margin: 8px 0 4px;
+        }
+
+        .person-fullname {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--jawa-gold);
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+
+        .person-parents {
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .person-ig-btn {
+            background-color: var(--jawa-gold);
+            color: #FFFFFF;
+            border-radius: 20px;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .person-ig-btn:hover {
+            background-color: #967c5c;
+            transform: translateY(-1px);
+        }
+
+        .couple-amp {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 60px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1;
+            margin: 22px 0;
+        }
+
+        /* =====================================================
+           4. SAVE THE DATE & QUOTE & COUNTDOWN (#savedate)
+           ===================================================== */
+        #savedate {
+            position: relative;
+            background-image: url('/assets/templates/jawa3/bg-savedate.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-height: 84vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding: 65px 28px 185px;
+            overflow: hidden;
+        }
+
+        .snow-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .savedate-inner {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .savedate-title {
+            font-family: 'Cormorant', serif;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--jawa-gold);
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .savedate-quote {
+            font-family: 'Cormorant', serif;
+            font-size: 15.5px;
+            font-weight: 600;
+            color: var(--jawa-gold);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .jawa-countdown {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 6px;
+            margin: 10px auto 22px;
+        }
+
+        .cd-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 52px;
+        }
+
+        .cd-num {
+            font-family: 'Lora', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--jawa-gold);
+            line-height: 1.1;
+        }
+
+        .cd-lbl {
+            font-family: 'Abyssinica SIL', serif;
+            font-size: 14px;
+            color: var(--jawa-gold);
+            margin-top: 4px;
+        }
+
+        .cd-sep {
+            font-family: 'Abhaya Libre', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--jawa-gold);
+            line-height: 1;
+            padding-top: 1px;
+        }
+
+        .jawa-std-btn {
+            font-family: 'Playfair Display', serif;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: var(--jawa-gold);
+            color: #FFFFFF;
+            border-style: solid;
+            border-width: 2px 0px 2px 0px;
+            border-color: #FFFFFF;
+            border-radius: 8px;
+            padding: 10px 22px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .jawa-std-btn:hover {
+            transform: scale(0.96);
+            background-color: #967c5c;
+        }
+
+        /* =====================================================
+           5. WEDDING EVENT (#acara)
+           ===================================================== */
+        #acara {
+            position: relative;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 65px 25px;
+        }
+
+        .acara-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: #00000040;
+            z-index: 1;
+        }
+
+        .acara-inner {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .dual-title-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .dual-title-script-white {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 46px;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 1;
+        }
+
+        .dual-title-serif-gold {
+            font-family: 'Cormorant', serif;
+            font-size: 38px;
+            font-weight: 600;
+            color: var(--jawa-gold-light);
+            line-height: 1;
+            margin-top: -10px;
+            margin-left: 48px;
+        }
+
+        .acara-sub {
+            font-family: 'Cormorant', serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #FFFFFF;
+            line-height: 1.55;
+            margin-bottom: 28px;
+            padding: 0 8px;
+        }
+
+        .event-pill-outer {
+            background-image: url('/assets/templates/jawa3/bg-event-pill.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            border-radius: 500px;
+            padding: 20px;
+            margin-bottom: 36px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+        }
+
+        .event-pill-inner {
+            background-color: var(--jawa-pill-bg);
+            background-image: url('/assets/templates/jawa3/wayang-anim.gif');
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-size: 41% auto;
+            border: 3px solid var(--jawa-brown);
+            border-radius: 500px;
+            padding: 55px 16px 52px;
+            text-align: center;
+        }
+
+        .event-gunungan {
+            width: 30%;
+            max-width: 90px;
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+            animation: gununganFloat 4s ease-in-out infinite;
+        }
+
+        .event-card-title {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 38px;
+            font-weight: 400;
+            color: #000000;
+            line-height: 1.15;
+            margin-bottom: 8px;
+        }
+
+        .event-card-date,
+        .event-card-time {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #000000;
+            line-height: 1.4;
+        }
+
+        .event-card-time {
+            margin-bottom: 12px;
+        }
+
+        .event-loc-icon {
+            color: var(--jawa-gold);
+            font-size: 24px;
+            margin: 8px 0;
+        }
+
+        .event-card-address {
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #000000;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        .event-map-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: var(--jawa-gold);
+            color: #FFFFFF;
+            border-radius: 20px;
+            padding: 8px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .event-map-btn:hover {
+            background-color: #967c5c;
+            transform: scale(0.96);
+        }
+
+        .turut-card {
+            background-color: var(--jawa-pill-bg);
+            border: 2px solid var(--jawa-brown);
+            border-radius: 20px;
+            padding: 20px 18px;
+            margin-top: 8px;
+            color: #000000;
+        }
+
+        .turut-title {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--jawa-brown);
+            margin-bottom: 10px;
+        }
+
+        .turut-list {
+            list-style: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #1f1410;
+        }
+
+        /* =====================================================
+           6. LIVE STREAMING (#livestream)
+           ===================================================== */
+        #livestream {
+            position: relative;
+            background-color: var(--jawa-cream);
+            padding: 50px 25px 30px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .livestream-title {
+            font-family: 'Cormorant', serif;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--jawa-gold);
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+
+        .video-embed-box {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--jawa-gold);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+            margin-bottom: 18px;
+            background: #000;
+        }
+
+        .video-embed-box iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .livestream-desc {
+            font-family: 'Cormorant', serif;
+            font-size: 15.5px;
+            font-weight: 500;
+            color: var(--jawa-gold);
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        /* =====================================================
+           7. GALERI FOTO (#galeri)
+           ===================================================== */
+        #galeri {
+            position: relative;
+            background-color: var(--jawa-cream);
+            padding: 45px 20px 55px;
+            text-align: center;
+        }
+
+        .dual-title-script-gold {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 46px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1;
+        }
+
+        .dual-title-serif-tan {
+            font-family: 'Cormorant', serif;
+            font-size: 40px;
+            font-weight: 600;
+            color: var(--jawa-gold);
+            line-height: 1;
+            margin-top: -10px;
+            margin-left: 48px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            aspect-ratio: 3 / 4;
+            cursor: pointer;
+            background-color: #eadfd3;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-item:nth-child(3n+1) {
+            aspect-ratio: 4 / 5;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.06);
+        }
+
+        /* =====================================================
+           8. LOVE STORY (#cerita)
+           ===================================================== */
+        #cerita {
+            position: relative;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-height: 87vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px 20px 35px;
+        }
+
+        .glass {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 26px 18px 24px;
+            color: #FFFFFF;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cerita-heading {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        .ls-carousel-wrap {
+            position: relative;
+            padding: 4px 26px 12px;
+            min-height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ls-slide {
+            display: none;
+            width: 100%;
+            animation: fadeInSlide 0.45s ease;
+        }
+
+        .ls-slide.active {
+            display: block;
+        }
+
+        .ls-slide-date {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--jawa-gold-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .ls-slide-title {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .ls-slide-desc {
+            font-family: 'Cormorant Infant', serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #FFFFFF;
+            line-height: 1.55;
+        }
+
+        .ls-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .ls-nav-btn:hover {
+            background: rgba(172, 146, 113, 0.75);
+        }
+
+        .ls-prev { left: -4px; }
+        .ls-next { right: -4px; }
+
+        .ls-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .ls-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .ls-dot.active {
+            width: 18px;
+            border-radius: 10px;
+            background: var(--jawa-gold-light);
+        }
+
+        /* =====================================================
+           9. WEDDING GIFT & GIFT CONFIRM (#gift)
+           ===================================================== */
+        #gift {
+            position: relative;
+            background-image: url('/assets/templates/jawa3/bg-couple.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 65px 25px;
+        }
+
+        .gift-pill-outer {
+            background-color: #FFFFFFC9;
+            border-radius: 500px;
+            padding: 14px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+        }
+
+        .gift-pill-mid {
+            background-color: var(--jawa-cream);
+            background-image: url('/assets/templates/jawa3/bg-texture.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 500px;
+            padding: 12px;
+        }
+
+        .gift-pill-inner {
+            background-color: var(--jawa-pill-bg);
+            background-image: url('/assets/templates/jawa3/wayang-anim.gif');
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-size: 41% auto;
+            border: 3px solid var(--jawa-brown);
+            border-radius: 500px;
+            padding: 62px 18px 65px;
+            text-align: center;
+        }
+
+        .gift-intro {
+            font-family: 'Cormorant', serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--jawa-gold);
+            line-height: 1.55;
+            margin: 10px 0 20px;
+            padding: 0 8px;
+        }
+
+        .bank-block {
+            margin-bottom: 12px;
+        }
+
+        .bank-logo-img {
+            max-width: 105px;
+            max-height: 40px;
+            object-fit: contain;
+            margin: 0 auto 8px;
+            display: block;
+        }
+
+        .bank-holder {
+            font-family: 'Abhaya Libre', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--jawa-gold);
+        }
+
+        .bank-number {
+            font-family: 'Abhaya Libre', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--jawa-gold);
+            margin: 2px 0 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .jawa-copy-btn {
+            font-family: 'Playfair Display', serif;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: var(--jawa-gold);
+            color: #FFFFFF;
+            border-style: solid;
+            border-width: 2px 0px 2px 0px;
+            border-color: #FFFFFF;
+            border-radius: 8px;
+            padding: 8px 18px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .jawa-copy-btn:hover {
+            transform: scale(0.96);
+            background-color: #967c5c;
+        }
+
+        .gift-heart-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 18px auto;
+            width: 80%;
+            color: var(--jawa-gold);
+            font-size: 14px;
+        }
+
+        .gift-heart-divider::before,
+        .gift-heart-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--jawa-gold);
+            opacity: 0.6;
+        }
+
+        .gift-confirm-card {
+            background-color: var(--jawa-card-bg);
+            border: 3px solid var(--jawa-brown);
+            border-radius: 25px;
+            padding: 26px 20px;
+            margin-top: 28px;
+            text-align: center;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        .gift-confirm-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--jawa-gold);
+            margin-bottom: 4px;
+        }
+
+        .gift-confirm-sub {
+            font-family: 'Playfair Display', serif;
+            font-size: 12.5px;
+            color: var(--jawa-gold);
+            margin-bottom: 16px;
+        }
+
+        .gc-field {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border: 1px solid #d5c5b0;
+            border-radius: 8px;
+            background-color: #FFFFFF;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            color: #2c2c2c;
+            outline: none;
+        }
+
+        .gc-field:focus {
+            border-color: var(--jawa-gold);
+        }
+
+        /* =====================================================
+           10. RSVP & UCAPAN DOA (#ucapan)
+           ===================================================== */
+        #ucapan {
+            position: relative;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 60px 20px;
+        }
+
+        .ucapan-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: #00000054;
+            z-index: 1;
+        }
+
+        .ucapan-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .rsvp-header-block {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .rsvp-main-title {
+            font-family: 'Lora', serif;
+            font-size: 33px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 6px;
+        }
+
+        .rsvp-main-sub {
+            font-family: 'Lora', serif;
+            font-size: 13px;
+            color: #FFFFFF;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        .cui-golden-box {
+            background-color: #0000006B;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            padding: 18px 14px;
+            margin-top: 14px;
+            text-align: left;
+        }
+
+        .jawa-input,
+        .jawa-textarea,
+        .jawa-select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.94);
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            color: #222222;
+            outline: none;
+        }
+
+        .jawa-input.locked-input {
+            background-color: rgba(245, 238, 228, 0.95);
+            font-weight: 600;
+            color: var(--jawa-brown);
+        }
+
+        .jawa-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .cui-submit-btn {
+            background-color: var(--jawa-maroon);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .cui-submit-btn:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .wishes-list {
+            margin-top: 18px;
+            max-height: 340px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+
+        .wish-item {
+            background: rgba(255, 255, 255, 0.12);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        .wish-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .wish-author {
+            font-family: 'Poppins', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--jawa-gold-light);
+        }
+
+        .wish-badge {
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background-color: rgba(172, 146, 113, 0.35);
+            color: #FFFFFF;
+        }
+
+        .wish-msg {
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            color: #FFFFFF;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        /* =====================================================
+           11. CLOSING / TERIMA KASIH (#penutup)
+           ===================================================== */
+        #penutup {
+            position: relative;
+            background-image: url('/assets/templates/jawa3/bg-closing.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 32px;
+        }
+
+        .closing-thanks {
+            font-family: 'Lora', serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--jawa-gold);
+            margin-bottom: 8px;
+        }
+
+        .closing-couple {
+            font-family: 'Cormorant', serif;
+            font-size: 27px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--jawa-gold);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .closing-text {
+            font-family: 'Lora', serif;
+            font-size: 13.5px;
+            font-weight: 400;
+            color: var(--jawa-gold);
+            line-height: 1.65;
+            max-width: 310px;
+            margin: 0 auto;
+        }
+
+        /* =====================================================
+           12. FOOTER & FLOATING AUDIO BUTTON
+           ===================================================== */
+        .jawa-footer {
+            position: relative;
+            background-image: url('/assets/templates/jawa3/bg-footer.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 36px 20px;
+            text-align: center;
+            color: #FFFFFF;
+        }
+
+        .jawa-footer-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .jawa-footer-inner {
+            position: relative;
+            z-index: 2;
+            font-family: 'Poppins', sans-serif;
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .audio-floating-btn {
+            position: fixed;
+            bottom: 24px;
+            right: calc(50% - 205px);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: var(--jawa-gold);
+            color: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 900;
+            font-size: 16px;
+        }
+
+        .audio-floating-btn.playing i {
+            animation: spinSlow 5s linear infinite;
+        }
+
+        @media (max-width: 450px) {
+            .audio-floating-btn {
+                right: 18px;
+            }
+        }
+
+        /* =====================================================
+           LIGHTBOX MODAL
+           ===================================================== */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox-overlay.active {
+            display: flex;
+        }
+
+        .lightbox-img {
+            max-width: 92vw;
+            max-height: 85vh;
+            border-radius: 10px;
+            object-fit: contain;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 22px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* =====================================================
+           ANIMATIONS
+           ===================================================== */
+        @keyframes gununganFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.03); }
+        }
+
+        @keyframes pulseGentle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.9s ease, transform 0.9s ease;
+        }
+
+        .reveal-up.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="locked">
+
+<div class="jawa-app-container" data-slug="{{ .Slug }}">
+
+    <!-- =====================================================
+         1. WELCOME GATE (#cover)
+         ===================================================== -->
+    <div id="cover">
+        <div class="cover-top">
+            <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="cover-gunungan">
+            <p class="cover-sub">{{ if eq .EventType "khitan" }}Tasyakuran Khitan{{ else }}The Wedding Of{{ end }}</p>
+            <h1 class="cover-couple">
+                {{ if eq .EventType "khitan" }}
+                    {{ if .ChildNickname }}{{ .ChildNickname }}{{ else if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}
+                {{ else }}
+                    {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}{{ .GroomName }}{{ end }} &amp; {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}
+                {{ end }}
+            </h1>
+        </div>
+
+        <div class="cover-bottom">
+            <p class="cover-kpd">Kepada Bapak/Ibu/Saudara/i</p>
+            <div class="cover-guest">{{ .GuestTo }}</div>
+            <p class="cover-ditempat">Di Tempat</p>
+            <button type="button" id="tombolbuka" onclick="openInvitation()">
+                <i class="fas fa-envelope-open"></i>
+                <span>Buka Undangan</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         2. HERO / VIDEO INTRO (#buka)
+         ===================================================== -->
+    <section id="buka">
+        <div class="hero-video-wrap">
+            <video id="heroVideo" class="hero-video-bg" src="/assets/templates/jawa3/water-jawa-coklat-3.mp4" muted playsinline preload="auto"></video>
+        </div>
+
+        <div class="motionText" id="heroMotionText">
+            <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="hero-gunungan">
+            <p class="hero-tag">{{ if eq .EventType "khitan" }}TASYAKURAN KHITAN{{ else }}THE WEDDING OF{{ end }}</p>
+            <h2 class="hero-couple-names">
+                {{ if eq .EventType "khitan" }}
+                    {{ if .ChildNickname }}{{ .ChildNickname }}{{ else if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}
+                {{ else }}
+                    {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}{{ .GroomName }}{{ end }}
+                    <br>&amp;<br>
+                    {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}
+                {{ end }}
+            </h2>
+            <p class="hero-date">{{ if .AkadDate }}{{ .AkadDate }}{{ else }}{{ .ResepsiDate }}{{ end }}</p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         3. COUPLE SECTION (#mempelai)
+         ===================================================== -->
+    <section id="mempelai">
+        <div class="couple-card reveal-up">
+            <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="couple-gunungan">
+            <h2 class="couple-heading-script">
+                {{ if eq .EventType "khitan" }}Tasyakuran<br>Khitanan{{ else }}We Are<br>Getting Married!{{ end }}
+            </h2>
+            <p class="couple-intro-text">
+                Siang dan malam berganti begitu cepat, di antara saat-saat mendebarkan yang belum pernah kami rasakan sebelumnya. Kami nantikan kehadiran para keluarga dan sahabat, untuk menjadi saksi ikrar janji suci kami di hari yang bahagia.
+            </p>
+
+            {{ if eq .EventType "khitan" }}
+                <!-- Khitan Profile -->
+                <div class="couple-photo-stage">
+                    <div class="oval-photo-frame">
+                        <img src="{{ if and .GroomPhoto (ne .GroomPhoto "/assets/templates/pn4/photos/LeniArdi15.jpeg") }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}">
+                    </div>
+                    <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
+                </div>
+                <div class="person-nickname">{{ if .ChildNickname }}{{ .ChildNickname }}{{ else }}{{ .GroomNickname }}{{ end }}</div>
+                <h3 class="person-fullname">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h3>
+                <p class="person-parents">
+                    {{ if .ChildOrder }}{{ .ChildOrder }}<br>{{ else if .GroomChildOrder }}{{ .GroomChildOrder }}<br>{{ end }}
+                    {{ .GroomParents }}
+                </p>
+            {{ else }}
+                <!-- Bride Block -->
+                <div class="couple-photo-stage">
+                    <div class="oval-photo-frame">
+                        <img src="{{ if and .BridePhoto (ne .BridePhoto "/assets/templates/pn4/photos/LeniArdi16.jpeg") }}{{ .BridePhoto }}{{ else }}/assets/templates/jawa3/photos/bride-default.jpg{{ end }}" alt="{{ .BrideName }}">
+                    </div>
+                    <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
+                </div>
+                <div class="person-nickname">{{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}</div>
+                <h3 class="person-fullname">{{ .BrideName }}</h3>
+                <p class="person-parents">
+                    {{ if .BrideChildOrder }}{{ .BrideChildOrder }} dari<br>{{ end }}
+                    {{ .BrideParents }}
+                </p>
+                {{ if .BrideInstagram }}
+                <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="person-ig-btn">
+                    <i class="fab fa-instagram"></i>
+                    <span>@{{ .BrideInstagram }}</span>
+                </a>
+                {{ end }}
+
+                <!-- Ampersand -->
+                <div class="couple-amp">&amp;</div>
+
+                <!-- Groom Block -->
+                <div class="couple-photo-stage">
+                    <div class="oval-photo-frame">
+                        <img src="{{ if and .GroomPhoto (ne .GroomPhoto "/assets/templates/pn4/photos/LeniArdi15.jpeg") }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}">
+                    </div>
+                    <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
+                </div>
+                <div class="person-nickname">{{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}{{ .GroomName }}{{ end }}</div>
+                <h3 class="person-fullname">{{ .GroomName }}</h3>
+                <p class="person-parents">
+                    {{ if .GroomChildOrder }}{{ .GroomChildOrder }} dari<br>{{ end }}
+                    {{ .GroomParents }}
+                </p>
+                {{ if .GroomInstagram }}
+                <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="person-ig-btn">
+                    <i class="fab fa-instagram"></i>
+                    <span>@{{ .GroomInstagram }}</span>
+                </a>
+                {{ end }}
+            {{ end }}
+        </div>
+    </section>
+
+    <!-- =====================================================
+         4. SAVE THE DATE & QUOTE & COUNTDOWN (#savedate)
+         ===================================================== -->
+    <section id="savedate">
+        <canvas class="snow-canvas" id="snowCanvas1"></canvas>
+        <div class="savedate-inner reveal-up">
+            <h2 class="savedate-title">Save The Date</h2>
+            <p class="savedate-quote">
+                {{ if .Quotes }}
+                    {{ .Quotes }}
+                {{ else }}
+                    "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir."<br><br>(QS Ar-Rum : 21)
+                {{ end }}
+            </p>
+
+            <div class="jawa-countdown" id="countdownBox" data-date="{{ if .AkadDate }}{{ .AkadDate }}{{ else }}{{ .ResepsiDate }}{{ end }}">
+                <div class="cd-box">
+                    <span class="cd-num" id="cdDays">00</span>
+                    <span class="cd-lbl">Day</span>
+                </div>
+                <span class="cd-sep">:</span>
+                <div class="cd-box">
+                    <span class="cd-num" id="cdHours">00</span>
+                    <span class="cd-lbl">Hrs</span>
+                </div>
+                <span class="cd-sep">:</span>
+                <div class="cd-box">
+                    <span class="cd-num" id="cdMins">00</span>
+                    <span class="cd-lbl">Min</span>
+                </div>
+                <span class="cd-sep">:</span>
+                <div class="cd-box">
+                    <span class="cd-num" id="cdSecs">00</span>
+                    <span class="cd-lbl">Sec</span>
+                </div>
+            </div>
+
+            <a href="#" id="btnSaveCalendar" target="_blank" rel="noopener" class="jawa-std-btn">
+                <i class="far fa-calendar-check"></i>
+                <span>SAVE THE DATE</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         5. WEDDING EVENT (#acara)
+         ===================================================== -->
+    <section id="acara" style="background-image: url('{{ if and .EventPhoto (ne .EventPhoto "/assets/templates/pn4/photos/LeniArdi16.jpeg") }}{{ .EventPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery4.jpg{{ end }}');">
+        <div class="acara-overlay"></div>
+        <div class="acara-inner">
+            <div class="dual-title-wrap reveal-up">
+                <span class="dual-title-script-white">{{ if eq .EventType "khitan" }}Acara{{ else }}Wedding{{ end }}</span>
+                <span class="dual-title-serif-gold">Event</span>
+            </div>
+            <p class="acara-sub reveal-up">
+                Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu pada acara kami:
+            </p>
+
+            <!-- Akad Nikah Card -->
+            <div class="event-pill-outer reveal-up">
+                <div class="event-pill-inner">
+                    <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="event-gunungan">
+                    <h3 class="event-card-title">{{ if eq .EventType "khitan" }}Tasyakuran Khitan{{ else }}Akad Nikah{{ end }}</h3>
+                    <div class="event-card-date">{{ .AkadDate }}</div>
+                    {{ if .AkadTime }}
+                    <div class="event-card-time">Pukul : {{ .AkadTime }}</div>
+                    {{ end }}
+                    <div class="event-loc-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <p class="event-card-address">
+                        {{ if .AkadVenue }}<strong>{{ .AkadVenue }}</strong><br>{{ end }}
+                        {{ .AkadAddress }}
+                    </p>
+                    {{ if .AkadMapsURL }}
+                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="event-map-btn">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Google Map</span>
+                    </a>
+                    {{ end }}
+                </div>
+            </div>
+
+            <!-- Resepsi Card -->
+            {{ if or .ResepsiDate .ResepsiVenue .ResepsiAddress }}
+            <div class="event-pill-outer reveal-up">
+                <div class="event-pill-inner">
+                    <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="event-gunungan">
+                    <h3 class="event-card-title">{{ if eq .EventType "khitan" }}Ramah Tamah{{ else }}Resepsi{{ end }}</h3>
+                    <div class="event-card-date">{{ if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}{{ .AkadDate }}{{ end }}</div>
+                    {{ if .ResepsiTime }}
+                    <div class="event-card-time">Pukul : {{ .ResepsiTime }}</div>
+                    {{ end }}
+                    <div class="event-loc-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <p class="event-card-address">
+                        {{ if .ResepsiVenue }}<strong>{{ .ResepsiVenue }}</strong><br>{{ end }}
+                        {{ .ResepsiAddress }}
+                    </p>
+                    {{ if .ResepsiMapsURL }}
+                    <a href="{{ .ResepsiMapsURL }}" target="_blank" rel="noopener" class="event-map-btn">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Google Map</span>
+                    </a>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+
+            {{ if .TurutMengundangList }}
+            <div class="turut-card reveal-up">
+                <h4 class="turut-title">Turut Mengundang</h4>
+                <ul class="turut-list">
+                    {{ range .TurutMengundangList }}
+                    <li>{{ . }}</li>
+                    {{ end }}
+                </ul>
+            </div>
+            {{ end }}
+        </div>
+    </section>
+
+    <!-- =====================================================
+         6. LIVE STREAMING (#livestream)
+         ===================================================== -->
+    {{ if .YoutubeEmbedURL }}
+    <section id="livestream">
+        <div class="reveal-up">
+            <h2 class="livestream-title">live streaming</h2>
+            <div class="video-embed-box">
+                <iframe src="{{ .YoutubeEmbedURL }}" title="Live Streaming Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+            <p class="livestream-desc">
+                Temui kami secara virtual untuk menyaksikan acara pernikahan kami melalui siaran langsung
+            </p>
+            <a href="{{ if .YoutubeURL }}{{ .YoutubeURL }}{{ else }}{{ .YoutubeEmbedURL }}{{ end }}" target="_blank" rel="noopener" class="jawa-std-btn">
+                <i class="fas fa-camera-retro"></i>
+                <span>JOIN LIVE</span>
+            </a>
+        </div>
+    </section>
+    {{ end }}
+
+    <!-- =====================================================
+         7. GALERI FOTO (#galeri)
+         ===================================================== -->
+    <section id="galeri">
+        <div class="dual-title-wrap reveal-up">
+            <span class="dual-title-script-gold">Galeri</span>
+            <span class="dual-title-serif-tan">Foto</span>
+        </div>
+
+        <div class="gallery-grid reveal-up">
+            {{ if .GalleryList }}
+                {{ range .GalleryList }}
+                <div class="gallery-item">
+                    <img src="{{ . }}" alt="Galeri Momen" loading="lazy">
+                </div>
+                {{ end }}
+            {{ else }}
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery1.jpg" alt="Galeri 1" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery2.jpg" alt="Galeri 2" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery3.jpg" alt="Galeri 3" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery4.jpg" alt="Galeri 4" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery5.jpg" alt="Galeri 5" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery6.jpg" alt="Galeri 6" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery7.jpg" alt="Galeri 7" loading="lazy"></div>
+                <div class="gallery-item"><img src="/assets/templates/jawa3/photos/gallery8.jpg" alt="Galeri 8" loading="lazy"></div>
+            {{ end }}
+        </div>
+    </section>
+
+    <!-- =====================================================
+         8. LOVE STORY (#cerita)
+         ===================================================== -->
+    {{ if and (ne .EventType "khitan") .LoveStory }}
+    <section id="cerita" style="background-image: url('{{ if and .Sec1Photo (ne .Sec1Photo "/assets/templates/pn4/photos/LeniArdi15.jpeg") }}{{ .Sec1Photo }}{{ else }}/assets/templates/jawa3/photos/gallery3.jpg{{ end }}');">
+        <div class="glass reveal-up">
+            <h2 class="cerita-heading">LOVE STORY</h2>
+            <div class="ls-carousel-wrap" id="loveStoryStage">
+                <button type="button" class="ls-nav-btn ls-prev" id="lsPrevBtn" aria-label="Sebelumnya">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div id="loveStorySlidesContainer" style="width:100%;"></div>
+                <button type="button" class="ls-nav-btn ls-next" id="lsNextBtn" aria-label="Selanjutnya">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="ls-dots" id="loveStoryDots"></div>
+        </div>
+    </section>
+    {{ end }}
+
+    <!-- =====================================================
+         9. WEDDING GIFT & GIFT CONFIRM (#gift)
+         ===================================================== -->
+    {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
+    <section id="gift">
+        <div class="gift-pill-outer reveal-up">
+            <div class="gift-pill-mid">
+                <div class="gift-pill-inner">
+                    <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="event-gunungan">
+                    <div class="dual-title-wrap" style="margin-bottom:8px;">
+                        <span class="dual-title-script-gold">Wedding</span>
+                        <span class="dual-title-serif-tan">Gift</span>
+                    </div>
+                    <p class="gift-intro">
+                        Bagi keluarga dan sahabat yang ingin mengirimkan hadiah, silakan mengirimkannya melalui tautan berikut:
+                    </p>
+
+                    {{ if .BankAccount1 }}
+                    <div class="bank-block">
+                        <img class="bank-logo-img" data-bank-name="{{ .BankName1 }}" src="/assets/templates/jawa3/logo_bca.png" alt="{{ .BankName1 }}">
+                        <div class="bank-holder">{{ .BankHolder1 }}</div>
+                        <div class="bank-number">{{ .BankAccount1 }}</div>
+                        <button type="button" class="jawa-copy-btn" onclick="copyText('{{ .BankAccount1 }}', this)">
+                            <i class="far fa-copy"></i>
+                            <span>Copy Rekening</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if and .BankAccount1 (or .BankAccount2 .GiftAddress) }}
+                    <div class="gift-heart-divider"><span><i class="far fa-heart"></i></span></div>
+                    {{ end }}
+
+                    {{ if .BankAccount2 }}
+                    <div class="bank-block">
+                        <img class="bank-logo-img" data-bank-name="{{ .BankName2 }}" src="/assets/templates/jawa3/logo_mandiri.png" alt="{{ .BankName2 }}">
+                        <div class="bank-holder">{{ .BankHolder2 }}</div>
+                        <div class="bank-number">{{ .BankAccount2 }}</div>
+                        <button type="button" class="jawa-copy-btn" onclick="copyText('{{ .BankAccount2 }}', this)">
+                            <i class="far fa-copy"></i>
+                            <span>Copy Rekening</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if and .BankAccount2 .GiftAddress }}
+                    <div class="gift-heart-divider"><span><i class="far fa-heart"></i></span></div>
+                    {{ end }}
+
+                    {{ if .GiftAddress }}
+                    <div class="bank-block">
+                        <div style="font-size:34px;color:var(--jawa-gold);margin-bottom:6px;">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="bank-holder" style="font-family:'Cormorant Infant',serif;font-size:18px;">Kirim Kado</div>
+                        <p class="gift-intro" style="margin:6px 0 12px;">{{ .GiftAddress }}</p>
+                        <button type="button" class="jawa-copy-btn" onclick="copyText('{{ .GiftAddress | js }}', this)">
+                            <i class="far fa-copy"></i>
+                            <span>Copy Alamat</span>
+                        </button>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+
+        {{ if .WaConfirmation }}
+        <div class="gift-confirm-card reveal-up">
+            <h3 class="gift-confirm-title">Gift Confirm</h3>
+            <p class="gift-confirm-sub">Silahkan konfirmasi melalui dibawah ini</p>
+            <form onsubmit="handleGiftConfirm(event)">
+                <input type="text" id="gcName" class="gc-field" placeholder="Nama" value="{{ if .HasGuestTo }}{{ .GuestTo }}{{ end }}" required>
+                <input type="text" id="gcMessage" class="gc-field" placeholder="Pesan / Doa Singkat">
+                <input type="text" id="gcAmount" class="gc-field" placeholder="Jumlah / Jenis Kado" required>
+                <select id="gcTarget" class="gc-field">
+                    {{ if .BankAccount1 }}<option value="{{ .BankName1 }} - {{ .BankAccount1 }}">Rekening {{ .BankName1 }} ({{ .BankHolder1 }})</option>{{ end }}
+                    {{ if .BankAccount2 }}<option value="{{ .BankName2 }} - {{ .BankAccount2 }}">Rekening {{ .BankName2 }} ({{ .BankHolder2 }})</option>{{ end }}
+                    {{ if .GiftAddress }}<option value="Kado Fisik">Kirim Kado Fisik</option>{{ end }}
+                </select>
+                <button type="submit" class="jawa-copy-btn" style="margin-top:6px;padding:9px 26px;">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Kirim</span>
+                </button>
+            </form>
+        </div>
+        {{ end }}
+    </section>
+    {{ end }}
+
+    <!-- =====================================================
+         10. RSVP & UCAPAN DOA (#ucapan)
+         ===================================================== -->
+    <section id="ucapan" style="background-image: url('{{ if and .ClosingPhoto (ne .ClosingPhoto "/assets/templates/pn4/photos/LeniArdi2.jpeg") }}{{ .ClosingPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery5.jpg{{ end }}');">
+        <div class="ucapan-overlay"></div>
+        <div class="ucapan-inner">
+            <div class="rsvp-header-block reveal-up">
+                <h2 class="rsvp-main-title">RSVP</h2>
+                <p class="rsvp-main-sub">Silahkan konfirmasi kehadiran anda kepada kedua mempelai</p>
+            </div>
+
+            <div class="glass reveal-up">
+                <div class="dual-title-wrap" style="margin-bottom:8px;">
+                    <span class="dual-title-script-white">Ucapan</span>
+                    <span class="dual-title-serif-gold">Doa</span>
+                </div>
+                <p style="font-family:'Cormorant',serif;font-size:14px;color:#FFFFFF;margin-bottom:12px;">
+                    Berikan ucapan terbaik untuk kedua mempelai
+                </p>
+
+                <div class="cui-golden-box">
+                    <form id="wishForm" onsubmit="submitWish(event)">
+                        {{ if .HasGuestTo }}
+                        <input type="text" id="wishName" value="{{ .GuestTo }}" readonly class="jawa-input locked-input">
+                        {{ else }}
+                        <input type="text" id="wishName" placeholder="Nama" required class="jawa-input">
+                        {{ end }}
+                        <textarea id="wishMessage" placeholder="Ucapan & Doa" required class="jawa-textarea"></textarea>
+                        <select id="wishAttendance" class="jawa-select">
+                            <option value="hadir">Hadir</option>
+                            <option value="tidak_hadir">Tidak Hadir</option>
+                            <option value="ragu">Masih Ragu</option>
+                        </select>
+                        <select id="wishCount" class="jawa-select">
+                            <option value="1">1 Orang</option>
+                            <option value="2">2 Orang</option>
+                            <option value="3">3 Orang</option>
+                        </select>
+                        <button type="submit" id="btnSubmitWish" class="cui-submit-btn">Kirim</button>
+                    </form>
+
+                    <div class="wishes-list" id="wishesList">
+                        {{ range .Wishes }}
+                        <div class="wish-item">
+                            <div class="wish-head">
+                                <span class="wish-author">{{ .GuestName }}</span>
+                                <span class="wish-badge">
+                                    {{ if eq .Attendance "hadir" }}Hadir{{ else if eq .Attendance "tidak_hadir" }}Tidak Hadir{{ else }}Ragu{{ end }}
+                                </span>
+                            </div>
+                            <p class="wish-msg">{{ .Message }}</p>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         11. CLOSING / TERIMA KASIH (#penutup)
+         ===================================================== -->
+    <section id="penutup">
+        <div class="reveal-up">
+            <p class="closing-thanks">Terima Kasih</p>
+            <h2 class="closing-couple">
+                {{ if eq .EventType "khitan" }}
+                    {{ if .ChildNickname }}{{ .ChildNickname }}{{ else }}{{ .GroomName }}{{ end }}
+                {{ else }}
+                    {{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}{{ .GroomName }}{{ end }} &amp; {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}
+                {{ end }}
+            </h2>
+            <p class="closing-text">
+                Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kami
+            </p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         12. FOOTER & FLOATING AUDIO
+         ===================================================== -->
+    <footer class="jawa-footer">
+        <div class="jawa-footer-overlay"></div>
+        <div class="jawa-footer-inner">
+            <p style="font-weight:600;letter-spacing:0.5px;">Made with ❤️ by Dekorin Digital Invitation</p>
+        </div>
+    </footer>
+
+    <button type="button" id="mute-sound" class="audio-floating-btn" onclick="toggleAudio()" aria-label="Toggle Musik">
+        <i class="fas fa-compact-disc" id="audioIcon"></i>
+    </button>
+    <audio id="song" loop preload="auto" src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/templates/jawa3/default-song.mp3{{ end }}"></audio>
+
+</div>
+
+<!-- Lightbox Modal -->
+<div class="lightbox-overlay" id="galleryLightbox" onclick="closeLightbox(event)">
+    <button type="button" class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <img src="" alt="Preview" class="lightbox-img" id="lightboxImg">
+</div>
+
+<script>
+    // 1. Open Invitation Gate & Play Video + Audio
+    var isAudioPlaying = false;
+    function openInvitation() {
+        var cover = document.getElementById('cover');
+        if (cover) {
+            cover.classList.add('closed');
+        }
+        document.body.classList.remove('locked');
+
+        // Play Hero Video
+        var video = document.getElementById('heroVideo');
+        if (video) {
+            video.currentTime = 0;
+            video.play().catch(function() {});
+        }
+
+        // Reveal motionText (matching reference delay + smooth transition)
+        setTimeout(function() {
+            var mt = document.getElementById('heroMotionText');
+            if (mt) mt.classList.add('visible');
+        }, 1200);
+
+        // Play Audio
+        var song = document.getElementById('song');
+        var btn = document.getElementById('mute-sound');
+        if (song) {
+            song.play().then(function() {
+                isAudioPlaying = true;
+                if (btn) btn.classList.add('playing');
+            }).catch(function() {});
+        }
+    }
+
+    function toggleAudio() {
+        var song = document.getElementById('song');
+        var btn = document.getElementById('mute-sound');
+        var icon = document.getElementById('audioIcon');
+        if (!song) return;
+        if (song.paused) {
+            song.play();
+            isAudioPlaying = true;
+            if (btn) btn.classList.add('playing');
+            if (icon) icon.className = 'fas fa-compact-disc';
+        } else {
+            song.pause();
+            isAudioPlaying = false;
+            if (btn) btn.classList.remove('playing');
+            if (icon) icon.className = 'fas fa-volume-mute';
+        }
+    }
+
+    // 2. Bank Logo Resolver (Passes TestBankLogoBriResolution)
+    function resolveBankLogos() {
+        var imgs = document.querySelectorAll('.bank-logo-img');
+        imgs.forEach(function(img) {
+            var raw = (img.getAttribute('data-bank-name') || '').toLowerCase();
+            var n = raw.trim();
+            var src = '/assets/templates/jawa3/logo_bca.png';
+            if (n.indexOf('bri') !== -1 || n.indexOf('rakyat') !== -1) {
+                src = '/assets/templates/jawa3/logo_bri.png';
+            } else if (n.indexOf('mandiri') !== -1) {
+                src = '/assets/templates/jawa3/logo_mandiri.png';
+            } else if (n.indexOf('bni') !== -1 || n.indexOf('negara') !== -1) {
+                src = '/assets/templates/jawa3/logo_bni.png';
+            } else if (n.indexOf('bca') !== -1 || n.indexOf('central') !== -1) {
+                src = '/assets/templates/jawa3/logo_bca.png';
+            }
+            img.src = src;
+        });
+    }
+
+    // 3. Copy Text Helper
+    function copyText(text, btnEl) {
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+        if (btnEl) {
+            var span = btnEl.querySelector('span');
+            var orig = span ? span.textContent : '';
+            if (span) span.textContent = 'Berhasil Disalin!';
+            setTimeout(function() {
+                if (span) span.textContent = orig;
+            }, 2000);
+        }
+    }
+
+    // 4. Indonesian Date Parser & Countdown + Google Calendar
+    var INDO_MONTHS = {
+        januari: 0, februari: 1, maret: 2, april: 3, mei: 4, juni: 5,
+        juli: 6, agustus: 7, september: 8, oktober: 9, november: 10, desember: 11,
+        jan: 0, feb: 1, mar: 2, apr: 3, jun: 5, jul: 6, agu: 7, agt: 7, sep: 8, okt: 9, nov: 10, des: 11
+    };
+
+    function parseEventDate(str) {
+        if (!str) return null;
+        var s = str.trim().toLowerCase();
+        var m = s.match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+        if (m) {
+            var d = parseInt(m[1], 10);
+            var mo = INDO_MONTHS[m[2]];
+            var y = parseInt(m[3], 10);
+            if (mo !== undefined) {
+                return new Date(y, mo, d, 8, 0, 0);
+            }
+        }
+        var parsed = new Date(str);
+        if (!isNaN(parsed.getTime())) return parsed;
+        return new Date(Date.now() + 14 * 86400000);
+    }
+
+    function initCountdown() {
+        var box = document.getElementById('countdownBox');
+        if (!box) return;
+        var rawDate = box.getAttribute('data-date') || '';
+        var targetDate = parseEventDate(rawDate);
+        if (!targetDate) return;
+
+        var calBtn = document.getElementById('btnSaveCalendar');
+        if (calBtn) {
+            var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+            var y = targetDate.getFullYear();
+            var m = pad(targetDate.getMonth() + 1);
+            var d = pad(targetDate.getDate());
+            var startIso = '' + y + m + d + 'T010000Z';
+            var endIso = '' + y + m + d + 'T070000Z';
+            var title = encodeURIComponent({{ .OGTitle }});
+            calBtn.href = 'https://www.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + startIso + '/' + endIso;
+        }
+
+        function tick() {
+            var now = new Date().getTime();
+            var diff = targetDate.getTime() - now;
+            if (diff <= 0) {
+                document.getElementById('cdDays').textContent = '00';
+                document.getElementById('cdHours').textContent = '00';
+                document.getElementById('cdMins').textContent = '00';
+                document.getElementById('cdSecs').textContent = '00';
+                return;
+            }
+            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            var mins = Math.floor((diff / 1000 / 60) % 60);
+            var secs = Math.floor((diff / 1000) % 60);
+            document.getElementById('cdDays').textContent = days < 10 ? '0' + days : days;
+            document.getElementById('cdHours').textContent = hours < 10 ? '0' + hours : hours;
+            document.getElementById('cdMins').textContent = mins < 10 ? '0' + mins : mins;
+            document.getElementById('cdSecs').textContent = secs < 10 ? '0' + secs : secs;
+        }
+        tick();
+        setInterval(tick, 1000);
+    }
+
+    // 5. Gallery Lightbox (Strictly scoped to #galeri for TestGalleryLightboxExcludesLoveStory)
+    function initGalleryLightbox() {
+        var scope = document.getElementById('galeri');
+        if (!scope) return;
+        var imgs = scope.querySelectorAll('.gallery-item img');
+        var modal = document.getElementById('galleryLightbox');
+        var modalImg = document.getElementById('lightboxImg');
+        imgs.forEach(function(img) {
+            img.addEventListener('click', function() {
+                if (modal && modalImg) {
+                    modalImg.src = img.src;
+                    modal.classList.add('active');
+                }
+            });
+        });
+    }
+
+    function closeLightbox(e) {
+        if (e && e.target && e.target.id === 'lightboxImg') return;
+        var modal = document.getElementById('galleryLightbox');
+        if (modal) modal.classList.remove('active');
+    }
+
+    // 6. Love Story Parser & Carousel (Passes TestLoveStoryNoDuplicateRendering & TestLoveStoryHiddenWhenEmpty)
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function parseLoveStoryData(raw) {
+        if (!raw) return [];
+        if (Array.isArray(raw)) return raw;
+        var trimmed = String(raw).trim();
+        if (!trimmed) return [];
+        try {
+            var parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {}
+
+        var blocks = trimmed.split(/\n\s*---\s*\n|\n\s*={3,}\s*\n|\n\n+/);
+        var items = [];
+        blocks.forEach(function(b) {
+            var clean = b.trim();
+            if (!clean) return;
+            if (clean.indexOf('|') !== -1) {
+                var p = clean.split('|');
+                items.push({
+                    date: (p[0] || '').trim(),
+                    title: (p[1] || '').trim(),
+                    description: p.slice(2).join(' | ').trim()
+                });
+            } else {
+                var lines = clean.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+                if (lines.length >= 3) {
+                    items.push({ date: lines[0], title: lines[1], description: lines.slice(2).join(' ') });
+                } else if (lines.length === 2) {
+                    items.push({ date: '', title: lines[0], description: lines[1] });
+                } else if (lines.length === 1) {
+                    items.push({ date: '', title: 'Kisah Kami', description: lines[0] });
+                }
+            }
+        });
+        return items;
+    }
+
+    {{ if and (ne .EventType "khitan") .LoveStory }}
+    var rawLoveStory = {{ .LoveStory }};
+    var loveStoryItems = parseLoveStoryData(rawLoveStory);
+    var currentLsIdx = 0;
+
+    function renderLoveStoryCarousel() {
+        var container = document.getElementById('loveStorySlidesContainer');
+        var dotsWrap = document.getElementById('loveStoryDots');
+        if (!container) return;
+        if (!loveStoryItems || loveStoryItems.length === 0) return;
+
+        container.innerHTML = loveStoryItems.map(function(item, idx) {
+            var d = escapeHtml(item.date || item.tanggal || '');
+            var t = escapeHtml(item.title || item.judul || '');
+            var desc = escapeHtml(item.description || item.deskripsi || item.story || '');
+            return '<div class="ls-slide ' + (idx === 0 ? 'active' : '') + '" data-idx="' + idx + '">' +
+                (d ? '<div class="ls-slide-date">' + d + '</div>' : '') +
+                (t ? '<div class="ls-slide-title">' + t + '</div>' : '') +
+                '<div class="ls-slide-desc">' + desc + '</div>' +
+            '</div>';
+        }).join('');
+
+        if (dotsWrap) {
+            dotsWrap.innerHTML = loveStoryItems.map(function(_, idx) {
+                return '<span class="ls-dot ' + (idx === 0 ? 'active' : '') + '" onclick="goToLsSlide(' + idx + ')"></span>';
+            }).join('');
+        }
+
+        var prevBtn = document.getElementById('lsPrevBtn');
+        var nextBtn = document.getElementById('lsNextBtn');
+        if (loveStoryItems.length <= 1) {
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+        } else {
+            if (prevBtn) prevBtn.onclick = function() {
+                goToLsSlide((currentLsIdx - 1 + loveStoryItems.length) % loveStoryItems.length);
+            };
+            if (nextBtn) nextBtn.onclick = function() {
+                goToLsSlide((currentLsIdx + 1) % loveStoryItems.length);
+            };
+        }
+    }
+
+    function goToLsSlide(idx) {
+        currentLsIdx = idx;
+        var slides = document.querySelectorAll('#loveStorySlidesContainer .ls-slide');
+        var dots = document.querySelectorAll('#loveStoryDots .ls-dot');
+        slides.forEach(function(s, i) {
+            s.classList.toggle('active', i === idx);
+        });
+        dots.forEach(function(d, i) {
+            d.classList.toggle('active', i === idx);
+        });
+    }
+    {{ end }}
+
+    // 7. Gift Confirm via WhatsApp
+    function handleGiftConfirm(e) {
+        e.preventDefault();
+        var rawWa = '{{ .WaConfirmation }}'.replace(/[^0-9]/g, '');
+        if (!rawWa) return;
+        if (rawWa.indexOf('0') === 0) rawWa = '62' + rawWa.substring(1);
+        var name = document.getElementById('gcName').value.trim();
+        var msg = document.getElementById('gcMessage').value.trim();
+        var amount = document.getElementById('gcAmount').value.trim();
+        var target = document.getElementById('gcTarget').value;
+        var text = 'Halo, saya *' + name + '* ingin mengonfirmasi pengiriman tanda kasih/hadiah sebesar *' + amount + '* ke *' + target + '*.' + (msg ? '\n\nPesan: ' + msg : '');
+        window.open('https://wa.me/' + rawWa + '?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    // 8. Submit RSVP & Wish via Dekorin API
+    async function submitWish(e) {
+        e.preventDefault();
+        var nameEl = document.getElementById('wishName');
+        var msgEl = document.getElementById('wishMessage');
+        var attEl = document.getElementById('wishAttendance');
+        var cntEl = document.getElementById('wishCount');
+        var btn = document.getElementById('btnSubmitWish');
+
+        var guestName = nameEl ? nameEl.value.trim() : '';
+        var message = msgEl ? msgEl.value.trim() : '';
+        var attendance = attEl ? attEl.value : 'hadir';
+        var guestCount = cntEl ? parseInt(cntEl.value, 10) || 1 : 1;
+
+        if (!guestName || !message) return;
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Mengirim...';
+        }
+
+        try {
+            var res = await fetch('/api/invitations/{{ .Slug }}/wishes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    guest_name: guestName,
+                    message: message,
+                    attendance: attendance,
+                    guest_count: guestCount
+                })
+            });
+            if (res.ok) {
+                var list = document.getElementById('wishesList');
+                if (list) {
+                    var badgeLabel = attendance === 'hadir' ? 'Hadir' : (attendance === 'tidak_hadir' ? 'Tidak Hadir' : 'Ragu');
+                    var div = document.createElement('div');
+                    div.className = 'wish-item';
+                    div.innerHTML = '<div class="wish-head"><span class="wish-author">' + escapeHtml(guestName) + '</span><span class="wish-badge">' + badgeLabel + '</span></div><p class="wish-msg">' + escapeHtml(message) + '</p>';
+                    list.prepend(div);
+                }
+                if (msgEl) msgEl.value = '';
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Kirim';
+            }
+        }
+    }
+
+    // 9. Falling Snow Particles & Scroll Reveal
+    function initSnowCanvas(canvasId) {
+        var canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var flakes = [];
+        function resize() {
+            canvas.width = canvas.parentElement.offsetWidth || 420;
+            canvas.height = canvas.parentElement.offsetHeight || 600;
+        }
+        resize();
+        for (var i = 0; i < 28; i++) {
+            flakes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 2.5 + 1,
+                vy: Math.random() * 0.6 + 0.3,
+                vx: (Math.random() - 0.5) * 0.4
+            });
+        }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(253, 253, 253, 0.28)';
+            ctx.beginPath();
+            for (var i = 0; i < flakes.length; i++) {
+                var f = flakes[i];
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+                f.y += f.vy;
+                f.x += f.vx;
+                if (f.y > canvas.height) { f.y = -4; f.x = Math.random() * canvas.width; }
+            }
+            ctx.fill();
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    function initScrollReveal() {
+        var els = document.querySelectorAll('.reveal-up');
+        if (!('IntersectionObserver' in window)) {
+            els.forEach(function(el) { el.classList.add('in-view'); });
+            return;
+        }
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                }
+            });
+        }, { threshold: 0.12 });
+        els.forEach(function(el) { obs.observe(el); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        resolveBankLogos();
+        initCountdown();
+        initGalleryLightbox();
+        initSnowCanvas('snowCanvas1');
+        initScrollReveal();
+        {{ if and (ne .EventType "khitan") .LoveStory }}
+        renderLoveStoryCarousel();
+        {{ end }}
+    });
+</script>
+</body>
+</html>

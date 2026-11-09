@@ -43,10 +43,23 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in landing superadmin client_form invitation_portal wedding_invitation template_floral template_luxury_grey template_pn4 template_ta3 template_ta17 template_khitan_green template_creamy_latte template_green_leaves; do
+for t in landing superadmin client_form invitation_portal template_pn4 template_ta3 template_ta17 template_jawa3; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
 done
+
+# Bersihkan file template lama yang sudah dinonaktifkan
+rm -f web/templates/wedding_invitation.html \
+      web/templates/template_floral.html \
+      web/templates/template_luxury_grey.html \
+      web/templates/template_khitan_green.html \
+      web/templates/template_creamy_latte.html \
+      web/templates/template_green_leaves.html
+rm -rf web/assets/templates/creamy-latte \
+       web/assets/templates/floral \
+       web/assets/templates/green-leaves \
+       web/assets/templates/khitan-green \
+       web/assets/templates/luxury-grey
 
 # 4b. Unduh Aset Template Monochrome PN4 (Fonts, Ornamen, Tekstur, Foto Default, Audio)
 echo "⬇️  Mengunduh aset template Monochrome PN4..."
@@ -79,6 +92,16 @@ for f in bg-cover.jpg bg-arch.jpg bg-blue-floral.jpg bg-floral-texture.jpg bride
 done
 for n in 1 2 3 4 5 6; do
     curl -s -f -L -o "web/assets/templates/ta17/photos/gallery${n}.jpg" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ta17/photos/gallery${n}.jpg?v=$TIMESTAMP" || true
+done
+
+# 4e. Unduh Aset Template Art Jawa Coklat 3 (Backgrounds, Video, Gunungan, Wayang GIF, Audio, Foto Default)
+echo "⬇️  Mengunduh aset template Art Jawa Coklat 3..."
+mkdir -p web/assets/templates/jawa3/photos
+for f in bg-closing.jpg bg-couple.jpg bg-cover.jpg bg-event-pill.jpg bg-footer.jpg bg-hero.jpg bg-savedate.jpg bg-texture.jpg default-song.mp3 floral-corner.png gunungan.png logo_bca.png logo_bni.png logo_bri.png logo_mandiri.png water-jawa-coklat-3.mp4 wayang-anim.gif; do
+    curl -s -f -L -o "web/assets/templates/jawa3/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa3/${f}?v=$TIMESTAMP" || true
+done
+for pf in bride-default.jpg groom-default.jpg gallery1.jpg gallery2.jpg gallery3.jpg gallery4.jpg gallery5.jpg gallery6.jpg gallery7.jpg gallery8.jpg; do
+    curl -s -f -L -o "web/assets/templates/jawa3/photos/${pf}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa3/photos/${pf}?v=$TIMESTAMP" || true
 done
 
 # 5. Icons & Branding

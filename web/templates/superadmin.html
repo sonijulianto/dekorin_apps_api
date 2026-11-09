@@ -684,14 +684,10 @@
                             <select id="filterInvitationTemplate" onchange="filterInvitations()"
                                 class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 <option value="all">Semua Template Desain</option>
-                                <option value="ta3">Sakura Blossom TA3</option>
                                 <option value="ta17">Ocean Blossom TA17</option>
+                                <option value="ta3">Sakura Blossom TA3</option>
                                 <option value="pn4">Monochrome PN4</option>
-                                <option value="luxury-grey">Luxury Grey</option>
-                                <option value="green-leaves">Green Leaves</option>
-                                <option value="creamy-latte">Creamy Latte</option>
-                                <option value="floral">Floral Terracotta</option>
-                                <option value="khitan-green">Khitan Green</option>
+                                <option value="jawa3">Art Jawa Coklat 3</option>
                             </select>
                             <select id="filterInvitationType" onchange="filterInvitations()"
                                 class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
@@ -1718,69 +1714,41 @@
             <!-- Form -->
             <form id="formInvitation" onsubmit="handleSaveInvitation(event)" class="space-y-4">
                 <input type="hidden" id="inputInvId" value="">
-                <input type="hidden" id="inputInvTemplate" value="green-leaves">
+                <input type="hidden" id="inputInvTemplate" value="ta17">
                 <input type="hidden" id="inputInvEventType" value="wedding">
 
                 <!-- TAB 1: TEMPLATE & INFO DASAR -->
                 <div id="tabInvDesign" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">1. Pilihan Template Desain Visual *</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
-                            <!-- Sakura Blossom TA3 -->
-                            <div id="tmplCard_ta3" onclick="selectInvTemplate('ta3')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-rose-400 text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🌸</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Sakura TA3</div>
-                                <div class="text-[10px] text-rose-500 font-semibold">Romantic Floral</div>
-                            </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             <!-- Ocean Blossom TA17 -->
                             <div id="tmplCard_ta17" onclick="selectInvTemplate('ta17')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#4B8DCB] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">💙</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Ocean TA17</div>
+                                class="inv-template-card cursor-pointer p-3.5 rounded-2xl border-2 border-[#D4A574] bg-[#F9F3EC]/50 ring-2 ring-[#D4A574]/30 transition hover:shadow-md text-center">
+                                <div class="w-9 h-9 rounded-full bg-[#4B8DCB] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">💙</div>
+                                <div class="font-bold text-xs text-slate-800 mt-2">Ocean Blossom TA17</div>
                                 <div class="text-[10px] text-[#4B8DCB] font-semibold">Pastel Blue & Floral</div>
                             </div>
-                            <!-- Green Leaves -->
-                            <div id="tmplCard_green-leaves" onclick="selectInvTemplate('green-leaves')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-[#D4A574] bg-[#F9F3EC]/50 ring-2 ring-[#D4A574]/30 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#588157] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🌿</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Green Leaves</div>
-                                <div class="text-[10px] text-[#588157] font-semibold">Natural & Asri</div>
+                            <!-- Sakura Blossom TA3 -->
+                            <div id="tmplCard_ta3" onclick="selectInvTemplate('ta3')" 
+                                class="inv-template-card cursor-pointer p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                <div class="w-9 h-9 rounded-full bg-rose-400 text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🌸</div>
+                                <div class="font-bold text-xs text-slate-800 mt-2">Sakura Blossom TA3</div>
+                                <div class="text-[10px] text-rose-500 font-semibold">Romantic Floral</div>
                             </div>
                             <!-- Monochrome PN4 -->
                             <div id="tmplCard_pn4" onclick="selectInvTemplate('pn4')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#343434] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🖤</div>
+                                class="inv-template-card cursor-pointer p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                <div class="w-9 h-9 rounded-full bg-[#343434] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🖤</div>
                                 <div class="font-bold text-xs text-slate-800 mt-2">Monochrome PN4</div>
                                 <div class="text-[10px] text-slate-500 font-semibold">Editorial B&amp;W</div>
                             </div>
-                            <!-- Luxury Grey -->
-                            <div id="tmplCard_luxury-grey" onclick="selectInvTemplate('luxury-grey')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#1E2022] text-[#D4A574] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">✨</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Luxury Grey</div>
-                                <div class="text-[10px] text-slate-500 font-semibold">Dark & Gold</div>
-                            </div>
-                            <!-- Creamy Latte -->
-                            <div id="tmplCard_creamy-latte" onclick="selectInvTemplate('creamy-latte')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#B4846C] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">☕</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Creamy Latte</div>
-                                <div class="text-[10px] text-[#B4846C] font-semibold">Warm & Soft</div>
-                            </div>
-                            <!-- Floral Terracotta -->
-                            <div id="tmplCard_floral" onclick="selectInvTemplate('floral')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#D47A60] text-white flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🌸</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Floral Terracotta</div>
-                                <div class="text-[10px] text-[#D47A60] font-semibold">Romantic Floral</div>
-                            </div>
-                            <!-- Khitan Green -->
-                            <div id="tmplCard_khitan-green" onclick="selectInvTemplate('khitan-green')" 
-                                class="inv-template-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
-                                <div class="w-8 h-8 rounded-full bg-[#2E8B57] text-[#FFCB58] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🕌</div>
-                                <div class="font-bold text-xs text-slate-800 mt-2">Khitan Green</div>
-                                <div class="text-[10px] text-[#2E8B57] font-semibold">Islamic Khitan</div>
+                            <!-- Art Jawa Coklat 3 -->
+                            <div id="tmplCard_jawa3" onclick="selectInvTemplate('jawa3')" 
+                                class="inv-template-card cursor-pointer p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                <div class="w-9 h-9 rounded-full bg-[#4F2323] text-[#D7BB83] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🤎</div>
+                                <div class="font-bold text-xs text-slate-800 mt-2">Art Jawa Coklat 3</div>
+                                <div class="text-[10px] text-[#AC9271] font-semibold">Javanese Royal &amp; Wayang</div>
                             </div>
                         </div>
                     </div>
@@ -5134,7 +5102,7 @@
             let filtered = invitationsCache;
 
             if (tmplFilter !== 'all') {
-                filtered = filtered.filter(i => (i.template || 'green-leaves').toLowerCase() === tmplFilter);
+                filtered = filtered.filter(i => (i.template || 'ta17').toLowerCase() === tmplFilter);
             }
             if (typeFilter !== 'all') {
                 filtered = filtered.filter(i => (i.event_type || 'wedding').toLowerCase() === typeFilter);
@@ -5181,14 +5149,10 @@
             }
 
             const tmplBadges = {
-                'green-leaves': { name: 'Green Leaves', bg: 'bg-[#588157]/15 text-[#3A5A40] border-[#588157]/30', dot: 'bg-[#588157]' },
-                'ta3': { name: 'Sakura TA3', bg: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-400' },
                 'ta17': { name: 'Ocean TA17', bg: 'bg-[#4B8DCB]/15 text-[#295177] border-[#4B8DCB]/30', dot: 'bg-[#4B8DCB]' },
+                'ta3': { name: 'Sakura TA3', bg: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-400' },
                 'pn4': { name: 'Monochrome PN4', bg: 'bg-[#343434] text-white border-[#262627]', dot: 'bg-white' },
-                'luxury-grey': { name: 'Luxury Grey', bg: 'bg-stone-800 text-[#D4A574] border-stone-700', dot: 'bg-[#D4A574]' },
-                'creamy-latte': { name: 'Creamy Latte', bg: 'bg-[#B4846C]/15 text-[#7D5A50] border-[#B4846C]/30', dot: 'bg-[#B4846C]' },
-                'floral': { name: 'Floral Terracotta', bg: 'bg-[#D47A60]/15 text-[#8E443D] border-[#D47A60]/30', dot: 'bg-[#D47A60]' },
-                'khitan-green': { name: 'Khitan Green', bg: 'bg-[#2E8B57]/15 text-[#1B4D3E] border-[#2E8B57]/30', dot: 'bg-[#2E8B57]' },
+                'jawa3': { name: 'Art Jawa Coklat 3', bg: 'bg-[#4F2323] text-[#D7BB83] border-[#79110E]', dot: 'bg-[#D7BB83]' },
             };
 
             tbody.innerHTML = list.map(inv => {
@@ -5401,9 +5365,6 @@
                 btnWedding.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
                 secWedding.classList.add('hidden');
                 secKhitan.classList.remove('hidden');
-                if (document.getElementById('inputInvTemplate').value === 'green-leaves') {
-                    selectInvTemplate('khitan-green');
-                }
                 if (isNew) {
                     if (!titleInput.value || titleInput.value.startsWith('The Wedding of')) {
                         titleInput.value = 'Tasyakuran Khitanan Rayyan';
@@ -5559,7 +5520,7 @@
             const randSuffix = Math.floor(1000 + Math.random() * 9000);
 
             // Default values
-            selectInvTemplate('green-leaves');
+            selectInvTemplate('ta17');
             selectInvEventType('wedding');
             switchInvTab('Design');
 
@@ -5660,7 +5621,8 @@
                 const inv = json.data;
                 if (!inv) return;
 
-                selectInvTemplate(inv.template || 'green-leaves');
+                const activeTmpl = ['ta17', 'ta3', 'pn4', 'jawa3'].includes(inv.template) ? inv.template : 'ta17';
+                selectInvTemplate(activeTmpl);
                 selectInvEventType(inv.event_type || 'wedding');
 
                 document.getElementById('inputInvTitle').value = inv.title || '';

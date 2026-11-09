@@ -258,7 +258,36 @@ func CreateInvitation(c *fiber.Ctx) error {
 	}
 
 	isIllustration := req.Template == "ta3" || req.Template == "ta17" || req.Template == "ocean-ta17" || req.Template == "blue-ta17"
-	if !isIllustration {
+	isJawa3 := req.Template == "jawa3" || req.Template == "art-jawa-coklat-3" || req.Template == "jawa-coklat-3"
+	if isJawa3 {
+		if strings.TrimSpace(req.CoverImage) == "" || req.CoverImage == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
+			req.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
+		}
+		if strings.TrimSpace(req.Sec1Photo) == "" || req.Sec1Photo == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.Sec1Photo = "/assets/templates/jawa3/photos/gallery3.jpg"
+		}
+		if strings.TrimSpace(req.GroomPhoto) == "" || req.GroomPhoto == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.GroomPhoto = "/assets/templates/jawa3/photos/groom-default.jpg"
+		}
+		if strings.TrimSpace(req.BridePhoto) == "" || req.BridePhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.BridePhoto = "/assets/templates/jawa3/photos/bride-default.jpg"
+		}
+		if strings.TrimSpace(req.AkadPhoto) == "" || req.AkadPhoto == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.AkadPhoto = "/assets/templates/jawa3/photos/gallery4.jpg"
+		}
+		if strings.TrimSpace(req.ResepsiPhoto) == "" || req.ResepsiPhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.ResepsiPhoto = "/assets/templates/jawa3/photos/gallery4.jpg"
+		}
+		if strings.TrimSpace(req.EventPhoto) == "" || req.EventPhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.EventPhoto = "/assets/templates/jawa3/photos/gallery4.jpg"
+		}
+		if strings.TrimSpace(req.ClosingPhoto) == "" || req.ClosingPhoto == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
+			req.ClosingPhoto = "/assets/templates/jawa3/photos/gallery5.jpg"
+		}
+		if strings.TrimSpace(req.GalleryImages) == "" || strings.HasPrefix(req.GalleryImages, "/assets/templates/pn4/photos/LeniArdi2.jpeg") {
+			req.GalleryImages = "/assets/templates/jawa3/photos/gallery1.jpg,/assets/templates/jawa3/photos/gallery2.jpg,/assets/templates/jawa3/photos/gallery3.jpg,/assets/templates/jawa3/photos/gallery4.jpg,/assets/templates/jawa3/photos/gallery5.jpg,/assets/templates/jawa3/photos/gallery6.jpg,/assets/templates/jawa3/photos/gallery7.jpg,/assets/templates/jawa3/photos/gallery8.jpg"
+		}
+	} else if !isIllustration {
 		if strings.TrimSpace(req.CoverImage) == "" {
 			req.CoverImage = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
 		}
@@ -341,8 +370,8 @@ func CreateInvitation(c *fiber.Ctx) error {
 	}
 
 	templateName := strings.TrimSpace(req.Template)
-	if templateName == "" {
-		templateName = "green-leaves"
+	if templateName != "pn4" && templateName != "ta3" && templateName != "ta17" && templateName != "jawa3" {
+		templateName = "ta17"
 	}
 
 	eventType := strings.TrimSpace(req.EventType)
@@ -445,7 +474,11 @@ func UpdateInvitation(c *fiber.Ctx) error {
 	}
 
 	if strings.TrimSpace(req.Template) != "" {
-		invitation.Template = strings.TrimSpace(req.Template)
+		tmpl := strings.TrimSpace(req.Template)
+		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" {
+			tmpl = "ta17"
+		}
+		invitation.Template = tmpl
 	}
 	if strings.TrimSpace(req.EventType) != "" {
 		invitation.EventType = strings.TrimSpace(req.EventType)
@@ -733,7 +766,7 @@ func getParsedTemplate(templateFile string) (*template.Template, error) {
 	templatePath := filepath.Join("web", "templates", templateFile)
 	parsedTmpl, err := template.ParseFiles(templatePath)
 	if err != nil {
-		fallbackPath := filepath.Join("web", "templates", "wedding_invitation.html")
+		fallbackPath := filepath.Join("web", "templates", "template_ta17.html")
 		var fallbackErr error
 		parsedTmpl, fallbackErr = template.ParseFiles(fallbackPath)
 		if fallbackErr != nil {
@@ -776,7 +809,7 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 	}
 
 	if strings.TrimSpace(invitation.Template) == "" {
-		invitation.Template = "green-leaves"
+		invitation.Template = "ta17"
 	}
 	if strings.TrimSpace(invitation.EventType) == "" {
 		invitation.EventType = "wedding"
@@ -898,8 +931,10 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 			ogImage = "/assets/templates/ta3/couple-welcome.png"
 		case "pn4", "monochrome-pn4":
 			ogImage = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
+		case "jawa3", "art-jawa-coklat-3", "jawa-coklat-3":
+			ogImage = "/assets/templates/jawa3/bg-cover.jpg"
 		default:
-			ogImage = "/assets/dekorin_logo_square.png"
+			ogImage = "/assets/templates/ta17/couple-welcome.png"
 		}
 	}
 
@@ -941,24 +976,17 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 
 	var templateFile string
 	switch templateName {
-	case "floral":
-		templateFile = "template_floral.html"
-	case "luxury-grey":
-		templateFile = "template_luxury_grey.html"
 	case "pn4", "monochrome-pn4":
 		templateFile = "template_pn4.html"
 	case "ta3", "sakura-ta3":
 		templateFile = "template_ta3.html"
 	case "ta17", "ocean-ta17", "blue-ta17":
 		templateFile = "template_ta17.html"
-	case "khitan-green":
-		templateFile = "template_khitan_green.html"
-	case "creamy-latte":
-		templateFile = "template_creamy_latte.html"
-	case "green-leaves":
-		templateFile = "template_green_leaves.html"
+	case "jawa3", "art-jawa-coklat-3", "jawa-coklat-3":
+		templateFile = "template_jawa3.html"
 	default:
-		templateFile = "template_green_leaves.html"
+		// Fallback otomatis ke Ocean Blossom (TA17) untuk template lama / selain yang disisakan
+		templateFile = "template_ta17.html"
 	}
 
 	tmpl, err := getParsedTemplate(templateFile)

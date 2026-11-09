@@ -313,7 +313,11 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 		invitation.EventType = strings.TrimSpace(req.EventType)
 	}
 	if strings.TrimSpace(req.Template) != "" {
-		invitation.Template = strings.TrimSpace(req.Template)
+		tmpl := strings.TrimSpace(req.Template)
+		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" {
+			tmpl = "ta17"
+		}
+		invitation.Template = tmpl
 	}
 
 	if invitation.EventType == "khitan" {

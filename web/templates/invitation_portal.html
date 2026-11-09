@@ -1081,14 +1081,10 @@
     const PUBLIC_INVITATION_DOMAIN = 'https://undangan.dekorin.my.id';
 
     const TEMPLATES_META = [
-      { id: 'green-leaves', name: 'Green Leaves', tag: 'Natural & Asri', color: '#588157', bg: '#F4F7F4', type: 'wedding' },
-      { id: 'creamy-latte', name: 'Creamy Latte', tag: 'Warm & Timeless', color: '#B4846C', bg: '#FAF5EF', type: 'wedding' },
-      { id: 'floral', name: 'Floral Terracotta', tag: 'Romantic & Soft', color: '#D47A60', bg: '#FDF8F5', type: 'wedding' },
-      { id: 'luxury-grey', name: 'Luxury Grey', tag: 'Modern Dark Gold', color: '#D4A574', bg: '#2C3333', type: 'wedding' },
-      { id: 'pn4', name: 'Monochrome PN4', tag: 'Editorial Monochrome', color: '#343434', bg: '#F1F1F1', type: 'wedding' },
-      { id: 'ta3', name: 'Sakura Blossom TA3', tag: 'Romantic Floral & Arch', color: '#D4A373', bg: '#FFF5F5', type: 'wedding' },
       { id: 'ta17', name: 'Ocean Blossom TA17', tag: 'Pastel Blue & Floral', color: '#4B8DCB', bg: '#F0F6FC', type: 'wedding' },
-      { id: 'khitan-green', name: 'Khitan Green', tag: 'Tasyakuran Islami', color: '#2E8B57', bg: '#F0F7F4', type: 'khitan' }
+      { id: 'ta3', name: 'Sakura Blossom TA3', tag: 'Romantic Floral & Arch', color: '#D4A373', bg: '#FFF5F5', type: 'wedding' },
+      { id: 'pn4', name: 'Monochrome PN4', tag: 'Editorial Monochrome', color: '#343434', bg: '#F1F1F1', type: 'wedding' },
+      { id: 'jawa3', name: 'Art Jawa Coklat 3', tag: 'Javanese Royal & Wayang', color: '#4F2323', bg: '#FFFCF3', type: 'wedding' }
     ];
 
     const PHOTO_SLOTS_CONFIG = [
@@ -1113,7 +1109,7 @@
     let portalToken = '';
     let currentInvitation = null;
     let currentStats = { total_wishes: 0, hadir_count: 0, tidak_hadir_count: 0, ragu_count: 0, total_pax_hadir: 0 };
-    let selectedTemplateId = 'green-leaves';
+    let selectedTemplateId = 'ta17';
     let photoValues = {};
     let galleryUrls = [];
     let isPinVisible = false;
@@ -1351,7 +1347,7 @@
       // Populate Form Editor
       const eventRadios = document.querySelectorAll('input[name="event_type"]');
       eventRadios.forEach(r => { r.checked = (r.value === (inv.event_type || 'wedding')); });
-      selectedTemplateId = inv.template || 'green-leaves';
+      selectedTemplateId = ['ta17', 'ta3', 'pn4', 'jawa3'].includes(inv.template) ? inv.template : 'ta17';
 
       setVal('f_title', inv.title);
       setVal('f_slug', inv.slug);
@@ -1562,12 +1558,6 @@
 
       document.getElementById('labelAkadCardTitle').textContent = isKhitan ? 'Acara Khitanan / Syukuran' : 'Akad Nikah / Pemberkatan';
       document.getElementById('labelResepsiCardTitle').textContent = isKhitan ? 'Ramah Tamah / Hiburan' : "Resepsi / Walimatul 'Ursy";
-
-      if (isKhitan && selectedTemplateId !== 'khitan-green') {
-        selectedTemplateId = 'khitan-green';
-      } else if (!isKhitan && selectedTemplateId === 'khitan-green') {
-        selectedTemplateId = 'green-leaves';
-      }
       renderTemplatePicker();
     }
 

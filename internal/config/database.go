@@ -100,6 +100,19 @@ func ConnectDB() {
 	SeedApiLogs(db)
 	SeedAppVersion(db)
 	SeedProperties(db)
+	MigrateInvitationTemplates(db)
+}
+
+// MigrateInvitationTemplates memigrasikan template undangan lama ke Ocean Blossom (ta17)
+func MigrateInvitationTemplates(db *gorm.DB) {
+	result := db.Model(&models.Invitation{}).
+		Where("template NOT IN ('pn4', 'ta3', 'ta17', 'jawa3') OR template IS NULL OR template = ''").
+		Update("template", "ta17")
+	if result.Error != nil {
+		log.Println("⚠️ Peringatan saat migrasi template undangan: ", result.Error)
+	} else if result.RowsAffected > 0 {
+		fmt.Printf("✅ Berhasil memigrasi %d undangan lama ke template Ocean Blossom (ta17)\n", result.RowsAffected)
+	}
 }
 
 // SeedAddons mengisi data awal master item tambahan jika kosong

@@ -21,15 +21,10 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 
 	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
 	templateFiles := []string{
-		"template_creamy_latte.html",
-		"template_floral.html",
-		"template_green_leaves.html",
-		"template_khitan_green.html",
-		"template_luxury_grey.html",
 		"template_pn4.html",
 		"template_ta3.html",
 		"template_ta17.html",
-		"wedding_invitation.html",
+		"template_jawa3.html",
 	}
 
 	testData := struct {
@@ -134,7 +129,7 @@ func TestLoveStoryHiddenWhenEmpty(t *testing.T) {
 	}
 
 	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
-	targets := []string{"template_pn4.html", "template_ta3.html", "template_ta17.html"}
+	targets := []string{"template_pn4.html", "template_ta3.html", "template_ta17.html", "template_jawa3.html"}
 
 	testDataWithoutStory := struct {
 		models.Invitation
@@ -192,15 +187,10 @@ func TestGuestToLockedWhenProvided(t *testing.T) {
 
 	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
 	allTemplates := []string{
-		"template_creamy_latte.html",
-		"template_floral.html",
-		"template_green_leaves.html",
-		"template_khitan_green.html",
-		"template_luxury_grey.html",
 		"template_pn4.html",
 		"template_ta3.html",
 		"template_ta17.html",
-		"wedding_invitation.html",
+		"template_jawa3.html",
 	}
 
 	// 1. With GuestTo = "Soni"
@@ -457,7 +447,7 @@ func TestBankLogoBriResolution(t *testing.T) {
 		t.Fatalf("Failed to get working directory: %v", err)
 	}
 
-	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html"}
+	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html", "template_jawa3.html"}
 	for _, target := range targets {
 		p := filepath.Join(wd, "..", "..", "web", "templates", target)
 		content, err := os.ReadFile(p)
@@ -483,15 +473,10 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 
 	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
 	targets := []string{
-		"template_creamy_latte.html",
-		"template_floral.html",
-		"template_green_leaves.html",
-		"template_khitan_green.html",
-		"template_luxury_grey.html",
 		"template_pn4.html",
 		"template_ta3.html",
 		"template_ta17.html",
-		"wedding_invitation.html",
+		"template_jawa3.html",
 	}
 
 	testDataWithoutGift := struct {
@@ -557,13 +542,6 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 
 			// Specific section & navbar checks per template
 			switch target {
-			case "wedding_invitation.html":
-				if strings.Contains(renderedWithout, `id="paySection"`) {
-					t.Errorf("wedding_invitation.html rendered paySection when bank accounts are empty")
-				}
-				if strings.Contains(renderedWithout, `href="#paySection"`) {
-					t.Errorf("wedding_invitation.html rendered navbar link #paySection when bank accounts are empty")
-				}
 			case "template_ta3.html", "template_ta17.html":
 				if strings.Contains(renderedWithout, `<section id="gift">`) {
 					t.Errorf("%s rendered <section id=\"gift\"> when bank accounts are empty", target)
@@ -571,20 +549,12 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 				if strings.Contains(renderedWithout, `href="#gift"`) {
 					t.Errorf("%s rendered navbar link #gift when bank accounts are empty", target)
 				}
-			case "template_pn4.html":
+			case "template_pn4.html", "template_jawa3.html":
 				if strings.Contains(renderedWithout, `<section id="gift"`) {
-					t.Errorf("template_pn4.html rendered <section id=\"gift\" when bank accounts are empty")
+					t.Errorf("%s rendered <section id=\"gift\" when bank accounts are empty", target)
 				}
 				if strings.Contains(renderedWithout, `href="#gift"`) {
-					t.Errorf("template_pn4.html rendered navbar link #gift when bank accounts are empty")
-				}
-			case "template_green_leaves.html", "template_creamy_latte.html", "template_floral.html", "template_khitan_green.html":
-				if strings.Contains(renderedWithout, `Tanda Kasih`) {
-					t.Errorf("%s rendered 'Tanda Kasih' section when bank accounts are empty", target)
-				}
-			case "template_luxury_grey.html":
-				if strings.Contains(renderedWithout, `Wedding Gift`) {
-					t.Errorf("template_luxury_grey.html rendered 'Wedding Gift' section when bank accounts are empty")
+					t.Errorf("%s rendered navbar link #gift when bank accounts are empty", target)
 				}
 			}
 
