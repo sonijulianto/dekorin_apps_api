@@ -928,7 +928,7 @@
 
                                 <!-- Force Update Checkbox -->
                                 <div class="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50/60 border border-amber-200/60">
-                                    <input type="checkbox" id="apkForceUpdate" class="w-4 h-4 text-[#D4A574] rounded border-stone-300 focus:ring-[#D4A574]">
+                                    <input type="checkbox" id="apkForceUpdate" checked class="w-4 h-4 text-[#D4A574] rounded border-stone-300 focus:ring-[#D4A574]">
                                     <label for="apkForceUpdate" class="text-xs font-bold text-amber-900 cursor-pointer">
                                         Wajibkan Pembaruan (Force Update)
                                         <span class="block text-[10px] font-normal text-amber-700">Pengguna tidak bisa menutup dialog update dan harus memperbarui</span>
@@ -5898,6 +5898,10 @@
                     if (codeInput && !codeInput.value) {
                         codeInput.value = nextCode;
                     }
+                    const forceInput = document.getElementById('apkForceUpdate');
+                    if (forceInput && !forceInput.dataset.userInteracted) {
+                        forceInput.checked = true;
+                    }
                 }
 
                 // 2. Ambil histori versi
@@ -5916,8 +5920,8 @@
                     const isLatest = idx === 0;
                     const dateStr = v.created_at ? new Date(v.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                     const forceBadge = v.force_update 
-                        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Force</span>` 
-                        : `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 text-stone-600">Opsional</span>`;
+                        ? `<button type="button" onclick="toggleForceUpdate('${v.id}')" title="Klik untuk ubah menjadi Opsional" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-700 transition inline-flex items-center gap-1">Force <span>🔄</span></button>` 
+                        : `<button type="button" onclick="toggleForceUpdate('${v.id}')" title="Klik untuk ubah menjadi Wajib Update (Force)" class="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 hover:bg-stone-200 text-stone-600 transition inline-flex items-center gap-1">Opsional <span>🔄</span></button>`;
                     const latestBadge = isLatest ? `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase">Aktif</span>` : '';
 
                     return `
@@ -6025,6 +6029,7 @@
                     succEl.innerText = '✅ File APK berhasil diunggah dan versi ' + versionName + ' (Build #' + versionCode + ') telah aktif dirilis!';
                     succEl.classList.remove('hidden');
                     document.getElementById('uploadApkForm').reset();
+                    document.getElementById('apkForceUpdate').checked = true;
                     document.getElementById('apkFileName').innerText = 'Pilih atau seret file .apk ke sini';
                     setTimeout(() => {
                         progContainer.classList.add('hidden');
@@ -6051,6 +6056,24 @@
             };
 
             xhr.send(formData);
+        }
+
+        async function toggleForceUpdate(id) {
+            if (currentUserRole !== 'superadmin') return;
+            try {
+                const res = await fetch('/api/app/version/' + id + '/toggle-force', {
+                    method: 'PATCH',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    loadAppVersions();
+                } else {
+                    alert(data.error || 'Gagal mengubah tipe update');
+                }
+            } catch (e) {
+                alert('Terjadi kesalahan: ' + e);
+            }
         }
 
         async function deleteAppVersion(id, versionName) {

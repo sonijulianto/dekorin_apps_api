@@ -199,6 +199,7 @@ func main() {
 	api.Get("/app/version-history", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetAppVersionHistory)
 	api.Post("/app/version", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UpdateAppVersion)
 	api.Post("/app/upload-apk", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UploadApkFile)
+	api.Patch("/app/version/:id/toggle-force", middleware.Protected(), middleware.RequireSuperadmin(), handlers.ToggleForceUpdate)
 	api.Delete("/app/version/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.DeleteAppVersion)
 
 	// Serve static upload directory dengan Cache-Control, Kompresi, dan ByteRange (Streaming Audio)

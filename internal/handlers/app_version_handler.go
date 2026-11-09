@@ -259,6 +259,42 @@ func DeleteAppVersion(c *fiber.Ctx) error {
 	})
 }
 
+// ToggleForceUpdate mengganti status force_update untuk versi APK tertentu (Khusus Superadmin)
+func ToggleForceUpdate(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ID versi tidak valid",
+		})
+	}
+
+	var appVersion models.AppVersion
+	if err := config.DB.First(&appVersion, "id = ?", id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Data versi tidak ditemukan",
+		})
+	}
+
+	appVersion.ForceUpdate = !appVersion.ForceUpdate
+	appVersion.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&appVersion).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal memperbarui status update: " + err.Error(),
+		})
+	}
+
+	statusStr := "Opsional"
+	if appVersion.ForceUpdate {
+		statusStr = "Force Update (Wajib)"
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": fmt.Sprintf("Status update versi %s berhasil diubah menjadi %s", appVersion.VersionName, statusStr),
+		"data":    appVersion,
+	})
+}
+
 // cleanOldApkFiles menjaga kuota disk dengan menghapus file APK lama melebihi batas keepLatest
 func cleanOldApkFiles(keepLatest int) {
 	var versions []models.AppVersion
