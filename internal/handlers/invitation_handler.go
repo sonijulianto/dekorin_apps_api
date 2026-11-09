@@ -260,9 +260,8 @@ func CreateInvitation(c *fiber.Ctx) error {
 	isIllustration := req.Template == "ta3" || req.Template == "ta17" || req.Template == "ocean-ta17" || req.Template == "blue-ta17"
 	isJawa3 := req.Template == "jawa3" || req.Template == "art-jawa-coklat-3" || req.Template == "jawa-coklat-3"
 	if isJawa3 {
-		if strings.TrimSpace(req.CoverImage) == "" || req.CoverImage == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
-			req.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
-		}
+		// Foto cover utama template Jawa 3 dikunci permanen menggunakan bg-cover bawaan
+		req.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
 		if strings.TrimSpace(req.Sec1Photo) == "" || req.Sec1Photo == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
 			req.Sec1Photo = "/assets/templates/jawa3/photos/gallery3.jpg"
 		}
@@ -489,7 +488,11 @@ func UpdateInvitation(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.Title) != "" {
 		invitation.Title = strings.TrimSpace(req.Title)
 	}
-	invitation.CoverImage = req.CoverImage
+	if invitation.Template == "jawa3" || invitation.Template == "art-jawa-coklat-3" || invitation.Template == "jawa-coklat-3" {
+		invitation.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
+	} else {
+		invitation.CoverImage = req.CoverImage
+	}
 	invitation.Quotes = req.Quotes
 	invitation.GroomName = req.GroomName
 	invitation.GroomNickname = req.GroomNickname
@@ -1051,6 +1054,10 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 	baseURL := "https://" + c.Hostname()
 	if strings.Contains(c.Hostname(), "localhost") {
 		baseURL = "https://undangan.dekorin.my.id"
+	}
+
+	if invitation.Template == "jawa3" || invitation.Template == "art-jawa-coklat-3" || invitation.Template == "jawa-coklat-3" || templateName == "jawa3" || templateName == "art-jawa-coklat-3" || templateName == "jawa-coklat-3" {
+		invitation.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
 	}
 
 	// 1. OG Title (The Wedding of Bride & Groom)

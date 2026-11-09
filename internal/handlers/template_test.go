@@ -759,3 +759,21 @@ func TestJawa3UserProvidedPhotos(t *testing.T) {
 		t.Errorf("template_jawa3.html rendered <section id=\"galeri\"> when GalleryList is empty")
 	}
 }
+
+func TestJawa3CoverImageLocked(t *testing.T) {
+	tmplPath := filepath.Join("..", "..", "web", "templates", "template_jawa3.html")
+	content, err := os.ReadFile(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to read template_jawa3.html: %v", err)
+	}
+
+	// Cover background CSS harus mengarah ke /assets/templates/jawa3/bg-cover.jpg
+	if !strings.Contains(string(content), "url('/assets/templates/jawa3/bg-cover.jpg')") {
+		t.Errorf("template_jawa3.html does not lock cover background to /assets/templates/jawa3/bg-cover.jpg")
+	}
+
+	sampleInv, _ := getSampleInvitationForTemplate("jawa3")
+	if sampleInv.CoverImage != "/assets/templates/jawa3/bg-cover.jpg" {
+		t.Errorf("expected sample jawa3 cover image to be /assets/templates/jawa3/bg-cover.jpg, got: %s", sampleInv.CoverImage)
+	}
+}

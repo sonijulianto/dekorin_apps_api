@@ -2038,14 +2038,21 @@
 
                     <div id="boxInvFourPhotos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Cover Opening (opening.jpeg) -->
-                        <div class="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/70 space-y-2">
+                        <div id="boxInvCoverImageWrap" class="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/70 space-y-2">
                             <label class="block text-xs font-bold text-slate-800">Foto Cover / Amplop Pembuka (opening.jpeg)</label>
                             <p class="text-[11px] text-slate-400">Tampil di layar pembuka saat tamu pertama kali mengakses tautan</p>
-                            <div class="flex items-center gap-2">
-                                <input type="file" accept="image/*" onchange="uploadInvImage(this, 'inputInvCoverImage', 'previewInvCoverImage')"
+                            <div id="boxInvCoverImagePicker" class="flex items-center gap-2">
+                                <input type="file" id="fileInvCoverImage" accept="image/*" onchange="uploadInvImage(this, 'inputInvCoverImage', 'previewInvCoverImage')"
                                     class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#D4A574]/20 file:text-[#C59563] hover:file:bg-[#D4A574]/30 cursor-pointer">
                                 <img id="previewInvCoverImage" src="" class="hidden w-14 h-10 rounded-lg object-cover border border-slate-200 shadow-xs shrink-0">
                                 <input type="hidden" id="inputInvCoverImage" value="">
+                            </div>
+                            <div id="boxInvCoverImageLockedJawa" class="hidden flex items-center gap-2.5 p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs">
+                                <img src="/assets/templates/jawa3/bg-cover.jpg" class="w-11 h-11 rounded-lg object-cover border border-amber-300 shadow-2xs shrink-0" alt="Cover Jawa">
+                                <div>
+                                    <div class="font-bold flex items-center gap-1">🔒 Foto Cover Terkunci Otomatis</div>
+                                    <div class="text-[11px] text-amber-800 mt-0.5">Template Art Jawa Coklat 3 menggunakan latar gunungan wayang eksklusif bawaan dan tidak dapat diganti.</div>
+                                </div>
                             </div>
                         </div>
 
@@ -5328,19 +5335,32 @@
                     : 'Pilih beberapa foto sekaligus untuk ditampilkan di galeri foto undangan';
             }
 
-            // 7. Cover photo handling for Illustration vs Photo templates
-            const isNew = !document.getElementById('inputInvId').value;
-            if (isNew) {
-                const coverInput = document.getElementById('inputInvCoverImage');
-                if (isSakura) {
-                    if (coverInput.value === '/assets/templates/pn4/photos/LeniArdi2.jpeg') {
-                        coverInput.value = '';
-                        setImgPreview('previewInvCoverImage', '');
-                    }
-                } else {
-                    if (!coverInput.value) {
-                        coverInput.value = '/assets/templates/pn4/photos/LeniArdi2.jpeg';
-                        setImgPreview('previewInvCoverImage', '/assets/templates/pn4/photos/LeniArdi2.jpeg');
+            // 7. Cover photo handling for Jawa 3 vs Illustration vs Photo templates
+            const isJawa = tmplId === 'jawa3' || tmplId === 'art-jawa-coklat-3' || tmplId === 'jawa-coklat-3';
+            const boxCoverPicker = document.getElementById('boxInvCoverImagePicker');
+            const boxCoverLocked = document.getElementById('boxInvCoverImageLockedJawa');
+            const coverInput = document.getElementById('inputInvCoverImage');
+
+            if (isJawa) {
+                if (boxCoverPicker) boxCoverPicker.classList.add('hidden');
+                if (boxCoverLocked) boxCoverLocked.classList.remove('hidden');
+                if (coverInput) coverInput.value = '/assets/templates/jawa3/bg-cover.jpg';
+                setImgPreview('previewInvCoverImage', '/assets/templates/jawa3/bg-cover.jpg');
+            } else {
+                if (boxCoverPicker) boxCoverPicker.classList.remove('hidden');
+                if (boxCoverLocked) boxCoverLocked.classList.add('hidden');
+                const isNew = !document.getElementById('inputInvId').value;
+                if (isNew) {
+                    if (isSakura) {
+                        if (coverInput.value === '/assets/templates/pn4/photos/LeniArdi2.jpeg' || coverInput.value === '/assets/templates/jawa3/bg-cover.jpg') {
+                            coverInput.value = '';
+                            setImgPreview('previewInvCoverImage', '');
+                        }
+                    } else {
+                        if (!coverInput.value || coverInput.value === '/assets/templates/jawa3/bg-cover.jpg') {
+                            coverInput.value = '/assets/templates/pn4/photos/LeniArdi2.jpeg';
+                            setImgPreview('previewInvCoverImage', '/assets/templates/pn4/photos/LeniArdi2.jpeg');
+                        }
                     }
                 }
             }
@@ -5721,17 +5741,19 @@
             btn.disabled = true;
             btn.innerHTML = '<span>Menyimpan...</span>';
 
-            const isSakura = document.getElementById('inputInvTemplate').value === 'ta3' || document.getElementById('inputInvTemplate').value === 'ta17';
+            const selectedTmpl = document.getElementById('inputInvTemplate').value;
+            const isSakura = selectedTmpl === 'ta3' || selectedTmpl === 'ta17';
+            const isJawa = selectedTmpl === 'jawa3' || selectedTmpl === 'art-jawa-coklat-3' || selectedTmpl === 'jawa-coklat-3';
             const eventType = isSakura ? 'wedding' : document.getElementById('inputInvEventType').value;
             const isKhitan = !isSakura && eventType === 'khitan';
 
             const payload = {
                 title: document.getElementById('inputInvTitle').value.trim(),
                 slug: document.getElementById('inputInvSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-                template: document.getElementById('inputInvTemplate').value,
+                template: selectedTmpl,
                 event_type: eventType,
                 quotes: document.getElementById('inputInvQuotes').value.trim(),
-                cover_image: document.getElementById('inputInvCoverImage').value,
+                cover_image: isJawa ? '/assets/templates/jawa3/bg-cover.jpg' : document.getElementById('inputInvCoverImage').value,
                 
                 groom_name: isKhitan
                     ? (document.getElementById('inputInvChildName').value.trim() || 'Rayyan')

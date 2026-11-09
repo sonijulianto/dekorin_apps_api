@@ -341,7 +341,9 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.Title) != "" {
 		invitation.Title = strings.TrimSpace(req.Title)
 	}
-	if strings.TrimSpace(req.CoverImage) != "" {
+	if invitation.Template == "jawa3" || invitation.Template == "art-jawa-coklat-3" || invitation.Template == "jawa-coklat-3" {
+		invitation.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
+	} else if strings.TrimSpace(req.CoverImage) != "" {
 		invitation.CoverImage = strings.TrimSpace(req.CoverImage)
 	}
 
