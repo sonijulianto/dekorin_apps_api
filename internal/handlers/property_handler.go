@@ -255,7 +255,7 @@ func GetPropertiesAvailability(c *fiber.Ctx) error {
 	var bookedList []BookedResult
 	agendaSubQuery := config.DB.Table("agendas").
 		Select("id").
-		Where("event_date_time >= ? AND event_date_time <= ? AND status != 'cancelled'", startOfDay, endOfDay)
+		Where("event_date_time >= ? AND event_date_time <= ? AND status != 'cancelled' AND (is_form_draft = false OR is_form_draft IS NULL)", startOfDay, endOfDay)
 
 	if companyID != "" {
 		agendaSubQuery = agendaSubQuery.Where("company_id = ?", companyID)

@@ -92,7 +92,7 @@ func GetDashboardSummary(c *fiber.Ctx) error {
 	}
 
 	// 1. Total Pendapatan: Diambil dari agenda perusahaan yang payment_status = 'paid'
-	agendaQuery := config.DB.Preload("ClientForm").Where("payment_status = ?", "paid")
+	agendaQuery := config.DB.Preload("ClientForm").Where("payment_status = ? AND (is_form_draft = ? OR is_form_draft IS NULL)", "paid", false)
 	if companyID != "" {
 		agendaQuery = agendaQuery.Where("company_id = ?", companyID)
 	}
@@ -130,7 +130,7 @@ func GetDashboardSummary(c *fiber.Ctx) error {
 	// 4. Hitung Jumlah Event Agenda dalam periode / mendatang
 	startOfToday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	var agendaCount int64 = 0
-	countQuery := config.DB.Model(&models.Agenda{}).Where("status != ?", "cancelled")
+	countQuery := config.DB.Model(&models.Agenda{}).Where("status != ? AND (is_form_draft = ? OR is_form_draft IS NULL)", "cancelled", false)
 	if companyID != "" {
 		countQuery = countQuery.Where("company_id = ?", companyID)
 	}
@@ -144,7 +144,7 @@ func GetDashboardSummary(c *fiber.Ctx) error {
 	// Ambil daftar booking mendatang terdekat (maks 10) untuk carousel
 	var upcomingAgendas []models.Agenda
 	upcomingListQuery := config.DB.Preload("ClientForm").
-		Where("event_date_time >= ? AND status != ?", startOfToday, "cancelled")
+		Where("event_date_time >= ? AND status != ? AND (is_form_draft = ? OR is_form_draft IS NULL)", startOfToday, "cancelled", false)
 	if companyID != "" {
 		upcomingListQuery = upcomingListQuery.Where("company_id = ?", companyID)
 	}

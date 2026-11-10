@@ -117,6 +117,11 @@ func main() {
 	api.Put("/company/role-permissions", middleware.Protected(), middleware.RequireRole("owner"), handlers.UpdateCompanyRolePermissions)
 	api.Post("/company/role-permissions/reset", middleware.Protected(), middleware.RequireRole("owner"), handlers.ResetCompanyRolePermissions)
 
+	// Company Client Form Config routes (Pengaturan Daftar Isian Link Client per Sub-Brand)
+	api.Get("/company/form-config", middleware.Protected(), handlers.GetCompanyFormConfig)
+	api.Put("/company/form-config", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateCompanyFormConfig)
+	api.Post("/company/form-config/reset", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.ResetCompanyFormConfig)
+
 	// User routes
 	api.Get("/users", middleware.Protected(), handlers.GetAllUsers)
 	api.Post("/users", middleware.Protected(), handlers.CreateUser)
@@ -128,8 +133,11 @@ func main() {
 
 	// Agenda routes
 	api.Get("/agendas", middleware.Protected(), handlers.GetAgendas)
+	api.Get("/agendas/pending-links", middleware.Protected(), handlers.GetPendingClientLinks)
+	api.Post("/agendas/generate-link", middleware.Protected(), handlers.GenerateClientFormLink)
 	api.Post("/agendas", middleware.Protected(), handlers.CreateAgenda)
 	api.Put("/agendas/:id", middleware.Protected(), handlers.UpdateAgenda)
+	api.Post("/agendas/:id/unlock-form", middleware.Protected(), handlers.UnlockAgendaForm)
 	api.Put("/agendas/:id/schedule", middleware.Protected(), handlers.UpdateAgendaSchedule)
 	api.Put("/agendas/:id/location", middleware.Protected(), handlers.UpdateAgendaLocation)
 	api.Put("/agendas/:id/dp", middleware.Protected(), handlers.UpdateAgendaDp)
@@ -267,8 +275,9 @@ func main() {
 	})
 
 	// Client Web Form routes (dengan rate limit untuk mencegah brute force token)
-	app.Get("/form/:token", formLimiter, handlers.ShowClientForm)             // Public HTML form view
-	api.Post("/client-form/:token", formLimiter, handlers.SubmitClientForm)   // Submit form API
+	app.Get("/form/:token", formLimiter, handlers.ShowClientForm)                        // Public HTML form / summary view
+	api.Post("/client-form/:token", formLimiter, handlers.SubmitClientForm)              // Submit form API
+	api.Post("/client-form/:token/upload", formLimiter, handlers.UploadClientFormMedia)  // Public image upload for client form
 	api.Get("/agendas/:id/client-form", middleware.Protected(), handlers.GetClientFormByAgendaID) // Fetch submitted form for Flutter app
 
 	// Rate Limiter khusus Portal Kelola Undangan Pengantin (90 req/menit agar upload banyak foto galeri lancar)

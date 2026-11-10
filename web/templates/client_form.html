@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail Booking & Konfirmasi Acara — {{.ClientName}}</title>
+  <title>{{if .IsLocked}}Ringkasan Konfirmasi Acara{{else}}Formulir Detail Acara{{end}} — {{.CompanyName}}</title>
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/dekorin-favicon-32x32.png?v=20261103">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/dekorin-favicon.png?v=20261103">
@@ -23,61 +23,582 @@
       font-family: 'Playfair Display', Georgia, serif;
     }
     @media print {
-      body {
-        background-color: #ffffff;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-shadow-none {
-        box-shadow: none !important;
-      }
-      .print-break-inside-avoid {
-        break-inside: avoid;
-      }
+      body { background-color: #ffffff; }
+      .no-print { display: none !important; }
+      .print-shadow-none { box-shadow: none !important; }
+      .print-break-inside-avoid { break-inside: avoid; }
     }
   </style>
 </head>
-<body class="min-h-screen pb-14 antialiased">
+<body class="min-h-screen pb-16 antialiased">
 
   <!-- ============================================== -->
   <!-- TOP BAR / BRANDING                             -->
   <!-- ============================================== -->
-  <header class="bg-white/90 backdrop-blur-md border-b border-[#D4A574]/20 py-3.5 px-4 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-lg mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
+  <header class="bg-white/95 backdrop-blur-md border-b border-[#D4A574]/20 py-3.5 px-4 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-lg mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3 min-w-0">
         {{if .CompanyLogo}}
-          <img src="{{.CompanyLogo}}" alt="{{.CompanyName}}" class="w-10 h-10 rounded-xl object-cover border border-[#D4A574]/30">
+          <img src="{{.CompanyLogo}}" alt="{{.CompanyName}}" class="w-10 h-10 rounded-xl object-cover border border-[#D4A574]/30 shrink-0">
         {{else}}
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4A574] to-[#C59563] text-white font-bold flex items-center justify-center text-base shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4A574] to-[#C59563] text-white font-bold flex items-center justify-center text-base shadow-sm shrink-0">
             ✨
           </div>
         {{end}}
-        <div>
-          <h1 class="font-bold text-slate-900 text-sm leading-tight">{{.CompanyName}}</h1>
-          <p class="text-[11px] text-[#C59563] font-semibold tracking-wide">Detail & Konfirmasi Booking</p>
+        <div class="min-w-0">
+          <h1 class="font-bold text-slate-900 text-sm leading-tight truncate">{{.CompanyName}}</h1>
+          <p class="text-[11px] text-[#C59563] font-semibold tracking-wide">
+            {{if .IsLocked}}Ringkasan Konfirmasi Acara{{else}}Formulir Isian Data Acara{{end}}
+          </p>
         </div>
       </div>
-      <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 bg-[#F9F3EC] text-[#C59563] rounded-full border border-[#D4A574]/30">
-        <span>✓</span> Terverifikasi
-      </span>
+      {{if .IsLocked}}
+        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200 shrink-0">
+          <span>🔒</span> Terkonfirmasi
+        </span>
+      {{else}}
+        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full border border-amber-200 shrink-0">
+          <span>📝</span> Menunggu Isian
+        </span>
+      {{end}}
     </div>
   </header>
 
+  {{if not .IsLocked}}
+  <!-- ================================================================ -->
+  <!-- MODE A: FORM PENGISIAN DINAMIS (CLIENT WAJIB LENGKAPI FIELD)     -->
+  <!-- ================================================================ -->
+  <main class="max-w-lg mx-auto px-4 mt-5 space-y-4">
+    <!-- Banner Selamat Datang -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#C59563] via-[#D4A574] to-[#B88755] text-white p-5 sm:p-6 shadow-xl shadow-[#D4A574]/20">
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+      <div class="relative z-10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-white/90 bg-black/15 px-2.5 py-1 rounded-full">
+            Form Data Acara Klien
+          </span>
+          <span class="text-[11px] font-mono text-white/90">ID: {{.FormToken}}</span>
+        </div>
+        <h2 class="font-serif-title text-xl sm:text-2xl font-bold leading-snug text-white">
+          {{if .ClientName}}Halo Kak {{.ClientName}},{{else}}Lengkapi Data Acara Anda{{end}}
+        </h2>
+        <p class="text-xs text-white/90 leading-relaxed">
+          Mohon lengkapi daftar isian bertanda wajib (<span class="font-bold text-white">*</span>) di bawah ini. Setelah semua data wajib terkirim, halaman ini otomatis terkunci menjadi ringkasan konfirmasi resmi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Container Form Dinamis -->
+    <form id="dynamicClientForm" onsubmit="handleSubmitClientForm(event)" class="space-y-4" novalidate>
+      <div id="dynamicFieldsContainer" class="space-y-4">
+        <div class="p-8 text-center bg-white rounded-2xl border border-slate-100 text-xs text-slate-400">
+          Memuat formulir isian...
+        </div>
+      </div>
+
+      <!-- Ringkasan Estimasi Harga (Jika ShowPrice aktif & ada item berharga) -->
+      <div id="livePriceSummaryBox" class="hidden p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC] to-[#F5EBE1] border border-[#D4A574]/30 space-y-1.5">
+        <div class="flex items-center justify-between text-xs text-slate-600">
+          <span>Estimasi Total Pilihan:</span>
+          <span id="liveTotalPriceText" class="text-lg font-black text-slate-900 font-mono">Rp 0</span>
+        </div>
+        <p class="text-[10px] text-slate-500">Harga akhir & biaya transport (jika ada) akan dikonfirmasi oleh admin {{.CompanyName}}.</p>
+      </div>
+
+      <!-- Error Box -->
+      <div id="formErrorBox" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium space-y-1"></div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="btnSubmitClientForm"
+        class="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#C59563] to-[#D4A574] hover:opacity-95 text-white font-bold text-sm shadow-xl shadow-[#D4A574]/25 transition transform active:scale-[0.99] flex items-center justify-center gap-2">
+        <span>✓</span>
+        <span>Kirim & Konfirmasi Data Acara</span>
+      </button>
+    </form>
+
+    <footer class="pt-4 pb-4 text-center text-xs text-slate-400 space-y-1">
+      <p class="font-semibold text-slate-600">{{.CompanyName}}</p>
+      {{if .CompanyAddress}}<p class="text-[11px] text-slate-400">{{.CompanyAddress}}</p>{{end}}
+      {{if .CompanyPhoneClean}}
+      <p class="pt-1">
+        <a href="https://wa.me/{{.CompanyPhoneClean}}" target="_blank" class="text-[11px] font-bold text-[#C59563] hover:underline">
+          Butuh bantuan? Chat Admin via WhatsApp
+        </a>
+      </p>
+      {{end}}
+    </footer>
+  </main>
+
+  <script>
+    const FORM_TOKEN = "{{.FormToken}}";
+    const SHOW_PRICE = {{.ShowPrice}};
+    const FIELDS_CONFIG = {{.FieldsJSON}} || [];
+    const INITIAL_VALUES = {{.InitialValuesJSON}} || {};
+    const PACKAGES_DATA = {{.PackagesJSON}} || [];
+    const MODELS_DATA = {{.ModelsJSON}} || [];
+    const ADDONS_DATA = {{.AddonsJSON}} || [];
+
+    const formState = {
+      values: { ...INITIAL_VALUES },
+      selectedPackageId: INITIAL_VALUES.package_id || '',
+      selectedModelId: INITIAL_VALUES.model_id || '',
+      addonQtyMap: {} // { addonId: qty }
+    };
+
+    function formatRp(val) {
+      return 'Rp ' + Number(val || 0).toLocaleString('id-ID');
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderDynamicForm() {
+      const container = document.getElementById('dynamicFieldsContainer');
+      if (!container) return;
+
+      if (!FIELDS_CONFIG || FIELDS_CONFIG.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center bg-white rounded-2xl border border-slate-100 text-xs text-slate-500">Belum ada field isian yang diaktifkan oleh vendor.</div>`;
+        return;
+      }
+
+      container.innerHTML = FIELDS_CONFIG.map((f) => {
+        const reqBadge = f.is_required
+          ? `<span class="text-rose-500 font-bold ml-0.5">*</span>`
+          : `<span class="text-[10px] text-slate-400 font-normal ml-1">(Opsional)</span>`;
+        const curVal = formState.values[f.key] || '';
+
+        let inputHtml = '';
+
+        if (f.type === 'textarea') {
+          inputHtml = `
+            <textarea id="field-${f.key}" data-key="${f.key}" rows="3"
+              placeholder="${escapeHtml(f.placeholder || 'Tulis jawaban Anda...')}"
+              oninput="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">${escapeHtml(curVal)}</textarea>
+          `;
+        } else if (f.type === 'number') {
+          inputHtml = `
+            <input type="number" id="field-${f.key}" data-key="${f.key}"
+              value="${escapeHtml(curVal)}"
+              placeholder="${escapeHtml(f.placeholder || 'Masukkan angka...')}"
+              oninput="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+          `;
+        } else if (f.type === 'date') {
+          inputHtml = `
+            <input type="date" id="field-${f.key}" data-key="${f.key}"
+              value="${escapeHtml(curVal)}"
+              onchange="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+          `;
+        } else if (f.type === 'time') {
+          inputHtml = `
+            <input type="time" id="field-${f.key}" data-key="${f.key}"
+              value="${escapeHtml(curVal)}"
+              onchange="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+          `;
+        } else if (f.type === 'datetime') {
+          inputHtml = `
+            <input type="datetime-local" id="field-${f.key}" data-key="${f.key}"
+              value="${escapeHtml(curVal)}"
+              onchange="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+          `;
+        } else if (f.type === 'maps') {
+          inputHtml = `
+            <div class="space-y-2">
+              <div class="relative">
+                <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-4 h-4 object-contain absolute left-3 top-1/2 -translate-y-1/2">
+                <input type="text" id="field-${f.key}" data-key="${f.key}"
+                  value="${escapeHtml(curVal)}"
+                  placeholder="${escapeHtml(f.placeholder || 'Tempel link Google Maps atau ketik nama gedung...')}"
+                  oninput="updateFieldValue('${f.key}', this.value)"
+                  class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+              </div>
+              <p class="text-[10px] text-slate-400">Anda bisa membagikan link lokasi dari aplikasi Google Maps atau mengetik nama venue/gedung.</p>
+            </div>
+          `;
+        } else if (f.type === 'select') {
+          const opts = (f.options || []).map(o =>
+            `<option value="${escapeHtml(o)}" ${curVal === o ? 'selected' : ''}>${escapeHtml(o)}</option>`
+          ).join('');
+          inputHtml = `
+            <select id="field-${f.key}" data-key="${f.key}"
+              onchange="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+              <option value="">-- Pilih Salah Satu --</option>
+              ${opts}
+            </select>
+          `;
+        } else if (f.type === 'radio') {
+          const opts = (f.options || []).map((o, idx) => {
+            const isChecked = curVal === o;
+            return `
+              <label class="flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition ${isChecked ? 'border-[#D4A574] bg-[#F9F3EC]/70' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'}">
+                <input type="radio" name="radio-${f.key}" value="${escapeHtml(o)}" ${isChecked ? 'checked' : ''}
+                  onchange="updateFieldValue('${f.key}', this.value); renderDynamicForm()"
+                  class="accent-[#C59563] w-4 h-4">
+                <span class="text-xs font-medium text-slate-800">${escapeHtml(o)}</span>
+              </label>
+            `;
+          }).join('');
+          inputHtml = `<div class="space-y-2">${opts || '<p class="text-xs text-slate-400">Belum ada opsi.</p>'}</div>`;
+        } else if (f.type === 'checkbox') {
+          const selectedArr = curVal ? curVal.split(',').map(x => x.trim()).filter(Boolean) : [];
+          const opts = (f.options || []).map(o => {
+            const isChecked = selectedArr.includes(o);
+            return `
+              <label class="flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition ${isChecked ? 'border-[#D4A574] bg-[#F9F3EC]/70' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'}">
+                <input type="checkbox" value="${escapeHtml(o)}" ${isChecked ? 'checked' : ''}
+                  onchange="toggleCheckboxOption('${f.key}', this.value, this.checked)"
+                  class="accent-[#C59563] w-4 h-4 rounded">
+                <span class="text-xs font-medium text-slate-800">${escapeHtml(o)}</span>
+              </label>
+            `;
+          }).join('');
+          inputHtml = `<div class="space-y-2">${opts || '<p class="text-xs text-slate-400">Belum ada opsi.</p>'}</div>`;
+        } else if (f.type === 'image') {
+          inputHtml = `
+            <div class="space-y-2.5">
+              ${curVal ? `
+                <div class="relative rounded-2xl overflow-hidden border border-[#D4A574]/30 bg-slate-50">
+                  <img src="${escapeHtml(curVal)}" alt="Preview" class="w-full h-48 object-cover">
+                  <button type="button" onclick="updateFieldValue('${f.key}', ''); renderDynamicForm()"
+                    class="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 text-white text-[10px] font-bold hover:bg-black/80">
+                    ✕ Hapus Foto
+                  </button>
+                </div>
+              ` : ''}
+              <label class="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-300 hover:border-[#D4A574] bg-slate-50/60 cursor-pointer transition">
+                <span class="text-2xl mb-1">📷</span>
+                <span id="uploadStatus-${f.key}" class="text-xs font-semibold text-slate-700">${curVal ? 'Ganti Foto' : 'Ketuk untuk Unggah Foto'}</span>
+                <span class="text-[10px] text-slate-400 mt-0.5">JPG, PNG, WEBP (Maks. 10 MB)</span>
+                <input type="file" accept="image/*" class="hidden" onchange="uploadClientImage('${f.key}', this)">
+              </label>
+            </div>
+          `;
+        } else if (f.type === 'package_picker') {
+          if (PACKAGES_DATA.length === 0) {
+            inputHtml = `<p class="text-xs text-slate-400 italic">Daftar paket belum tersedia.</p>`;
+          } else {
+            inputHtml = `<div class="space-y-2.5">` + PACKAGES_DATA.map(pkg => {
+              const isSelected = formState.selectedPackageId === pkg.id;
+              return `
+                <div onclick="selectClientPackage('${pkg.id}')"
+                  class="cursor-pointer p-3.5 rounded-2xl border-2 transition ${isSelected ? 'border-[#D4A574] bg-[#F9F3EC]/60 shadow-xs' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'}">
+                  <div class="flex items-start gap-3">
+                    ${pkg.image_url
+                      ? `<img src="${escapeHtml(pkg.image_url)}" class="w-14 h-14 rounded-xl object-cover shrink-0 border border-slate-200">`
+                      : `<div class="w-14 h-14 rounded-xl bg-[#F9F3EC] text-[#C59563] flex items-center justify-center text-xl shrink-0">💐</div>`}
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-2">
+                        <h4 class="text-xs font-bold text-slate-900">${escapeHtml(pkg.name)}</h4>
+                        ${SHOW_PRICE ? `<span class="text-xs font-bold text-[#C59563] font-mono shrink-0">${formatRp(pkg.base_price)}</span>` : ''}
+                      </div>
+                      ${pkg.description ? `<p class="text-[11px] text-slate-500 mt-1 line-clamp-2">${escapeHtml(pkg.description)}</p>` : ''}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('') + `</div>`;
+          }
+        } else if (f.type === 'model_picker') {
+          if (MODELS_DATA.length === 0) {
+            inputHtml = `<p class="text-xs text-slate-400 italic">Daftar model dekorasi belum tersedia.</p>`;
+          } else {
+            // Cek harga tambahan model jika terkait dengan paket terpilih
+            const activePkg = PACKAGES_DATA.find(p => p.id === formState.selectedPackageId);
+            const pmMap = {};
+            if (activePkg && activePkg.package_models) {
+              activePkg.package_models.forEach(pm => { pmMap[pm.decoration_model_id] = pm.additional_price || 0; });
+            }
+            inputHtml = `<div class="grid grid-cols-2 gap-2.5">` + MODELS_DATA.map(m => {
+              const isSelected = formState.selectedModelId === m.id;
+              const extraPrice = pmMap[m.id] || 0;
+              return `
+                <div onclick="selectClientModel('${m.id}')"
+                  class="cursor-pointer rounded-2xl border-2 overflow-hidden transition flex flex-col ${isSelected ? 'border-[#D4A574] bg-[#F9F3EC]/60 shadow-xs' : 'border-slate-100 bg-white hover:border-slate-200'}">
+                  ${m.image_url
+                    ? `<img src="${escapeHtml(m.image_url)}" class="w-full h-28 object-cover">`
+                    : `<div class="w-full h-28 bg-slate-100 flex items-center justify-center text-2xl text-slate-300">🖼️</div>`}
+                  <div class="p-2.5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <p class="text-xs font-bold text-slate-900 leading-tight">${escapeHtml(m.name)}</p>
+                      ${m.width ? `<span class="inline-block mt-1 px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-semibold text-slate-600">Lebar: ${escapeHtml(m.width)}</span>` : ''}
+                    </div>
+                    ${SHOW_PRICE ? `
+                      <p class="text-[11px] font-bold mt-1.5 ${extraPrice > 0 ? 'text-amber-700' : 'text-emerald-600'}">
+                        ${extraPrice > 0 ? '+ ' + formatRp(extraPrice) : 'Termasuk Paket'}
+                      </p>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('') + `</div>`;
+          }
+        } else if (f.type === 'addon_picker') {
+          if (ADDONS_DATA.length === 0) {
+            inputHtml = `<p class="text-xs text-slate-400 italic">Item tambahan belum tersedia.</p>`;
+          } else {
+            inputHtml = `<div class="space-y-2">` + ADDONS_DATA.map(a => {
+              const qty = formState.addonQtyMap[a.id] || 0;
+              return `
+                <div class="p-3 rounded-2xl border transition flex items-center justify-between gap-3 ${qty > 0 ? 'border-[#D4A574] bg-[#F9F3EC]/50' : 'border-slate-100 bg-slate-50/50'}">
+                  <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                    ${a.image_url
+                      ? `<img src="${escapeHtml(a.image_url)}" class="w-11 h-11 rounded-xl object-cover shrink-0 border border-slate-200">`
+                      : `<div class="w-11 h-11 rounded-xl bg-[#F9F3EC] text-[#C59563] flex items-center justify-center text-base shrink-0">✨</div>`}
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold text-slate-900 truncate">${escapeHtml(a.name)}</p>
+                      ${SHOW_PRICE ? `<p class="text-[11px] font-bold text-[#C59563] font-mono">${formatRp(a.price)}</p>` : ''}
+                      ${a.description ? `<p class="text-[10px] text-slate-400 truncate">${escapeHtml(a.description)}</p>` : ''}
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="changeAddonQty('${a.id}', -1)"
+                      class="w-7 h-7 rounded-lg border border-slate-200 bg-white text-slate-600 font-bold text-xs hover:bg-slate-100">-</button>
+                    <span class="w-6 text-center text-xs font-bold text-slate-800 font-mono">${qty}</span>
+                    <button type="button" onclick="changeAddonQty('${a.id}', 1)"
+                      class="w-7 h-7 rounded-lg bg-[#D4A574] text-white font-bold text-xs hover:bg-[#C59563]">+</button>
+                  </div>
+                </div>
+              `;
+            }).join('') + `</div>`;
+          }
+        } else {
+          // Default: text input
+          const inputType = f.key === 'client_phone' ? 'tel' : 'text';
+          inputHtml = `
+            <input type="${inputType}" id="field-${f.key}" data-key="${f.key}"
+              value="${escapeHtml(curVal)}"
+              placeholder="${escapeHtml(f.placeholder || 'Ketik jawaban Anda...')}"
+              oninput="updateFieldValue('${f.key}', this.value)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition">
+          `;
+        }
+
+        return `
+          <div id="fieldWrapper-${f.key}" class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-xs space-y-2.5">
+            <label class="block text-xs font-bold text-slate-800">
+              ${escapeHtml(f.label)}${reqBadge}
+            </label>
+            ${inputHtml}
+          </div>
+        `;
+      }).join('');
+
+      updateLivePrice();
+    }
+
+    function updateFieldValue(key, val) {
+      formState.values[key] = val;
+    }
+
+    function toggleCheckboxOption(key, optVal, isChecked) {
+      const cur = formState.values[key] ? formState.values[key].split(',').map(x => x.trim()).filter(Boolean) : [];
+      let next;
+      if (isChecked) {
+        next = cur.includes(optVal) ? cur : [...cur, optVal];
+      } else {
+        next = cur.filter(x => x !== optVal);
+      }
+      formState.values[key] = next.join(', ');
+      renderDynamicForm();
+    }
+
+    function selectClientPackage(pkgId) {
+      formState.selectedPackageId = formState.selectedPackageId === pkgId ? '' : pkgId;
+      formState.values['package_id'] = formState.selectedPackageId;
+      renderDynamicForm();
+    }
+
+    function selectClientModel(modelId) {
+      formState.selectedModelId = formState.selectedModelId === modelId ? '' : modelId;
+      formState.values['model_id'] = formState.selectedModelId;
+      renderDynamicForm();
+    }
+
+    function changeAddonQty(addonId, delta) {
+      const cur = formState.addonQtyMap[addonId] || 0;
+      const next = Math.max(0, cur + delta);
+      if (next === 0) delete formState.addonQtyMap[addonId];
+      else formState.addonQtyMap[addonId] = next;
+
+      const anySelected = Object.keys(formState.addonQtyMap).length > 0;
+      formState.values['addons'] = anySelected ? 'selected' : '';
+      renderDynamicForm();
+    }
+
+    function updateLivePrice() {
+      const box = document.getElementById('livePriceSummaryBox');
+      const totalEl = document.getElementById('liveTotalPriceText');
+      if (!box || !totalEl || !SHOW_PRICE) {
+        if (box) box.classList.add('hidden');
+        return;
+      }
+
+      let total = 0;
+      const pkg = PACKAGES_DATA.find(p => p.id === formState.selectedPackageId);
+      if (pkg) {
+        total += Number(pkg.base_price || 0);
+        if (formState.selectedModelId && pkg.package_models) {
+          const pm = pkg.package_models.find(m => m.decoration_model_id === formState.selectedModelId);
+          if (pm) total += Number(pm.additional_price || 0);
+        }
+      }
+
+      Object.entries(formState.addonQtyMap).forEach(([id, qty]) => {
+        const a = ADDONS_DATA.find(x => x.id === id);
+        if (a) total += Number(a.price || 0) * qty;
+      });
+
+      if (total > 0) {
+        box.classList.remove('hidden');
+        totalEl.innerText = formatRp(total);
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    async function uploadClientImage(key, input) {
+      if (!input.files || !input.files[0]) return;
+      const statusEl = document.getElementById(`uploadStatus-${key}`);
+      if (statusEl) statusEl.innerText = 'Mengunggah foto...';
+
+      const formData = new FormData();
+      formData.append('image', input.files[0]);
+
+      try {
+        const res = await fetch(`/api/client-form/${encodeURIComponent(FORM_TOKEN)}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Gagal mengunggah gambar');
+
+        formState.values[key] = json.url;
+        renderDynamicForm();
+      } catch (err) {
+        alert('Gagal mengunggah foto: ' + err.message);
+        if (statusEl) statusEl.innerText = 'Ketuk untuk Unggah Foto';
+      }
+    }
+
+    async function handleSubmitClientForm(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('formErrorBox');
+      const btn = document.getElementById('btnSubmitClientForm');
+      errBox.classList.add('hidden');
+      errBox.innerHTML = '';
+
+      // Reset highlight error
+      document.querySelectorAll('[id^="fieldWrapper-"]').forEach(w => {
+        w.classList.remove('border-rose-400', 'ring-2', 'ring-rose-200');
+      });
+
+      // Validasi client-side semua field wajib
+      const missing = [];
+      FIELDS_CONFIG.forEach(f => {
+        if (f.is_required) {
+          let val = (formState.values[f.key] || '').trim();
+          if (f.key === 'package_id') val = formState.selectedPackageId;
+          if (f.key === 'model_id') val = formState.selectedModelId;
+          if (f.key === 'addons') val = Object.keys(formState.addonQtyMap).length > 0 ? 'selected' : '';
+          if (!val) {
+            missing.push(f);
+          }
+        }
+      });
+
+      if (missing.length > 0) {
+        missing.forEach(f => {
+          const wrap = document.getElementById(`fieldWrapper-${f.key}`);
+          if (wrap) wrap.classList.add('border-rose-400', 'ring-2', 'ring-rose-200');
+        });
+        errBox.innerHTML = `<p class="font-bold">Mohon lengkapi isian wajib berikut:</p><ul class="list-disc pl-4">${missing.map(f => `<li>${escapeHtml(f.label)}</li>`).join('')}</ul>`;
+        errBox.classList.remove('hidden');
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const addonItems = Object.entries(formState.addonQtyMap).map(([id, qty]) => ({
+        addon_id: id,
+        quantity: qty
+      }));
+
+      const payload = {
+        client_name: formState.values.client_name || '',
+        client_phone: formState.values.client_phone || '',
+        backdrop_title: formState.values.backdrop_title || '',
+        event_date_time: formState.values.event_date_time || '',
+        event_address: formState.values.event_address || '',
+        maps_url: formState.values.maps_url || '',
+        package_id: formState.selectedPackageId || '',
+        model_id: formState.selectedModelId || '',
+        addon_items: addonItems,
+        decoration_theme: formState.values.decoration_theme || '',
+        color_preference: formState.values.color_preference || '',
+        reference_photo_url: formState.values.reference_photo_url || '',
+        notes: formState.values.notes || '',
+        custom_answers: formState.values
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span><span>Menyimpan & Mengunci Data...</span>`;
+
+      try {
+        const res = await fetch(`/api/client-form/${encodeURIComponent(FORM_TOKEN)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Gagal menyimpan data');
+
+        // Reload agar langsung berubah menjadi Ringkasan Konfirmasi (Terkunci)
+        window.location.reload();
+      } catch (err) {
+        errBox.innerHTML = `<p>${escapeHtml(err.message)}</p>`;
+        errBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = `<span>✓</span><span>Kirim & Konfirmasi Data Acara</span>`;
+      }
+    }
+
+    renderDynamicForm();
+  </script>
+
+  {{else}}
+  <!-- ================================================================ -->
+  <!-- MODE B: RINGKASAN KONFIRMASI TERKUNCI (READ-ONLY)                -->
+  <!-- ================================================================ -->
   <main class="max-w-lg mx-auto px-4 mt-5 space-y-4">
 
-    <!-- ============================================== -->
-    <!-- HERO CARD: JUDUL BACKDROP & PEMESAN            -->
-    <!-- ============================================== -->
+    <!-- Notice Terkunci -->
+    <div class="no-print p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-start gap-2.5 shadow-2xs">
+      <span class="text-base shrink-0">🔒</span>
+      <div class="leading-relaxed">
+        <span class="font-bold block">Data Terkonfirmasi & Terkunci</span>
+        <span class="text-[11px] text-emerald-700">Seluruh isian telah diterima dan dikunci sebagai ringkasan resmi. Jika ada perubahan atau tambahan, silakan ajukan langsung ke admin via WhatsApp di bawah.</span>
+      </div>
+    </div>
+
+    <!-- HERO CARD: JUDUL BACKDROP & PEMESAN -->
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#C59563] via-[#D4A574] to-[#B88755] text-white p-6 shadow-xl shadow-[#D4A574]/20">
-      <!-- Decorative floral subtle background circles -->
       <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
       <div class="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-white/10 blur-lg pointer-events-none"></div>
 
       <div class="relative z-10 space-y-4">
         <div class="flex items-center justify-between">
           <span class="text-[10px] uppercase font-bold tracking-widest text-white/80 bg-black/15 px-2.5 py-1 rounded-full backdrop-blur-xs">
-            Konfirmasi Pesanan Dekorasi
+            Ringkasan Konfirmasi Dekorasi
           </span>
           <span class="text-[11px] font-mono text-white/90">
             ID: {{.FormToken}}
@@ -126,103 +647,127 @@
       </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- STATUS PEMBAYARAN CARD                         -->
-    <!-- ============================================== -->
-    {{if .IsPaidOff}}
-    <div class="bg-white rounded-2xl p-4 border border-emerald-200 shadow-sm flex items-center gap-3.5">
-      <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-black text-2xl flex items-center justify-center shrink-0">
-        ✓
+    <!-- STATUS PEMBAYARAN (Hanya jika ShowPrice aktif) -->
+    {{if .ShowPrice}}
+      {{if .IsPaidOff}}
+      <div class="bg-white rounded-2xl p-4 border border-emerald-200 shadow-sm flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-black text-2xl flex items-center justify-center shrink-0">✓</div>
+        <div class="flex-1 min-w-0">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-600 block">Status Pembayaran</span>
+          <h3 class="text-sm font-bold text-emerald-900">LUNAS (Terverifikasi)</h3>
+          <p class="text-[11px] text-emerald-700 mt-0.5">Seluruh pembayaran acara Anda telah lunas. Terima kasih atas kepercayaan Anda!</p>
+        </div>
       </div>
-      <div class="flex-1 min-w-0">
-        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-600 block">Status Pembayaran</span>
-        <h3 class="text-sm font-bold text-emerald-900">LUNAS (Terverifikasi)</h3>
-        <p class="text-[11px] text-emerald-700 mt-0.5">Seluruh pembayaran acara Anda telah lunas. Terima kasih atas kepercayaan Anda!</p>
-      </div>
-    </div>
-    {{else if .HasDP}}
-    <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm space-y-2.5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">💳</span>
+      {{else if .HasDP}}
+      <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">💳</span>
+            <div>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-amber-700 block">Status Pembayaran</span>
+              <h3 class="text-xs font-bold text-slate-900">UANG MUKA (DP) DITERIMA</h3>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">DP Terbayar</span>
+        </div>
+        <div class="p-3 bg-[#F9F3EC]/70 rounded-xl grid grid-cols-2 gap-2 text-xs">
           <div>
-            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-700 block">Status Pembayaran</span>
-            <h3 class="text-xs font-bold text-slate-900">UANG MUKA (DP) DITERIMA</h3>
+            <span class="text-[10px] text-slate-500 block">DP yang Sudah Masuk:</span>
+            <span class="font-bold text-emerald-600 font-mono text-sm">{{.DpAmountFormatted}}</span>
+          </div>
+          <div class="text-right border-l border-amber-200/50 pl-2">
+            <span class="text-[10px] text-slate-500 block">Sisa Tagihan:</span>
+            <span class="font-bold text-rose-600 font-mono text-sm">{{.RemainingFormatted}}</span>
           </div>
         </div>
-        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-          DP Terbayar
-        </span>
       </div>
-      <div class="p-3 bg-[#F9F3EC]/70 rounded-xl grid grid-cols-2 gap-2 text-xs">
-        <div>
-          <span class="text-[10px] text-slate-500 block">DP yang Sudah Masuk:</span>
-          <span class="font-bold text-emerald-600 font-mono text-sm">{{.DpAmountFormatted}}</span>
-        </div>
-        <div class="text-right border-l border-amber-200/50 pl-2">
-          <span class="text-[10px] text-slate-500 block">Sisa Tagihan:</span>
-          <span class="font-bold text-rose-600 font-mono text-sm">{{.RemainingFormatted}}</span>
-        </div>
-      </div>
-    </div>
-    {{else}}
-    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-3.5">
-      <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 font-bold text-xl flex items-center justify-center shrink-0">
-        ⏳
-      </div>
-      <div class="flex-1 min-w-0">
-        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 block">Status Pembayaran</span>
-        <h3 class="text-xs font-bold text-slate-900">Menunggu Pembayaran Uang Muka (DP)</h3>
-        <p class="text-[11px] text-slate-500 mt-0.5">Silakan hubungi vendor kami untuk pembayaran DP agar tanggal Anda terkunci secara resmi.</p>
-      </div>
-    </div>
+      {{end}}
     {{end}}
 
-    <!-- ============================================== -->
-    <!-- TEMPAT / LOKASI ACARA                          -->
-    <!-- ============================================== -->
+    <!-- TEMPAT / LOKASI ACARA -->
+    {{if or .EventAddress .MapsURL}}
     <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3 print-break-inside-avoid">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-          <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-4 h-4 object-contain inline-block"> Tempat & Lokasi Acara
-        </h3>
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+        <img src="/assets/icons/google-maps-icon.webp" alt="Maps" class="w-4 h-4 object-contain inline-block"> Tempat & Lokasi Acara
+      </h3>
+
+      {{if .EventAddress}}
+      <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-800 leading-relaxed">
+        <span class="text-[10px] font-semibold text-slate-400 uppercase block mb-0.5">Alamat Lengkap:</span>
+        {{.EventAddress}}
       </div>
+      {{end}}
 
       {{if .MapsURL}}
       <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex-1 min-w-0">
-          <span class="text-[11px] text-slate-500 block">Link Google Maps / Alamat Venue:</span>
+          <span class="text-[11px] text-slate-500 block">Link Google Maps:</span>
           <span class="text-xs font-semibold text-slate-800 break-all">{{.MapsURL}}</span>
         </div>
         <a href="{{.MapsURL}}" target="_blank" rel="noopener noreferrer"
           class="no-print inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-sm shrink-0">
           <img src="/assets/icons/google-maps-icon.webp" alt="Google Maps" class="w-4 h-4 object-contain">
-          <span>Buka Petunjuk Arah</span>
+          <span>Buka Maps</span>
         </a>
       </div>
-      {{else}}
-      <p class="text-xs text-slate-500 italic bg-slate-50 p-3 rounded-xl border border-slate-100">
-        Lokasi venue belum diisi di sistem / koordinasikan langsung dengan vendor dekorasi.
-      </p>
       {{end}}
     </div>
+    {{end}}
 
-    <!-- ============================================== -->
-    <!-- PAKET DEKORASI YANG DIPILIH                    -->
-    <!-- ============================================== -->
+    <!-- DETAIL ISIAN KHUSUS / KUSTOM DARI CLIENT -->
+    {{if .CustomAnswers}}
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3 print-break-inside-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+        <span>📋</span> Rincian Isian Tambahan Klien
+      </h3>
+      <div class="divide-y divide-slate-100">
+        {{range .CustomAnswers}}
+        <div class="py-2.5 first:pt-0 last:pb-0 space-y-1">
+          <span class="text-[11px] font-semibold text-slate-400 block">{{.Label}}</span>
+          {{if eq .Type "image"}}
+          <a href="{{.Value}}" target="_blank" class="block mt-1">
+            <img src="{{.Value}}" alt="{{.Label}}" class="w-full max-h-60 rounded-xl object-cover border border-slate-200">
+          </a>
+          {{else}}
+          <p class="text-xs font-semibold text-slate-800 whitespace-pre-line">{{.Value}}</p>
+          {{end}}
+        </div>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+
+    <!-- FOTO REFERENSI -->
+    {{if .ReferencePhotoURL}}
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-2.5 print-break-inside-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+        <span>📸</span> Foto Referensi / Denah Lokasi
+      </h3>
+      <a href="{{.ReferencePhotoURL}}" target="_blank" class="block rounded-2xl overflow-hidden border border-slate-200">
+        <img src="{{.ReferencePhotoURL}}" alt="Foto Referensi" class="w-full max-h-72 object-cover">
+      </a>
+    </div>
+    {{end}}
+
+    <!-- PAKET DEKORASI -->
+    {{if or .PackageName (gt .PackagePrice 0.0)}}
     <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3.5 print-break-inside-avoid">
       <div class="flex items-center justify-between">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
           <span>💐</span> Paket Dekorasi yang Dipilih
         </h3>
+        {{if .ShowPrice}}
         <span class="text-xs font-bold text-[#C59563] font-mono">{{.PackagePriceFormatted}}</span>
+        {{end}}
       </div>
 
       <div class="p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC]/80 to-[#F5EBE1]/40 border border-[#D4A574]/20 space-y-2">
         <div class="flex items-start justify-between gap-2">
           <div>
             <h4 class="text-sm font-bold text-slate-900">{{if .PackageName}}{{.PackageName}}{{else}}Paket Khusus/Custom{{end}}</h4>
+            {{if .ShowPrice}}
             <span class="text-[11px] text-[#C59563] font-medium">Harga Dasar: {{.PackagePriceFormatted}}</span>
+            {{end}}
           </div>
           {{if .PackageImage}}
           <img src="{{.PackageImage}}" alt="{{.PackageName}}" class="w-14 h-14 rounded-xl object-cover border border-[#D4A574]/20 shrink-0">
@@ -237,27 +782,24 @@
         {{end}}
       </div>
     </div>
+    {{end}}
 
-    <!-- ============================================== -->
-    <!-- MODEL PELAMINAN / BACKDROP YANG DIPILIH        -->
-    <!-- ============================================== -->
+    <!-- MODEL PELAMINAN / BACKDROP -->
+    {{if .ModelName}}
     <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3.5 print-break-inside-avoid">
       <div class="flex items-center justify-between">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
           <span>🖼️</span> Model Pelaminan / Backdrop
         </h3>
         {{if .ModelWidth}}
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30">
-          Lebar: {{.ModelWidth}}
-        </span>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30">Lebar: {{.ModelWidth}}</span>
         {{end}}
       </div>
 
-      {{if .ModelName}}
       <div class="space-y-3">
         {{if .ModelImageURL}}
-        <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative group">
-          <img src="{{.ModelImageURL}}" alt="{{.ModelName}}" class="w-full h-56 sm:h-72 object-cover transition duration-300 group-hover:scale-[1.02]">
+        <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+          <img src="{{.ModelImageURL}}" alt="{{.ModelName}}" class="w-full h-56 sm:h-72 object-cover">
         </div>
         {{end}}
 
@@ -268,28 +810,40 @@
               {{if .ModelWidth}}Ukuran Backdrop: {{.ModelWidth}}{{else}}Ukuran standar pelaminan{{end}}
             </div>
           </div>
-          {{if gt .ModelAddPrice 0.0}}
-          <div class="text-right">
-            <span class="text-[10px] text-slate-400 block font-medium">Biaya Tambahan:</span>
-            <span class="text-xs font-bold text-amber-700 font-mono">+{{.ModelAddPriceFormatted}}</span>
-          </div>
-          {{else}}
-          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-            Termasuk dalam paket
-          </span>
+          {{if .ShowPrice}}
+            {{if gt .ModelAddPrice 0.0}}
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 block font-medium">Biaya Tambahan:</span>
+              <span class="text-xs font-bold text-amber-700 font-mono">+{{.ModelAddPriceFormatted}}</span>
+            </div>
+            {{else}}
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Termasuk paket</span>
+            {{end}}
           {{end}}
         </div>
       </div>
-      {{else}}
-      <div class="p-4 rounded-xl bg-slate-50 text-center text-xs text-slate-400 border border-slate-100">
-        Model dekorasi akan dipilih langsung saat konsultasi bersama tim desainer kami.
-      </div>
-      {{end}}
     </div>
+    {{end}}
 
-    <!-- ============================================== -->
-    <!-- RINCIAN BIAYA & REKAP PEMBAYARAN (INVOICE)     -->
-    <!-- ============================================== -->
+    <!-- ITEM TAMBAHAN (ADDONS) -->
+    {{if .SelectedAddons}}
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-2.5 print-break-inside-avoid">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <span>✨</span> Item Tambahan (Addons)
+        </h3>
+        {{if and .ShowPrice (gt .AddonsPrice 0.0)}}
+        <span class="text-xs font-bold text-[#C59563] font-mono">{{.AddonsPriceFormatted}}</span>
+        {{end}}
+      </div>
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed">
+        {{.SelectedAddons}}
+      </div>
+    </div>
+    {{end}}
+
+    <!-- RINCIAN BIAYA & REKAP PEMBAYARAN (Hanya jika ShowPrice aktif) -->
+    {{if .ShowPrice}}
     <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-4 print-break-inside-avoid">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -308,6 +862,13 @@
         <div class="flex justify-between py-1 text-slate-600">
           <span>Upgrade Model ({{.ModelName}}):</span>
           <span class="font-mono font-semibold text-amber-700">+ {{.ModelAddPriceFormatted}}</span>
+        </div>
+        {{end}}
+
+        {{if gt .AddonsPrice 0.0}}
+        <div class="flex justify-between py-1 text-slate-600">
+          <span>Item Tambahan (Addons):</span>
+          <span class="font-mono font-semibold text-slate-800">+ {{.AddonsPriceFormatted}}</span>
         </div>
         {{end}}
 
@@ -337,10 +898,9 @@
         </div>
       </div>
     </div>
+    {{end}}
 
-    <!-- ============================================== -->
-    <!-- CATATAN KHUSUS ACARA                           -->
-    <!-- ============================================== -->
+    <!-- CATATAN KHUSUS ACARA -->
     {{if .Notes}}
     <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-2 print-break-inside-avoid">
       <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -352,38 +912,35 @@
     </div>
     {{end}}
 
-    <!-- ============================================== -->
-    <!-- AKSI: HUBUNGI WA & PRINT                       -->
-    <!-- ============================================== -->
+    <!-- AKSI: REQUEST PERUBAHAN KE ADMIN VIA WA & CETAK PDF -->
     <div class="no-print space-y-2.5 pt-2">
       {{if .CompanyPhoneClean}}
-      <a href="https://wa.me/{{.CompanyPhoneClean}}?text=Halo%20{{.CompanyName}},%20saya%20atas%20nama%20{{.ClientName}}%20ingin%20konfirmasi%20mengenai%20booking%20dekorasi%20acara%20kami%20(ID:%20{{.FormToken}})."
+      <a href="https://wa.me/{{.CompanyPhoneClean}}?text=Halo%20{{.CompanyName}},%20saya%20{{.ClientName}}%20(ID%20Booking:%20{{.FormToken}})%20ingin%20mengajukan%20perubahan%20atau%20tambahan%20detail%20acara%20berikut:"
         target="_blank" rel="noopener noreferrer"
         class="w-full py-3.5 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/20 transition transform active:scale-[0.99]">
         <span class="text-base">💬</span>
-        <span>Hubungi Vendor via WhatsApp</span>
+        <span>Ajukan Perubahan / Tambahan ke Admin (WA)</span>
       </a>
       {{end}}
 
       <button type="button" onclick="window.print()"
         class="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 border border-slate-200 shadow-xs transition">
         <span>🖨️</span>
-        <span>Simpan / Cetak Bukti Booking (PDF)</span>
+        <span>Simpan / Cetak Ringkasan Konfirmasi (PDF)</span>
       </button>
     </div>
 
-    <!-- ============================================== -->
-    <!-- FOOTER                                         -->
-    <!-- ============================================== -->
+    <!-- FOOTER -->
     <footer class="pt-6 pb-4 text-center text-xs text-slate-400 space-y-1">
       <p class="font-semibold text-slate-600">{{.CompanyName}}</p>
       {{if .CompanyAddress}}<p class="text-[11px] text-slate-400">{{.CompanyAddress}}</p>{{end}}
       {{if .CompanyInstagram}}<p class="text-[11px] text-[#C59563] font-medium">IG: {{.CompanyInstagram}}</p>{{end}}
-      {{if .CompanyBankInfo}}<p class="text-[11px] text-slate-500 pt-1">Info Rekening: {{.CompanyBankInfo}}</p>{{end}}
-      <p class="text-[10px] text-slate-400 pt-1">Dokumen ini merupakan konfirmasi pemesanan resmi yang tercatat di sistem Dekorin.</p>
+      {{if and .ShowPrice .CompanyBankInfo}}<p class="text-[11px] text-slate-500 pt-1">Info Rekening: {{.CompanyBankInfo}}</p>{{end}}
+      <p class="text-[10px] text-slate-400 pt-1">Dokumen ini merupakan ringkasan konfirmasi resmi yang tercatat di sistem Dekorin.</p>
     </footer>
 
   </main>
+  {{end}}
 
 </body>
 </html>

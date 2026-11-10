@@ -151,10 +151,26 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	// Buat user baru dan ikat otomatis ke CompanyID pembuatnya
+	// Tentukan CompanyID target (Superadmin dapat menentukan company tujuan)
+	targetCompanyID := creatorCompanyID
+	if strings.EqualFold(creatorRole, "superadmin") {
+		if strings.TrimSpace(req.CompanyID) != "" {
+			targetCompanyID = strings.TrimSpace(req.CompanyID)
+		} else if qCid := strings.TrimSpace(c.Query("company_id")); qCid != "" {
+			targetCompanyID = qCid
+		}
+		if targetCompanyID == "" {
+			var firstCompany models.Company
+			if err := config.DB.First(&firstCompany).Error; err == nil {
+				targetCompanyID = firstCompany.ID
+			}
+		}
+	}
+
+	// Buat user baru dan ikat ke CompanyID target
 	newUser := models.User{
 		ID:        fmt.Sprintf("usr_%s", uuid.New().String()[:8]),
-		CompanyID: creatorCompanyID,
+		CompanyID: targetCompanyID,
 		FullName:  req.FullName,
 		Phone:     cleanPhone,
 		Email:     strings.TrimSpace(req.Email),

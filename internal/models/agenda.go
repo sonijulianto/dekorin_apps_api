@@ -47,6 +47,7 @@ type Agenda struct {
 	PaymentStatus        string      `gorm:"type:varchar(50);default:'unpaid'" json:"payment_status"` // unpaid, dp, paid
 	FormToken            string      `gorm:"type:varchar(50);uniqueIndex" json:"form_token"`
 	FormStatus           string      `gorm:"type:varchar(50);default:'pending'" json:"form_status"` // pending, filled
+	IsFormDraft          bool        `gorm:"default:false;index" json:"is_form_draft"`
 	DpAmount             float64     `gorm:"type:decimal(15,2);default:0" json:"dp_amount"`
 	Notes                string           `gorm:"type:text" json:"notes"`
 	ClientForm           *ClientForm      `gorm:"foreignKey:AgendaID" json:"client_form,omitempty"`

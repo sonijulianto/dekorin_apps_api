@@ -163,7 +163,15 @@
                             </a>
                             <a href="javascript:void(0)" onclick="switchView('users')" id="nav-users"
                                 class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
-                                Data Pengguna (Users)
+                                Tim & Pengguna (Users)
+                            </a>
+                            <a href="javascript:void(0)" onclick="switchView('role-permissions')" id="nav-role-permissions"
+                                class="owner-superadmin-only block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
+                                🔐 Hak Akses & Izin Role
+                            </a>
+                            <a href="javascript:void(0)" onclick="switchView('form-config')" id="nav-form-config"
+                                class="block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
+                                📝 Pengaturan Form Client
                             </a>
                             <a href="javascript:void(0)" onclick="switchView('appversion')" id="nav-appversion"
                                 class="superadmin-only hidden block py-1.5 px-2 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
@@ -434,35 +442,303 @@
                 </div>
 
                 <!-- ============================================== -->
-                <!-- VIEW 3: USERS MANAGEMENT                       -->
+                <!-- VIEW 3: USERS & TEAM MANAGEMENT                -->
                 <!-- ============================================== -->
                 <div id="viewUsers" class="hidden space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">Manajemen Pengguna (Users)</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Seluruh akun Superadmin, Owner, Admin, dan Crew di platform.</p>
+                            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <span>👥</span> Manajemen Tim & Pengguna (Team)
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola akun Owner, Administrator operasional, dan Crew lapangan pada usaha dekorasi.</p>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="switchView('role-permissions')" 
+                                class="owner-superadmin-only inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 transition">
+                                <span>🔐</span>
+                                <span>Hak Akses Role</span>
+                            </button>
+                            <button onclick="openAddUserModal()" 
+                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                                <span>+ Tambah Anggota Tim</span>
+                            </button>
                         </div>
                     </div>
 
+                    <!-- Role Summary Cards (Matching Mobile ManageTeamView) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-xl shrink-0">👥</div>
+                            <div>
+                                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Tim</p>
+                                <p class="text-lg font-bold text-slate-800" id="userSummaryTotal">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl shrink-0">👑</div>
+                            <div>
+                                <p class="text-[11px] font-semibold text-purple-600 uppercase tracking-wider">Owner</p>
+                                <p class="text-lg font-bold text-purple-700" id="userSummaryOwner">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">🛡️</div>
+                            <div>
+                                <p class="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">Admin</p>
+                                <p class="text-lg font-bold text-amber-700" id="userSummaryAdmin">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">👷</div>
+                            <div>
+                                <p class="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">Crew Lapangan</p>
+                                <p class="text-lg font-bold text-blue-700" id="userSummaryCrew">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Filters & Search Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                            <button type="button" onclick="filterUsersByRole('all')" id="btnFilterUser-all"
+                                class="user-role-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30 transition">
+                                Semua
+                            </button>
+                            <button type="button" onclick="filterUsersByRole('owner')" id="btnFilterUser-owner"
+                                class="user-role-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-slate-200 transition">
+                                Owner
+                            </button>
+                            <button type="button" onclick="filterUsersByRole('admin')" id="btnFilterUser-admin"
+                                class="user-role-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-slate-200 transition">
+                                Admin
+                            </button>
+                            <button type="button" onclick="filterUsersByRole('crew')" id="btnFilterUser-crew"
+                                class="user-role-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-slate-200 transition">
+                                Crew
+                            </button>
+                        </div>
+
+                        <div class="relative flex-1 max-w-xs min-w-[200px]">
+                            <input type="text" id="searchUserInput" oninput="filterUsersBySearch(this.value)" placeholder="Cari nama, no. HP, atau email..."
+                                class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs text-slate-600">
                                 <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                                     <tr>
-                                        <th class="py-3.5 px-5">Nama Lengkap</th>
+                                        <th class="py-3.5 px-5">Nama Anggota Tim</th>
                                         <th class="py-3.5 px-5">No. Handphone</th>
                                         <th class="py-3.5 px-5">Email</th>
-                                        <th class="py-3.5 px-5">Role</th>
+                                        <th class="py-3.5 px-5">Role / Jabatan</th>
                                         <th class="py-3.5 px-5">Perusahaan</th>
+                                        <th class="py-3.5 px-5 text-right w-44">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody" class="divide-y divide-slate-100 font-medium">
                                     <tr>
-                                        <td colspan="5" class="text-center py-8 text-slate-400">Memuat data pengguna...</td>
+                                        <td colspan="6" class="text-center py-8 text-slate-400">Memuat data pengguna...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 3B: ROLE ACCESS & PERMISSIONS (NEW)       -->
+                <!-- ============================================== -->
+                <div id="viewRolePermissions" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="switchView('users')" class="text-slate-400 hover:text-slate-600 text-sm font-bold">← Tim</button>
+                                <span class="text-slate-300">|</span>
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <span>🔐</span> Hak Akses & Izin Role
+                                </h2>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Atur wewenang menu, pembatasan data finansial, dan hak akses operasional untuk Admin & Crew lapangan.</p>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="confirmResetRolePermissions()" 
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition">
+                                <span>↺</span>
+                                <span>Kembalikan Default</span>
+                            </button>
+                            <button onclick="saveRolePermissions()" id="btnSaveRolePermissionsTop"
+                                class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                                <span>✓</span>
+                                <span>Simpan Hak Akses</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Role Selector Tabs (Admin vs Crew) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div onclick="selectRoleForPermissions('admin')" id="roleTabCard-admin"
+                            class="cursor-pointer p-4 rounded-2xl border-2 transition duration-150 flex items-center justify-between bg-white border-[#D4A574] shadow-sm shadow-[#D4A574]/10">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl shrink-0">🛡️</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-slate-900 text-sm">Administrator</h3>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">Admin Usaha</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5">Admin operasional harian, kelola agenda, dan koordinasi tim.</p>
+                                </div>
+                            </div>
+                            <div id="roleTabRadio-admin" class="w-5 h-5 rounded-full border-2 border-[#D4A574] flex items-center justify-center">
+                                <div class="w-2.5 h-2.5 rounded-full bg-[#D4A574]"></div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectRoleForPermissions('crew')" id="roleTabCard-crew"
+                            class="cursor-pointer p-4 rounded-2xl border-2 transition duration-150 flex items-center justify-between bg-white border-slate-200 hover:border-slate-300">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl shrink-0">👷</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-slate-900 text-sm">Crew Lapangan</h3>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800">Staf Lapangan</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5">Staf bongkar muat, checklist alat, dan operasional panggung.</p>
+                                </div>
+                            </div>
+                            <div id="roleTabRadio-crew" class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center">
+                                <div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Owner Full Access Reminder Box -->
+                    <div class="p-4 rounded-2xl bg-[#F9F3EC] border border-[#D4A574]/30 flex items-start gap-3.5">
+                        <div class="w-9 h-9 rounded-xl bg-[#D4A574]/20 text-[#C59563] flex items-center justify-center text-lg shrink-0 mt-0.5">👑</div>
+                        <div class="text-xs text-stone-700 leading-relaxed">
+                            <p class="font-bold text-slate-900">Akses Penuh Pemilik Usaha (Owner)</p>
+                            <p class="mt-0.5 text-stone-600">Sebagai Pemilik Usaha (Owner), Anda selalu memiliki wewenang penuh tanpa batas ke seluruh modul & fitur sistem Dekorin. Matriks izin di bawah mengatur hak akses untuk role <strong id="activeRoleLabelNotice" class="text-[#C59563]">Administrator</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Permission Categories Container -->
+                    <div id="rolePermissionsContainer" class="space-y-4">
+                        <div class="p-12 text-center text-slate-400 bg-white rounded-2xl border border-slate-100">
+                            Memuat matriks hak akses & izin role...
+                        </div>
+                    </div>
+
+                    <!-- Sticky Bottom Action Bar -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-500 font-medium">Mengatur izin untuk:</span>
+                            <span id="activeRoleBadgeBottom" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                🛡️ Administrator
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="confirmResetRolePermissions()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+                                Kembalikan Default
+                            </button>
+                            <button onclick="saveRolePermissions()" 
+                                class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                                Simpan Perubahan Hak Akses
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 3C: PENGATURAN FORM CLIENT PER SUB-BRAND  -->
+                <!-- ============================================== -->
+                <div id="viewFormConfig" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <span>📝</span> Pengaturan Daftar Isian Form Client
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Atur kolom isian yang wajib/opsional diisi client pada link, urutannya, dan sesuaikan berbeda untuk tiap Sub-Brand.</p>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="confirmResetFormConfig()"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition">
+                                <span>↺</span>
+                                <span>Reset Default</span>
+                            </button>
+                            <button onclick="saveFormConfig()" id="btnSaveFormConfigTop"
+                                class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                                <span>✓</span>
+                                <span>Simpan Pengaturan Form</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pemilih Brand / Sub-Brand -->
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-xs space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Pilih Brand / Sub-Brand</h3>
+                                <p class="text-[11px] text-slate-400">Setiap Sub-Brand dapat memiliki daftar isian form yang berbeda.</p>
+                            </div>
+                            <span id="formConfigInheritedBadge" class="hidden px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                                Mengikuti template default (klik Simpan untuk kustomisasi khusus brand ini)
+                            </span>
+                        </div>
+                        <div id="formConfigBrandTabs" class="flex flex-wrap gap-2">
+                            <button type="button" onclick="selectFormConfigBrand('')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#D4A574] text-white">
+                                Brand Utama
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Global Settings & Tambah Pertanyaan -->
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <div class="relative inline-flex items-center">
+                                <input type="checkbox" id="toggleFormConfigShowPrice" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D4A574]"></div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">Tampilkan Nominal Harga & Tagihan di Link Client</p>
+                                <p class="text-[11px] text-slate-400">Matikan jika link ini dipakai untuk klien yang melalui WO/EO agar harga tidak ditampilkan.</p>
+                            </div>
+                        </label>
+                        <button type="button" onclick="openFormFieldModal()"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F9F3EC] hover:bg-[#F3E7D8] text-[#C59563] font-bold text-xs border border-[#D4A574]/30 transition shrink-0">
+                            <span>+ Tambah Pertanyaan Kustom</span>
+                        </button>
+                    </div>
+
+                    <!-- Info Rule Penguncian -->
+                    <div class="p-4 rounded-2xl bg-[#F9F3EC] border border-[#D4A574]/30 flex items-start gap-3">
+                        <span class="text-lg">🔒</span>
+                        <div class="text-xs text-stone-700 leading-relaxed">
+                            <p class="font-bold text-slate-900">Aturan Penguncian Link Otomatis</p>
+                            <p class="mt-0.5 text-stone-600">Selama masih ada kolom bertanda <strong>Wajib (Required)</strong> yang belum diisi client, link akan terbuka sebagai formulir pengisian. Begitu semua kolom wajib terisi, link otomatis berubah menjadi <strong>Ringkasan Konfirmasi Terkunci</strong> dan hanya Owner/Admin yang dapat mengeditnya.</p>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Field Isian (Urutan, Toggle ON/OFF, Toggle Required) -->
+                    <div id="formConfigFieldsContainer" class="space-y-2.5">
+                        <div class="p-10 text-center text-slate-400 bg-white rounded-2xl border border-slate-100 text-xs">
+                            Memuat daftar isian form...
+                        </div>
+                    </div>
+
+                    <!-- Bottom Save Bar -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-end gap-3">
+                        <button type="button" onclick="confirmResetFormConfig()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+                            Reset Default
+                        </button>
+                        <button type="button" onclick="saveFormConfig()"
+                            class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                            Simpan Pengaturan Form
+                        </button>
                     </div>
                 </div>
 
@@ -568,6 +844,58 @@
                 </div>
 
                 <!-- ============================================== -->
+                <!-- VIEW 4C: MASTER ADDONS (ITEM TAMBAHAN)         -->
+                <!-- ============================================== -->
+                <div id="viewAddons" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <span>✨</span> Master Item Tambahan (Addons)
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola item sewa atau layanan tambahan seperti tenda, kursi, blower/cooling fan, lighting, karpet, atau panggung.</p>
+                        </div>
+                        <button onclick="openAddonModal()" 
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                            <span>+ Tambah Item Tambahan</span>
+                        </button>
+                    </div>
+
+                    <!-- Search & Counter Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
+                        <div class="relative flex-1 max-w-sm">
+                            <input type="text" id="searchAddonInput" oninput="filterAddons(this.value)" placeholder="Cari nama item tambahan..."
+                                class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-slate-500 font-medium" id="addonCountInfo">Memuat data item tambahan...</span>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 select-none">
+                                    <tr>
+                                        <th class="py-3.5 px-5 w-24">Foto</th>
+                                        <th class="py-3.5 px-5">Nama Item Tambahan</th>
+                                        <th class="py-3.5 px-5 w-40">Harga Satuan</th>
+                                        <th class="py-3.5 px-5">Deskripsi / Keterangan</th>
+                                        <th class="py-3.5 px-5 text-right w-28">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="addonsTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-8 text-slate-400">Memuat item tambahan...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
                 <!-- VIEW 5: AGENDAS & TRANSACTIONS                 -->
                 <!-- ============================================== -->
                 <div id="viewAgendas" class="hidden space-y-6">
@@ -576,10 +904,18 @@
                             <h2 class="text-lg font-bold text-slate-900">Agenda & Booking Acara</h2>
                             <p class="text-xs text-slate-500 mt-0.5">Daftar jadwal acara pernikahan, client booking, dan status dekorasi.</p>
                         </div>
-                        <button onclick="openAgendaModal()" 
-                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
-                            <span>+ Tambah Agenda Baru</span>
-                        </button>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <button onclick="openPendingLinksModal()"
+                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 transition">
+                                <span>🔗</span>
+                                <span>Link Form Client</span>
+                                <span id="pendingLinksCountBadge" class="hidden px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-600 text-white">0</span>
+                            </button>
+                            <button onclick="openAgendaModal()" 
+                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                                <span>+ Tambah Agenda Baru</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Search & Filter Bar -->
@@ -1512,6 +1848,20 @@
                         class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
                 </div>
 
+                <!-- Ringkasan Isian Form Client & Status Penguncian -->
+                <div id="agendaClientFormSummaryBox" class="hidden bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                            <span>📋</span> Hasil Isian Form Client
+                        </h4>
+                        <button type="button" id="btnUnlockAgendaForm" onclick="unlockCurrentAgendaForm()"
+                            class="hidden px-2.5 py-1 rounded-lg bg-white hover:bg-amber-50 text-amber-700 font-bold text-[11px] border border-amber-300 transition">
+                            🔓 Buka Kunci Form
+                        </button>
+                    </div>
+                    <div id="agendaClientFormAnswersList" class="space-y-1.5 text-xs"></div>
+                </div>
+
                 <div id="agendaErrorBox" class="hidden p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-medium border border-rose-100"></div>
 
                 <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
@@ -2264,6 +2614,379 @@
         </div>
     </div>
 
+    <!-- ======================================================== -->
+    <!-- MODAL: TAMBAH ANGGOTA TIM BARU                           -->
+    <!-- ======================================================== -->
+    <div id="modalAddUser" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="modalAddUserTitle">Tambah Anggota Tim Baru</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Buat akun untuk staf atau pengelola usaha dekorasi Anda</p>
+                </div>
+                <button type="button" onclick="closeAddUserModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formAddUser" onsubmit="handleSaveNewUser(event)" class="space-y-4">
+                <div id="addUserCompanySelectBox" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Perusahaan / Usaha Vendor *</label>
+                    <select id="inputAddUserCompanyId" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
+                    <input type="text" id="inputAddUserFullName" required placeholder="Contoh: Rian Pratama"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">No. Handphone (WhatsApp) *</label>
+                        <input type="tel" id="inputAddUserPhone" required placeholder="081234567890"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email (Opsional)</label>
+                        <input type="email" id="inputAddUserEmail" placeholder="nama@email.com"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Awal *</label>
+                    <input type="password" id="inputAddUserPassword" required minlength="6" placeholder="Minimal 6 karakter"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    <p class="text-[11px] text-slate-400 mt-1">Berikan kata sandi ini kepada anggota untuk login pertama kali.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Role / Jabatan *</label>
+                    <select id="inputAddUserRole" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        <option value="crew">👷 Crew Lapangan (Staf Operasional)</option>
+                        <option value="admin">🛡️ Administrator (Admin Operasional)</option>
+                        <option value="owner" id="optionAddUserOwner">👑 Owner (Pemilik / Co-Owner)</option>
+                    </select>
+                    <p class="text-[11px] text-slate-400 mt-1" id="roleSelectHelpText">Pilih role untuk menentukan batasan akses sistem.</p>
+                </div>
+
+                <div id="addUserError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeAddUserModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitAddUser" class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                        Simpan Akun
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: EDIT DATA ANGGOTA TIM                             -->
+    <!-- ======================================================== -->
+    <div id="modalEditUser" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Ubah Data Anggota Tim</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Perbarui nama, nomor telepon, email, atau jabatan</p>
+                </div>
+                <button type="button" onclick="closeEditUserModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formEditUser" onsubmit="handleSaveEditUser(event)" class="space-y-4">
+                <input type="hidden" id="inputEditUserId" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
+                    <input type="text" id="inputEditUserFullName" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">No. Handphone *</label>
+                        <input type="tel" id="inputEditUserPhone" required
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email</label>
+                        <input type="email" id="inputEditUserEmail"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Role / Jabatan *</label>
+                    <select id="inputEditUserRole" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        <option value="crew">👷 Crew Lapangan</option>
+                        <option value="admin">🛡️ Administrator</option>
+                        <option value="owner" id="optionEditUserOwner">👑 Owner</option>
+                    </select>
+                </div>
+
+                <div id="editUserError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeEditUserModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitEditUser" class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: GANTI KATA SANDI ANGGOTA TIM                      -->
+    <!-- ======================================================== -->
+    <div id="modalResetUserPassword" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Ganti Kata Sandi Anggota</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="resetPasswordUserLabel">Akun: -</p>
+                </div>
+                <button type="button" onclick="closeResetPasswordModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formResetUserPassword" onsubmit="handleSaveResetPassword(event)" class="space-y-4">
+                <input type="hidden" id="inputResetPasswordUserId" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Baru *</label>
+                    <input type="password" id="inputResetPasswordNew" required minlength="6" placeholder="Minimal 6 karakter"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Konfirmasi Kata Sandi Baru *</label>
+                    <input type="password" id="inputResetPasswordConfirm" required minlength="6" placeholder="Ulangi kata sandi baru"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div id="resetPasswordError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeResetPasswordModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitResetPassword" class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                        Ganti Sandi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: TAMBAH / EDIT ITEM TAMBAHAN (ADDON)               -->
+    <!-- ======================================================== -->
+    <div id="modalAddon" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="modalAddonTitle">Tambah Item Tambahan</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Kelola item sewa atau fasilitas opsional dekorasi</p>
+                </div>
+                <button type="button" onclick="closeAddonModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formAddon" onsubmit="handleSaveAddon(event)" class="space-y-4">
+                <input type="hidden" id="inputAddonId" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Item Tambahan *</label>
+                    <input type="text" id="inputAddonName" required placeholder="Contoh: Cooling Fan / Misty Fan 26 Inch"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Satuan (Rp) *</label>
+                    <input type="number" id="inputAddonPrice" required min="0" placeholder="Contoh: 350000"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <!-- Foto Item Tambahan -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-slate-700">Foto Item (Opsional)</label>
+                    <div class="flex items-center gap-3">
+                        <div id="addonImagePreviewBox" class="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="text-2xl text-slate-300">✨</span>
+                        </div>
+                        <div class="flex-1 space-y-1.5">
+                            <input type="file" id="inputAddonImageFile" accept="image/*" onchange="handleAddonImageFileSelected(this)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#F9F3EC] file:text-[#C59563] hover:file:bg-[#F4ECE2] cursor-pointer">
+                            <input type="text" id="inputAddonImageUrl" placeholder="Atau tempel URL gambar..." oninput="updateAddonImagePreview(this.value)"
+                                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi / Keterangan (Opsional)</label>
+                    <textarea id="inputAddonDescription" rows="3" placeholder="Contoh: Termasuk kabel rol 20 meter dan operator standby..."
+                        class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
+                </div>
+
+                <div id="addonError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium"></div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeAddonModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitAddon" class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                        Simpan Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: TAMBAH / EDIT PERTANYAAN FORM CLIENT              -->
+    <!-- ======================================================== -->
+    <div id="modalFormField" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="modalFormFieldTitle">Tambah Pertanyaan Kustom</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Tambahkan isian baru yang harus/dapat diisi client di link form</p>
+                </div>
+                <button type="button" onclick="closeFormFieldModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form id="formFieldItem" onsubmit="handleSaveFormField(event)" class="space-y-4">
+                <input type="hidden" id="inputFormFieldIndex" value="-1">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Label Pertanyaan / Judul Isian *</label>
+                    <input type="text" id="inputFormFieldLabel" required placeholder="Contoh: Jam Akses Loading Gedung / Request Warna Bunga"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <div id="formFieldTypeBox">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tipe Input *</label>
+                    <select id="inputFormFieldType" onchange="toggleFormFieldOptionsBox(this.value)"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        <option value="text">Teks Singkat (Text)</option>
+                        <option value="textarea">Teks Panjang / Paragraf (Textarea)</option>
+                        <option value="number">Angka (Number)</option>
+                        <option value="date">Tanggal (Date)</option>
+                        <option value="time">Jam (Time)</option>
+                        <option value="select">Pilihan Dropdown (Select)</option>
+                        <option value="radio">Pilihan Tunggal (Radio)</option>
+                        <option value="checkbox">Pilihan Ganda / Centang (Checkbox)</option>
+                        <option value="image">Upload Foto / Gambar</option>
+                    </select>
+                </div>
+
+                <div id="formFieldOptionsBox" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Daftar Opsi Pilihan (pisahkan dengan koma atau baris baru) *</label>
+                    <textarea id="inputFormFieldOptions" rows="3" placeholder="Indoor AC&#10;Semi Outdoor&#10;Outdoor / Tenda"
+                        class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Placeholder / Petunjuk Pengisian (Opsional)</label>
+                    <input type="text" id="inputFormFieldPlaceholder" placeholder="Contoh: Tulis keterangan lengkap..."
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                </div>
+
+                <label class="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 cursor-pointer">
+                    <input type="checkbox" id="inputFormFieldRequired" class="accent-[#C59563] w-4 h-4 rounded">
+                    <div>
+                        <span class="text-xs font-bold text-slate-800 block">Wajib Diisi (Required)</span>
+                        <span class="text-[11px] text-slate-400">Client harus mengisi kolom ini sebelum link berubah menjadi ringkasan konfirmasi.</span>
+                    </div>
+                </label>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeFormFieldModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
+                        Simpan Pertanyaan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: GENERATE & KELOLA LINK FORM CLIENT (PENDING DRAFT)-->
+    <!-- ======================================================== -->
+    <div id="modalPendingLinks" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <span>🔗</span> Link Form Client (Menunggu Isian)
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Generate link langsung tanpa isi data awal. Data baru masuk ke Agenda setelah client melengkapi form.</p>
+                </div>
+                <button type="button" onclick="closePendingLinksModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <!-- Quick Generator Card -->
+            <div class="p-4 rounded-2xl bg-[#F9F3EC] border border-[#D4A574]/30 space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Brand / Sub-Brand</label>
+                        <select id="inputGenerateLinkBrandId"
+                            class="w-full px-3 py-2 rounded-xl border border-[#D4A574]/30 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30">
+                            <option value="">-- Brand Utama --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Catatan Label Admin (Opsional)</label>
+                        <input type="text" id="inputGenerateLinkLabel" placeholder="Kosongkan jika langsung generate..."
+                            class="w-full px-3 py-2 rounded-xl border border-[#D4A574]/30 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30">
+                    </div>
+                </div>
+                <button type="button" id="btnGenerateQuickLink" onclick="generateQuickClientLink()"
+                    class="w-full py-2.5 px-4 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25 flex items-center justify-center gap-2">
+                    <span>✨</span>
+                    <span>Generate Link Form Client Sekarang</span>
+                </button>
+            </div>
+
+            <!-- Newly Created Link Highlight -->
+            <div id="newlyGeneratedLinkBox" class="hidden p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-emerald-800">✅ Link Baru Berhasil Dibuat!</span>
+                    <span class="text-[10px] font-mono text-emerald-700" id="newlyGeneratedLinkToken"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="newlyGeneratedLinkInput" readonly
+                        class="flex-1 px-3 py-2 rounded-xl border border-emerald-200 bg-white text-xs font-mono text-slate-700">
+                    <button type="button" onclick="copyTextValue(document.getElementById('newlyGeneratedLinkInput').value)"
+                        class="px-3 py-2 rounded-xl bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-xs font-bold transition">
+                        Salin
+                    </button>
+                    <a id="newlyGeneratedLinkWaBtn" href="#" target="_blank"
+                        class="px-3 py-2 rounded-xl bg-[#25D366] hover:bg-[#20BD5A] text-white text-xs font-bold transition">
+                        Kirim WA
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pending Links List -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Daftar Link Menunggu Isian Client</h4>
+                <div id="pendingLinksListContainer" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                    <p class="text-center py-6 text-xs text-slate-400">Memuat daftar link...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================== -->
     <!-- JAVASCRIPT LOGIC                           -->
     <!-- ========================================== -->
@@ -2273,6 +2996,7 @@
         let currentUserCompanyId = '';
         let currentUserCompanyName = '';
         let currentUserName = '';
+        let currentUserPermissions = [];
         let selectedCompanyId = '';
         let companiesCache = [];
         let packagesCache = [];
@@ -2284,6 +3008,30 @@
         let donutChart = null;
         let lastCreatedCredential = '';
         let isSidebarCollapsed = false;
+
+        // Form Config & Pending Links Cache
+        let formConfigBrandId = '';
+        let formConfigFields = [];
+        let formConfigShowPrice = true;
+        let formConfigInherited = false;
+        let pendingLinksCache = [];
+
+        // User Management & Role Access Cache
+        let usersCache = [];
+        let userFilterRole = 'all';
+        let userSearchQuery = '';
+        let rolePermissionsMatrix = null;
+        let rolePermissionsWorkingMap = {};
+        let selectedRoleForPermissions = 'admin';
+        let isSavingRolePermissions = false;
+        let addonsCache = [];
+        let addonSearchQuery = '';
+
+        // Helper cek izin role (RBAC)
+        function can(permissionKey) {
+            if (currentUserRole === 'superadmin' || currentUserRole === 'owner') return true;
+            return currentUserPermissions.includes(permissionKey);
+        }
 
         // Inisialisasi Tanggal
         const dateEl = document.getElementById('currentDateDisplay');
@@ -2325,6 +3073,7 @@
             let roleLabel = 'Superadmin Platform';
             if (currentUserRole === 'owner') roleLabel = 'Owner (' + (currentUserCompanyName || 'Usaha') + ')';
             else if (currentUserRole === 'admin') roleLabel = 'Admin Usaha (' + (currentUserCompanyName || 'Usaha') + ')';
+            else if (currentUserRole === 'crew') roleLabel = 'Crew Lapangan (' + (currentUserCompanyName || 'Usaha') + ')';
             if (dropRole) dropRole.innerText = roleLabel;
 
             const switcherBtn = document.getElementById('btnCompanySwitcher');
@@ -2362,6 +3111,28 @@
                 // Tampilkan elemen khusus Superadmin
                 document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('hidden'));
             }
+
+            // Role Access: Hak Akses Role hanya dapat diakses oleh Owner dan Superadmin
+            const isOwnerOrSuper = currentUserRole === 'superadmin' || currentUserRole === 'owner';
+            document.querySelectorAll('.owner-superadmin-only').forEach(el => {
+                if (isOwnerOrSuper) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+
+            // Role option limiters for Admin
+            const optOwnerAdd = document.getElementById('optionAddUserOwner');
+            if (optOwnerAdd) {
+                if (isOwnerOrSuper) optOwnerAdd.classList.remove('hidden');
+                else optOwnerAdd.classList.add('hidden');
+            }
+            const optOwnerEdit = document.getElementById('optionEditUserOwner');
+            if (optOwnerEdit) {
+                if (isOwnerOrSuper) optOwnerEdit.classList.remove('hidden');
+                else optOwnerEdit.classList.add('hidden');
+            }
         }
 
         async function handleLogin(e) {
@@ -2391,6 +3162,7 @@
                 currentUserCompanyId = me.company_id;
                 currentUserCompanyName = me.company_name;
                 currentUserName = me.full_name;
+                currentUserPermissions = me.permissions || [];
 
                 applyRolePermissions();
                 showDashboardUI();
@@ -2410,6 +3182,10 @@
             currentUserRole = '';
             currentUserCompanyId = '';
             currentUserCompanyName = '';
+            currentUserName = '';
+            currentUserPermissions = [];
+            showLogin();
+        }
             currentUserName = '';
             showLogin();
         }
@@ -2507,6 +3283,7 @@
                 currentUserCompanyId = me.company_id;
                 currentUserCompanyName = me.company_name;
                 currentUserName = me.full_name;
+                currentUserPermissions = me.permissions || [];
 
                 applyRolePermissions();
                 showDashboardUI();
@@ -2618,9 +3395,12 @@
             if (currentView === 'dashboard') loadDashboardStats();
             else if (currentView === 'companies') renderCompaniesTable();
             else if (currentView === 'users') loadUsers();
+            else if (currentView === 'role-permissions') loadRolePermissions();
+            else if (currentView === 'form-config') loadFormConfigView();
             else if (currentView === 'packages') loadPackages();
             else if (currentView === 'decoration-models') loadDecorationModels();
-            else if (currentView === 'agendas') loadAgendas();
+            else if (currentView === 'addons') loadAddons();
+            else if (currentView === 'agendas') { loadAgendas(); loadPendingLinksCount(); }
             else if (currentView === 'invitations') loadInvitations();
             else if (currentView === 'reports') loadReports();
             else if (currentView === 'apilogs') loadApiLogs(1);
@@ -2634,10 +3414,16 @@
                 return;
             }
 
+            if (viewName === 'role-permissions' && currentUserRole !== 'superadmin' && currentUserRole !== 'owner') {
+                alert('Akses ditolak: Menu Hak Akses & Izin Role hanya dapat diakses oleh Pemilik Usaha (Owner).');
+                switchView('dashboard');
+                return;
+            }
+
             currentView = viewName;
             
             // Sembunyikan semua section
-            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewPackages', 'viewDecorationModels', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs', 'viewAppVersion'];
+            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewRolePermissions', 'viewFormConfig', 'viewPackages', 'viewDecorationModels', 'viewAddons', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs', 'viewAppVersion'];
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if (el) el.classList.add('hidden');
@@ -2656,12 +3442,14 @@
             const viewMap = {
                 'dashboard': { el: 'viewDashboard', title: 'Dashboard', path: '<span class="text-[#C59563]">🏠</span> • Dashboard', nav: 'nav-dashboard' },
                 'companies': { el: 'viewCompanies', title: (currentUserRole === 'superadmin' ? 'Usaha & Vendor (Companies)' : 'Profil Usaha Saya'), path: 'Administration • Usaha & Vendor', nav: 'nav-companies', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
-                'users': { el: 'viewUsers', title: 'Data Pengguna (Users)', path: 'Administration • Data Pengguna', nav: 'nav-users', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'users': { el: 'viewUsers', title: 'Manajemen Tim & Pengguna', path: 'Administration • Tim & Pengguna', nav: 'nav-users', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'role-permissions': { el: 'viewRolePermissions', title: 'Hak Akses & Izin Role', path: 'Administration • Hak Akses & Izin Role', nav: 'nav-role-permissions', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
+                'form-config': { el: 'viewFormConfig', title: 'Pengaturan Form Client', path: 'Administration • Pengaturan Form Client', nav: 'nav-form-config', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: '<span class="text-slate-600">📜</span> • API Log System', nav: 'nav-apilogs-direct' },
                 'appversion': { el: 'viewAppVersion', title: 'Rilis & Pembaruan APK', path: 'Administration • Rilis APK', nav: 'nav-appversion', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
-                'addons': { el: 'viewPackages', title: 'Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
+                'addons': { el: 'viewAddons', title: 'Master Item Tambahan (Addons)', path: 'Master • Item Tambahan', nav: 'nav-addons', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'agendas': { el: 'viewAgendas', title: 'Agenda Acara', path: 'Transaction • Agenda Acara', nav: 'nav-agendas', parentSubmenu: 'transSubmenu', parentCaret: 'transCaret' },
                 'invitations': { el: 'viewInvitations', title: 'Undangan Digital', path: '<span class="text-[#C59563]">💌</span> • Undangan Digital', nav: 'nav-invitations-direct' },
                 'reports': { el: 'viewReports', title: 'Laporan Keuangan', path: 'Report • Laporan Keuangan', nav: 'nav-reports' },
@@ -3105,45 +3893,871 @@
             }).join('');
         }
 
+        // ==========================================
+        // MANAJEMEN TIM & PENGGUNA (Matching Mobile ManageTeamView)
+        // ==========================================
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
             if (!tbody) return;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Memuat data pengguna...</td></tr>`;
+
             try {
                 let url = '/api/users';
-                if (selectedCompanyId) url += '?company_id=' + selectedCompanyId;
+                if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
                 const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
                 const json = await res.json();
                 const users = Array.isArray(json) ? json : (json.data || []);
+                usersCache = users;
 
-                if (users.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Tidak ada pengguna</td></tr>`;
-                    return;
+                // Update Ringkasan Anggota (Summary Counters)
+                const owners = users.filter(u => (u.role || '').toLowerCase() === 'owner');
+                const admins = users.filter(u => (u.role || '').toLowerCase() === 'admin');
+                const crew = users.filter(u => {
+                    const r = (u.role || '').toLowerCase();
+                    return r === 'crew' || r === 'staff';
+                });
+
+                const totalEl = document.getElementById('userSummaryTotal');
+                const ownerEl = document.getElementById('userSummaryOwner');
+                const adminEl = document.getElementById('userSummaryAdmin');
+                const crewEl = document.getElementById('userSummaryCrew');
+
+                if (totalEl) totalEl.innerText = users.length;
+                if (ownerEl) ownerEl.innerText = owners.length;
+                if (adminEl) adminEl.innerText = admins.length;
+                if (crewEl) crewEl.innerText = crew.length;
+
+                renderFilteredUsers();
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+            }
+        }
+
+        function filterUsersByRole(role) {
+            userFilterRole = role;
+            document.querySelectorAll('.user-role-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-[#F9F3EC]', 'text-[#C59563]', 'border-[#D4A574]/30', 'font-bold');
+                btn.classList.add('text-slate-500', 'hover:text-slate-700', 'hover:bg-slate-50', 'border-slate-200');
+            });
+
+            const activeBtn = document.getElementById('btnFilterUser-' + role);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-500', 'hover:text-slate-700', 'hover:bg-slate-50', 'border-slate-200');
+                activeBtn.classList.add('bg-[#F9F3EC]', 'text-[#C59563]', 'border-[#D4A574]/30', 'font-bold');
+            }
+
+            renderFilteredUsers();
+        }
+
+        function filterUsersBySearch(query) {
+            userSearchQuery = (query || '').toLowerCase().trim();
+            renderFilteredUsers();
+        }
+
+        function renderFilteredUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+
+            let filtered = usersCache;
+            if (userFilterRole !== 'all') {
+                filtered = filtered.filter(u => {
+                    const r = (u.role || '').toLowerCase();
+                    if (userFilterRole === 'crew') return r === 'crew' || r === 'staff';
+                    return r === userFilterRole;
+                });
+            }
+
+            if (userSearchQuery) {
+                filtered = filtered.filter(u => {
+                    const name = (u.full_name || '').toLowerCase();
+                    const phone = (u.phone || '').toLowerCase();
+                    const email = (u.email || '').toLowerCase();
+                    return name.includes(userSearchQuery) || phone.includes(userSearchQuery) || email.includes(userSearchQuery);
+                });
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-400">Tidak ada anggota tim yang cocok dengan filter.</td></tr>`;
+                return;
+            }
+
+            const currentRoleLower = (currentUserRole || '').toLowerCase();
+            const isOwner = currentRoleLower === 'owner' || currentRoleLower === 'superadmin';
+            const isAdmin = currentRoleLower === 'admin' || isOwner;
+
+            tbody.innerHTML = filtered.map(u => {
+                const roleLower = (u.role || '').toLowerCase();
+                let roleBadge = '';
+                if (roleLower === 'superadmin') {
+                    roleBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">👑 Superadmin</span>`;
+                } else if (roleLower === 'owner') {
+                    roleBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">👑 Owner</span>`;
+                } else if (roleLower === 'admin') {
+                    roleBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">🛡️ Admin</span>`;
+                } else {
+                    roleBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">👷 Crew</span>`;
                 }
 
-                tbody.innerHTML = users.map(u => {
-                    const roleBadgeColor = {
-                        'superadmin': 'bg-amber-100 text-amber-800',
-                        'owner': 'bg-purple-100 text-purple-800',
-                        'admin': 'bg-blue-100 text-blue-800',
-                        'crew': 'bg-slate-100 text-slate-700'
-                    }[u.role.toLowerCase()] || 'bg-slate-100 text-slate-700';
+                // WhatsApp link generator
+                let waLink = '';
+                if (u.phone) {
+                    let cleanPhone = u.phone.replace(/[^0-9]/g, '');
+                    if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.substring(1);
+                    waLink = `
+                        <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" 
+                            class="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-600 hover:text-emerald-700 font-semibold hover:underline">
+                            <span>💬</span> ${u.phone}
+                        </a>
+                    `;
+                } else {
+                    waLink = `<span class="text-slate-400 font-mono">-</span>`;
+                }
 
+                // Initial Avatar
+                const initial = (u.full_name || 'U').charAt(0).toUpperCase();
+
+                // Izin Aksi
+                const canEdit = isOwner || (isAdmin && (roleLower === 'crew' || roleLower === 'staff'));
+                const canDelete = roleLower !== 'superadmin' && (isOwner || (isAdmin && (roleLower === 'crew' || roleLower === 'staff')));
+                const escapeName = (u.full_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                return `
+                    <tr class="hover:bg-slate-50/60 transition duration-150">
+                        <td class="py-3 px-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-[#F9F3EC] text-[#C59563] font-bold text-xs flex items-center justify-center border border-[#D4A574]/20 shrink-0">
+                                    ${initial}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-slate-900 truncate">${u.full_name || '-'}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">${u.id || ''}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-5">${waLink}</td>
+                        <td class="py-3 px-5 text-slate-600">${u.email || '-'}</td>
+                        <td class="py-3 px-5">${roleBadge}</td>
+                        <td class="py-3 px-5 text-slate-500">${u.company_name || u.company_id || '-'}</td>
+                        <td class="py-3 px-5 text-right whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1.5">
+                                ${canEdit ? `
+                                    <button onclick="openEditUserModal('${u.id}')" title="Edit Data" 
+                                        class="px-2 py-1 rounded-lg text-xs font-semibold text-stone-600 hover:text-[#C59563] hover:bg-[#F9F3EC] border border-stone-200 transition">
+                                        Ubah
+                                    </button>
+                                    <button onclick="openResetPasswordModal('${u.id}', '${escapeName}')" title="Ganti Sandi"
+                                        class="px-2 py-1 rounded-lg text-xs font-semibold text-stone-600 hover:text-amber-700 hover:bg-amber-50 border border-stone-200 transition">
+                                        Sandi
+                                    </button>
+                                ` : ''}
+                                ${canDelete ? `
+                                    <button onclick="handleDeleteUser('${u.id}', '${escapeName}')" title="Hapus Anggota"
+                                        class="px-2 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 transition">
+                                        Hapus
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddUserModal() {
+            const form = document.getElementById('formAddUser');
+            if (form) form.reset();
+            const errBox = document.getElementById('addUserError');
+            if (errBox) errBox.classList.add('hidden');
+
+            const compBox = document.getElementById('addUserCompanySelectBox');
+            const compSelect = document.getElementById('inputAddUserCompanyId');
+            if (currentUserRole === 'superadmin' && compBox && compSelect) {
+                compBox.classList.remove('hidden');
+                compSelect.innerHTML = companiesCache.map(c => 
+                    `<option value="${c.id}" ${c.id === selectedCompanyId ? 'selected' : ''}>${c.name} (${c.id})</option>`
+                ).join('');
+            } else if (compBox) {
+                compBox.classList.add('hidden');
+            }
+
+            const modal = document.getElementById('modalAddUser');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAddUserModal() {
+            const modal = document.getElementById('modalAddUser');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleSaveNewUser(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitAddUser');
+            const errBox = document.getElementById('addUserError');
+            errBox.classList.add('hidden');
+
+            const full_name = document.getElementById('inputAddUserFullName').value.trim();
+            const phone = document.getElementById('inputAddUserPhone').value.trim();
+            const email = document.getElementById('inputAddUserEmail').value.trim();
+            const password = document.getElementById('inputAddUserPassword').value;
+            const role = document.getElementById('inputAddUserRole').value;
+
+            let company_id = '';
+            if (currentUserRole === 'superadmin') {
+                const compSelect = document.getElementById('inputAddUserCompanyId');
+                if (compSelect) company_id = compSelect.value;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({ full_name, phone, email, password, role, company_id })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menambahkan anggota');
+
+                closeAddUserModal();
+                await loadUsers();
+                alert(`Akun anggota tim ${full_name} (${role}) berhasil dibuat!`);
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Akun';
+            }
+        }
+
+        function openEditUserModal(id) {
+            const u = usersCache.find(x => x.id === id);
+            if (!u) return;
+
+            const form = document.getElementById('formEditUser');
+            if (form) form.reset();
+            const errBox = document.getElementById('editUserError');
+            if (errBox) errBox.classList.add('hidden');
+
+            document.getElementById('inputEditUserId').value = u.id;
+            document.getElementById('inputEditUserFullName').value = u.full_name || '';
+            document.getElementById('inputEditUserPhone').value = u.phone || '';
+            document.getElementById('inputEditUserEmail').value = u.email || '';
+
+            const roleSelect = document.getElementById('inputEditUserRole');
+            if (roleSelect) {
+                const r = (u.role || 'crew').toLowerCase();
+                roleSelect.value = (r === 'staff' ? 'crew' : r);
+            }
+
+            const modal = document.getElementById('modalEditUser');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeEditUserModal() {
+            const modal = document.getElementById('modalEditUser');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleSaveEditUser(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitEditUser');
+            const errBox = document.getElementById('editUserError');
+            errBox.classList.add('hidden');
+
+            const id = document.getElementById('inputEditUserId').value;
+            const full_name = document.getElementById('inputEditUserFullName').value.trim();
+            const phone = document.getElementById('inputEditUserPhone').value.trim();
+            const email = document.getElementById('inputEditUserEmail').value.trim();
+            const role = document.getElementById('inputEditUserRole').value;
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const res = await fetch(`/api/users/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({ full_name, phone, email, role })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal mengubah data anggota');
+
+                closeEditUserModal();
+                await loadUsers();
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Perubahan';
+            }
+        }
+
+        function openResetPasswordModal(id, name) {
+            document.getElementById('inputResetPasswordUserId').value = id;
+            document.getElementById('resetPasswordUserLabel').innerText = 'Akun: ' + name;
+            const form = document.getElementById('formResetUserPassword');
+            if (form) form.reset();
+            const errBox = document.getElementById('resetPasswordError');
+            if (errBox) errBox.classList.add('hidden');
+
+            const modal = document.getElementById('modalResetUserPassword');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeResetPasswordModal() {
+            const modal = document.getElementById('modalResetUserPassword');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleSaveResetPassword(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitResetPassword');
+            const errBox = document.getElementById('resetPasswordError');
+            errBox.classList.add('hidden');
+
+            const id = document.getElementById('inputResetPasswordUserId').value;
+            const new_pass = document.getElementById('inputResetPasswordNew').value;
+            const confirm_pass = document.getElementById('inputResetPasswordConfirm').value;
+
+            if (new_pass !== confirm_pass) {
+                errBox.innerText = 'Konfirmasi kata sandi baru tidak cocok';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const res = await fetch(`/api/users/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({ password: new_pass })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal mengganti kata sandi');
+
+                closeResetPasswordModal();
+                alert('Kata sandi berhasil diperbarui!');
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Ganti Sandi';
+            }
+        }
+
+        async function handleDeleteUser(id, name) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus akun anggota "${name}"?\nTindakan ini tidak dapat dibatalkan.`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/users/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menghapus pengguna');
+
+                await loadUsers();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // HAK AKSES & IZIN ROLE (ROLE PERMISSIONS)
+        // ==========================================
+        async function loadRolePermissions() {
+            const container = document.getElementById('rolePermissionsContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="p-12 text-center text-slate-400 bg-white rounded-2xl border border-slate-100">
+                    <span class="text-3xl block mb-2">🔐</span>
+                    Memuat matriks hak akses & izin role...
+                </div>
+            `;
+
+            try {
+                let url = '/api/company/role-permissions';
+                if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
+
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal memuat hak akses role');
+
+                rolePermissionsMatrix = json;
+                const rolePerms = json.role_permissions || {};
+                rolePermissionsWorkingMap = {
+                    'admin': new Set(rolePerms.admin || []),
+                    'crew': new Set(rolePerms.crew || [])
+                };
+
+                renderRolePermissionsView();
+            } catch (err) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-rose-600 bg-rose-50 rounded-2xl border border-rose-200">
+                        Gagal memuat hak akses: ${err.message}
+                    </div>
+                `;
+            }
+        }
+
+        function selectRoleForPermissions(role) {
+            selectedRoleForPermissions = role;
+
+            // Visual Card Selection
+            const cardAdmin = document.getElementById('roleTabCard-admin');
+            const cardCrew = document.getElementById('roleTabCard-crew');
+            const radioAdmin = document.getElementById('roleTabRadio-admin');
+            const radioCrew = document.getElementById('roleTabRadio-crew');
+
+            if (role === 'admin') {
+                if (cardAdmin) {
+                    cardAdmin.classList.add('border-[#D4A574]', 'shadow-sm', 'shadow-[#D4A574]/10');
+                    cardAdmin.classList.remove('border-slate-200');
+                }
+                if (cardCrew) {
+                    cardCrew.classList.remove('border-[#D4A574]', 'shadow-sm', 'shadow-[#D4A574]/10');
+                    cardCrew.classList.add('border-slate-200');
+                }
+                if (radioAdmin) radioAdmin.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-[#D4A574]"></div>`;
+                if (radioCrew) radioCrew.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>`;
+            } else {
+                if (cardCrew) {
+                    cardCrew.classList.add('border-[#D4A574]', 'shadow-sm', 'shadow-[#D4A574]/10');
+                    cardCrew.classList.remove('border-slate-200');
+                }
+                if (cardAdmin) {
+                    cardAdmin.classList.remove('border-[#D4A574]', 'shadow-sm', 'shadow-[#D4A574]/10');
+                    cardAdmin.classList.add('border-slate-200');
+                }
+                if (radioCrew) radioCrew.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-[#D4A574]"></div>`;
+                if (radioAdmin) radioAdmin.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>`;
+            }
+
+            const noticeLabel = document.getElementById('activeRoleLabelNotice');
+            if (noticeLabel) noticeLabel.innerText = role === 'admin' ? 'Administrator' : 'Crew Lapangan';
+
+            const bottomBadge = document.getElementById('activeRoleBadgeBottom');
+            if (bottomBadge) {
+                if (role === 'admin') {
+                    bottomBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200';
+                    bottomBadge.innerText = '🛡️ Administrator';
+                } else {
+                    bottomBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200';
+                    bottomBadge.innerText = '👷 Crew Lapangan';
+                }
+            }
+
+            renderRolePermissionsView();
+        }
+
+        function renderRolePermissionsView() {
+            const container = document.getElementById('rolePermissionsContainer');
+            if (!container || !rolePermissionsMatrix) return;
+
+            const role = selectedRoleForPermissions;
+            const currentPerms = rolePermissionsWorkingMap[role] || new Set();
+            const definitions = rolePermissionsMatrix.definitions || [];
+
+            container.innerHTML = definitions.map((cat, catIdx) => {
+                const catKeys = (cat.permissions || []).map(p => p.id);
+                const enabledCount = catKeys.filter(k => currentPerms.has(k)).length;
+                const isAllEnabled = enabledCount === catKeys.length && catKeys.length > 0;
+
+                // Category Icon
+                const catLower = (cat.category || '').toLowerCase();
+                let catIcon = '⚙️';
+                if (catLower.includes('keuangan')) catIcon = '💰';
+                else if (catLower.includes('agenda')) catIcon = '📅';
+                else if (catLower.includes('inventaris') || catLower.includes('pick list')) catIcon = '🚚';
+                else if (catLower.includes('katalog') || catLower.includes('brand')) catIcon = '🏷️';
+                else if (catLower.includes('ai') || catLower.includes('tim')) catIcon = '🤖';
+
+                const itemsHtml = (cat.permissions || []).map(p => {
+                    const isChecked = currentPerms.has(p.id);
                     return `
-                        <tr class="hover:bg-slate-50/50 transition">
-                            <td class="py-3 px-5 font-bold text-slate-900">${u.full_name}</td>
-                            <td class="py-3 px-5 font-mono">${u.phone || '-'}</td>
-                            <td class="py-3 px-5">${u.email || '-'}</td>
-                            <td class="py-3 px-5">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${roleBadgeColor}">
-                                    ${u.role}
-                                </span>
-                            </td>
-                            <td class="py-3 px-5 text-slate-500">${u.company_name || u.company_id || '-'}</td>
-                        </tr>
+                        <div class="p-3.5 rounded-xl bg-slate-50/70 hover:bg-slate-50 border border-slate-100 flex items-start justify-between gap-4 transition">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-800">${p.name}</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">${p.description}</p>
+                                <p class="text-[10px] text-slate-400 font-mono mt-1">${p.id}</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                                <input type="checkbox" ${isChecked ? 'checked' : ''} 
+                                    onchange="togglePermission('${role}', '${p.id}', this.checked)"
+                                    class="sr-only peer">
+                                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#D4A574]"></div>
+                            </label>
+                        </div>
                     `;
                 }).join('');
+
+                return `
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+                        <div class="p-4 sm:px-5 bg-slate-50/60 border-b border-slate-100 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-lg">${catIcon}</span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900">${cat.category}</h4>
+                                    <p class="text-[10px] text-slate-400 font-medium" id="catCountBadge-${catIdx}">
+                                        ${enabledCount} dari ${catKeys.length} izin aktif
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-semibold text-slate-500 hidden sm:inline">Pilih Semua</span>
+                                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                    <input type="checkbox" ${isAllEnabled ? 'checked' : ''} 
+                                        onchange="toggleCategoryPermissions('${role}', ${catIdx}, this.checked)"
+                                        class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#D4A574]"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function togglePermission(role, permKey, isChecked) {
+            if (!rolePermissionsWorkingMap[role]) {
+                rolePermissionsWorkingMap[role] = new Set();
+            }
+
+            if (isChecked) {
+                rolePermissionsWorkingMap[role].add(permKey);
+            } else {
+                rolePermissionsWorkingMap[role].delete(permKey);
+            }
+
+            // Update category badge counters
+            renderRolePermissionsView();
+        }
+
+        function toggleCategoryPermissions(role, catIdx, isChecked) {
+            if (!rolePermissionsWorkingMap[role]) {
+                rolePermissionsWorkingMap[role] = new Set();
+            }
+
+            const cat = rolePermissionsMatrix.definitions[catIdx];
+            if (!cat) return;
+
+            (cat.permissions || []).forEach(p => {
+                if (isChecked) {
+                    rolePermissionsWorkingMap[role].add(p.id);
+                } else {
+                    rolePermissionsWorkingMap[role].delete(p.id);
+                }
+            });
+
+            renderRolePermissionsView();
+        }
+
+        async function saveRolePermissions() {
+            if (isSavingRolePermissions) return;
+            isSavingRolePermissions = true;
+
+            const role = selectedRoleForPermissions;
+            const permsArray = Array.from(rolePermissionsWorkingMap[role] || []);
+            const roleName = role === 'admin' ? 'Administrator' : 'Crew Lapangan';
+
+            const btnTop = document.getElementById('btnSaveRolePermissionsTop');
+            if (btnTop) {
+                btnTop.disabled = true;
+                btnTop.innerText = 'Menyimpan...';
+            }
+
+            try {
+                let url = '/api/company/role-permissions';
+                if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
+
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        role: role,
+                        permissions: permsArray
+                    })
+                });
+
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menyimpan hak akses');
+
+                alert(`Hak akses untuk role ${roleName} berhasil disimpan ke database!`);
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            } finally {
+                isSavingRolePermissions = false;
+                if (btnTop) {
+                    btnTop.disabled = false;
+                    btnTop.innerHTML = `<span>✓</span> <span>Simpan Hak Akses</span>`;
+                }
+            }
+        }
+
+        async function confirmResetRolePermissions() {
+            const role = selectedRoleForPermissions;
+            const roleName = role === 'admin' ? 'Administrator' : 'Crew Lapangan';
+
+            if (!confirm(`Kembalikan hak akses untuk role ${roleName} ke setelan standar bawaan sistem Dekorin?`)) {
+                return;
+            }
+
+            try {
+                let url = `/api/company/role-permissions/reset?role=${role}`;
+                if (selectedCompanyId) url += '&company_id=' + encodeURIComponent(selectedCompanyId);
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal mereset hak akses');
+
+                alert(`Hak akses role ${roleName} telah dikembalikan ke setelan default.`);
+                await loadRolePermissions();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // MASTER ITEM TAMBAHAN (ADDONS)
+        // ==========================================
+        async function loadAddons() {
+            const tbody = document.getElementById('addonsTableBody');
+            const countInfo = document.getElementById('addonCountInfo');
+            if (!tbody) return;
+
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Memuat data item tambahan...</td></tr>`;
+            if (countInfo) countInfo.innerText = 'Memuat data...';
+
+            try {
+                let url = '/api/addons';
+                if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                const addons = json.data || [];
+                addonsCache = addons;
+                renderAddonsTable(addonsCache);
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-rose-500">Gagal: ${err.message}</td></tr>`;
+                if (countInfo) countInfo.innerText = 'Gagal memuat';
+            }
+        }
+
+        function filterAddons(query) {
+            addonSearchQuery = (query || '').toLowerCase().trim();
+            if (!addonSearchQuery) {
+                renderAddonsTable(addonsCache);
+                return;
+            }
+            const filtered = addonsCache.filter(a => {
+                const name = (a.name || '').toLowerCase();
+                const desc = (a.description || '').toLowerCase();
+                return name.includes(addonSearchQuery) || desc.includes(addonSearchQuery);
+            });
+            renderAddonsTable(filtered);
+        }
+
+        function renderAddonsTable(addons) {
+            const tbody = document.getElementById('addonsTableBody');
+            const countInfo = document.getElementById('addonCountInfo');
+            if (!tbody) return;
+
+            if (countInfo) {
+                countInfo.innerText = `Menampilkan ${addons.length} dari total ${addonsCache.length} item tambahan`;
+            }
+
+            if (!addons || addons.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-400">Belum ada item tambahan. Klik tombol "+ Tambah Item Tambahan" untuk membuat baru.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = addons.map(a => {
+                const imgTag = a.image_url 
+                    ? `<img src="${a.image_url}" class="w-12 h-12 rounded-xl object-cover border border-slate-100 shrink-0">`
+                    : `<div class="w-12 h-12 rounded-xl bg-[#F9F3EC] text-[#C59563] flex items-center justify-center text-xl shrink-0">✨</div>`;
+
+                const priceFormatted = 'Rp ' + Number(a.price || 0).toLocaleString('id-ID');
+                const escapeName = (a.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                return `
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="py-3 px-5">${imgTag}</td>
+                        <td class="py-3 px-5 font-bold text-slate-900">${a.name}</td>
+                        <td class="py-3 px-5 font-mono font-bold text-[#C59563]">${priceFormatted}</td>
+                        <td class="py-3 px-5 text-slate-500 text-xs max-w-sm truncate">${a.description || '-'}</td>
+                        <td class="py-3 px-5 text-right whitespace-nowrap">
+                            <button onclick="openAddonModal('${a.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-stone-600 hover:text-[#C59563] hover:bg-[#F9F3EC] border border-stone-200 transition">
+                                Ubah
+                            </button>
+                            <button onclick="handleDeleteAddon('${a.id}', '${escapeName}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 ml-1.5 transition">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateAddonImagePreview(url) {
+            const box = document.getElementById('addonImagePreviewBox');
+            if (!box) return;
+            if (url && url.trim() !== '') {
+                box.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+            } else {
+                box.innerHTML = `<span class="text-2xl text-slate-300">✨</span>`;
+            }
+        }
+
+        async function handleAddonImageFileSelected(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                updateAddonImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    body: formData
+                });
+                const json = await res.json();
+                if (res.ok && json.url) {
+                    document.getElementById('inputAddonImageUrl').value = json.url;
+                    updateAddonImagePreview(json.url);
+                }
+            } catch (err) {
+                console.error("Gagal unggah gambar addon:", err);
+            }
+        }
+
+        function openAddonModal(addonId) {
+            const form = document.getElementById('formAddon');
+            if (form) form.reset();
+            const errBox = document.getElementById('addonError');
+            if (errBox) errBox.classList.add('hidden');
+
+            const title = document.getElementById('modalAddonTitle');
+
+            if (addonId) {
+                const a = addonsCache.find(x => x.id === addonId);
+                if (!a) return;
+                title.innerText = 'Ubah Item Tambahan';
+                document.getElementById('inputAddonId').value = a.id;
+                document.getElementById('inputAddonName').value = a.name;
+                document.getElementById('inputAddonPrice').value = a.price;
+                document.getElementById('inputAddonImageUrl').value = a.image_url || '';
+                document.getElementById('inputAddonDescription').value = a.description || '';
+                updateAddonImagePreview(a.image_url);
+            } else {
+                title.innerText = 'Tambah Item Tambahan';
+                document.getElementById('inputAddonId').value = '';
+                updateAddonImagePreview('');
+            }
+
+            const modal = document.getElementById('modalAddon');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAddonModal() {
+            const modal = document.getElementById('modalAddon');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleSaveAddon(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitAddon');
+            const errBox = document.getElementById('addonError');
+            errBox.classList.add('hidden');
+
+            const id = document.getElementById('inputAddonId').value;
+            const name = document.getElementById('inputAddonName').value.trim();
+            const price = parseFloat(document.getElementById('inputAddonPrice').value) || 0;
+            const image_url = document.getElementById('inputAddonImageUrl').value.trim();
+            const description = document.getElementById('inputAddonDescription').value.trim();
+
+            const isEdit = id && id.trim() !== '';
+            const method = isEdit ? 'PUT' : 'POST';
+            let url = isEdit ? `/api/addons/${id}` : '/api/addons';
+            if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
+
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({ name, price, image_url, description })
+                });
+
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menyimpan item tambahan');
+
+                closeAddonModal();
+                await loadAddons();
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan Item';
+            }
+        }
+
+        async function handleDeleteAddon(id, name) {
+            if (!confirm(`Hapus item tambahan "${name}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+            try {
+                let url = `/api/addons/${id}`;
+                if (selectedCompanyId) url += '?company_id=' + encodeURIComponent(selectedCompanyId);
+
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menghapus item tambahan');
+
+                await loadAddons();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
             }
         }
 
@@ -4217,6 +5831,9 @@
             // Populate Models dropdown
             populateAgendaModelSelect();
 
+            const cfBox = document.getElementById('agendaClientFormSummaryBox');
+            if (cfBox) cfBox.classList.add('hidden');
+
             calculateAgendaTotal();
             modal.classList.remove('hidden');
         }
@@ -4314,6 +5931,37 @@
                 Array.from(formEl.elements).forEach(el => {
                     el.disabled = false;
                 });
+            }
+
+            // Render Hasil Isian Form Client & tombol Buka Kunci
+            const cfBox = document.getElementById('agendaClientFormSummaryBox');
+            const cfList = document.getElementById('agendaClientFormAnswersList');
+            const btnUnlock = document.getElementById('btnUnlockAgendaForm');
+            if (cfBox && cfList) {
+                const answers = (a.client_form && a.client_form.custom_answers) ? a.client_form.custom_answers : [];
+                if (answers.length > 0 || a.form_status === 'filled') {
+                    cfBox.classList.remove('hidden');
+                    if (answers.length > 0) {
+                        cfList.innerHTML = answers.map(ans => {
+                            if (ans.type === 'image') {
+                                return `<div class="p-2 bg-white rounded-xl border border-emerald-100"><span class="text-[11px] font-bold text-slate-600 block mb-1">${ans.label}:</span><a href="${ans.value}" target="_blank" class="text-xs text-[#C59563] underline">Lihat Foto Unggahan</a></div>`;
+                            }
+                            return `<div class="p-2 bg-white rounded-xl border border-emerald-100 flex justify-between gap-2"><span class="text-[11px] font-semibold text-slate-500">${ans.label}</span><span class="text-xs font-bold text-slate-800 text-right">${ans.value}</span></div>`;
+                        }).join('');
+                    } else {
+                        cfList.innerHTML = `<p class="text-[11px] text-emerald-700">Client telah mengonfirmasi form pesanan.</p>`;
+                    }
+                    if (btnUnlock) {
+                        if (a.form_status === 'filled' && (currentUserRole === 'owner' || currentUserRole === 'admin' || currentUserRole === 'superadmin')) {
+                            btnUnlock.classList.remove('hidden');
+                            btnUnlock.disabled = false;
+                        } else {
+                            btnUnlock.classList.add('hidden');
+                        }
+                    }
+                } else {
+                    cfBox.classList.add('hidden');
+                }
             }
 
             calculateAgendaTotal();
@@ -6203,6 +7851,584 @@
             
             const waUrl = 'https://wa.me/?text=' + encodeURIComponent(message);
             window.open(waUrl, '_blank');
+        }
+
+        // ==========================================
+        // PENGATURAN FORM CLIENT PER SUB-BRAND
+        // ==========================================
+        async function loadFormConfigView() {
+            await ensureAgendaMasterDataLoaded();
+            renderFormConfigBrandTabs();
+            await loadFormConfig();
+        }
+
+        function renderFormConfigBrandTabs() {
+            const container = document.getElementById('formConfigBrandTabs');
+            if (!container) return;
+
+            const tabs = [
+                { id: '', name: 'Brand Utama (Default)' },
+                ...(companyBrandsCache || []).map(b => ({ id: b.id, name: b.name }))
+            ];
+
+            container.innerHTML = tabs.map(t => {
+                const isActive = formConfigBrandId === t.id;
+                return `
+                    <button type="button" onclick="selectFormConfigBrand('${t.id}')"
+                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition border ${isActive ? 'bg-[#D4A574] text-white border-[#D4A574] shadow-sm shadow-[#D4A574]/25' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}">
+                        ${t.name}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        async function selectFormConfigBrand(brandId) {
+            formConfigBrandId = brandId || '';
+            renderFormConfigBrandTabs();
+            await loadFormConfig();
+        }
+
+        async function loadFormConfig() {
+            const container = document.getElementById('formConfigFieldsContainer');
+            const inheritedBadge = document.getElementById('formConfigInheritedBadge');
+            const showPriceToggle = document.getElementById('toggleFormConfigShowPrice');
+            if (container) {
+                container.innerHTML = `<div class="p-10 text-center text-slate-400 bg-white rounded-2xl border border-slate-100 text-xs">Memuat daftar isian form...</div>`;
+            }
+
+            try {
+                let url = `/api/company/form-config?brand_id=${encodeURIComponent(formConfigBrandId)}`;
+                if (selectedCompanyId) url += `&company_id=${encodeURIComponent(selectedCompanyId)}`;
+
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal memuat pengaturan form');
+
+                const cfg = json.data || {};
+                formConfigFields = Array.isArray(cfg.fields) ? cfg.fields : [];
+                formConfigShowPrice = cfg.show_price !== false;
+                formConfigInherited = !!json.is_inherited;
+
+                if (showPriceToggle) showPriceToggle.checked = formConfigShowPrice;
+                if (inheritedBadge) {
+                    if (formConfigInherited && formConfigBrandId) inheritedBadge.classList.remove('hidden');
+                    else inheritedBadge.classList.add('hidden');
+                }
+
+                renderFormConfigFields();
+            } catch (err) {
+                if (container) {
+                    container.innerHTML = `<div class="p-8 text-center text-rose-600 bg-rose-50 rounded-2xl border border-rose-200 text-xs">Gagal: ${err.message}</div>`;
+                }
+            }
+        }
+
+        function getFieldTypeDisplay(type) {
+            const map = {
+                'text': 'Teks Singkat',
+                'textarea': 'Paragraf',
+                'number': 'Angka',
+                'date': 'Tanggal',
+                'time': 'Jam',
+                'datetime': 'Tanggal & Jam',
+                'select': 'Dropdown',
+                'radio': 'Pilihan Tunggal',
+                'checkbox': 'Centang Ganda',
+                'image': 'Upload Foto',
+                'maps': 'Google Maps',
+                'package_picker': 'Pilih Paket',
+                'model_picker': 'Pilih Model',
+                'addon_picker': 'Pilih Addon'
+            };
+            return map[type] || type;
+        }
+
+        function renderFormConfigFields() {
+            const container = document.getElementById('formConfigFieldsContainer');
+            if (!container) return;
+
+            if (!formConfigFields || formConfigFields.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-100 text-xs">Belum ada daftar isian.</div>`;
+                return;
+            }
+
+            container.innerHTML = formConfigFields.map((f, idx) => {
+                const isFirst = idx === 0;
+                const isLast = idx === formConfigFields.length - 1;
+                const typeBadge = getFieldTypeDisplay(f.type);
+                const optsPreview = (f.options && f.options.length > 0)
+                    ? `<span class="text-[10px] text-slate-400 block mt-0.5">Opsi: ${f.options.join(', ')}</span>`
+                    : '';
+
+                return `
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${f.is_active ? 'border-slate-200 shadow-2xs' : 'border-slate-100 bg-slate-50/60 opacity-75'}">
+                        <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                            <!-- Urutan & Tombol Naik/Turun -->
+                            <div class="flex flex-col items-center gap-0.5 shrink-0">
+                                <button type="button" onclick="moveFormField(${idx}, -1)" ${isFirst ? 'disabled' : ''}
+                                    class="w-6 h-5 rounded flex items-center justify-center text-[10px] font-bold border border-slate-200 ${isFirst ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-[#F9F3EC] hover:text-[#C59563]'}">↑</button>
+                                <span class="text-[10px] font-mono font-bold text-slate-400">#${idx + 1}</span>
+                                <button type="button" onclick="moveFormField(${idx}, 1)" ${isLast ? 'disabled' : ''}
+                                    class="w-6 h-5 rounded flex items-center justify-center text-[10px] font-bold border border-slate-200 ${isLast ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-[#F9F3EC] hover:text-[#C59563]'}">↓</button>
+                            </div>
+
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="text-xs font-bold text-slate-900">${f.label}</span>
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600">${typeBadge}</span>
+                                    ${f.is_system
+                                        ? `<span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-[#F9F3EC] text-[#C59563]">Bawaan</span>`
+                                        : `<span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-purple-50 text-purple-700">Kustom</span>`}
+                                </div>
+                                ${f.placeholder ? `<span class="text-[11px] text-slate-400 block truncate">${f.placeholder}</span>` : ''}
+                                ${optsPreview}
+                            </div>
+                        </div>
+
+                        <!-- Kontrol Toggle ON/OFF, Required, Edit & Hapus -->
+                        <div class="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 shrink-0">
+                            <!-- Toggle ON/OFF -->
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <div class="relative inline-flex items-center">
+                                    <input type="checkbox" ${f.is_active ? 'checked' : ''} onchange="toggleFormFieldActive(${idx}, this.checked)" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                </div>
+                                <span class="text-[11px] font-bold ${f.is_active ? 'text-emerald-700' : 'text-slate-400'}">${f.is_active ? 'ON' : 'OFF'}</span>
+                            </label>
+
+                            <!-- Toggle Required -->
+                            <label class="flex items-center gap-1.5 ${f.is_active ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'}">
+                                <div class="relative inline-flex items-center">
+                                    <input type="checkbox" ${f.is_required ? 'checked' : ''} ${!f.is_active ? 'disabled' : ''} onchange="toggleFormFieldRequired(${idx}, this.checked)" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#D4A574]"></div>
+                                </div>
+                                <span class="text-[11px] font-bold ${f.is_required ? 'text-[#C59563]' : 'text-slate-400'}">Wajib</span>
+                            </label>
+
+                            <!-- Edit / Delete -->
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="openFormFieldModal(${idx})" title="Ubah Label/Opsi"
+                                    class="px-2 py-1 rounded-lg text-[11px] font-semibold text-stone-600 hover:bg-[#F9F3EC] hover:text-[#C59563] border border-stone-200 transition">
+                                    Ubah
+                                </button>
+                                ${!f.is_system ? `
+                                    <button type="button" onclick="deleteFormField(${idx})" title="Hapus Pertanyaan"
+                                        class="px-2 py-1 rounded-lg text-[11px] font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 transition">
+                                        Hapus
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function moveFormField(idx, delta) {
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= formConfigFields.length) return;
+            const temp = formConfigFields[idx];
+            formConfigFields[idx] = formConfigFields[targetIdx];
+            formConfigFields[targetIdx] = temp;
+            renderFormConfigFields();
+        }
+
+        function toggleFormFieldActive(idx, val) {
+            if (!formConfigFields[idx]) return;
+            formConfigFields[idx].is_active = val;
+            if (!val) formConfigFields[idx].is_required = false;
+            renderFormConfigFields();
+        }
+
+        function toggleFormFieldRequired(idx, val) {
+            if (!formConfigFields[idx] || !formConfigFields[idx].is_active) return;
+            formConfigFields[idx].is_required = val;
+            renderFormConfigFields();
+        }
+
+        function toggleFormFieldOptionsBox(typeVal) {
+            const box = document.getElementById('formFieldOptionsBox');
+            if (!box) return;
+            if (typeVal === 'select' || typeVal === 'radio' || typeVal === 'checkbox') {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function openFormFieldModal(editIdx = -1) {
+            const form = document.getElementById('formFieldItem');
+            if (form) form.reset();
+
+            document.getElementById('inputFormFieldIndex').value = editIdx;
+            const titleEl = document.getElementById('modalFormFieldTitle');
+            const typeSelect = document.getElementById('inputFormFieldType');
+            const typeBox = document.getElementById('formFieldTypeBox');
+
+            if (editIdx >= 0 && formConfigFields[editIdx]) {
+                const f = formConfigFields[editIdx];
+                titleEl.innerText = f.is_system ? 'Ubah Label & Petunjuk Field' : 'Ubah Pertanyaan Kustom';
+                document.getElementById('inputFormFieldLabel').value = f.label || '';
+                document.getElementById('inputFormFieldPlaceholder').value = f.placeholder || '';
+                document.getElementById('inputFormFieldRequired').checked = !!f.is_required;
+                document.getElementById('inputFormFieldOptions').value = (f.options || []).join('\n');
+
+                if (f.is_system) {
+                    typeBox.classList.add('hidden');
+                    document.getElementById('formFieldOptionsBox').classList.add('hidden');
+                } else {
+                    typeBox.classList.remove('hidden');
+                    typeSelect.value = f.type || 'text';
+                    toggleFormFieldOptionsBox(typeSelect.value);
+                }
+            } else {
+                titleEl.innerText = 'Tambah Pertanyaan Kustom';
+                typeBox.classList.remove('hidden');
+                typeSelect.value = 'text';
+                toggleFormFieldOptionsBox('text');
+            }
+
+            document.getElementById('modalFormField').classList.remove('hidden');
+        }
+
+        function closeFormFieldModal() {
+            document.getElementById('modalFormField').classList.add('hidden');
+        }
+
+        function handleSaveFormField(e) {
+            e.preventDefault();
+            const idx = parseInt(document.getElementById('inputFormFieldIndex').value, 10);
+            const label = document.getElementById('inputFormFieldLabel').value.trim();
+            const type = document.getElementById('inputFormFieldType').value;
+            const placeholder = document.getElementById('inputFormFieldPlaceholder').value.trim();
+            const isRequired = document.getElementById('inputFormFieldRequired').checked;
+            const rawOpts = document.getElementById('inputFormFieldOptions').value;
+
+            const options = rawOpts.split(/[\n,]+/).map(x => x.trim()).filter(Boolean);
+
+            if (!label) return;
+
+            if (idx >= 0 && formConfigFields[idx]) {
+                formConfigFields[idx].label = label;
+                formConfigFields[idx].placeholder = placeholder;
+                formConfigFields[idx].is_required = isRequired;
+                if (isRequired) formConfigFields[idx].is_active = true;
+                if (!formConfigFields[idx].is_system) {
+                    formConfigFields[idx].type = type;
+                    formConfigFields[idx].options = options;
+                }
+            } else {
+                const randKey = 'custom_' + Math.random().toString(36).substring(2, 9);
+                formConfigFields.push({
+                    key: randKey,
+                    label: label,
+                    type: type,
+                    placeholder: placeholder,
+                    options: options,
+                    is_system: false,
+                    is_active: true,
+                    is_required: isRequired,
+                    sort_order: formConfigFields.length + 1
+                });
+            }
+
+            closeFormFieldModal();
+            renderFormConfigFields();
+        }
+
+        function deleteFormField(idx) {
+            const f = formConfigFields[idx];
+            if (!f || f.is_system) return;
+            if (!confirm(`Hapus pertanyaan "${f.label}" dari daftar isian?`)) return;
+            formConfigFields.splice(idx, 1);
+            renderFormConfigFields();
+        }
+
+        async function saveFormConfig() {
+            const btnTop = document.getElementById('btnSaveFormConfigTop');
+            if (btnTop) {
+                btnTop.disabled = true;
+                btnTop.innerText = 'Menyimpan...';
+            }
+
+            const showPrice = document.getElementById('toggleFormConfigShowPrice')?.checked ?? true;
+            const orderedFields = formConfigFields.map((f, idx) => ({
+                ...f,
+                sort_order: idx + 1
+            }));
+
+            try {
+                let url = '/api/company/form-config';
+                if (selectedCompanyId) url += `?company_id=${encodeURIComponent(selectedCompanyId)}`;
+
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        brand_id: formConfigBrandId,
+                        show_price: showPrice,
+                        fields: orderedFields
+                    })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menyimpan pengaturan form');
+
+                alert('Pengaturan daftar isian form client berhasil disimpan!');
+                await loadFormConfig();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            } finally {
+                if (btnTop) {
+                    btnTop.disabled = false;
+                    btnTop.innerHTML = `<span>✓</span><span>Simpan Pengaturan Form</span>`;
+                }
+            }
+        }
+
+        async function confirmResetFormConfig() {
+            if (!confirm('Kembalikan pengaturan form client ini ke setelan bawaan standar sistem?')) return;
+            try {
+                let url = `/api/company/form-config/reset?brand_id=${encodeURIComponent(formConfigBrandId)}`;
+                if (selectedCompanyId) url += `&company_id=${encodeURIComponent(selectedCompanyId)}`;
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal mereset pengaturan form');
+
+                await loadFormConfig();
+                alert('Pengaturan form berhasil dikembalikan ke default.');
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // GENERATE & KELOLA LINK FORM CLIENT (PENDING DRAFT)
+        // ==========================================
+        async function loadPendingLinksCount() {
+            const badge = document.getElementById('pendingLinksCountBadge');
+            if (!badge) return;
+            try {
+                let url = '/api/agendas/pending-links';
+                if (selectedCompanyId) url += `?company_id=${encodeURIComponent(selectedCompanyId)}`;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                const list = json.data || [];
+                pendingLinksCache = list;
+                if (list.length > 0) {
+                    badge.innerText = list.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (_) {}
+        }
+
+        async function openPendingLinksModal() {
+            const modal = document.getElementById('modalPendingLinks');
+            const newBox = document.getElementById('newlyGeneratedLinkBox');
+            if (newBox) newBox.classList.add('hidden');
+            const labelInput = document.getElementById('inputGenerateLinkLabel');
+            if (labelInput) labelInput.value = '';
+
+            await ensureAgendaMasterDataLoaded();
+            const brandSelect = document.getElementById('inputGenerateLinkBrandId');
+            if (brandSelect) {
+                brandSelect.innerHTML = '<option value="">-- Brand Utama --</option>' +
+                    (companyBrandsCache || []).map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+            }
+
+            if (modal) modal.classList.remove('hidden');
+            await loadPendingLinks();
+        }
+
+        function closePendingLinksModal() {
+            const modal = document.getElementById('modalPendingLinks');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function loadPendingLinks() {
+            const container = document.getElementById('pendingLinksListContainer');
+            if (!container) return;
+            container.innerHTML = `<p class="text-center py-6 text-xs text-slate-400">Memuat daftar link...</p>`;
+
+            try {
+                let url = '/api/agendas/pending-links';
+                if (selectedCompanyId) url += `?company_id=${encodeURIComponent(selectedCompanyId)}`;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                pendingLinksCache = json.data || [];
+
+                const badge = document.getElementById('pendingLinksCountBadge');
+                if (badge) {
+                    if (pendingLinksCache.length > 0) {
+                        badge.innerText = pendingLinksCache.length;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+
+                renderPendingLinksList();
+            } catch (err) {
+                container.innerHTML = `<p class="text-center py-6 text-xs text-rose-500">Gagal memuat: ${err.message}</p>`;
+            }
+        }
+
+        function renderPendingLinksList() {
+            const container = document.getElementById('pendingLinksListContainer');
+            if (!container) return;
+
+            if (!pendingLinksCache || pendingLinksCache.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-xs text-slate-400">
+                        Belum ada link kosong yang menunggu isian client. Klik tombol di atas untuk generate link baru!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = pendingLinksCache.map(item => {
+                const formUrl = `${window.location.origin}/form/${item.form_token}`;
+                const createdStr = item.created_at ? new Date(item.created_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                const brandBadge = item.brand_name
+                    ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30">${item.brand_name}</span>`
+                    : `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">Brand Utama</span>`;
+                const waText = encodeURIComponent(`Halo Kak, silakan lengkapi detail acara Anda melalui tautan formulir resmi berikut ini ya:\n\n${formUrl}\n\nTerima kasih!`);
+
+                return `
+                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="min-w-0 flex-1 space-y-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${brandBadge}
+                                <span class="text-xs font-bold text-slate-800">${item.client_name || 'Menunggu Isian Client'}</span>
+                                <span class="text-[10px] text-slate-400">• ${createdStr}</span>
+                            </div>
+                            <p class="text-[11px] font-mono text-slate-500 truncate">${formUrl}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="copyTextValue('${formUrl}')"
+                                class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#F9F3EC] text-slate-700 hover:text-[#C59563] border border-slate-200 text-[11px] font-bold transition">
+                                Salin
+                            </button>
+                            <a href="https://wa.me/?text=${waText}" target="_blank"
+                                class="px-2.5 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#20BD5A] text-white text-[11px] font-bold transition">
+                                Kirim WA
+                            </a>
+                            <button type="button" onclick="deletePendingLink('${item.id}')"
+                                class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 text-[11px] font-bold transition">
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function generateQuickClientLink() {
+            const btn = document.getElementById('btnGenerateQuickLink');
+            const brandId = document.getElementById('inputGenerateLinkBrandId')?.value || '';
+            const label = document.getElementById('inputGenerateLinkLabel')?.value.trim() || '';
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳</span><span>Membuat Link...</span>`;
+            }
+
+            try {
+                const res = await fetch('/api/agendas/generate-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        company_id: selectedCompanyId || '',
+                        brand_id: brandId,
+                        label: label
+                    })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal membuat link form');
+
+                const agenda = json.data;
+                const formUrl = `${window.location.origin}/form/${agenda.form_token}`;
+
+                const newBox = document.getElementById('newlyGeneratedLinkBox');
+                const inputEl = document.getElementById('newlyGeneratedLinkInput');
+                const tokenEl = document.getElementById('newlyGeneratedLinkToken');
+                const waBtn = document.getElementById('newlyGeneratedLinkWaBtn');
+
+                if (newBox && inputEl) {
+                    inputEl.value = formUrl;
+                    if (tokenEl) tokenEl.innerText = 'ID: ' + agenda.form_token;
+                    if (waBtn) {
+                        const msg = encodeURIComponent(`Halo Kak, silakan lengkapi detail acara Anda melalui link formulir berikut:\n\n${formUrl}\n\nTerima kasih!`);
+                        waBtn.href = `https://wa.me/?text=${msg}`;
+                    }
+                    newBox.classList.remove('hidden');
+                }
+
+                await loadPendingLinks();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>✨</span><span>Generate Link Form Client Sekarang</span>`;
+                }
+            }
+        }
+
+        async function deletePendingLink(id) {
+            if (!confirm('Hapus link form client yang belum diisi ini?')) return;
+            try {
+                const res = await fetch(`/api/agendas/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menghapus link');
+                await loadPendingLinks();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
+        }
+
+        function copyTextValue(val) {
+            navigator.clipboard.writeText(val).then(() => {
+                alert('Link berhasil disalin ke clipboard!\n' + val);
+            }).catch(() => {
+                prompt('Salin link di bawah ini:', val);
+            });
+        }
+
+        async function unlockCurrentAgendaForm() {
+            const agendaId = document.getElementById('inputAgendaId')?.value;
+            if (!agendaId) return;
+            if (!confirm('Buka kunci form client untuk agenda ini? Setelah dibuka, client dapat mengisi ulang / melengkapi lewat link yang sama hingga di-submit kembali.')) return;
+
+            try {
+                const res = await fetch(`/api/agendas/${agendaId}/unlock-form`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal membuka kunci form');
+
+                alert('Kunci form berhasil dibuka!');
+                const btnUnlock = document.getElementById('btnUnlockAgendaForm');
+                if (btnUnlock) btnUnlock.classList.add('hidden');
+                await loadAgendas();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
         }
     </script>
 </body>

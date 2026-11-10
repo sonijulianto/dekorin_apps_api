@@ -196,7 +196,7 @@ func GetAllCompanies(c *fiber.Ctx) error {
 		config.DB.Model(&models.User{}).Where("company_id = ? AND role = ?", comp.ID, "owner").Count(&totalOwners)
 		config.DB.Model(&models.User{}).Where("company_id = ? AND role = ?", comp.ID, "admin").Count(&totalAdmins)
 		config.DB.Model(&models.User{}).Where("company_id = ? AND role = ?", comp.ID, "crew").Count(&totalCrew)
-		config.DB.Model(&models.Agenda{}).Where("company_id = ?", comp.ID).Count(&totalAgendas)
+		config.DB.Model(&models.Agenda{}).Where("company_id = ? AND (is_form_draft = ? OR is_form_draft IS NULL)", comp.ID, false).Count(&totalAgendas)
 
 		var owners []models.User
 		config.DB.Where("company_id = ? AND role = ?", comp.ID, "owner").Find(&owners)
@@ -799,7 +799,7 @@ func GetSuperadminDashboardStats(c *fiber.Ctx) error {
 	}
 
 	// Filter query
-	agendaQuery := config.DB.Model(&models.Agenda{})
+	agendaQuery := config.DB.Model(&models.Agenda{}).Where("is_form_draft = ? OR is_form_draft IS NULL", false)
 	userQuery := config.DB.Model(&models.User{})
 
 	if companyID != "" && companyID != "all" {
@@ -821,7 +821,7 @@ func GetSuperadminDashboardStats(c *fiber.Ctx) error {
 
 	// Hitung Revenue aktual dari agenda
 	var paidAgendas []models.Agenda
-	paidQuery := config.DB.Model(&models.Agenda{}).Preload("ClientForm")
+	paidQuery := config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("is_form_draft = ? OR is_form_draft IS NULL", false)
 	if companyID != "" && companyID != "all" {
 		paidQuery = paidQuery.Where("company_id = ?", companyID)
 	}
@@ -864,7 +864,7 @@ func GetSuperadminDashboardStats(c *fiber.Ctx) error {
 	var topCustomers []TopCustomerItem
 	if companyID != "" && companyID != "all" {
 		var clientAgendas []models.Agenda
-		config.DB.Where("company_id = ?", companyID).Order("event_date_time desc").Limit(20).Find(&clientAgendas)
+		config.DB.Where("company_id = ? AND (is_form_draft = ? OR is_form_draft IS NULL)", companyID, false).Order("event_date_time desc").Limit(20).Find(&clientAgendas)
 		clientMap := make(map[string]float64)
 		for _, a := range clientAgendas {
 			if strings.TrimSpace(a.ClientName) != "" {
@@ -890,7 +890,7 @@ func GetSuperadminDashboardStats(c *fiber.Ctx) error {
 			for i, comp := range companies {
 				var compRevenue float64 = 0
 				var compAgendas []models.Agenda
-				config.DB.Where("company_id = ?", comp.ID).Find(&compAgendas)
+				config.DB.Where("company_id = ? AND (is_form_draft = ? OR is_form_draft IS NULL)", comp.ID, false).Find(&compAgendas)
 				for _, a := range compAgendas {
 					compRevenue += a.CalculateTotalBiaya()
 				}

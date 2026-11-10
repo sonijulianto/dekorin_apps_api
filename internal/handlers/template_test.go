@@ -442,6 +442,45 @@ func TestSuperadminDefaultValues(t *testing.T) {
 	}
 }
 
+func TestSuperadminRoleAccessAndTeamManagement(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+	superadminPath := filepath.Join(wd, "..", "..", "web", "templates", "superadmin.html")
+	content, err := os.ReadFile(superadminPath)
+	if err != nil {
+		t.Fatalf("superadmin.html missing or unreadable: %v", err)
+	}
+	html := string(content)
+
+	roleFeatures := []string{
+		"id=\"nav-role-permissions\"",
+		"id=\"viewRolePermissions\"",
+		"id=\"viewUsers\"",
+		"id=\"viewAddons\"",
+		"id=\"modalAddUser\"",
+		"id=\"modalEditUser\"",
+		"id=\"modalResetUserPassword\"",
+		"id=\"modalAddon\"",
+		"loadRolePermissions()",
+		"saveRolePermissions()",
+		"confirmResetRolePermissions()",
+		"selectRoleForPermissions",
+		"userSummaryTotal",
+		"userSummaryOwner",
+		"userSummaryAdmin",
+		"userSummaryCrew",
+		"can(permissionKey)",
+	}
+
+	for _, elem := range roleFeatures {
+		if !strings.Contains(html, elem) {
+			t.Errorf("superadmin.html expected to contain role access / team feature %q", elem)
+		}
+	}
+}
+
 func TestBankLogoBriResolution(t *testing.T) {
 	wd, err := os.Getwd()
 	if err != nil {

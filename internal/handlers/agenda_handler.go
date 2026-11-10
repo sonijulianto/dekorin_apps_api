@@ -19,7 +19,8 @@ func GetAgendas(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
 	userRole, _ := c.Locals("user_role").(string)
 	var agendas []models.Agenda
-	query := config.DB.Model(&models.Agenda{}).Preload("ClientForm")
+	query := config.DB.Model(&models.Agenda{}).Preload("ClientForm").
+		Where("is_form_draft = ? OR is_form_draft IS NULL", false)
 
 	if strings.EqualFold(userRole, "superadmin") {
 		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
@@ -1263,5 +1264,183 @@ func UpdateAgenda(c *fiber.Ctx) error {
 		"data":    agenda,
 	})
 }
+
+// GenerateClientFormLink handles POST /api/agendas/generate-link
+// Membuat draft link isian form client tanpa harus mengisi data awal (tidak tampil di agenda sampai client submit)
+func GenerateClientFormLink(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var body struct {
+		CompanyID string `json:"company_id"`
+		BrandID   string `json:"brand_id"`
+		Label     string `json:"label"`
+	}
+	_ = c.BodyParser(&body)
+
+	if strings.EqualFold(userRole, "superadmin") {
+		if strings.TrimSpace(body.CompanyID) != "" {
+			companyID = strings.TrimSpace(body.CompanyID)
+		} else if qComp := strings.TrimSpace(c.Query("company_id")); qComp != "" && qComp != "all" {
+			companyID = qComp
+		}
+		if companyID == "" {
+			var firstCompany models.Company
+			if err := config.DB.First(&firstCompany).Error; err == nil {
+				companyID = firstCompany.ID
+			}
+		}
+	}
+	if companyID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Company ID tidak ditemukan",
+		})
+	}
+
+	brandID := strings.TrimSpace(body.BrandID)
+	brandName := ""
+	brandLogo := ""
+	brandPhone := ""
+	brandInstagram := ""
+	brandDesc := ""
+
+	if brandID != "" {
+		var brand models.CompanyBrand
+		if err := config.DB.Where("id = ? AND company_id = ?", brandID, companyID).First(&brand).Error; err == nil {
+			brandName = brand.Name
+			brandLogo = brand.LogoURL
+			brandPhone = brand.Phone
+			brandInstagram = brand.Instagram
+			brandDesc = brand.Description
+		} else {
+			brandID = ""
+		}
+	}
+
+	token := fmt.Sprintf("dkr-%s", strings.ReplaceAll(uuid.New().String()[:8], "-", ""))
+	clientPlaceholder := strings.TrimSpace(body.Label)
+	if clientPlaceholder == "" {
+		clientPlaceholder = "Menunggu Isian Client"
+	}
+
+	draftAgenda := models.Agenda{
+		ID:               fmt.Sprintf("agd_%s", uuid.New().String()[:8]),
+		CompanyID:        companyID,
+		BrandID:          brandID,
+		BrandName:        brandName,
+		BrandLogo:        brandLogo,
+		BrandPhone:       brandPhone,
+		BrandInstagram:   brandInstagram,
+		BrandDescription: brandDesc,
+		ClientName:       clientPlaceholder,
+		Status:           "upcoming",
+		PaymentStatus:    "unpaid",
+		FormToken:        token,
+		FormStatus:       "pending",
+		IsFormDraft:      true,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+	}
+
+	if err := config.DB.Create(&draftAgenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal membuat link form client: " + err.Error(),
+		})
+	}
+
+	formURL := fmt.Sprintf("https://dekorin.my.id/form/%s", token)
+	if host := c.Hostname(); host != "" && !strings.Contains(host, "localhost") && !strings.Contains(host, "127.0.0.1") {
+		formURL = fmt.Sprintf("%s://%s/form/%s", c.Protocol(), host, token)
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message":  "Link form client berhasil dibuat",
+		"data":     draftAgenda,
+		"form_url": formURL,
+	})
+}
+
+// GetPendingClientLinks handles GET /api/agendas/pending-links
+// Mengambil daftar link form yang belum diisi oleh client (is_form_draft = true)
+func GetPendingClientLinks(c *fiber.Ctx) error {
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	query := config.DB.Model(&models.Agenda{}).Where("is_form_draft = ?", true)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qComp := strings.TrimSpace(c.Query("company_id")); qComp != "" && qComp != "all" {
+			query = query.Where("company_id = ?", qComp)
+		}
+	} else if companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+
+	if brandID := strings.TrimSpace(c.Query("brand_id")); brandID != "" {
+		query = query.Where("brand_id = ?", brandID)
+	}
+
+	var drafts []models.Agenda
+	if err := query.Order("created_at DESC").Find(&drafts).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengambil daftar link form: " + err.Error(),
+		})
+	}
+
+	for i := range drafts {
+		if drafts[i].BrandID != "" && drafts[i].BrandName == "" {
+			var brand models.CompanyBrand
+			if err := config.DB.Where("id = ?", drafts[i].BrandID).First(&brand).Error; err == nil {
+				drafts[i].BrandName = brand.Name
+				drafts[i].BrandLogo = brand.LogoURL
+				drafts[i].BrandPhone = brand.Phone
+				drafts[i].BrandInstagram = brand.Instagram
+			}
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Berhasil mengambil daftar link menunggu isian client",
+		"data":    drafts,
+	})
+}
+
+// UnlockAgendaForm handles POST /api/agendas/:id/unlock-form
+// Mengizinkan Owner/Admin membuka kunci form agar client dapat mengedit/mengisi ulang melalui link
+func UnlockAgendaForm(c *fiber.Ctx) error {
+	id := c.Params("id")
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	if !strings.EqualFold(userRole, "superadmin") && !strings.EqualFold(userRole, "owner") && !strings.EqualFold(userRole, "admin") {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Hanya Owner atau Admin yang dapat membuka kunci form client",
+		})
+	}
+
+	var agenda models.Agenda
+	query := config.DB.Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	agenda.FormStatus = "pending"
+	agenda.UpdatedAt = time.Now()
+	if err := config.DB.Save(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal membuka kunci form client",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Kunci form berhasil dibuka, client dapat mengisi ulang melalui link.",
+		"data":    agenda,
+	})
+}
+
 
 

@@ -7,11 +7,12 @@ type LoginRequest struct {
 }
 
 type CreateUserRequest struct {
-	FullName string `json:"full_name"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"` // 'admin' atau 'crew'
+	CompanyID string `json:"company_id"` // Opsional jika dibuat oleh Superadmin
+	FullName  string `json:"full_name"`
+	Phone     string `json:"phone"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Role      string `json:"role"` // 'owner', 'admin' atau 'crew'
 }
 
 type UpdateUserRequest struct {

@@ -200,6 +200,18 @@ func GetEffectiveUserPermissions(companyID string, role string) []string {
 // GetCompanyRolePermissions handles GET /api/company/role-permissions
 func GetCompanyRolePermissions(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qCid := strings.TrimSpace(c.Query("company_id")); qCid != "" {
+			companyID = qCid
+		}
+	}
+	if companyID == "" {
+		var firstCompany models.Company
+		if err := config.DB.First(&firstCompany).Error; err == nil {
+			companyID = firstCompany.ID
+		}
+	}
 	if companyID == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Company ID tidak ditemukan pada sesi user",
@@ -228,9 +240,21 @@ func GetCompanyRolePermissions(c *fiber.Ctx) error {
 }
 
 // UpdateCompanyRolePermissions handles PUT /api/company/role-permissions
-// Hanya dapat diakses oleh Owner
+// Dapat diakses oleh Owner dan Superadmin
 func UpdateCompanyRolePermissions(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qCid := strings.TrimSpace(c.Query("company_id")); qCid != "" {
+			companyID = qCid
+		}
+	}
+	if companyID == "" {
+		var firstCompany models.Company
+		if err := config.DB.First(&firstCompany).Error; err == nil {
+			companyID = firstCompany.ID
+		}
+	}
 	if companyID == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Company ID tidak ditemukan pada sesi user",
@@ -316,9 +340,21 @@ func UpdateCompanyRolePermissions(c *fiber.Ctx) error {
 }
 
 // ResetCompanyRolePermissions handles POST /api/company/role-permissions/reset
-// Mereset hak akses ke setelan bawaan sistem
+// Mereset hak akses ke setelan bawaan sistem (Owner dan Superadmin)
 func ResetCompanyRolePermissions(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+	if strings.EqualFold(userRole, "superadmin") {
+		if qCid := strings.TrimSpace(c.Query("company_id")); qCid != "" {
+			companyID = qCid
+		}
+	}
+	if companyID == "" {
+		var firstCompany models.Company
+		if err := config.DB.First(&firstCompany).Error; err == nil {
+			companyID = firstCompany.ID
+		}
+	}
 	if companyID == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Company ID tidak ditemukan pada sesi user",
