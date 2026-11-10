@@ -1024,6 +1024,7 @@
                                 <option value="ta3">Sakura Blossom TA3</option>
                                 <option value="pn4">Monochrome PN4</option>
                                 <option value="jawa3">Art Jawa Coklat 3</option>
+                                <option value="jawa2">Art Jawa Biru 2</option>
                             </select>
                             <select id="filterInvitationType" onchange="filterInvitations()"
                                 class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
@@ -1769,7 +1770,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Biaya Tambahan Model (Rp)</label>
+                            <label id="labelAgendaModelPrice" class="block text-xs font-semibold text-slate-700 mb-1">Biaya Tambahan Model (Rp)</label>
                             <input type="number" id="inputAgendaModelAdditionalPrice" min="0" value="0" oninput="calculateAgendaTotal()"
                                 class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
@@ -2099,6 +2100,13 @@
                                 <div class="w-9 h-9 rounded-full bg-[#4F2323] text-[#D7BB83] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🤎</div>
                                 <div class="font-bold text-xs text-slate-800 mt-2">Art Jawa Coklat 3</div>
                                 <div class="text-[10px] text-[#AC9271] font-semibold">Javanese Royal &amp; Wayang</div>
+                            </div>
+                            <!-- Art Jawa Biru 2 -->
+                            <div id="tmplCard_jawa2" onclick="selectInvTemplate('jawa2')" 
+                                class="inv-template-card cursor-pointer p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                <div class="w-9 h-9 rounded-full bg-[#284B73] text-[#6EC1E4] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">💠</div>
+                                <div class="font-bold text-xs text-slate-800 mt-2">Art Jawa Biru 2</div>
+                                <div class="text-[10px] text-[#284B73] font-semibold">Javanese Royal Blue</div>
                             </div>
                         </div>
                     </div>
@@ -3658,7 +3666,8 @@
                     formattedDateTime = dt.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' }) + ' • ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 }
 
-                const displayPackage = a.backdrop_title ? a.backdrop_title : (a.package_name || 'Tanpa Paket');
+                const hasPkg = Boolean(a.package_id) || pkgPrice > 0;
+                const displayPackage = a.backdrop_title ? a.backdrop_title : (hasPkg ? (a.package_name || 'Paket') : (a.model_name ? ('Model: ' + a.model_name) : (a.package_name || 'Tanpa Paket')));
                 const escapeName = (a.client_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 return `
@@ -5642,8 +5651,9 @@
                 const pkgPrice = Number(a.package_price || 0);
                 const modelPrice = Number(a.model_additional_price || 0);
                 const transport = Number(a.transport_fee || 0);
+                const hasPkg = Boolean(a.package_id) || pkgPrice > 0;
                 const formPrice = a.client_form && a.client_form.total_price > 0 ? Number(a.client_form.total_price) : 0;
-                const totalCost = formPrice > 0 ? (formPrice + transport) : (pkgPrice + modelPrice + transport);
+                const totalCost = formPrice > 0 ? (formPrice + modelPrice + transport) : (pkgPrice + modelPrice + transport);
                 const dpAmount = Number(a.dp_amount || 0);
                 const sisaPelunasan = Math.max(0, totalCost - dpAmount);
 
@@ -5698,15 +5708,19 @@
 
                         <!-- Paket & Model Dekorasi -->
                         <td class="py-3.5 px-5">
-                            <div class="font-bold text-slate-900 text-xs">${a.package_name || 'Tanpa Paket'}</div>
-                            <div class="text-[11px] text-slate-400 font-mono">Rp ${pkgPrice.toLocaleString('id-ID')}</div>
+                            ${hasPkg ? `
+                                <div class="font-bold text-slate-900 text-xs">${a.package_name || 'Paket'}</div>
+                                <div class="text-[11px] text-slate-400 font-mono">Rp ${pkgPrice.toLocaleString('id-ID')}</div>
+                            ` : `
+                                <div class="font-semibold text-slate-500 text-xs">${a.model_name ? 'Model Saja (Tanpa Paket)' : (a.package_name || 'Tanpa Paket')}</div>
+                            `}
 
                             ${a.model_name ? `
-                                <div class="flex items-center gap-2 mt-2 p-1.5 rounded-xl bg-slate-50 border border-slate-100 max-w-xs">
+                                <div class="flex items-center gap-2 ${hasPkg ? 'mt-2' : 'mt-1.5'} p-1.5 rounded-xl bg-slate-50 border border-slate-100 max-w-xs">
                                     ${a.model_image_url ? `<img src="${a.model_image_url}" class="w-8 h-8 rounded-lg object-cover border border-slate-200 shrink-0">` : `<div class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-[10px]">🖼️</div>`}
                                     <div class="min-w-0 flex-1">
                                         <div class="text-[11px] font-semibold text-slate-800 truncate">${a.model_name}</div>
-                                        <div class="text-[10px] text-slate-400">${a.model_width ? a.model_width : ''} ${modelPrice > 0 ? `(+Rp ${modelPrice.toLocaleString('id-ID')})` : ''}</div>
+                                        <div class="text-[10px] text-slate-400">${a.model_width ? a.model_width : ''} ${modelPrice > 0 ? (hasPkg ? `(+Rp ${modelPrice.toLocaleString('id-ID')})` : `• Rp ${modelPrice.toLocaleString('id-ID')}`) : ''}</div>
                                     </div>
                                 </div>
                             ` : ''}
@@ -5827,6 +5841,7 @@
 
             // Populate Models dropdown
             populateAgendaModelSelect();
+            handleAgendaModelChanged('');
 
             const cfBox = document.getElementById('agendaClientFormSummaryBox');
             if (cfBox) cfBox.classList.add('hidden');
@@ -5875,7 +5890,7 @@
             populateAgendaModelSelect(a.package_id || '');
             document.getElementById('inputAgendaModelId').value = a.model_id || '';
             document.getElementById('inputAgendaModelAdditionalPrice').value = a.model_additional_price || 0;
-            handleAgendaModelChanged(a.model_id || '');
+            handleAgendaModelChanged(a.model_id || '', true);
 
             // Isi rincian data klien & acara
             document.getElementById('inputAgendaClientName').value = a.client_name || '';
@@ -6036,7 +6051,10 @@
             } else {
                 html += decorationModelsCache.map(m => {
                     const widthLabel = m.width ? ` [${m.width}]` : '';
-                    return `<option value="${m.id}">${m.name}${widthLabel}</option>`;
+                    const priceLabel = !selectedPkg && Number(m.price || 0) > 0
+                        ? ` — Rp ${Number(m.price || 0).toLocaleString('id-ID')}`
+                        : '';
+                    return `<option value="${m.id}">${m.name}${widthLabel}${priceLabel}</option>`;
                 }).join('');
             }
 
@@ -6059,18 +6077,26 @@
             handleAgendaModelChanged(document.getElementById('inputAgendaModelId').value);
         }
 
-        function handleAgendaModelChanged(modelId) {
+        function handleAgendaModelChanged(modelId, preservePrice = false) {
             const previewBox = document.getElementById('agendaModelPreviewBox');
             const previewImg = document.getElementById('agendaModelPreviewImg');
             const previewName = document.getElementById('agendaModelPreviewName');
             const previewWidth = document.getElementById('agendaModelPreviewWidth');
             const previewExtra = document.getElementById('agendaModelPreviewExtra');
             const extraPriceInput = document.getElementById('inputAgendaModelAdditionalPrice');
+            const modelPriceLabel = document.getElementById('labelAgendaModelPrice');
+            const pkgId = document.getElementById('inputAgendaPackageId').value;
+
+            if (modelPriceLabel) {
+                modelPriceLabel.innerText = pkgId ? 'Biaya Tambahan Model (Rp)' : 'Harga Model Dekorasi (Rp)';
+            }
 
             if (!modelId) {
                 previewBox.classList.add('hidden');
                 previewBox.classList.remove('flex');
-                extraPriceInput.value = 0;
+                if (!preservePrice) {
+                    extraPriceInput.value = 0;
+                }
                 calculateAgendaTotal();
                 return;
             }
@@ -6079,7 +6105,9 @@
             if (!m) {
                 previewBox.classList.add('hidden');
                 previewBox.classList.remove('flex');
-                extraPriceInput.value = 0;
+                if (!preservePrice) {
+                    extraPriceInput.value = 0;
+                }
                 calculateAgendaTotal();
                 return;
             }
@@ -6090,20 +6118,37 @@
             previewName.innerText = m.name || 'Model Dekorasi';
             previewWidth.innerText = m.width ? ('Lebar backdrop: ' + m.width) : 'Lebar standar';
 
-            const pkgId = document.getElementById('inputAgendaPackageId').value;
             const pkg = packagesCache.find(p => String(p.id) === String(pkgId));
             let additionalPrice = 0;
-            if (pkg && pkg.package_models && Array.isArray(pkg.package_models)) {
-                const pm = pkg.package_models.find(x => String(x.decoration_model_id) === String(modelId));
-                if (pm) {
-                    additionalPrice = pm.additional_price || 0;
+            if (pkg) {
+                if (pkg.package_models && Array.isArray(pkg.package_models)) {
+                    const pm = pkg.package_models.find(x => String(x.decoration_model_id) === String(modelId));
+                    if (pm) {
+                        additionalPrice = Number(pm.additional_price || 0);
+                    }
                 }
-            }
-            extraPriceInput.value = additionalPrice;
-            if (additionalPrice > 0) {
-                previewExtra.innerText = '+ Biaya Tambahan: Rp ' + additionalPrice.toLocaleString('id-ID');
             } else {
-                previewExtra.innerText = 'Termasuk dalam paket (Tanpa biaya tambahan)';
+                additionalPrice = Number(m.price || 0);
+            }
+
+            if (!preservePrice) {
+                extraPriceInput.value = additionalPrice;
+            } else {
+                additionalPrice = Number(extraPriceInput.value) || 0;
+            }
+
+            if (pkg) {
+                if (additionalPrice > 0) {
+                    previewExtra.innerText = '+ Biaya Tambahan: Rp ' + additionalPrice.toLocaleString('id-ID');
+                } else {
+                    previewExtra.innerText = 'Termasuk dalam paket (Tanpa biaya tambahan)';
+                }
+            } else {
+                if (additionalPrice > 0) {
+                    previewExtra.innerText = 'Harga Model (Tanpa Paket): Rp ' + additionalPrice.toLocaleString('id-ID');
+                } else {
+                    previewExtra.innerText = 'Harga model Rp 0 (dapat diisi manual)';
+                }
             }
 
             calculateAgendaTotal();
@@ -6805,6 +6850,7 @@
                 'ta3': { name: 'Sakura TA3', bg: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-400' },
                 'pn4': { name: 'Monochrome PN4', bg: 'bg-[#343434] text-white border-[#262627]', dot: 'bg-white' },
                 'jawa3': { name: 'Art Jawa Coklat 3', bg: 'bg-[#4F2323] text-[#D7BB83] border-[#79110E]', dot: 'bg-[#D7BB83]' },
+                'jawa2': { name: 'Art Jawa Biru 2', bg: 'bg-[#284B73] text-white border-[#1B3554]', dot: 'bg-[#6EC1E4]' },
             };
 
             tbody.innerHTML = list.map(inv => {
@@ -7286,7 +7332,7 @@
                 const inv = json.data;
                 if (!inv) return;
 
-                const activeTmpl = ['ta17', 'ta3', 'pn4', 'jawa3'].includes(inv.template) ? inv.template : 'ta17';
+                const activeTmpl = ['ta17', 'ta3', 'pn4', 'jawa3', 'jawa2'].includes(inv.template) ? inv.template : 'ta17';
                 selectInvTemplate(activeTmpl);
                 selectInvEventType(inv.event_type || 'wedding');
 

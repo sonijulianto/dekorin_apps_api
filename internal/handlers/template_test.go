@@ -26,6 +26,7 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		"template_ta3.html",
 		"template_ta17.html",
 		"template_jawa3.html",
+		"template_jawa2.html",
 	}
 
 	testData := struct {
@@ -130,7 +131,7 @@ func TestLoveStoryHiddenWhenEmpty(t *testing.T) {
 	}
 
 	templatesDir := filepath.Join(wd, "..", "..", "web", "templates")
-	targets := []string{"template_pn4.html", "template_ta3.html", "template_ta17.html", "template_jawa3.html"}
+	targets := []string{"template_pn4.html", "template_ta3.html", "template_ta17.html", "template_jawa3.html", "template_jawa2.html"}
 
 	testDataWithoutStory := struct {
 		models.Invitation
@@ -192,6 +193,7 @@ func TestGuestToLockedWhenProvided(t *testing.T) {
 		"template_ta3.html",
 		"template_ta17.html",
 		"template_jawa3.html",
+		"template_jawa2.html",
 	}
 
 	// 1. With GuestTo = "Soni"
@@ -487,7 +489,7 @@ func TestBankLogoBriResolution(t *testing.T) {
 		t.Fatalf("Failed to get working directory: %v", err)
 	}
 
-	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html", "template_jawa3.html"}
+	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html", "template_jawa3.html", "template_jawa2.html"}
 	for _, target := range targets {
 		p := filepath.Join(wd, "..", "..", "web", "templates", target)
 		content, err := os.ReadFile(p)
@@ -517,6 +519,7 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 		"template_ta3.html",
 		"template_ta17.html",
 		"template_jawa3.html",
+		"template_jawa2.html",
 	}
 
 	testDataWithoutGift := struct {
@@ -589,7 +592,7 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 				if strings.Contains(renderedWithout, `href="#gift"`) {
 					t.Errorf("%s rendered navbar link #gift when bank accounts are empty", target)
 				}
-			case "template_pn4.html", "template_jawa3.html":
+			case "template_pn4.html", "template_jawa3.html", "template_jawa2.html":
 				if strings.Contains(renderedWithout, `<section id="gift"`) {
 					t.Errorf("%s rendered <section id=\"gift\" when bank accounts are empty", target)
 				}
@@ -623,6 +626,7 @@ func TestSampleInvitationForTemplate(t *testing.T) {
 	}{
 		{"ta17", "template_ta17.html"},
 		{"jawa3", "template_jawa3.html"},
+		{"jawa2", "template_jawa2.html"},
 		{"ta3", "template_ta3.html"},
 		{"pn4", "template_pn4.html"},
 	}
@@ -814,5 +818,86 @@ func TestJawa3CoverImageLocked(t *testing.T) {
 	sampleInv, _ := getSampleInvitationForTemplate("jawa3")
 	if sampleInv.CoverImage != "/assets/templates/jawa3/bg-cover.jpg" {
 		t.Errorf("expected sample jawa3 cover image to be /assets/templates/jawa3/bg-cover.jpg, got: %s", sampleInv.CoverImage)
+	}
+}
+
+func TestJawa2UserProvidedPhotosAndNoWatermarks(t *testing.T) {
+	tmplPath := filepath.Join("..", "..", "web", "templates", "template_jawa2.html")
+	content, err := os.ReadFile(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to read template_jawa2.html: %v", err)
+	}
+
+	rawHTML := string(content)
+	if strings.Contains(strings.ToLower(rawHTML), "galeriundanganofficial") || strings.Contains(rawHTML, "082176971754") {
+		t.Errorf("template_jawa2.html contains forbidden third-party watermark or phone number")
+	}
+
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to parse template_jawa2.html: %v", err)
+	}
+
+	userCoverPhoto := "https://dekorin.my.id/uploads/cover_yogi_ratna.jpg"
+	userBridePhoto := "https://dekorin.my.id/uploads/bride_ratna.jpg"
+	userGroomPhoto := "https://dekorin.my.id/uploads/groom_yogi.jpg"
+	userGallery := []string{
+		"https://dekorin.my.id/uploads/gal1.jpg",
+		"https://dekorin.my.id/uploads/gal2.jpg",
+	}
+
+	data := struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:            "inv_jawa2_test",
+			Slug:          "yogi-ratna",
+			Title:         "The Wedding of Ratna & Yogi",
+			Template:      "jawa2",
+			EventType:     "wedding",
+			CoverImage:    userCoverPhoto,
+			BrideName:     "Ratna",
+			BrideNickname: "Ratna",
+			BridePhoto:    userBridePhoto,
+			GroomName:     "Yogi",
+			GroomNickname: "Yogi",
+			GroomPhoto:    userGroomPhoto,
+			AkadDate:      "Sabtu, 20 Desember 2026",
+			ResepsiDate:   "Sabtu, 20 Desember 2026",
+		},
+		GuestTo:     "Yogi dan Ratna",
+		HasGuestTo:  true,
+		GalleryList: userGallery,
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		t.Fatalf("Failed to execute template_jawa2.html: %v", err)
+	}
+
+	rendered := buf.String()
+	if !strings.Contains(rendered, userCoverPhoto) {
+		t.Errorf("template_jawa2.html did not render custom CoverImage")
+	}
+	if !strings.Contains(rendered, userBridePhoto) {
+		t.Errorf("template_jawa2.html did not render custom BridePhoto")
+	}
+	if !strings.Contains(rendered, userGroomPhoto) {
+		t.Errorf("template_jawa2.html did not render custom GroomPhoto")
+	}
+	for _, g := range userGallery {
+		if !strings.Contains(rendered, g) {
+			t.Errorf("template_jawa2.html did not render user gallery photo: %s", g)
+		}
 	}
 }

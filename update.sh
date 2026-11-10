@@ -43,7 +43,7 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in landing superadmin client_form invitation_portal template_pn4 template_ta3 template_ta17 template_jawa3; do
+for t in landing superadmin client_form invitation_portal template_pn4 template_ta3 template_ta17 template_jawa3 template_jawa2; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
 done
@@ -102,6 +102,17 @@ for f in bg-closing.jpg bg-couple.jpg bg-cover.jpg bg-event-pill.jpg bg-footer.j
 done
 for pf in bride-default.jpg groom-default.jpg gallery1.jpg gallery2.jpg gallery3.jpg gallery4.jpg gallery5.jpg gallery6.jpg gallery7.jpg gallery8.jpg; do
     curl -s -f -L -o "web/assets/templates/jawa3/photos/${pf}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa3/photos/${pf}?v=$TIMESTAMP" || true
+done
+
+# 4f. Unduh Aset Template Art Jawa Biru 2 (Backgrounds, Video, Gunungan, Wayang GIF, Font Charlotte, Audio, Foto Default)
+echo "⬇️  Mengunduh aset template Art Jawa Biru 2..."
+mkdir -p web/assets/templates/jawa2/photos web/assets/templates/jawa2/fonts
+for f in bg-closing.jpg bg-floral-blue.jpg bg-hero.jpg bg-savedate.jpg bg-texture.jpg default-song.mp3 floral-corner.png floral-left.png gunungan-biru.png icon-akad.png icon-resepsi.png icon-ucapan.png logo_bca.png logo_bni.png logo_bri.png logo_mandiri.png water-jawa-biru-2.mp4 wayang-anim.gif; do
+    curl -s -f -L -o "web/assets/templates/jawa2/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa2/${f}?v=$TIMESTAMP" || true
+done
+curl -s -f -L -o "web/assets/templates/jawa2/fonts/charlotte.woff2" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa2/fonts/charlotte.woff2?v=$TIMESTAMP" || true
+for pf in cover-default.jpg bride-default.jpg groom-default.jpg gallery1.jpg gallery2.jpg gallery3.jpg gallery4.jpg gallery5.jpg gallery6.jpg gallery7.jpg gallery8.jpg; do
+    curl -s -f -L -o "web/assets/templates/jawa2/photos/${pf}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa2/photos/${pf}?v=$TIMESTAMP" || true
 done
 
 # 5. Icons & Branding

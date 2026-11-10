@@ -1084,7 +1084,8 @@
       { id: 'ta17', name: 'Ocean Blossom TA17', tag: 'Pastel Blue & Floral', color: '#4B8DCB', bg: '#F0F6FC', type: 'wedding' },
       { id: 'ta3', name: 'Sakura Blossom TA3', tag: 'Romantic Floral & Arch', color: '#D4A373', bg: '#FFF5F5', type: 'wedding' },
       { id: 'pn4', name: 'Monochrome PN4', tag: 'Editorial Monochrome', color: '#343434', bg: '#F1F1F1', type: 'wedding' },
-      { id: 'jawa3', name: 'Art Jawa Coklat 3', tag: 'Javanese Royal & Wayang', color: '#4F2323', bg: '#FFFCF3', type: 'wedding' }
+      { id: 'jawa3', name: 'Art Jawa Coklat 3', tag: 'Javanese Royal & Wayang', color: '#4F2323', bg: '#FFFCF3', type: 'wedding' },
+      { id: 'jawa2', name: 'Art Jawa Biru 2', tag: 'Javanese Royal Blue & Wayang', color: '#284B73', bg: '#F6F8FB', type: 'wedding' }
     ];
 
     const PHOTO_SLOTS_CONFIG = [
@@ -1347,7 +1348,7 @@
       // Populate Form Editor
       const eventRadios = document.querySelectorAll('input[name="event_type"]');
       eventRadios.forEach(r => { r.checked = (r.value === (inv.event_type || 'wedding')); });
-      selectedTemplateId = ['ta17', 'ta3', 'pn4', 'jawa3'].includes(inv.template) ? inv.template : 'ta17';
+      selectedTemplateId = ['ta17', 'ta3', 'pn4', 'jawa3', 'jawa2'].includes(inv.template) ? inv.template : 'ta17';
 
       setVal('f_title', inv.title);
       setVal('f_slug', inv.slug);

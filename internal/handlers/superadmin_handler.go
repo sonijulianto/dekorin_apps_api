@@ -135,6 +135,7 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 	companyDescription := ""
 	companyInstagram := ""
 	companyBankInfo := ""
+	companyInvoiceTemplate := DefaultInvoiceTemplate
 	if user.Company != nil {
 		companyName = user.Company.Name
 		companyAddress = user.Company.Address
@@ -144,25 +145,27 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 		companyDescription = user.Company.Description
 		companyInstagram = user.Company.Instagram
 		companyBankInfo = user.Company.BankInfo
+		companyInvoiceTemplate = EffectiveInvoiceTemplate(user.Company.InvoiceTemplate)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data": models.UserResponse{
-			ID:                 user.ID,
-			CompanyID:          user.CompanyID,
-			CompanyName:        companyName,
-			CompanyAddress:     companyAddress,
-			CompanyPhone:       companyPhone,
-			CompanyLogo:        companyLogo,
-			CompanyEmail:       companyEmail,
-			CompanyDescription: companyDescription,
-			CompanyInstagram:   companyInstagram,
-			CompanyBankInfo:    companyBankInfo,
-			FullName:           user.FullName,
-			Phone:              user.Phone,
-			Email:              user.Email,
-			Role:               user.Role,
-			Permissions:        GetEffectiveUserPermissions(user.CompanyID, user.Role),
+			ID:                     user.ID,
+			CompanyID:              user.CompanyID,
+			CompanyName:            companyName,
+			CompanyAddress:         companyAddress,
+			CompanyPhone:           companyPhone,
+			CompanyLogo:            companyLogo,
+			CompanyEmail:           companyEmail,
+			CompanyDescription:     companyDescription,
+			CompanyInstagram:       companyInstagram,
+			CompanyBankInfo:        companyBankInfo,
+			CompanyInvoiceTemplate: companyInvoiceTemplate,
+			FullName:               user.FullName,
+			Phone:                  user.Phone,
+			Email:                  user.Email,
+			Role:                   user.Role,
+			Permissions:            GetEffectiveUserPermissions(user.CompanyID, user.Role),
 		},
 	})
 }
@@ -206,24 +209,25 @@ func GetAllCompanies(c *fiber.Ctx) error {
 		}
 
 		results = append(results, models.CompanyDetailResponse{
-			ID:            comp.ID,
-			Name:          comp.Name,
-			Address:       comp.Address,
-			Phone:         comp.Phone,
-			Email:         comp.Email,
-			LogoURL:       comp.LogoURL,
-			Description:   comp.Description,
-			Instagram:     comp.Instagram,
-			BankInfo:      comp.BankInfo,
-			UpdatedBy:     comp.UpdatedBy,
-			UpdatedByName: comp.UpdatedByName,
-			TotalOwners:   totalOwners,
-			TotalAdmins:   totalAdmins,
-			TotalCrew:     totalCrew,
-			TotalAgendas:  totalAgendas,
-			OwnersList:    ownersList,
-			CreatedAt:     comp.CreatedAt,
-			UpdatedAt:     comp.UpdatedAt,
+			ID:              comp.ID,
+			Name:            comp.Name,
+			Address:         comp.Address,
+			Phone:           comp.Phone,
+			Email:           comp.Email,
+			LogoURL:         comp.LogoURL,
+			Description:     comp.Description,
+			Instagram:       comp.Instagram,
+			BankInfo:        comp.BankInfo,
+			InvoiceTemplate: EffectiveInvoiceTemplate(comp.InvoiceTemplate),
+			UpdatedBy:       comp.UpdatedBy,
+			UpdatedByName:   comp.UpdatedByName,
+			TotalOwners:     totalOwners,
+			TotalAdmins:     totalAdmins,
+			TotalCrew:       totalCrew,
+			TotalAgendas:    totalAgendas,
+			OwnersList:      ownersList,
+			CreatedAt:       comp.CreatedAt,
+			UpdatedAt:       comp.UpdatedAt,
 		})
 	}
 
@@ -280,12 +284,13 @@ func CreateCompanyWithInitialOwner(c *fiber.Ctx) error {
 	// 1. Buat Company Baru
 	companyID := fmt.Sprintf("cmp_%s", uuid.New().String()[:8])
 	company := models.Company{
-		ID:        companyID,
-		Name:      req.CompanyName,
-		Address:   strings.TrimSpace(req.CompanyAddress),
-		Phone:     utils.NormalizePhone(req.CompanyPhone),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:              companyID,
+		Name:            req.CompanyName,
+		Address:         strings.TrimSpace(req.CompanyAddress),
+		Phone:           utils.NormalizePhone(req.CompanyPhone),
+		InvoiceTemplate: DefaultInvoiceTemplate,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	if err := config.DB.Create(&company).Error; err != nil {
@@ -386,6 +391,9 @@ func UpdateCompany(c *fiber.Ctx) error {
 	if req.BankInfo != "" {
 		comp.BankInfo = strings.TrimSpace(req.BankInfo)
 	}
+	if tmpl, ok := NormalizeInvoiceTemplate(req.InvoiceTemplate); ok {
+		comp.InvoiceTemplate = tmpl
+	}
 
 	// Catat siapa yang melakukan update ke database
 	userID, _ := c.Locals("user_id").(string)
@@ -423,6 +431,7 @@ func GetMyCompanyProfile(c *fiber.Ctx) error {
 			"error": "Data profil usaha tidak ditemukan",
 		})
 	}
+	comp.InvoiceTemplate = EffectiveInvoiceTemplate(comp.InvoiceTemplate)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil memuat profil usaha",
@@ -465,6 +474,9 @@ func UpdateMyCompanyProfile(c *fiber.Ctx) error {
 	comp.Description = strings.TrimSpace(req.Description)
 	comp.Instagram = strings.TrimSpace(req.Instagram)
 	comp.BankInfo = strings.TrimSpace(req.BankInfo)
+	if tmpl, ok := NormalizeInvoiceTemplate(req.InvoiceTemplate); ok {
+		comp.InvoiceTemplate = tmpl
+	}
 
 	// Catat siapa yang melakukan update ke database
 	userID, _ := c.Locals("user_id").(string)
@@ -535,16 +547,22 @@ func CreateCompanyBrand(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama brand wajib diisi"})
 	}
 
+	brandTemplate := ""
+	if tmpl, ok := NormalizeInvoiceTemplate(req.InvoiceTemplate); ok {
+		brandTemplate = tmpl
+	}
+
 	brand := models.CompanyBrand{
-		ID:          fmt.Sprintf("brd_%s", uuid.New().String()[:8]),
-		CompanyID:   companyID,
-		Name:        strings.TrimSpace(req.Name),
-		LogoURL:     strings.TrimSpace(req.LogoURL),
-		Description: strings.TrimSpace(req.Description),
-		Phone:       utils.NormalizePhone(req.Phone),
-		Instagram:   strings.TrimSpace(req.Instagram),
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:              fmt.Sprintf("brd_%s", uuid.New().String()[:8]),
+		CompanyID:       companyID,
+		Name:            strings.TrimSpace(req.Name),
+		LogoURL:         strings.TrimSpace(req.LogoURL),
+		Description:     strings.TrimSpace(req.Description),
+		Phone:           utils.NormalizePhone(req.Phone),
+		Instagram:       strings.TrimSpace(req.Instagram),
+		InvoiceTemplate: brandTemplate,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 	}
 
 	if err := config.DB.Create(&brand).Error; err != nil {
@@ -591,6 +609,9 @@ func UpdateCompanyBrand(c *fiber.Ctx) error {
 		brand.Phone = ""
 	}
 	brand.Instagram = strings.TrimSpace(req.Instagram)
+	if tmpl, ok := NormalizeInvoiceTemplate(req.InvoiceTemplate); ok {
+		brand.InvoiceTemplate = tmpl
+	}
 	brand.UpdatedAt = time.Now()
 
 	if err := config.DB.Save(&brand).Error; err != nil {

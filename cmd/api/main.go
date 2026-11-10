@@ -106,6 +106,10 @@ func main() {
 	api.Get("/company/profile", middleware.Protected(), handlers.GetMyCompanyProfile)
 	api.Put("/company/profile", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateMyCompanyProfile)
 
+	// Company Invoice Template routes (Pengaturan Desain Template Invoice per Brand)
+	api.Get("/company/invoice-template", middleware.Protected(), handlers.GetCompanyInvoiceTemplate)
+	api.Put("/company/invoice-template", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateCompanyInvoiceTemplate)
+
 	// Company Brand (Sub-Brand / Multi-Brand) routes
 	api.Get("/company/brands", middleware.Protected(), handlers.GetCompanyBrands)
 	api.Post("/company/brands", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.CreateCompanyBrand)

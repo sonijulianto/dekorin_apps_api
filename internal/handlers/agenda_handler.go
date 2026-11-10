@@ -14,6 +14,51 @@ import (
 	"github.com/google/uuid"
 )
 
+// pickContextualModelPrice adalah fungsi murni untuk menentukan harga model berdasarkan konteks paket:
+// - Jika tanpa paket (hasPackage == false), gunakan harga dasar model (decorModelPrice).
+// - Jika memakai paket (hasPackage == true), gunakan additional_price relasi paket-model.
+func pickContextualModelPrice(hasPackage bool, packageModelAdditionalPrice float64, decorModelPrice float64) float64 {
+	if !hasPackage {
+		return decorModelPrice
+	}
+	return packageModelAdditionalPrice
+}
+
+// resolveModelPriceByContext menentukan harga model berdasarkan ada tidaknya paket di database.
+func resolveModelPriceByContext(packageID string, packagePrice float64, modelID string, decorModelPrice float64) float64 {
+	pkgID := strings.TrimSpace(packageID)
+	mID := strings.TrimSpace(modelID)
+	if mID == "" {
+		return 0
+	}
+	hasPackage := pkgID != "" || packagePrice > 0
+	if !hasPackage {
+		return pickContextualModelPrice(false, 0, decorModelPrice)
+	}
+	var pkgAdditional float64
+	if pkgID != "" {
+		var pkgModel models.PackageDecorationModel
+		if err := config.DB.Where("package_id = ? AND decoration_model_id = ?", pkgID, mID).First(&pkgModel).Error; err == nil {
+			pkgAdditional = pkgModel.AdditionalPrice
+		}
+	}
+	return pickContextualModelPrice(true, pkgAdditional, decorModelPrice)
+}
+
+// syncClientFormPackageAndModel menjaga data ClientForm agar sinkron saat paket/model agenda diperbarui.
+func syncClientFormPackageAndModel(agenda models.Agenda) {
+	var existingForm models.ClientForm
+	if err := config.DB.Where("agenda_id = ?", agenda.ID).First(&existingForm).Error; err == nil {
+		existingForm.PackageID = agenda.PackageID
+		existingForm.PackageName = agenda.PackageName
+		existingForm.PackagePrice = agenda.PackagePrice
+		existingForm.ModelID = agenda.ModelID
+		existingForm.ModelName = agenda.ModelName
+		existingForm.TotalPrice = agenda.PackagePrice + existingForm.AddonsPrice
+		config.DB.Save(&existingForm)
+	}
+}
+
 // GetAgendas handles GET /api/agendas
 func GetAgendas(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
@@ -148,12 +193,13 @@ func CreateAgenda(c *fiber.Ctx) error {
 	}
 
 	// Ambil nama & harga paket dari master Paket (jika ada)
+	packageID := strings.TrimSpace(req.PackageID)
 	packageName := "Belum Dipilih"
 	packagePrice := req.PackagePrice
 	brandID := strings.TrimSpace(req.BrandID)
-	if strings.TrimSpace(req.PackageID) != "" {
+	if packageID != "" {
 		var pkg models.Package
-		if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
+		if err := config.DB.Where("id = ?", packageID).First(&pkg).Error; err == nil {
 			packageName = pkg.Name
 			if packagePrice == 0 {
 				packagePrice = pkg.BasePrice
@@ -173,7 +219,7 @@ func CreateAgenda(c *fiber.Ctx) error {
 	modelImageURL := strings.TrimSpace(req.ModelImageURL)
 	modelAdditionalPrice := req.ModelAdditionalPrice
 
-	if modelID != "" && (modelName == "" || modelWidth == "" || modelImageURL == "") {
+	if modelID != "" {
 		var decorModel models.DecorationModel
 		if err := config.DB.Where("id = ?", modelID).First(&decorModel).Error; err == nil {
 			if modelName == "" {
@@ -187,6 +233,9 @@ func CreateAgenda(c *fiber.Ctx) error {
 			}
 			if brandID == "" && decorModel.BrandID != "" {
 				brandID = decorModel.BrandID
+			}
+			if modelAdditionalPrice <= 0 {
+				modelAdditionalPrice = resolveModelPriceByContext(packageID, packagePrice, modelID, decorModel.Price)
 			}
 		}
 	}
@@ -244,7 +293,7 @@ func CreateAgenda(c *fiber.Ctx) error {
 		EventDateTime:        eventTime,
 		EventAddress:         strings.TrimSpace(req.EventAddress),
 		MapsURL:              mapsURL,
-		PackageID:            req.PackageID,
+		PackageID:            packageID,
 		PackageName:          packageName,
 		PackagePrice:         packagePrice,
 		ModelID:              modelID,
@@ -624,12 +673,13 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 		})
 	}
 
+	pkgID := strings.TrimSpace(req.PackageID)
 	packageName := strings.TrimSpace(req.PackageName)
 	packagePrice := req.PackagePrice
 
-	if strings.TrimSpace(req.PackageID) != "" {
+	if pkgID != "" {
 		var pkg models.Package
-		if err := config.DB.Where("id = ?", req.PackageID).First(&pkg).Error; err == nil {
+		if err := config.DB.Where("id = ?", pkgID).First(&pkg).Error; err == nil {
 			if packageName == "" {
 				packageName = pkg.Name
 			}
@@ -643,32 +693,38 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 		packageName = "Belum Dipilih"
 	}
 
-	agenda.PackageID = req.PackageID
+	agenda.PackageID = pkgID
 	agenda.PackageName = packageName
 	agenda.PackagePrice = packagePrice
 
-	// Update model info jika disediakan
-	if req.ModelID != "" {
-		agenda.ModelID = req.ModelID
-		agenda.ModelName = req.ModelName
-		agenda.ModelWidth = req.ModelWidth
-		agenda.ModelImageURL = req.ModelImageURL
+	// Update model info jika disediakan, atau sesuaikan harga model yang sudah terpilih
+	reqModelID := strings.TrimSpace(req.ModelID)
+	if reqModelID != "" {
+		agenda.ModelID = reqModelID
+		agenda.ModelName = strings.TrimSpace(req.ModelName)
+		agenda.ModelWidth = strings.TrimSpace(req.ModelWidth)
+		agenda.ModelImageURL = strings.TrimSpace(req.ModelImageURL)
 		agenda.ModelAdditionalPrice = req.ModelAdditionalPrice
 
-		if (agenda.ModelName == "" || agenda.ModelWidth == "" || agenda.ModelImageURL == "") && agenda.ModelID != "" {
-			var decorModel models.DecorationModel
-			if err := config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error; err == nil {
-				if agenda.ModelName == "" {
-					agenda.ModelName = decorModel.Name
-				}
-				if agenda.ModelWidth == "" {
-					agenda.ModelWidth = decorModel.Width
-				}
-				if agenda.ModelImageURL == "" {
-					agenda.ModelImageURL = decorModel.ImageURL
-				}
+		var decorModel models.DecorationModel
+		if err := config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error; err == nil {
+			if agenda.ModelName == "" {
+				agenda.ModelName = decorModel.Name
+			}
+			if agenda.ModelWidth == "" {
+				agenda.ModelWidth = decorModel.Width
+			}
+			if agenda.ModelImageURL == "" {
+				agenda.ModelImageURL = decorModel.ImageURL
+			}
+			if agenda.ModelAdditionalPrice <= 0 {
+				agenda.ModelAdditionalPrice = resolveModelPriceByContext(agenda.PackageID, agenda.PackagePrice, agenda.ModelID, decorModel.Price)
 			}
 		}
+	} else if agenda.ModelID != "" && req.ModelAdditionalPrice <= 0 {
+		var decorModel models.DecorationModel
+		_ = config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error
+		agenda.ModelAdditionalPrice = resolveModelPriceByContext(agenda.PackageID, agenda.PackagePrice, agenda.ModelID, decorModel.Price)
 	}
 
 	if err := config.DB.Save(&agenda).Error; err != nil {
@@ -678,14 +734,7 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 	}
 
 	// Update ClientForm jika ada agar sinkron
-	var existingForm models.ClientForm
-	if err := config.DB.Where("agenda_id = ?", id).First(&existingForm).Error; err == nil {
-		existingForm.PackageID = req.PackageID
-		existingForm.PackageName = packageName
-		existingForm.PackagePrice = packagePrice
-		existingForm.TotalPrice = packagePrice + existingForm.AddonsPrice
-		config.DB.Save(&existingForm)
-	}
+	syncClientFormPackageAndModel(agenda)
 
 	// Reload with ClientForm
 	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
@@ -746,13 +795,8 @@ func UpdateAgendaModel(c *fiber.Ctx) error {
 			if modelImageURL == "" {
 				modelImageURL = decorModel.ImageURL
 			}
-		}
-
-		// Jika ada paket terkait, cek harga tambahan dari relasi package_models
-		if agenda.PackageID != "" && modelAdditionalPrice <= 0 {
-			var pkgModel models.PackageDecorationModel
-			if err := config.DB.Where("package_id = ? AND decoration_model_id = ?", agenda.PackageID, modelID).First(&pkgModel).Error; err == nil {
-				modelAdditionalPrice = pkgModel.AdditionalPrice
+			if modelAdditionalPrice <= 0 {
+				modelAdditionalPrice = resolveModelPriceByContext(agenda.PackageID, agenda.PackagePrice, modelID, decorModel.Price)
 			}
 		}
 	} else {
@@ -775,6 +819,8 @@ func UpdateAgendaModel(c *fiber.Ctx) error {
 			"error": "Gagal mengupdate model dekorasi agenda: " + err.Error(),
 		})
 	}
+
+	syncClientFormPackageAndModel(agenda)
 
 	// Reload with ClientForm
 	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
@@ -1149,59 +1195,83 @@ func UpdateAgenda(c *fiber.Ctx) error {
 		agenda.MapsURL = mapsURL
 	}
 
-	// Update Brand jika dipilih
-	brandID := strings.TrimSpace(req.BrandID)
-	if brandID != "" && brandID != agenda.BrandID {
-		var brand models.CompanyBrand
-		targetCompanyID := agenda.CompanyID
-		if err := config.DB.Where("id = ? AND company_id = ?", brandID, targetCompanyID).First(&brand).Error; err == nil {
-			agenda.BrandID = brand.ID
-			agenda.BrandName = brand.Name
-			agenda.BrandLogo = brand.LogoURL
-			agenda.BrandPhone = brand.Phone
-			agenda.BrandInstagram = brand.Instagram
-			agenda.BrandDescription = brand.Description
+	prevHasPackage := agenda.HasPackage()
+	prevModelID := agenda.ModelID
+
+	// Update Brand jika dipilih atau dikosongkan
+	if req.BrandID != nil {
+		brandID := strings.TrimSpace(*req.BrandID)
+		if brandID != "" && brandID != agenda.BrandID {
+			var brand models.CompanyBrand
+			targetCompanyID := agenda.CompanyID
+			if err := config.DB.Where("id = ? AND company_id = ?", brandID, targetCompanyID).First(&brand).Error; err == nil {
+				agenda.BrandID = brand.ID
+				agenda.BrandName = brand.Name
+				agenda.BrandLogo = brand.LogoURL
+				agenda.BrandPhone = brand.Phone
+				agenda.BrandInstagram = brand.Instagram
+				agenda.BrandDescription = brand.Description
+			}
+		} else if brandID == "" {
+			agenda.BrandID = ""
+			agenda.BrandName = ""
+			agenda.BrandLogo = ""
+			agenda.BrandPhone = ""
+			agenda.BrandInstagram = ""
+			agenda.BrandDescription = ""
 		}
-	} else if brandID == "" && req.BrandID != "" {
-		agenda.BrandID = ""
-		agenda.BrandName = ""
-		agenda.BrandLogo = ""
-		agenda.BrandPhone = ""
-		agenda.BrandInstagram = ""
-		agenda.BrandDescription = ""
 	}
 
 	// Paket Dekorasi
-	if strings.TrimSpace(req.PackageID) != "" {
-		agenda.PackageID = strings.TrimSpace(req.PackageID)
-		if strings.TrimSpace(req.PackageName) != "" {
-			agenda.PackageName = strings.TrimSpace(req.PackageName)
-		} else {
-			var pkg models.Package
-			if err := config.DB.Where("id = ?", agenda.PackageID).First(&pkg).Error; err == nil {
-				agenda.PackageName = pkg.Name
-				if req.PackagePrice == 0 {
-					agenda.PackagePrice = pkg.BasePrice
+	packageChanged := false
+	if req.PackageID != nil {
+		packageChanged = true
+		pkgID := strings.TrimSpace(*req.PackageID)
+		agenda.PackageID = pkgID
+		if pkgID != "" {
+			if req.PackageName != nil && strings.TrimSpace(*req.PackageName) != "" {
+				agenda.PackageName = strings.TrimSpace(*req.PackageName)
+			} else {
+				var pkg models.Package
+				if err := config.DB.Where("id = ?", pkgID).First(&pkg).Error; err == nil {
+					agenda.PackageName = pkg.Name
+					if req.PackagePrice == nil {
+						agenda.PackagePrice = pkg.BasePrice
+					}
 				}
 			}
+		} else {
+			if req.PackageName != nil && strings.TrimSpace(*req.PackageName) != "" {
+				agenda.PackageName = strings.TrimSpace(*req.PackageName)
+			} else {
+				agenda.PackageName = "Belum Dipilih"
+			}
+			if req.PackagePrice == nil {
+				agenda.PackagePrice = 0
+			}
 		}
-	} else if strings.TrimSpace(req.PackageName) != "" {
-		agenda.PackageName = strings.TrimSpace(req.PackageName)
+	} else if req.PackageName != nil && strings.TrimSpace(*req.PackageName) != "" {
+		agenda.PackageName = strings.TrimSpace(*req.PackageName)
 	}
-	if req.PackagePrice >= 0 {
-		agenda.PackagePrice = req.PackagePrice
+	if req.PackagePrice != nil && *req.PackagePrice >= 0 {
+		agenda.PackagePrice = *req.PackagePrice
 	}
 
 	// Model Dekorasi
-	modelID := strings.TrimSpace(req.ModelID)
-	if modelID != "" {
-		agenda.ModelID = modelID
-		agenda.ModelName = strings.TrimSpace(req.ModelName)
-		agenda.ModelWidth = strings.TrimSpace(req.ModelWidth)
-		agenda.ModelImageURL = strings.TrimSpace(req.ModelImageURL)
-		agenda.ModelAdditionalPrice = req.ModelAdditionalPrice
+	if req.ModelID != nil {
+		modelID := strings.TrimSpace(*req.ModelID)
+		if modelID != "" {
+			agenda.ModelID = modelID
+			if req.ModelName != nil {
+				agenda.ModelName = strings.TrimSpace(*req.ModelName)
+			}
+			if req.ModelWidth != nil {
+				agenda.ModelWidth = strings.TrimSpace(*req.ModelWidth)
+			}
+			if req.ModelImageURL != nil {
+				agenda.ModelImageURL = strings.TrimSpace(*req.ModelImageURL)
+			}
 
-		if agenda.ModelName == "" || agenda.ModelImageURL == "" {
 			var decorModel models.DecorationModel
 			if err := config.DB.Where("id = ?", modelID).First(&decorModel).Error; err == nil {
 				if agenda.ModelName == "" {
@@ -1214,21 +1284,35 @@ func UpdateAgenda(c *fiber.Ctx) error {
 					agenda.ModelImageURL = decorModel.ImageURL
 				}
 			}
+
+			if req.ModelAdditionalPrice != nil && *req.ModelAdditionalPrice >= 0 {
+				agenda.ModelAdditionalPrice = *req.ModelAdditionalPrice
+			} else {
+				agenda.ModelAdditionalPrice = resolveModelPriceByContext(agenda.PackageID, agenda.PackagePrice, modelID, decorModel.Price)
+			}
+		} else {
+			agenda.ModelID = ""
+			agenda.ModelName = ""
+			agenda.ModelWidth = ""
+			agenda.ModelImageURL = ""
+			agenda.ModelAdditionalPrice = 0
 		}
-	} else if req.ModelID != "" {
-		agenda.ModelID = ""
-		agenda.ModelName = ""
-		agenda.ModelWidth = ""
-		agenda.ModelImageURL = ""
-		agenda.ModelAdditionalPrice = 0
+	} else if req.ModelAdditionalPrice != nil && *req.ModelAdditionalPrice >= 0 {
+		agenda.ModelAdditionalPrice = *req.ModelAdditionalPrice
+	} else if packageChanged && agenda.ModelID != "" && prevHasPackage != agenda.HasPackage() && prevModelID == agenda.ModelID {
+		var decorModel models.DecorationModel
+		_ = config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error
+		agenda.ModelAdditionalPrice = resolveModelPriceByContext(agenda.PackageID, agenda.PackagePrice, agenda.ModelID, decorModel.Price)
 	}
 
 	// Transport fee
-	agenda.TransportFee = req.TransportFee
+	if req.TransportFee != nil && *req.TransportFee >= 0 {
+		agenda.TransportFee = *req.TransportFee
+	}
 
 	// DP
-	if req.DpAmount >= 0 {
-		agenda.DpAmount = req.DpAmount
+	if req.DpAmount != nil && *req.DpAmount >= 0 {
+		agenda.DpAmount = *req.DpAmount
 	}
 
 	// Payment status
@@ -1248,7 +1332,9 @@ func UpdateAgenda(c *fiber.Ctx) error {
 	}
 
 	// Notes
-	agenda.Notes = strings.TrimSpace(req.Notes)
+	if req.Notes != nil {
+		agenda.Notes = strings.TrimSpace(*req.Notes)
+	}
 	agenda.UpdatedAt = time.Now()
 
 	if err := config.DB.Save(&agenda).Error; err != nil {
@@ -1256,6 +1342,8 @@ func UpdateAgenda(c *fiber.Ctx) error {
 			"error": "Gagal mengupdate agenda: " + err.Error(),
 		})
 	}
+
+	syncClientFormPackageAndModel(agenda)
 
 	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
 

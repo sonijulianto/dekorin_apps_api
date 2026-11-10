@@ -259,6 +259,7 @@ func CreateInvitation(c *fiber.Ctx) error {
 
 	isIllustration := req.Template == "ta3" || req.Template == "ta17" || req.Template == "ocean-ta17" || req.Template == "blue-ta17"
 	isJawa3 := req.Template == "jawa3" || req.Template == "art-jawa-coklat-3" || req.Template == "jawa-coklat-3"
+	isJawa2 := req.Template == "jawa2" || req.Template == "art-jawa-biru-2" || req.Template == "jawa-biru-2"
 	if isJawa3 {
 		// Foto cover utama template Jawa 3 dikunci permanen menggunakan bg-cover bawaan
 		req.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
@@ -285,6 +286,34 @@ func CreateInvitation(c *fiber.Ctx) error {
 		}
 		if strings.TrimSpace(req.GalleryImages) == "" || strings.HasPrefix(req.GalleryImages, "/assets/templates/pn4/photos/LeniArdi2.jpeg") {
 			req.GalleryImages = "/assets/templates/jawa3/photos/gallery1.jpg,/assets/templates/jawa3/photos/gallery2.jpg,/assets/templates/jawa3/photos/gallery3.jpg,/assets/templates/jawa3/photos/gallery4.jpg,/assets/templates/jawa3/photos/gallery5.jpg,/assets/templates/jawa3/photos/gallery6.jpg,/assets/templates/jawa3/photos/gallery7.jpg,/assets/templates/jawa3/photos/gallery8.jpg"
+		}
+	} else if isJawa2 {
+		if strings.TrimSpace(req.CoverImage) == "" || req.CoverImage == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
+			req.CoverImage = "/assets/templates/jawa2/photos/cover-default.jpg"
+		}
+		if strings.TrimSpace(req.Sec1Photo) == "" || req.Sec1Photo == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.Sec1Photo = "/assets/templates/jawa2/photos/gallery1.jpg"
+		}
+		if strings.TrimSpace(req.GroomPhoto) == "" || req.GroomPhoto == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.GroomPhoto = "/assets/templates/jawa2/photos/groom-default.jpg"
+		}
+		if strings.TrimSpace(req.BridePhoto) == "" || req.BridePhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.BridePhoto = "/assets/templates/jawa2/photos/bride-default.jpg"
+		}
+		if strings.TrimSpace(req.AkadPhoto) == "" || req.AkadPhoto == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.AkadPhoto = "/assets/templates/jawa2/photos/gallery2.jpg"
+		}
+		if strings.TrimSpace(req.ResepsiPhoto) == "" || req.ResepsiPhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.ResepsiPhoto = "/assets/templates/jawa2/photos/gallery3.jpg"
+		}
+		if strings.TrimSpace(req.EventPhoto) == "" || req.EventPhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.EventPhoto = "/assets/templates/jawa2/photos/gallery4.jpg"
+		}
+		if strings.TrimSpace(req.ClosingPhoto) == "" || req.ClosingPhoto == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
+			req.ClosingPhoto = "/assets/templates/jawa2/photos/cover-default.jpg"
+		}
+		if strings.TrimSpace(req.GalleryImages) == "" || strings.HasPrefix(req.GalleryImages, "/assets/templates/pn4/photos/LeniArdi2.jpeg") {
+			req.GalleryImages = "/assets/templates/jawa2/photos/gallery1.jpg,/assets/templates/jawa2/photos/gallery2.jpg,/assets/templates/jawa2/photos/gallery3.jpg,/assets/templates/jawa2/photos/gallery4.jpg,/assets/templates/jawa2/photos/gallery5.jpg,/assets/templates/jawa2/photos/gallery6.jpg,/assets/templates/jawa2/photos/gallery7.jpg,/assets/templates/jawa2/photos/gallery8.jpg"
 		}
 	} else if !isIllustration {
 		if strings.TrimSpace(req.CoverImage) == "" {
@@ -369,7 +398,12 @@ func CreateInvitation(c *fiber.Ctx) error {
 	}
 
 	templateName := strings.TrimSpace(req.Template)
-	if templateName != "pn4" && templateName != "ta3" && templateName != "ta17" && templateName != "jawa3" {
+	if templateName == "art-jawa-biru-2" || templateName == "jawa-biru-2" {
+		templateName = "jawa2"
+	} else if templateName == "art-jawa-coklat-3" || templateName == "jawa-coklat-3" {
+		templateName = "jawa3"
+	}
+	if templateName != "pn4" && templateName != "ta3" && templateName != "ta17" && templateName != "jawa3" && templateName != "jawa2" {
 		templateName = "ta17"
 	}
 
@@ -474,7 +508,12 @@ func UpdateInvitation(c *fiber.Ctx) error {
 
 	if strings.TrimSpace(req.Template) != "" {
 		tmpl := strings.TrimSpace(req.Template)
-		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" {
+		if tmpl == "art-jawa-biru-2" || tmpl == "jawa-biru-2" {
+			tmpl = "jawa2"
+		} else if tmpl == "art-jawa-coklat-3" || tmpl == "jawa-coklat-3" {
+			tmpl = "jawa3"
+		}
+		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" && tmpl != "jawa2" {
 			tmpl = "ta17"
 		}
 		invitation.Template = tmpl
@@ -974,6 +1013,14 @@ func getSampleInvitationForTemplate(templateName string) (models.Invitation, []m
 		inv.BridePhoto = "/assets/templates/jawa3/photos/bride-default.jpg"
 		inv.GalleryImages = "/assets/templates/jawa3/photos/gallery1.jpg, /assets/templates/jawa3/photos/gallery2.jpg, /assets/templates/jawa3/photos/gallery3.jpg, /assets/templates/jawa3/photos/gallery4.jpg"
 		inv.AudioURL = "/assets/templates/jawa3/default-song.mp3"
+	case "jawa2", "art-jawa-biru-2", "jawa-biru-2":
+		inv.Title = "Pawiwahan Ageng Bagas & Zulia"
+		inv.CoverImage = "/assets/templates/jawa2/photos/cover-default.jpg"
+		inv.GroomPhoto = "/assets/templates/jawa2/photos/groom-default.jpg"
+		inv.BridePhoto = "/assets/templates/jawa2/photos/bride-default.jpg"
+		inv.ClosingPhoto = "/assets/templates/jawa2/photos/cover-default.jpg"
+		inv.GalleryImages = "/assets/templates/jawa2/photos/gallery1.jpg, /assets/templates/jawa2/photos/gallery2.jpg, /assets/templates/jawa2/photos/gallery3.jpg, /assets/templates/jawa2/photos/gallery4.jpg, /assets/templates/jawa2/photos/gallery5.jpg, /assets/templates/jawa2/photos/gallery6.jpg, /assets/templates/jawa2/photos/gallery7.jpg, /assets/templates/jawa2/photos/gallery8.jpg"
+		inv.AudioURL = "/assets/templates/jawa2/default-song.mp3"
 	default: // ta17
 		inv.CoverImage = "/assets/templates/ta17/couple-welcome.png"
 		inv.GroomPhoto = "/assets/templates/ta17/groom-default.png"
@@ -1129,6 +1176,8 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 			ogImage = "/assets/templates/pn4/photos/LeniArdi2.jpeg"
 		case "jawa3", "art-jawa-coklat-3", "jawa-coklat-3":
 			ogImage = "/assets/templates/jawa3/bg-cover.jpg"
+		case "jawa2", "art-jawa-biru-2", "jawa-biru-2":
+			ogImage = "/assets/templates/jawa2/photos/cover-default.jpg"
 		default:
 			ogImage = "/assets/templates/ta17/couple-welcome.png"
 		}
@@ -1180,6 +1229,8 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 		templateFile = "template_ta17.html"
 	case "jawa3", "art-jawa-coklat-3", "jawa-coklat-3":
 		templateFile = "template_jawa3.html"
+	case "jawa2", "art-jawa-biru-2", "jawa-biru-2":
+		templateFile = "template_jawa2.html"
 	default:
 		// Fallback otomatis ke Ocean Blossom (TA17) untuk template lama / selain yang disisakan
 		templateFile = "template_ta17.html"

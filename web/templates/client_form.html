@@ -313,8 +313,9 @@
           if (MODELS_DATA.length === 0) {
             inputHtml = `<p class="text-xs text-slate-400 italic">Daftar model dekorasi belum tersedia.</p>`;
           } else {
-            // Cek harga tambahan model jika terkait dengan paket terpilih
+            // Cek harga tambahan model jika terkait dengan paket terpilih, atau harga dasar model jika tanpa paket
             const activePkg = PACKAGES_DATA.find(p => p.id === formState.selectedPackageId);
+            const hasActivePkg = !!activePkg;
             const pmMap = {};
             if (activePkg && activePkg.package_models) {
               activePkg.package_models.forEach(pm => { pmMap[pm.decoration_model_id] = pm.additional_price || 0; });
@@ -322,6 +323,23 @@
             inputHtml = `<div class="grid grid-cols-2 gap-2.5">` + MODELS_DATA.map(m => {
               const isSelected = formState.selectedModelId === m.id;
               const extraPrice = pmMap[m.id] || 0;
+              const standalonePrice = Number(m.price || 0);
+              let priceHtml = '';
+              if (SHOW_PRICE) {
+                if (hasActivePkg) {
+                  priceHtml = `
+                    <p class="text-[11px] font-bold mt-1.5 ${extraPrice > 0 ? 'text-amber-700' : 'text-emerald-600'}">
+                      ${extraPrice > 0 ? '+ ' + formatRp(extraPrice) : 'Termasuk Paket'}
+                    </p>
+                  `;
+                } else {
+                  priceHtml = `
+                    <p class="text-[11px] font-bold mt-1.5 ${standalonePrice > 0 ? 'text-[#C59563] font-mono' : 'text-slate-400'}">
+                      ${standalonePrice > 0 ? formatRp(standalonePrice) : 'Harga belum diatur'}
+                    </p>
+                  `;
+                }
+              }
               return `
                 <div onclick="selectClientModel('${m.id}')"
                   class="cursor-pointer rounded-2xl border-2 overflow-hidden transition flex flex-col ${isSelected ? 'border-[#D4A574] bg-[#F9F3EC]/60 shadow-xs' : 'border-slate-100 bg-white hover:border-slate-200'}">
@@ -333,11 +351,7 @@
                       <p class="text-xs font-bold text-slate-900 leading-tight">${escapeHtml(m.name)}</p>
                       ${m.width ? `<span class="inline-block mt-1 px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-semibold text-slate-600">Lebar: ${escapeHtml(m.width)}</span>` : ''}
                     </div>
-                    ${SHOW_PRICE ? `
-                      <p class="text-[11px] font-bold mt-1.5 ${extraPrice > 0 ? 'text-amber-700' : 'text-emerald-600'}">
-                        ${extraPrice > 0 ? '+ ' + formatRp(extraPrice) : 'Termasuk Paket'}
-                      </p>
-                    ` : ''}
+                    ${priceHtml}
                   </div>
                 </div>
               `;
@@ -452,6 +466,9 @@
           const pm = pkg.package_models.find(m => m.decoration_model_id === formState.selectedModelId);
           if (pm) total += Number(pm.additional_price || 0);
         }
+      } else if (formState.selectedModelId) {
+        const mdl = MODELS_DATA.find(m => m.id === formState.selectedModelId);
+        if (mdl) total += Number(mdl.price || 0);
       }
 
       Object.entries(formState.addonQtyMap).forEach(([id, qty]) => {
@@ -750,7 +767,7 @@
     {{end}}
 
     <!-- PAKET DEKORASI -->
-    {{if or .PackageName (gt .PackagePrice 0.0)}}
+    {{if .HasPackage}}
     <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3.5 print-break-inside-avoid">
       <div class="flex items-center justify-between">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -811,13 +828,20 @@
             </div>
           </div>
           {{if .ShowPrice}}
-            {{if gt .ModelAddPrice 0.0}}
-            <div class="text-right">
-              <span class="text-[10px] text-slate-400 block font-medium">Biaya Tambahan:</span>
-              <span class="text-xs font-bold text-amber-700 font-mono">+{{.ModelAddPriceFormatted}}</span>
-            </div>
-            {{else}}
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Termasuk paket</span>
+            {{if .HasPackage}}
+              {{if gt .ModelAddPrice 0.0}}
+              <div class="text-right">
+                <span class="text-[10px] text-slate-400 block font-medium">Biaya Tambahan:</span>
+                <span class="text-xs font-bold text-amber-700 font-mono">+{{.ModelAddPriceFormatted}}</span>
+              </div>
+              {{else}}
+              <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Termasuk paket</span>
+              {{end}}
+            {{else if gt .ModelAddPrice 0.0}}
+              <div class="text-right">
+                <span class="text-[10px] text-slate-400 block font-medium">Harga Model:</span>
+                <span class="text-xs font-bold text-[#C59563] font-mono">{{.ModelAddPriceFormatted}}</span>
+              </div>
             {{end}}
           {{end}}
         </div>
@@ -853,6 +877,7 @@
       </div>
 
       <div class="space-y-2 text-xs">
+        {{if .HasPackage}}
         <div class="flex justify-between py-1 text-slate-600">
           <span>Paket Dekorasi ({{if .PackageName}}{{.PackageName}}{{else}}Dasar{{end}}):</span>
           <span class="font-mono font-semibold text-slate-800">{{.PackagePriceFormatted}}</span>
@@ -862,6 +887,17 @@
         <div class="flex justify-between py-1 text-slate-600">
           <span>Upgrade Model ({{.ModelName}}):</span>
           <span class="font-mono font-semibold text-amber-700">+ {{.ModelAddPriceFormatted}}</span>
+        </div>
+        {{end}}
+        {{else if .ModelName}}
+        <div class="flex justify-between py-1 text-slate-600">
+          <span>Model Dekorasi ({{.ModelName}}):</span>
+          <span class="font-mono font-semibold text-slate-800">{{.ModelAddPriceFormatted}}</span>
+        </div>
+        {{else}}
+        <div class="flex justify-between py-1 text-slate-600">
+          <span>Paket Dekorasi ({{if .PackageName}}{{.PackageName}}{{else}}Dasar{{end}}):</span>
+          <span class="font-mono font-semibold text-slate-800">{{.PackagePriceFormatted}}</span>
         </div>
         {{end}}
 

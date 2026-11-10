@@ -38,6 +38,7 @@ type BookingDetailViewData struct {
 	PackageImage           string
 	PackagePrice           float64
 	PackagePriceFormatted  string
+	HasPackage             bool
 	ModelName              string
 	ModelWidth             string
 	ModelImageURL          string
@@ -440,6 +441,7 @@ func ShowClientForm(c *fiber.Ctx) error {
 		PackageImage:           packageImage,
 		PackagePrice:           agenda.PackagePrice,
 		PackagePriceFormatted:  formatRupiahID(agenda.PackagePrice),
+		HasPackage:             agenda.HasPackage(),
 		ModelName:              modelName,
 		ModelWidth:             modelWidth,
 		ModelImageURL:          modelImg,
@@ -722,6 +724,9 @@ func SubmitClientForm(c *fiber.Ctx) error {
 		agenda.MapsURL = mapsVal
 	}
 
+	prevPackageID := strings.TrimSpace(agenda.PackageID)
+	prevModelID := strings.TrimSpace(agenda.ModelID)
+
 	// Paket Dekorasi
 	packageID := getEffectiveVal("package_id")
 	packagePrice := agenda.PackagePrice
@@ -734,6 +739,15 @@ func SubmitClientForm(c *fiber.Ctx) error {
 			agenda.PackageID = packageID
 			agenda.PackageName = packageName
 			agenda.PackagePrice = packagePrice
+		}
+	} else {
+		_, packageKeySubmitted := req.CustomAnswers["package_id"]
+		if prevPackageID != "" || packageKeySubmitted {
+			packagePrice = 0
+			packageName = "Belum Dipilih"
+			agenda.PackageID = ""
+			agenda.PackageName = packageName
+			agenda.PackagePrice = 0
 		}
 	}
 
@@ -749,11 +763,21 @@ func SubmitClientForm(c *fiber.Ctx) error {
 			agenda.ModelWidth = decorModel.Width
 			agenda.ModelImageURL = decorModel.ImageURL
 
-			// Cek harga tambahan model di dalam paket jika ada
-			var pm models.PackageDecorationModel
-			if packageID != "" && config.DB.Where("package_id = ? AND decoration_model_id = ?", packageID, modelID).First(&pm).Error == nil {
-				agenda.ModelAdditionalPrice = pm.AdditionalPrice
+			if agenda.HasPackage() {
+				agenda.ModelAdditionalPrice = resolveModelPriceByContext(packageID, packagePrice, modelID, decorModel.Price)
+			} else if prevPackageID != "" || prevModelID != modelID || agenda.ModelAdditionalPrice <= 0 {
+				agenda.ModelAdditionalPrice = decorModel.Price
 			}
+		}
+	} else {
+		_, modelKeySubmitted := req.CustomAnswers["model_id"]
+		if prevModelID != "" || modelKeySubmitted {
+			modelName = ""
+			agenda.ModelID = ""
+			agenda.ModelName = ""
+			agenda.ModelWidth = ""
+			agenda.ModelImageURL = ""
+			agenda.ModelAdditionalPrice = 0
 		}
 	}
 
@@ -944,7 +968,7 @@ func SubmitClientForm(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message":     "Form berhasil dikirim dan terkonfirmasi!",
-		"total_price": totalPrice,
+		"total_price": totalPrice + agenda.ModelAdditionalPrice + agenda.TransportFee,
 		"locked":      true,
 	})
 }

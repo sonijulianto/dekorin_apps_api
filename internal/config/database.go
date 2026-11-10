@@ -108,7 +108,7 @@ func ConnectDB() {
 // MigrateInvitationTemplates memigrasikan template undangan lama ke Ocean Blossom (ta17)
 func MigrateInvitationTemplates(db *gorm.DB) {
 	result := db.Model(&models.Invitation{}).
-		Where("template NOT IN ('pn4', 'ta3', 'ta17', 'jawa3') OR template IS NULL OR template = ''").
+		Where("template NOT IN ('pn4', 'ta3', 'ta17', 'jawa3', 'jawa2') OR template IS NULL OR template = ''").
 		Update("template", "ta17")
 	if result.Error != nil {
 		log.Println("⚠️ Peringatan saat migrasi template undangan: ", result.Error)
@@ -252,10 +252,11 @@ func SeedCompany(db *gorm.DB) {
 	var comp models.Company
 	if err := db.Where("id = ?", "cmp_default").First(&comp).Error; err != nil {
 		defaultCompany := models.Company{
-			ID:      "cmp_default",
-			Name:    "Dekorin Wedding & Event Decoration",
-			Address: "Jl. Melati Raya No. 123, Jakarta Selatan",
-			Phone:   "081234567890",
+			ID:              "cmp_default",
+			Name:            "Dekorin Wedding & Event Decoration",
+			Address:         "Jl. Melati Raya No. 123, Jakarta Selatan",
+			Phone:           "081234567890",
+			InvoiceTemplate: "template_modern_navy",
 		}
 		db.Create(&defaultCompany)
 		fmt.Println("🌱 Seeding: Perusahaan default berhasil dibuat!")

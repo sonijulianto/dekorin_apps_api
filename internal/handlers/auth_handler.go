@@ -94,6 +94,7 @@ func Login(c *fiber.Ctx) error {
 	companyDescription := ""
 	companyInstagram := ""
 	companyBankInfo := ""
+	companyInvoiceTemplate := DefaultInvoiceTemplate
 	if user.Company != nil {
 		companyName = user.Company.Name
 		companyAddress = user.Company.Address
@@ -103,6 +104,7 @@ func Login(c *fiber.Ctx) error {
 		companyDescription = user.Company.Description
 		companyInstagram = user.Company.Instagram
 		companyBankInfo = user.Company.BankInfo
+		companyInvoiceTemplate = EffectiveInvoiceTemplate(user.Company.InvoiceTemplate)
 	}
 
 	// Return data user beserta token-nya
@@ -110,21 +112,22 @@ func Login(c *fiber.Ctx) error {
 		"message": "Login berhasil",
 		"token":   tokenString,
 		"data": models.UserResponse{
-			ID:                 user.ID,
-			CompanyID:          user.CompanyID,
-			CompanyName:        companyName,
-			CompanyAddress:     companyAddress,
-			CompanyPhone:       companyPhone,
-			CompanyLogo:        companyLogo,
-			CompanyEmail:       companyEmail,
-			CompanyDescription: companyDescription,
-			CompanyInstagram:   companyInstagram,
-			CompanyBankInfo:    companyBankInfo,
-			FullName:           user.FullName,
-			Phone:              user.Phone,
-			Email:              user.Email,
-			Role:               user.Role,
-			Permissions:        GetEffectiveUserPermissions(user.CompanyID, user.Role),
+			ID:                     user.ID,
+			CompanyID:              user.CompanyID,
+			CompanyName:            companyName,
+			CompanyAddress:         companyAddress,
+			CompanyPhone:           companyPhone,
+			CompanyLogo:            companyLogo,
+			CompanyEmail:           companyEmail,
+			CompanyDescription:     companyDescription,
+			CompanyInstagram:       companyInstagram,
+			CompanyBankInfo:        companyBankInfo,
+			CompanyInvoiceTemplate: companyInvoiceTemplate,
+			FullName:               user.FullName,
+			Phone:                  user.Phone,
+			Email:                  user.Email,
+			Role:                   user.Role,
+			Permissions:            GetEffectiveUserPermissions(user.CompanyID, user.Role),
 		},
 	})
 }

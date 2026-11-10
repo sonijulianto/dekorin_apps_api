@@ -8,7 +8,7 @@ type Invitation struct {
 	CompanyID      string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	Slug           string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"slug"` // URL slug, misal: bagas-zulia
 	Title          string    `gorm:"type:varchar(200);not null" json:"title"`           // misal: The Wedding of Bagas & Zulia
-	Template       string    `gorm:"type:varchar(50);default:'ta17'" json:"template"` // pn4, ta3, ta17, jawa3
+	Template       string    `gorm:"type:varchar(50);default:'ta17'" json:"template"` // pn4, ta3, ta17, jawa3, jawa2
 	EventType      string    `gorm:"type:varchar(50);default:'wedding'" json:"event_type"` // wedding, khitan
 	CoverImage     string    `gorm:"type:text" json:"cover_image"`
 	Quotes         string    `gorm:"type:text" json:"quotes"` // Kutipan ayat suci / mutiara

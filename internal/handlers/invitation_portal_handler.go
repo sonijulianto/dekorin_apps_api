@@ -315,7 +315,12 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 	}
 	if strings.TrimSpace(req.Template) != "" {
 		tmpl := strings.TrimSpace(req.Template)
-		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" {
+		if tmpl == "art-jawa-biru-2" || tmpl == "jawa-biru-2" {
+			tmpl = "jawa2"
+		} else if tmpl == "art-jawa-coklat-3" || tmpl == "jawa-coklat-3" {
+			tmpl = "jawa3"
+		}
+		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" && tmpl != "jawa2" {
 			tmpl = "ta17"
 		}
 		invitation.Template = tmpl
