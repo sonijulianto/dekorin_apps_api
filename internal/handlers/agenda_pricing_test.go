@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"dekorin_apps_api/internal/models"
 )
@@ -141,5 +142,75 @@ func TestSuperadminTemplateExistsAndHasStandaloneModelHooks(t *testing.T) {
 	}
 	if !strings.Contains(src, "Harga Model Dekorasi (Rp)") {
 		t.Error("expected superadmin.html to support 'Harga Model Dekorasi (Rp)' label when no package is chosen")
+	}
+}
+
+func TestBuildAgendaPaymentStatusUpdatesPreservesSchedule(t *testing.T) {
+	eventTime := time.Date(2026, 12, 20, 10, 0, 0, 0, time.FixedZone("WIB", 7*3600))
+	now := time.Date(2026, 11, 10, 18, 0, 0, 0, time.FixedZone("WIB", 7*3600))
+	agenda := models.Agenda{
+		ID:            "agd_pay_1",
+		EventDateTime: eventTime,
+		PackagePrice:  3000000,
+		TransportFee:  250000,
+		DpAmount:      1000000,
+		PaymentStatus: "dp",
+	}
+
+	updates := buildAgendaPaymentStatusUpdates(agenda, "paid", now)
+	if _, touchesSchedule := updates["event_date_time"]; touchesSchedule {
+		t.Fatal("buildAgendaPaymentStatusUpdates must never touch event_date_time")
+	}
+	if updates["payment_status"] != "paid" {
+		t.Errorf("expected payment_status 'paid', got %v", updates["payment_status"])
+	}
+	if updates["dp_amount"] != 3250000.0 {
+		t.Errorf("expected dp_amount 3250000, got %v", updates["dp_amount"])
+	}
+	if updates["updated_at"] != now {
+		t.Errorf("expected updated_at %v, got %v", now, updates["updated_at"])
+	}
+}
+
+func TestBuildAgendaDpUpdatesPreservesSchedule(t *testing.T) {
+	eventTime := time.Date(2026, 12, 20, 10, 0, 0, 0, time.FixedZone("WIB", 7*3600))
+	now := time.Date(2026, 11, 10, 18, 0, 0, 0, time.FixedZone("WIB", 7*3600))
+	agenda := models.Agenda{
+		ID:            "agd_dp_1",
+		EventDateTime: eventTime,
+		PackagePrice:  3000000,
+		DpAmount:      0,
+		PaymentStatus: "unpaid",
+	}
+
+	updates := buildAgendaDpUpdates(agenda, 3000000, now)
+	if _, touchesSchedule := updates["event_date_time"]; touchesSchedule {
+		t.Fatal("buildAgendaDpUpdates must never touch event_date_time")
+	}
+	if updates["payment_status"] != "paid" {
+		t.Errorf("expected payment_status 'paid' when dp >= total, got %v", updates["payment_status"])
+	}
+	if updates["dp_amount"] != 3000000.0 {
+		t.Errorf("expected dp_amount 3000000, got %v", updates["dp_amount"])
+	}
+}
+
+func TestSuperadminHasMarkAgendaPaidAction(t *testing.T) {
+	path := filepath.Join("..", "..", "web", "templates", "superadmin.html")
+	content, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("failed reading superadmin.html: %v", err)
+	}
+	src := string(content)
+
+	for _, marker := range []string{
+		"btnMarkAgendaPaidInModal",
+		"markCurrentAgendaAsPaid",
+		"markAgendaAsPaid",
+		"/payment-status",
+	} {
+		if !strings.Contains(src, marker) {
+			t.Errorf("expected superadmin.html to contain %q", marker)
+		}
 	}
 }

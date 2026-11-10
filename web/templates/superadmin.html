@@ -2124,8 +2124,9 @@
                 </div>
 
                 <!-- Sticky Footer -->
-                <div class="shrink-0 px-5 sm:px-7 py-3.5 border-t border-slate-100 bg-white safe-footer-pb flex items-center justify-end gap-2.5">
+                <div class="shrink-0 px-5 sm:px-7 py-3.5 border-t border-slate-100 bg-white safe-footer-pb flex flex-wrap items-center justify-end gap-2.5">
                     <button type="button" onclick="closeAgendaModal()" class="flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 border border-slate-200 sm:border-transparent transition">Batal</button>
+                    <button type="button" id="btnMarkAgendaPaidInModal" onclick="markCurrentAgendaAsPaid()" class="hidden flex-1 sm:flex-initial px-4 py-2.5 min-h-[44px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-md shadow-emerald-600/20">✓ Tandai Lunas</button>
                     <button type="submit" id="btnSubmitAgenda" class="flex-1 sm:flex-initial px-5 py-2.5 min-h-[44px] rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">Buat Agenda</button>
                 </div>
             </form>
@@ -4143,11 +4144,17 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 pt-1">
+                        <div class="flex flex-wrap items-center gap-2 pt-1">
                             <button type="button" onclick="openEditAgendaModal('${a.id}')"
                                 class="flex-1 py-2 px-3 rounded-lg bg-[#F9F3EC] hover:bg-[#F3E7D8] text-[#C59563] font-bold text-[11px] transition text-center">
                                 ✏️ Edit / Detail
                             </button>
+                            ${!isPaid && (a.status || '').toLowerCase() !== 'cancelled' ? `
+                                <button type="button" onclick="markAgendaAsPaid('${a.id}')"
+                                    class="py-2 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[11px] transition">
+                                    ✓ Lunas
+                                </button>
+                            ` : ''}
                             ${a.form_token ? `
                                 <button type="button" onclick="copyClientFormLink('${a.form_token}')"
                                     class="py-2 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/80 font-semibold text-[11px] transition">
@@ -6478,6 +6485,12 @@
                             <!-- Aksi -->
                             <td class="py-3.5 px-5 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
+                                    ${(a.payment_status || '').toLowerCase() !== 'paid' && (a.status || '').toLowerCase() !== 'cancelled' ? `
+                                        <button onclick="markAgendaAsPaid('${a.id}')" title="Tandai Pembayaran Lunas (Tanpa Mengubah Jadwal)"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition font-bold text-xs border border-emerald-200 shadow-xs">
+                                            <span>✓</span> <span class="hidden md:inline">Lunas</span>
+                                        </button>
+                                    ` : ''}
                                     ${editable ? `
                                         <button onclick="openEditAgendaModal('${a.id}')" title="Edit Agenda Acara (Belum Terlewat)"
                                             class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#F9F3EC] text-[#C59563] hover:bg-[#F4ECE2] hover:text-[#B38352] transition font-bold text-xs border border-[#D4A574]/30 shadow-xs">
@@ -6592,7 +6605,12 @@
                                 ` : ''}
                             </div>
 
-                            <div class="flex items-center gap-2 pt-2.5 border-t border-slate-100">
+                            <div class="flex flex-wrap items-center gap-2 pt-2.5 border-t border-slate-100">
+                                ${(a.payment_status || '').toLowerCase() !== 'paid' && (a.status || '').toLowerCase() !== 'cancelled' ? `
+                                    <button onclick="markAgendaAsPaid('${a.id}')" class="min-h-[40px] px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs border border-emerald-200 transition" title="Tandai Pembayaran Lunas (Tanpa Mengubah Jadwal)">
+                                        ✓ Lunas
+                                    </button>
+                                ` : ''}
                                 <button onclick="openEditAgendaModal('${a.id}')" class="flex-1 min-h-[40px] px-3 py-1.5 rounded-xl font-bold text-xs transition border ${editable ? 'bg-[#F9F3EC] text-[#C59563] border-[#D4A574]/30' : 'bg-slate-100 text-slate-600 border-slate-200'}">
                                     ${editable ? '✏️ Edit Agenda' : '🔒 Lihat Detail'}
                                 </button>
@@ -6626,6 +6644,13 @@
             subtitleEl.innerText = 'Jadwalkan booking event, tentukan paket dekorasi, model, dan lokasi acara';
             submitBtn.classList.remove('hidden');
             submitBtn.innerText = 'Buat Agenda';
+
+            const markPaidBtn = document.getElementById('btnMarkAgendaPaidInModal');
+            if (markPaidBtn) {
+                markPaidBtn.classList.add('hidden');
+                markPaidBtn.disabled = false;
+                markPaidBtn.innerText = '✓ Tandai Lunas';
+            }
 
             document.getElementById('inputAgendaId').value = '';
             formEl.reset();
@@ -6734,6 +6759,14 @@
                 const tzOffset = d.getTimezoneOffset() * 60000;
                 const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 16);
                 document.getElementById('inputAgendaEventDateTime').value = localISOTime;
+            }
+
+            const markPaidBtn = document.getElementById('btnMarkAgendaPaidInModal');
+            if (markPaidBtn) {
+                const canMarkPaid = (a.payment_status || '').toLowerCase() !== 'paid' && (a.status || '').toLowerCase() !== 'cancelled';
+                markPaidBtn.classList.toggle('hidden', !canMarkPaid);
+                markPaidBtn.disabled = false;
+                markPaidBtn.innerText = '✓ Tandai Lunas';
             }
 
             const editable = isAgendaEditable(a);
@@ -9468,6 +9501,80 @@
                 await loadAgendas();
             } catch (err) {
                 alert('Gagal: ' + err.message);
+            }
+        }
+
+        function markCurrentAgendaAsPaid() {
+            const agendaId = document.getElementById('inputAgendaId')?.value;
+            if (!agendaId) return;
+            markAgendaAsPaid(agendaId, true);
+        }
+
+        async function markAgendaAsPaid(agendaId, closeModalAfter = false) {
+            const agenda = agendasCache.find(x => String(x.id) === String(agendaId)) ||
+                upcomingAgendasCache.find(x => String(x.id) === String(agendaId));
+            const clientName = agenda && agenda.client_name ? agenda.client_name : 'agenda ini';
+
+            if (!confirm(`Tandai pembayaran agenda "${clientName}" sebagai LUNAS?\n\nTanggal & jam acara tidak akan berubah.`)) {
+                return;
+            }
+
+            const markPaidBtn = closeModalAfter ? document.getElementById('btnMarkAgendaPaidInModal') : null;
+            const errBox = closeModalAfter ? document.getElementById('agendaErrorBox') : null;
+            if (errBox) {
+                errBox.classList.add('hidden');
+                errBox.innerText = '';
+            }
+            if (markPaidBtn) {
+                markPaidBtn.disabled = true;
+                markPaidBtn.innerText = 'Menyimpan...';
+            }
+
+            try {
+                let url = `/api/agendas/${encodeURIComponent(agendaId)}/payment-status`;
+                if (typeof currentUserRole !== 'undefined' && currentUserRole === 'superadmin' && typeof selectedCompanyId !== 'undefined' && selectedCompanyId) {
+                    url += '?company_id=' + encodeURIComponent(selectedCompanyId);
+                }
+
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({ payment_status: 'paid' })
+                });
+                const json = await res.json();
+                if (!res.ok) {
+                    throw new Error(json.error || 'Gagal memperbarui status pembayaran');
+                }
+
+                if (closeModalAfter) {
+                    closeAgendaModal();
+                }
+
+                if (currentView === 'dashboard') {
+                    await loadDashboardStats();
+                    if (agendasCache.length > 0) {
+                        await loadAgendas();
+                    }
+                } else {
+                    await loadAgendas();
+                }
+
+                showToast(`Pembayaran agenda "${clientName}" ditandai LUNAS`);
+            } catch (err) {
+                if (errBox) {
+                    errBox.innerText = err.message;
+                    errBox.classList.remove('hidden');
+                } else {
+                    alert('Gagal memperbarui pembayaran: ' + err.message);
+                }
+            } finally {
+                if (markPaidBtn) {
+                    markPaidBtn.disabled = false;
+                    markPaidBtn.innerText = '✓ Tandai Lunas';
+                }
             }
         }
     </script>

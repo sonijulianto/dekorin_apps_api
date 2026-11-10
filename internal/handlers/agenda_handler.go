@@ -426,6 +426,39 @@ func ReorderPackages(c *fiber.Ctx) error {
 	})
 }
 
+// buildAgendaDpUpdates menyusun kolom pembaruan nominal DP dan status pembayaran tanpa menyentuh jadwal acara.
+func buildAgendaDpUpdates(agenda models.Agenda, dpAmount float64, now time.Time) map[string]interface{} {
+	nextPaymentStatus := agenda.PaymentStatus
+	totalBiaya := agenda.CalculateTotalBiaya()
+	if totalBiaya > 0 && dpAmount >= totalBiaya {
+		nextPaymentStatus = "paid"
+	} else if dpAmount > 0 {
+		nextPaymentStatus = "dp"
+	}
+
+	return map[string]interface{}{
+		"dp_amount":      dpAmount,
+		"payment_status": nextPaymentStatus,
+		"updated_at":     now,
+	}
+}
+
+// buildAgendaPaymentStatusUpdates menyusun kolom pembaruan status pembayaran tanpa menyentuh jadwal acara.
+func buildAgendaPaymentStatusUpdates(agenda models.Agenda, paymentStatus string, now time.Time) map[string]interface{} {
+	updates := map[string]interface{}{
+		"payment_status": paymentStatus,
+		"updated_at":     now,
+	}
+	// Jika status diubah menjadi paid dan dp_amount belum menyamai total, update dp_amount
+	if paymentStatus == "paid" {
+		totalBiaya := agenda.CalculateTotalBiaya()
+		if totalBiaya > 0 && agenda.DpAmount < totalBiaya {
+			updates["dp_amount"] = totalBiaya
+		}
+	}
+	return updates
+}
+
 // UpdateAgendaDp handles PUT /api/agendas/:id/dp
 func UpdateAgendaDp(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -456,15 +489,8 @@ func UpdateAgendaDp(c *fiber.Ctx) error {
 		})
 	}
 
-	agenda.DpAmount = req.DpAmount
-	totalBiaya := agenda.CalculateTotalBiaya()
-	if totalBiaya > 0 && agenda.DpAmount >= totalBiaya {
-		agenda.PaymentStatus = "paid"
-	} else if agenda.DpAmount > 0 {
-		agenda.PaymentStatus = "dp"
-	}
-
-	if err := config.DB.Save(&agenda).Error; err != nil {
+	updates := buildAgendaDpUpdates(agenda, req.DpAmount, time.Now())
+	if err := config.DB.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengupdate DP agenda: " + err.Error(),
 		})
@@ -515,20 +541,15 @@ func UpdateAgendaPaymentStatus(c *fiber.Ctx) error {
 		})
 	}
 
-	agenda.PaymentStatus = req.PaymentStatus
-	// Jika status diubah menjadi paid dan dp_amount belum menyamai total, opsional update dp_amount
-	if req.PaymentStatus == "paid" {
-		totalBiaya := agenda.CalculateTotalBiaya()
-		if totalBiaya > 0 && agenda.DpAmount < totalBiaya {
-			agenda.DpAmount = totalBiaya
-		}
-	}
-
-	if err := config.DB.Save(&agenda).Error; err != nil {
+	updates := buildAgendaPaymentStatusUpdates(agenda, req.PaymentStatus, time.Now())
+	if err := config.DB.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal memperbarui status pembayaran: " + err.Error(),
 		})
 	}
+
+	// Reload with ClientForm agar seluruh data (termasuk event_date_time) tetap konsisten
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Status pembayaran berhasil diperbarui",
@@ -572,12 +593,17 @@ func UpdateAgendaStatus(c *fiber.Ctx) error {
 		})
 	}
 
-	agenda.Status = req.Status
-	if err := config.DB.Save(&agenda).Error; err != nil {
+	updates := map[string]interface{}{
+		"status":     req.Status,
+		"updated_at": time.Now(),
+	}
+	if err := config.DB.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal memperbarui status acara: " + err.Error(),
 		})
 	}
+
+	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Status acara berhasil diperbarui",
