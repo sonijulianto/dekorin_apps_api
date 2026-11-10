@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -147,6 +149,48 @@ func TestClientFormAndSuperadminTemplatesContainDynamicFormFeatures(t *testing.T
 	} {
 		if !strings.Contains(saHTML, sub) {
 			t.Errorf("superadmin.html missing expected substring %q", sub)
+		}
+	}
+}
+
+func TestWebTemplatesJavaScriptSyntax(t *testing.T) {
+	if _, err := exec.LookPath("node"); err != nil {
+		t.Skip("node not installed, skipping JS syntax check")
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
+	scriptRe := regexp.MustCompile(`(?s)<script>(.*?)</script>`)
+	tmplExprRe := regexp.MustCompile(`\{\{\.[^}]+\}\}`)
+
+	for _, name := range []string{"superadmin.html", "client_form.html"} {
+		p := filepath.Join(wd, "..", "..", "web", "templates", name)
+		data, err := os.ReadFile(p)
+		if err != nil {
+			t.Fatalf("Failed to read %s: %v", name, err)
+		}
+		matches := scriptRe.FindAllStringSubmatch(string(data), -1)
+		if len(matches) == 0 {
+			t.Errorf("%s expected to have inline <script> block", name)
+		}
+		for idx, m := range matches {
+			cleaned := tmplExprRe.ReplaceAllString(m[1], "null")
+			tmpFile, err := os.CreateTemp("", "check_*.js")
+			if err != nil {
+				t.Fatalf("Failed to create temp file: %v", err)
+			}
+			tmpPath := tmpFile.Name()
+			_, _ = tmpFile.WriteString(cleaned)
+			_ = tmpFile.Close()
+
+			out, err := exec.Command("node", "--check", tmpPath).CombinedOutput()
+			_ = os.Remove(tmpPath)
+			if err != nil {
+				t.Errorf("%s inline script #%d has JS syntax error: %v\n%s", name, idx, err, string(out))
+			}
 		}
 	}
 }
