@@ -45,6 +45,18 @@ func resolveModelPriceByContext(packageID string, packagePrice float64, modelID 
 	return pickContextualModelPrice(true, pkgAdditional, decorModelPrice)
 }
 
+// validateDiscountInput menormalisasi tipe diskon dan memvalidasi nilai diskon agar tidak negatif atau >100%.
+func validateDiscountInput(discountType string, discountValue float64) (string, float64, error) {
+	normalized := models.NormalizeDiscountType(discountType)
+	if discountValue < 0 {
+		return normalized, 0, fmt.Errorf("Nominal diskon tidak boleh negatif")
+	}
+	if normalized == "percent" && discountValue > 100 {
+		return normalized, 0, fmt.Errorf("Diskon persen maksimal 100%%")
+	}
+	return normalized, discountValue, nil
+}
+
 // syncClientFormPackageAndModel menjaga data ClientForm agar sinkron saat paket/model agenda diperbarui.
 func syncClientFormPackageAndModel(agenda models.Agenda) {
 	var existingForm models.ClientForm
@@ -278,6 +290,23 @@ func CreateAgenda(c *fiber.Ctx) error {
 		mapsURL = fmt.Sprintf("https://www.google.com/maps/search/?api=1&query=%s", url.QueryEscape(mapsURL))
 	}
 
+	if req.TransportFee < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nominal uang transport tidak boleh negatif",
+		})
+	}
+	if req.DpAmount < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nominal DP tidak boleh negatif",
+		})
+	}
+	discountType, discountValue, err := validateDiscountInput(req.DiscountType, req.DiscountValue)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	agenda := models.Agenda{
 		ID:                   agendaID,
 		CompanyID:            companyID,
@@ -301,13 +330,32 @@ func CreateAgenda(c *fiber.Ctx) error {
 		ModelWidth:           modelWidth,
 		ModelImageURL:        modelImageURL,
 		ModelAdditionalPrice: modelAdditionalPrice,
+		DiscountType:         discountType,
+		DiscountValue:        discountValue,
 		TransportFee:         req.TransportFee,
+		DpAmount:             req.DpAmount,
+		PaymentStatus:        "unpaid",
 		Status:               "upcoming",
 		FormToken:            formToken,
 		FormStatus:           "pending",
 		Notes:                strings.TrimSpace(req.Notes),
 		CreatedAt:            time.Now(),
 		UpdatedAt:            time.Now(),
+	}
+
+	totalBiaya := agenda.CalculateTotalBiaya()
+	reqPaymentStatus := strings.ToLower(strings.TrimSpace(req.PaymentStatus))
+	if reqPaymentStatus == "paid" || reqPaymentStatus == "dp" || reqPaymentStatus == "unpaid" {
+		agenda.PaymentStatus = reqPaymentStatus
+		if reqPaymentStatus == "paid" && totalBiaya > 0 && agenda.DpAmount < totalBiaya {
+			agenda.DpAmount = totalBiaya
+		}
+	} else if agenda.DpAmount > 0 {
+		if totalBiaya > 0 && agenda.DpAmount >= totalBiaya {
+			agenda.PaymentStatus = "paid"
+		} else {
+			agenda.PaymentStatus = "dp"
+		}
 	}
 
 	if err := config.DB.Create(&agenda).Error; err != nil {
@@ -1329,6 +1377,26 @@ func UpdateAgenda(c *fiber.Ctx) error {
 		var decorModel models.DecorationModel
 		_ = config.DB.Where("id = ?", agenda.ModelID).First(&decorModel).Error
 		agenda.ModelAdditionalPrice = resolveModelPriceByContext(agenda.PackageID, agenda.PackagePrice, agenda.ModelID, decorModel.Price)
+	}
+
+	// Diskon (% atau nominal Rp) - hanya memotong subtotal dekorasi (di luar transport)
+	effectiveDiscountType := models.NormalizeDiscountType(agenda.DiscountType)
+	if req.DiscountType != nil {
+		effectiveDiscountType = models.NormalizeDiscountType(*req.DiscountType)
+	}
+	effectiveDiscountValue := agenda.DiscountValue
+	if req.DiscountValue != nil {
+		effectiveDiscountValue = *req.DiscountValue
+	}
+	if req.DiscountType != nil || req.DiscountValue != nil {
+		validatedType, validatedValue, err := validateDiscountInput(effectiveDiscountType, effectiveDiscountValue)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+		agenda.DiscountType = validatedType
+		agenda.DiscountValue = validatedValue
 	}
 
 	// Transport fee

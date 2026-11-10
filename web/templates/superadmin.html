@@ -2043,19 +2043,30 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Biaya Transport / Luar Kota (Rp)</label>
-                            <input type="number" inputmode="numeric" id="inputAgendaTransportFee" min="0" value="0" oninput="calculateAgendaTotal()"
-                                class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tipe Diskon</label>
+                                <select id="inputAgendaDiscountType" onchange="calculateAgendaTotal()"
+                                    class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                                    <option value="amount">Nominal (Rp)</option>
+                                    <option value="percent">Persen (%)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Nilai Diskon (Potong Harga Dekorasi)</label>
+                                <input type="number" inputmode="decimal" id="inputAgendaDiscountValue" min="0" step="any" value="0" oninput="calculateAgendaTotal()"
+                                    class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                                <p class="text-[10px] text-slate-400 mt-1">Hanya memotong harga paket/model/addon, tidak memotong transport.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Status Acara & Status Pembayaran & DP -->
+                    <!-- Status Acara & Status Pembayaran, Transport & DP -->
                     <div class="bg-slate-50/70 p-3.5 sm:p-4 rounded-2xl border border-slate-100 space-y-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-[#C59563] flex items-center gap-1.5">
-                            <span>🏷️</span> Status Acara & Pembayaran
+                            <span>🏷️</span> Status Acara, Transport & Pembayaran
                         </h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Status Acara</label>
                                 <select id="inputAgendaStatus"
@@ -2075,6 +2086,11 @@
                                 </select>
                             </div>
                             <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Biaya Transport / Luar Kota (Rp)</label>
+                                <input type="number" inputmode="numeric" id="inputAgendaTransportFee" min="0" value="0" oninput="calculateAgendaTotal()"
+                                    class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
+                            </div>
+                            <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal DP (Rp)</label>
                                 <input type="number" inputmode="numeric" id="inputAgendaDpAmount" min="0" value="0" oninput="calculateAgendaTotal()"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
@@ -2084,10 +2100,22 @@
 
                     <!-- Total Estimasi Biaya Box & Sisa Pelunasan -->
                     <div class="p-4 rounded-2xl bg-gradient-to-br from-[#F9F3EC] to-[#F5EBE1] border border-[#D4A574]/20 space-y-2">
-                        <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center justify-between text-xs text-slate-600">
+                            <span>Subtotal Dekorasi (Paket + Model):</span>
+                            <span class="font-mono font-semibold text-slate-800" id="agendaSubtotalDisplay">Rp 0</span>
+                        </div>
+                        <div id="agendaDiscountSummaryRow" class="hidden flex items-center justify-between text-xs text-emerald-700">
+                            <span id="agendaDiscountSummaryLabel">Diskon:</span>
+                            <span class="font-mono font-semibold" id="agendaDiscountSummaryDisplay">- Rp 0</span>
+                        </div>
+                        <div id="agendaTransportSummaryRow" class="hidden flex items-center justify-between text-xs text-slate-600 pt-1.5 border-t border-[#D4A574]/15">
+                            <span>Biaya Transport / Luar Kota:</span>
+                            <span class="font-mono font-semibold text-slate-800" id="agendaTransportSummaryDisplay">+ Rp 0</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-[#D4A574]/20">
                             <div>
-                                <span class="text-[11px] font-bold text-[#C59563] uppercase tracking-wider block">Estimasi Total Biaya</span>
-                                <span class="text-[11px] sm:text-xs text-slate-500">Paket + Model + Transport</span>
+                                <span class="text-[11px] font-bold text-[#C59563] uppercase tracking-wider block">Estimasi Total Tagihan</span>
+                                <span class="text-[11px] sm:text-xs text-slate-500">(Subtotal - Diskon) + Transport</span>
                             </div>
                             <div class="text-right">
                                 <span class="text-lg sm:text-2xl font-black text-slate-900 font-mono" id="agendaTotalEstimatedDisplay">Rp 0</span>
@@ -4086,14 +4114,10 @@
             }
 
             container.innerHTML = agendas.map(a => {
-                // Biaya total
+                // Biaya total (diskon memotong subtotal dekorasi saja, di luar transport)
+                const costInfo = calculateAgendaItemCost(a);
                 const pkgPrice = Number(a.package_price || 0);
-                const modelPrice = Number(a.model_additional_price || 0);
-                const transport = Number(a.transport_fee || 0);
-                let totalCost = pkgPrice + modelPrice + transport;
-                if (a.client_form && Number(a.client_form.total_price) > 0) {
-                    totalCost = Number(a.client_form.total_price) + modelPrice + transport;
-                }
+                const totalCost = costInfo.totalCost;
 
                 // Payment Status Badge
                 const isPaid = (a.payment_status || '').toLowerCase() === 'paid';
@@ -6378,10 +6402,11 @@
 
                     const pkgPrice = Number(a.package_price || 0);
                     const modelPrice = Number(a.model_additional_price || 0);
-                    const transport = Number(a.transport_fee || 0);
+                    const costInfo = calculateAgendaItemCost(a);
+                    const transport = costInfo.transport;
+                    const discountAmount = costInfo.discountAmount;
                     const hasPkg = Boolean(a.package_id) || pkgPrice > 0;
-                    const formPrice = a.client_form && a.client_form.total_price > 0 ? Number(a.client_form.total_price) : 0;
-                    const totalCost = formPrice > 0 ? (formPrice + modelPrice + transport) : (pkgPrice + modelPrice + transport);
+                    const totalCost = costInfo.totalCost;
                     const dpAmount = Number(a.dp_amount || 0);
                     const sisaPelunasan = Math.max(0, totalCost - dpAmount);
 
@@ -6475,6 +6500,11 @@
                                 <div class="font-bold text-slate-900 text-sm">
                                     Rp ${totalCost.toLocaleString('id-ID')}
                                 </div>
+                                ${discountAmount > 0 ? `
+                                    <div class="text-[10px] text-emerald-600 font-normal">
+                                        - Diskon Rp ${discountAmount.toLocaleString('id-ID')}
+                                    </div>
+                                ` : ''}
                                 ${transport > 0 ? `
                                     <div class="text-[10px] text-slate-400 font-normal">
                                         + Transport Rp ${transport.toLocaleString('id-ID')}
@@ -6547,10 +6577,11 @@
 
                     const pkgPrice = Number(a.package_price || 0);
                     const modelPrice = Number(a.model_additional_price || 0);
-                    const transport = Number(a.transport_fee || 0);
+                    const costInfo = calculateAgendaItemCost(a);
+                    const transport = costInfo.transport;
+                    const discountAmount = costInfo.discountAmount;
                     const hasPkg = Boolean(a.package_id) || pkgPrice > 0;
-                    const formPrice = a.client_form && a.client_form.total_price > 0 ? Number(a.client_form.total_price) : 0;
-                    const totalCost = formPrice > 0 ? (formPrice + modelPrice + transport) : (pkgPrice + modelPrice + transport);
+                    const totalCost = costInfo.totalCost;
                     const dpAmount = Number(a.dp_amount || 0);
                     const sisaPelunasan = Math.max(0, totalCost - dpAmount);
                     const escapeName = (a.client_name || '').replace(/'/g, "\\'");
@@ -6675,6 +6706,8 @@
             // Default status
             document.getElementById('inputAgendaStatus').value = 'upcoming';
             document.getElementById('inputAgendaPaymentStatus').value = 'unpaid';
+            document.getElementById('inputAgendaDiscountType').value = 'amount';
+            document.getElementById('inputAgendaDiscountValue').value = 0;
             document.getElementById('inputAgendaDpAmount').value = 0;
 
             // Pastikan master data paket & model & brand sudah ter-cache
@@ -6748,6 +6781,8 @@
             document.getElementById('inputAgendaClientPhone').value = a.client_phone || '';
             document.getElementById('inputAgendaBackdropTitle').value = a.backdrop_title || '';
             document.getElementById('inputAgendaMapsUrl').value = a.maps_url || '';
+            document.getElementById('inputAgendaDiscountType').value = ((a.discount_type || '').toLowerCase() === 'percent') ? 'percent' : 'amount';
+            document.getElementById('inputAgendaDiscountValue').value = a.discount_value || 0;
             document.getElementById('inputAgendaTransportFee').value = a.transport_fee || 0;
             document.getElementById('inputAgendaStatus').value = (a.status || 'upcoming').toLowerCase();
             document.getElementById('inputAgendaPaymentStatus').value = (a.payment_status || 'unpaid').toLowerCase();
@@ -7026,13 +7061,68 @@
             calculateAgendaTotal();
         }
 
+        function calculateAgendaDiscountAmount(subtotal, discountType, discountValue) {
+            const sub = Math.max(0, Number(subtotal) || 0);
+            const val = Math.max(0, Number(discountValue) || 0);
+            if (sub <= 0 || val <= 0) return 0;
+            if ((discountType || '').toLowerCase() === 'percent') {
+                const pct = Math.min(100, val);
+                return Math.round(sub * pct / 100);
+            }
+            return Math.min(sub, val);
+        }
+
+        function calculateAgendaItemCost(a) {
+            const pkgPrice = Number(a.package_price || 0);
+            const modelPrice = Number(a.model_additional_price || 0);
+            const transport = Number(a.transport_fee || 0);
+            const formPrice = (a.client_form && Number(a.client_form.total_price) > 0) ? Number(a.client_form.total_price) : 0;
+            const subtotal = formPrice > 0 ? (formPrice + modelPrice) : (pkgPrice + modelPrice);
+            const discountAmount = calculateAgendaDiscountAmount(subtotal, a.discount_type, a.discount_value);
+            const totalCost = Math.max(0, subtotal - discountAmount) + transport;
+            return { subtotal, discountAmount, transport, totalCost };
+        }
+
         function calculateAgendaTotal() {
             const pkgPrice = Number(document.getElementById('inputAgendaPackagePrice').value) || 0;
             const modelPrice = Number(document.getElementById('inputAgendaModelAdditionalPrice').value) || 0;
+            const discountType = document.getElementById('inputAgendaDiscountType')?.value || 'amount';
+            const discountValue = Number(document.getElementById('inputAgendaDiscountValue')?.value) || 0;
             const transport = Number(document.getElementById('inputAgendaTransportFee').value) || 0;
             const dp = Number(document.getElementById('inputAgendaDpAmount')?.value) || 0;
-            const total = pkgPrice + modelPrice + transport;
+            const subtotal = pkgPrice + modelPrice;
+            const discountAmount = calculateAgendaDiscountAmount(subtotal, discountType, discountValue);
+            const total = Math.max(0, subtotal - discountAmount) + transport;
             const sisa = Math.max(0, total - dp);
+
+            const subtotalDisplay = document.getElementById('agendaSubtotalDisplay');
+            if (subtotalDisplay) {
+                subtotalDisplay.innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
+            }
+
+            const discRow = document.getElementById('agendaDiscountSummaryRow');
+            const discLabel = document.getElementById('agendaDiscountSummaryLabel');
+            const discDisplay = document.getElementById('agendaDiscountSummaryDisplay');
+            if (discRow && discLabel && discDisplay) {
+                if (discountAmount > 0) {
+                    discRow.classList.remove('hidden');
+                    discLabel.innerText = discountType === 'percent' ? `Diskon (${Math.min(100, discountValue)}%):` : 'Diskon:';
+                    discDisplay.innerText = '- Rp ' + discountAmount.toLocaleString('id-ID');
+                } else {
+                    discRow.classList.add('hidden');
+                }
+            }
+
+            const trRow = document.getElementById('agendaTransportSummaryRow');
+            const trDisplay = document.getElementById('agendaTransportSummaryDisplay');
+            if (trRow && trDisplay) {
+                if (transport > 0) {
+                    trRow.classList.remove('hidden');
+                    trDisplay.innerText = '+ Rp ' + transport.toLocaleString('id-ID');
+                } else {
+                    trRow.classList.add('hidden');
+                }
+            }
 
             const display = document.getElementById('agendaTotalEstimatedDisplay');
             if (display) {
@@ -7068,6 +7158,8 @@
             const packagePrice = Number(document.getElementById('inputAgendaPackagePrice').value) || 0;
             const modelId = document.getElementById('inputAgendaModelId').value;
             const modelAdditionalPrice = Number(document.getElementById('inputAgendaModelAdditionalPrice').value) || 0;
+            const discountType = document.getElementById('inputAgendaDiscountType')?.value || 'amount';
+            const discountValue = Number(document.getElementById('inputAgendaDiscountValue')?.value) || 0;
             const transportFee = Number(document.getElementById('inputAgendaTransportFee').value) || 0;
             const status = document.getElementById('inputAgendaStatus').value;
             const paymentStatus = document.getElementById('inputAgendaPaymentStatus').value;
@@ -7118,6 +7210,8 @@
                 model_width: modelWidth,
                 model_image_url: modelImageUrl,
                 model_additional_price: modelAdditionalPrice,
+                discount_type: discountType,
+                discount_value: discountValue,
                 transport_fee: transportFee,
                 status: status,
                 payment_status: paymentStatus,

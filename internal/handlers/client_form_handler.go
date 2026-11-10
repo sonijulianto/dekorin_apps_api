@@ -47,6 +47,11 @@ type BookingDetailViewData struct {
 	SelectedAddons         string
 	AddonsPrice            float64
 	AddonsPriceFormatted   string
+	DecorSubtotal          float64
+	DecorSubtotalFormatted string
+	DiscountLabel          string
+	DiscountAmount         float64
+	DiscountAmountFormatted string
 	TransportFee           float64
 	TransportFeeFormatted  string
 	TotalCost              float64
@@ -313,7 +318,21 @@ func ShowClientForm(c *fiber.Ctx) error {
 		customAnswers = agenda.ClientForm.CustomAnswers
 	}
 
-	totalCost := agenda.PackagePrice + agenda.ModelAdditionalPrice + addonsPrice + agenda.TransportFee
+	decorSubtotal := agenda.PackagePrice + agenda.ModelAdditionalPrice + addonsPrice
+	discountAmount := models.CalculateDiscountAmountForSubtotal(decorSubtotal, agenda.DiscountType, agenda.DiscountValue)
+	discountLabel := "Diskon"
+	if models.NormalizeDiscountType(agenda.DiscountType) == "percent" && agenda.DiscountValue > 0 {
+		if agenda.DiscountValue == float64(int64(agenda.DiscountValue)) {
+			discountLabel = fmt.Sprintf("Diskon (%.0f%%)", agenda.DiscountValue)
+		} else {
+			discountLabel = fmt.Sprintf("Diskon (%.1f%%)", agenda.DiscountValue)
+		}
+	}
+	netDecor := decorSubtotal - discountAmount
+	if netDecor < 0 {
+		netDecor = 0
+	}
+	totalCost := netDecor + agenda.TransportFee
 	dpAmount := agenda.DpAmount
 	remainingPayment := totalCost - dpAmount
 	if remainingPayment < 0 {
@@ -447,11 +466,16 @@ func ShowClientForm(c *fiber.Ctx) error {
 		ModelImageURL:          modelImg,
 		ModelAddPrice:          agenda.ModelAdditionalPrice,
 		ModelAddPriceFormatted: formatRupiahID(agenda.ModelAdditionalPrice),
-		SelectedAddons:         selectedAddonsStr,
-		AddonsPrice:            addonsPrice,
-		AddonsPriceFormatted:   formatRupiahID(addonsPrice),
-		TransportFee:           agenda.TransportFee,
-		TransportFeeFormatted:  formatRupiahID(agenda.TransportFee),
+		SelectedAddons:          selectedAddonsStr,
+		AddonsPrice:             addonsPrice,
+		AddonsPriceFormatted:    formatRupiahID(addonsPrice),
+		DecorSubtotal:           decorSubtotal,
+		DecorSubtotalFormatted:  formatRupiahID(decorSubtotal),
+		DiscountLabel:           discountLabel,
+		DiscountAmount:          discountAmount,
+		DiscountAmountFormatted: formatRupiahID(discountAmount),
+		TransportFee:            agenda.TransportFee,
+		TransportFeeFormatted:   formatRupiahID(agenda.TransportFee),
 		TotalCost:              totalCost,
 		TotalCostFormatted:     formatRupiahID(totalCost),
 		DpAmount:               dpAmount,
@@ -966,9 +990,16 @@ func SubmitClientForm(c *fiber.Ctx) error {
 		}
 	}
 
+	submitSubtotal := totalPrice + agenda.ModelAdditionalPrice
+	submitDiscount := models.CalculateDiscountAmountForSubtotal(submitSubtotal, agenda.DiscountType, agenda.DiscountValue)
+	submitNet := submitSubtotal - submitDiscount
+	if submitNet < 0 {
+		submitNet = 0
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message":     "Form berhasil dikirim dan terkonfirmasi!",
-		"total_price": totalPrice + agenda.ModelAdditionalPrice + agenda.TransportFee,
+		"total_price": submitNet + agenda.TransportFee,
 		"locked":      true,
 	})
 }

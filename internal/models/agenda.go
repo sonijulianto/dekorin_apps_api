@@ -1,6 +1,7 @@
 package models
 
 import (
+	"math"
 	"strings"
 	"time"
 )
@@ -45,6 +46,8 @@ type Agenda struct {
 	ModelWidth           string      `gorm:"type:varchar(50)" json:"model_width"`
 	ModelImageURL        string      `gorm:"type:text" json:"model_image_url"`
 	ModelAdditionalPrice float64     `gorm:"type:decimal(15,2);default:0" json:"model_additional_price"`
+	DiscountType         string      `gorm:"type:varchar(20);default:'amount'" json:"discount_type"` // amount, percent
+	DiscountValue        float64     `gorm:"type:decimal(15,2);default:0" json:"discount_value"`
 	TransportFee         float64     `gorm:"type:decimal(15,2);default:0" json:"transport_fee"`
 	Status               string      `gorm:"type:varchar(50);default:'upcoming'" json:"status"` // upcoming, completed, cancelled
 	PaymentStatus        string      `gorm:"type:varchar(50);default:'unpaid'" json:"payment_status"` // unpaid, dp, paid
@@ -69,15 +72,61 @@ func (a *Agenda) IsStandaloneModel() bool {
 	return !a.HasPackage() && (strings.TrimSpace(a.ModelID) != "" || strings.TrimSpace(a.ModelName) != "")
 }
 
-// CalculateTotalBiaya menghitung total biaya keseluruhan agenda (paket + model + addon + transport)
-func (a *Agenda) CalculateTotalBiaya() float64 {
-	total := a.TransportFee + a.ModelAdditionalPrice
-	if a.ClientForm != nil && a.ClientForm.TotalPrice > 0 {
-		total += a.ClientForm.TotalPrice
-	} else {
-		total += a.PackagePrice
+// NormalizeDiscountType memastikan tipe diskon hanya bernilai "percent" atau "amount".
+func NormalizeDiscountType(raw string) string {
+	if strings.EqualFold(strings.TrimSpace(raw), "percent") {
+		return "percent"
 	}
-	return total
+	return "amount"
+}
+
+// CalculateDecorSubtotal menghitung subtotal item dekorasi sebelum diskon dan tanpa ongkos transport.
+func (a *Agenda) CalculateDecorSubtotal() float64 {
+	subtotal := a.ModelAdditionalPrice
+	if a.ClientForm != nil && a.ClientForm.TotalPrice > 0 {
+		subtotal += a.ClientForm.TotalPrice
+	} else {
+		subtotal += a.PackagePrice
+	}
+	if subtotal < 0 {
+		return 0
+	}
+	return subtotal
+}
+
+// CalculateDiscountAmountForSubtotal menghitung nominal potongan diskon terhadap subtotal dekorasi saja.
+// Transport sengaja dipisahkan agar tidak ikut terpotong diskon persen maupun nominal.
+func CalculateDiscountAmountForSubtotal(subtotal float64, discountType string, discountValue float64) float64 {
+	if subtotal <= 0 || discountValue <= 0 {
+		return 0
+	}
+	if NormalizeDiscountType(discountType) == "percent" {
+		pct := discountValue
+		if pct > 100 {
+			pct = 100
+		}
+		return math.Round(subtotal * pct / 100.0)
+	}
+	if discountValue > subtotal {
+		return subtotal
+	}
+	return discountValue
+}
+
+// CalculateDiscountAmount menghitung nominal potongan diskon agenda terhadap subtotal dekorasi.
+func (a *Agenda) CalculateDiscountAmount() float64 {
+	return CalculateDiscountAmountForSubtotal(a.CalculateDecorSubtotal(), a.DiscountType, a.DiscountValue)
+}
+
+// CalculateTotalBiaya menghitung total biaya keseluruhan agenda: (paket + model + addon - diskon) + transport
+func (a *Agenda) CalculateTotalBiaya() float64 {
+	subtotal := a.CalculateDecorSubtotal()
+	discount := CalculateDiscountAmountForSubtotal(subtotal, a.DiscountType, a.DiscountValue)
+	netDecor := subtotal - discount
+	if netDecor < 0 {
+		netDecor = 0
+	}
+	return netDecor + a.TransportFee
 }
 
 // CreateAgendaRequest adalah payload untuk membuat agenda baru
@@ -95,8 +144,12 @@ type CreateAgendaRequest struct {
 	ModelName            string  `json:"model_name"`
 	ModelWidth           string  `json:"model_width"`
 	ModelImageURL        string  `json:"model_image_url"`
-	ModelAdditionalPrice float64 `json:"model_additional_price"`
+	ModelAdditionalPrice float64               `json:"model_additional_price"`
+	DiscountType         string                `json:"discount_type"`
+	DiscountValue        float64               `json:"discount_value"`
 	TransportFee         float64               `json:"transport_fee"`
+	DpAmount             float64               `json:"dp_amount"`
+	PaymentStatus        string                `json:"payment_status"`
 	Notes                string                `json:"notes"`
 	AgendaProperties     []AgendaPropertyInput `json:"agenda_properties,omitempty"`
 }
@@ -185,6 +238,8 @@ type UpdateAgendaRequest struct {
 	ModelWidth           *string  `json:"model_width"`
 	ModelImageURL        *string  `json:"model_image_url"`
 	ModelAdditionalPrice *float64 `json:"model_additional_price"`
+	DiscountType         *string  `json:"discount_type"`
+	DiscountValue        *float64 `json:"discount_value"`
 	TransportFee         *float64 `json:"transport_fee"`
 	DpAmount             *float64 `json:"dp_amount"`
 	PaymentStatus        string   `json:"payment_status"`

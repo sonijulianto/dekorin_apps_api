@@ -195,6 +195,123 @@ func TestBuildAgendaDpUpdatesPreservesSchedule(t *testing.T) {
 	}
 }
 
+func TestAgendaDiscountExcludesTransportFee(t *testing.T) {
+	// Paket 4.000.000 + Addon 500.000 = Subtotal Dekorasi 4.500.000
+	// Diskon 10% hanya memotong 4.500.000 -> -450.000 (Transport 300.000 TIDAK kena diskon)
+	// Total = (4.500.000 - 450.000) + 300.000 = 4.350.000
+	percentAgenda := models.Agenda{
+		ID:            "agd_disc_pct",
+		PackageID:     "pkg_1",
+		PackagePrice:  4000000,
+		DiscountType:  "percent",
+		DiscountValue: 10,
+		TransportFee:  300000,
+		ClientForm: &models.ClientForm{
+			AddonsPrice: 500000,
+			TotalPrice:  4500000,
+		},
+	}
+
+	if got := percentAgenda.CalculateDecorSubtotal(); got != 4500000 {
+		t.Fatalf("expected decor subtotal 4500000, got %.0f", got)
+	}
+	if got := percentAgenda.CalculateDiscountAmount(); got != 450000 {
+		t.Fatalf("expected percent discount 450000 (excluding transport), got %.0f", got)
+	}
+	if got := percentAgenda.CalculateTotalBiaya(); got != 4350000 {
+		t.Fatalf("expected total 4350000, got %.0f", got)
+	}
+
+	// Diskon Rupiah yang melebihi subtotal dekorasi tidak boleh memotong biaya transport
+	cappedAmountAgenda := models.Agenda{
+		ID:            "agd_disc_amt",
+		PackageID:     "pkg_1",
+		PackagePrice:  1000000,
+		DiscountType:  "amount",
+		DiscountValue: 1500000,
+		TransportFee:  250000,
+	}
+	if got := cappedAmountAgenda.CalculateDiscountAmount(); got != 1000000 {
+		t.Fatalf("expected nominal discount capped at decor subtotal 1000000, got %.0f", got)
+	}
+	if got := cappedAmountAgenda.CalculateTotalBiaya(); got != 250000 {
+		t.Fatalf("expected transport 250000 preserved when decor is 100%% discounted, got %.0f", got)
+	}
+
+	// Mark paid uses discounted total + transport
+	now := time.Now()
+	updates := buildAgendaPaymentStatusUpdates(percentAgenda, "paid", now)
+	if updates["dp_amount"] != 4350000.0 {
+		t.Errorf("expected paid dp_amount 4350000, got %v", updates["dp_amount"])
+	}
+}
+
+func TestClientFormTemplateDiscountHideAndTransportOrder(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get wd: %v", err)
+	}
+	tmplPath := filepath.Join(wd, "..", "..", "web", "templates", "client_form.html")
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to parse client_form.html: %v", err)
+	}
+
+	// Case 1: Tanpa diskon -> teks "Diskon" harus tersembunyi
+	noDiscData := BookingDetailViewData{
+		CompanyName:            "Dekorin Studio",
+		ClientName:             "Rian",
+		PackageName:            "Paket Silver",
+		PackagePrice:           3000000,
+		PackagePriceFormatted:  "Rp 3.000.000",
+		HasPackage:             true,
+		DecorSubtotal:          3000000,
+		DecorSubtotalFormatted: "Rp 3.000.000",
+		DiscountAmount:         0,
+		TransportFee:           200000,
+		TransportFeeFormatted:  "Rp 200.000",
+		TotalCost:              3200000,
+		TotalCostFormatted:     "Rp 3.200.000",
+		DpAmountFormatted:      "Rp 0",
+		RemainingFormatted:     "Rp 3.200.000",
+		FormToken:              "tok_nodisc",
+		IsLocked:               true,
+		ShowPrice:              true,
+	}
+	var noDiscBuf bytes.Buffer
+	if err := tmpl.Execute(&noDiscBuf, noDiscData); err != nil {
+		t.Fatalf("Failed to execute client_form.html (no discount): %v", err)
+	}
+	if strings.Contains(noDiscBuf.String(), "Diskon") {
+		t.Error("expected discount row to be hidden when DiscountAmount is 0")
+	}
+
+	// Case 2: Dengan diskon -> Subtotal -> Diskon -> Transport sejajar blok DP & Sisa
+	withDiscData := noDiscData
+	withDiscData.DiscountLabel = "Diskon (10%)"
+	withDiscData.DiscountAmount = 300000
+	withDiscData.DiscountAmountFormatted = "Rp 300.000"
+	withDiscData.TotalCost = 2900000
+	withDiscData.TotalCostFormatted = "Rp 2.900.000"
+
+	var withDiscBuf bytes.Buffer
+	if err := tmpl.Execute(&withDiscBuf, withDiscData); err != nil {
+		t.Fatalf("Failed to execute client_form.html (with discount): %v", err)
+	}
+	out := withDiscBuf.String()
+	idxSubtotal := strings.Index(out, "Subtotal Dekorasi:")
+	idxDiscount := strings.Index(out, "Diskon (10%):")
+	idxTransport := strings.Index(out, "Biaya Transport / Luar Kota:")
+	idxDP := strings.Index(out, "Uang Muka (DP) yang Telah Masuk:")
+	if idxSubtotal == -1 || idxDiscount == -1 || idxTransport == -1 || idxDP == -1 {
+		t.Fatalf("expected all summary rows to appear in client_form.html")
+	}
+	if !(idxSubtotal < idxDiscount && idxDiscount < idxTransport && idxTransport < idxDP) {
+		t.Errorf("expected order Subtotal < Discount < Transport < DP, got indices %d, %d, %d, %d",
+			idxSubtotal, idxDiscount, idxTransport, idxDP)
+	}
+}
+
 func TestSuperadminHasMarkAgendaPaidAction(t *testing.T) {
 	path := filepath.Join("..", "..", "web", "templates", "superadmin.html")
 	content, err := os.ReadFile(path)
