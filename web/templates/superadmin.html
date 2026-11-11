@@ -71,15 +71,27 @@
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 sm:space-y-5">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">No. Handphone / Email</label>
-                    <input type="text" id="loginPhone" required autocomplete="username" placeholder="Masukkan No. Handphone atau Email" value=""
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <label for="loginPhone" class="block text-xs font-bold uppercase tracking-wider text-stone-600">No. Handphone / Email</label>
+                        <div class="inline-flex items-center p-0.5 rounded-lg bg-stone-100 border border-stone-200/80 text-[11px] font-semibold">
+                            <button type="button" id="btnLoginModeTel" onclick="setLoginInputMode('tel', true)"
+                                class="px-2 py-0.5 rounded-md bg-white text-[#9A6E3E] shadow-2xs transition">
+                                📱 No. HP
+                            </button>
+                            <button type="button" id="btnLoginModeEmail" onclick="setLoginInputMode('email', true)"
+                                class="px-2 py-0.5 rounded-md text-stone-500 hover:text-stone-700 transition">
+                                ✉️ Email
+                            </button>
+                        </div>
+                    </div>
+                    <input type="text" id="loginPhone" inputmode="tel" required autocomplete="tel" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" placeholder="Masukkan No. Handphone (08xxxxxxxxxx)" value=""
                         class="w-full px-4 py-3 min-h-[48px] rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition font-medium text-base sm:text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">Password</label>
+                    <label for="loginPassword" class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">Password</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Masukkan Password" value=""
+                        <input type="password" id="loginPassword" required autocomplete="current-password" enterkeyhint="go" placeholder="Masukkan Password" value=""
                             class="w-full pl-4 pr-12 py-3 min-h-[48px] rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] transition font-medium text-base sm:text-sm">
                         <button type="button" onclick="toggleLoginPasswordVisibility()" aria-label="Tampilkan atau sembunyikan password"
                             class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition text-sm">
@@ -672,7 +684,7 @@
                         </div>
 
                         <div class="relative w-full sm:flex-1 sm:max-w-xs">
-                            <input type="text" id="searchUserInput" oninput="filterUsersBySearch(this.value)" placeholder="Cari nama, no. HP, atau email..."
+                            <input type="text" id="searchUserInput" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filterUsersBySearch(this.value)" placeholder="Cari nama, no. HP, atau email..."
                                 class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -941,7 +953,7 @@
                     <!-- Search & Counter Bar -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
                         <div class="relative w-full sm:flex-1 sm:max-w-sm">
-                            <input type="text" id="searchPackageInput" oninput="filterPackages(this.value)" placeholder="Cari nama paket atau fasilitas..."
+                            <input type="text" id="searchPackageInput" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filterPackages(this.value)" placeholder="Cari nama paket atau fasilitas..."
                                 class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1003,7 +1015,7 @@
                     <!-- Search & Counter Bar -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
                         <div class="relative w-full sm:flex-1 sm:max-w-sm">
-                            <input type="text" id="searchDecorationModelInput" oninput="filterDecorationModels(this.value)" placeholder="Cari nama model atau lebar..."
+                            <input type="text" id="searchDecorationModelInput" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filterDecorationModels(this.value)" placeholder="Cari nama model atau lebar..."
                                 class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1068,7 +1080,7 @@
                     <!-- Search & Counter Bar -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
                         <div class="relative w-full sm:flex-1 sm:max-w-sm">
-                            <input type="text" id="searchAddonInput" oninput="filterAddons(this.value)" placeholder="Cari nama item tambahan..."
+                            <input type="text" id="searchAddonInput" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filterAddons(this.value)" placeholder="Cari nama item tambahan..."
                                 class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1132,7 +1144,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 flex-1 max-w-xl">
                             <div class="relative flex-1 min-w-0">
-                                <input type="text" id="searchAgendaInput" oninput="filterAgendas()" placeholder="Cari nama klien, telp, backdrop, paket, model..."
+                                <input type="text" id="searchAgendaInput" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filterAgendas()" placeholder="Cari nama klien, telp, backdrop, paket, model..."
                                     class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1226,7 +1238,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs">
                         <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 flex-1 max-w-2xl">
                             <div class="col-span-2 relative sm:flex-1 sm:min-w-[200px]">
-                                <input type="text" id="searchInvitationInput" oninput="filterInvitations()" placeholder="Cari judul, mempelai, atau slug tautan..."
+                                <input type="text" id="searchInvitationInput" inputmode="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="filterInvitations()" placeholder="Cari judul, mempelai, atau slug tautan..."
                                     class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1468,13 +1480,13 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Version Name *</label>
-                                        <input type="text" id="apkVersionName" required placeholder="Contoh: 1.0.1"
+                                        <input type="text" id="apkVersionName" required autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Contoh: 1.0.1"
                                             class="w-full px-3 py-2.5 sm:py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-semibold">
                                         <span class="text-[10px] text-stone-400">Sesuai versionName di pubspec</span>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Build Number *</label>
-                                        <input type="number" id="apkVersionCode" inputmode="numeric" required min="1" placeholder="Contoh: 2"
+                                        <input type="number" id="apkVersionCode" inputmode="numeric" pattern="[0-9]*" required min="1" placeholder="Contoh: 2"
                                             class="w-full px-3 py-2.5 sm:py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-semibold">
                                         <span class="text-[10px] text-stone-400">Harus lebih tinggi dari saat ini</span>
                                     </div>
@@ -1483,7 +1495,7 @@
                                 <!-- Min Version Code -->
                                 <div>
                                     <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Versi Minimum Support (Build Number)</label>
-                                    <input type="number" id="apkMinVersionCode" inputmode="numeric" min="1" value="1"
+                                    <input type="number" id="apkMinVersionCode" inputmode="numeric" pattern="[0-9]*" min="1" value="1"
                                         class="w-full px-3 py-2.5 sm:py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574] text-xs font-semibold">
                                     <span class="text-[10px] text-stone-400">Pengguna dengan build number di bawah ini wajib update</span>
                                 </div>
@@ -1789,7 +1801,7 @@
                         </h4>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Usaha Dekorasi *</label>
-                            <input type="text" id="inputCompanyName" required placeholder="Contoh: Sonia Wedding & Decor"
+                            <input type="text" id="inputCompanyName" required autocomplete="organization" autocapitalize="words" placeholder="Contoh: Sonia Wedding & Decor"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                         <div>
@@ -1799,7 +1811,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / Telp Usaha</label>
-                            <input type="tel" id="inputCompanyPhone" placeholder="Contoh: 08123456789"
+                            <input type="tel" id="inputCompanyPhone" inputmode="tel" autocomplete="tel" placeholder="Contoh: 08123456789"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                     </div>
@@ -1810,18 +1822,18 @@
                         </h4>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Owner *</label>
-                            <input type="text" id="inputOwnerName" required placeholder="Contoh: Sonia Rahmawati"
+                            <input type="text" id="inputOwnerName" required autocomplete="name" autocapitalize="words" placeholder="Contoh: Sonia Rahmawati"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">No. Handphone (Login) *</label>
-                                <input type="tel" id="inputOwnerPhone" required placeholder="0812xxxxxxxx"
+                                <input type="tel" id="inputOwnerPhone" inputmode="tel" autocomplete="tel" required placeholder="0812xxxxxxxx"
                                     class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Password Baru *</label>
-                                <input type="password" id="inputOwnerPassword" required placeholder="Minimal 6 karakter"
+                                <input type="password" id="inputOwnerPassword" required autocomplete="new-password" placeholder="Minimal 6 karakter"
                                     class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -1859,17 +1871,17 @@
                 <div class="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 py-4 space-y-3.5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Saat Ini *</label>
-                        <input type="password" id="inputCurrentPassword" required placeholder="Masukkan kata sandi lama"
+                        <input type="password" id="inputCurrentPassword" required autocomplete="current-password" placeholder="Masukkan kata sandi lama"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Baru *</label>
-                        <input type="password" id="inputNewPassword" required minlength="6" placeholder="Minimal 6 karakter"
+                        <input type="password" id="inputNewPassword" required autocomplete="new-password" minlength="6" placeholder="Minimal 6 karakter"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Konfirmasi Kata Sandi Baru *</label>
-                        <input type="password" id="inputConfirmPassword" required minlength="6" placeholder="Ulangi kata sandi baru"
+                        <input type="password" id="inputConfirmPassword" required autocomplete="new-password" minlength="6" placeholder="Ulangi kata sandi baru"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
@@ -2032,12 +2044,12 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Klien / Pengantin *</label>
-                                <input type="text" id="inputAgendaClientName" required placeholder="Contoh: Sarah & Dimas"
+                                <input type="text" id="inputAgendaClientName" required autocapitalize="words" placeholder="Contoh: Sarah & Dimas"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP</label>
-                                <input type="tel" id="inputAgendaClientPhone" placeholder="0812xxxxxxxx"
+                                <input type="tel" id="inputAgendaClientPhone" inputmode="tel" autocomplete="tel" placeholder="0812xxxxxxxx"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -2106,7 +2118,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Dasar Paket (Rp)</label>
-                                <input type="number" inputmode="numeric" id="inputAgendaPackagePrice" min="0" value="0" oninput="calculateAgendaTotal()"
+                                <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputAgendaPackagePrice" min="0" value="0" oninput="calculateAgendaTotal()"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -2121,7 +2133,7 @@
                             </div>
                             <div>
                                 <label id="labelAgendaModelPrice" class="block text-xs font-semibold text-slate-700 mb-1">Biaya Tambahan Model (Rp)</label>
-                                <input type="number" inputmode="numeric" id="inputAgendaModelAdditionalPrice" min="0" value="0" oninput="calculateAgendaTotal()"
+                                <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputAgendaModelAdditionalPrice" min="0" value="0" oninput="calculateAgendaTotal()"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -2180,12 +2192,12 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Biaya Transport / Luar Kota (Rp)</label>
-                                <input type="number" inputmode="numeric" id="inputAgendaTransportFee" min="0" value="0" oninput="calculateAgendaTotal()"
+                                <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputAgendaTransportFee" min="0" value="0" oninput="calculateAgendaTotal()"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal DP (Rp)</label>
-                                <input type="number" inputmode="numeric" id="inputAgendaDpAmount" min="0" value="0" oninput="calculateAgendaTotal()"
+                                <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputAgendaDpAmount" min="0" value="0" oninput="calculateAgendaTotal()"
                                     class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -2280,7 +2292,7 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Dasar Paket (Rp) *</label>
-                        <input type="number" inputmode="numeric" id="inputPackagePrice" required min="0" placeholder="15000000"
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputPackagePrice" required min="0" placeholder="15000000"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
@@ -2293,7 +2305,7 @@
                             </div>
                             <div class="flex-1 min-w-0 space-y-1.5">
                                 <input type="file" id="inputPackageImageFile" accept="image/*" onchange="handlePackageImageFileSelected(this)" class="block w-full min-w-0 overflow-hidden text-xs text-slate-500 file:mr-2.5 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#F9F3EC] file:text-[#C59563] hover:file:bg-[#F4ECE2] cursor-pointer">
-                                <input type="text" id="inputPackageImageUrl" placeholder="Atau tempel URL gambar (https://...)" oninput="updatePackageImagePreview(this.value)"
+                                <input type="text" id="inputPackageImageUrl" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Atau tempel URL gambar (https://...)" oninput="updatePackageImagePreview(this.value)"
                                     class="w-full px-3 py-2 sm:py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -2362,7 +2374,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Dasar / Referensi (Rp) *</label>
-                            <input type="number" inputmode="numeric" id="inputModelPrice" required min="0" placeholder="0"
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputModelPrice" required min="0" placeholder="0"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                     </div>
@@ -2376,7 +2388,7 @@
                             </div>
                             <div class="flex-1 min-w-0 space-y-1.5">
                                 <input type="file" id="inputModelImageFile" accept="image/*" onchange="handleModelImageFileSelected(this)" class="block w-full min-w-0 overflow-hidden text-xs text-slate-500 file:mr-2.5 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#F9F3EC] file:text-[#C59563] hover:file:bg-[#F4ECE2] cursor-pointer">
-                                <input type="text" id="inputModelImageUrl" placeholder="Atau tempel URL gambar (https://...)" oninput="updateModelImagePreview(this.value)"
+                                <input type="text" id="inputModelImageUrl" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Atau tempel URL gambar (https://...)" oninput="updateModelImagePreview(this.value)"
                                     class="w-full px-3 py-2 sm:py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -2534,7 +2546,7 @@
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Tautan Slug URL (Unik) *</label>
                                     <div class="flex items-center min-w-0">
                                         <span class="px-2.5 sm:px-3 py-2.5 sm:py-2 bg-slate-200/70 border border-r-0 border-slate-200 rounded-l-xl text-slate-500 text-xs font-mono shrink-0">/invitation/</span>
-                                        <input type="text" id="inputInvSlug" required placeholder="bagas-zulia"
+                                        <input type="text" id="inputInvSlug" required autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="bagas-zulia"
                                             class="flex-1 min-w-0 px-3 sm:px-3.5 py-2.5 sm:py-2 rounded-r-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                     </div>
                                 </div>
@@ -2583,7 +2595,7 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-700 mb-1">Instagram (tanpa @)</label>
-                                        <input type="text" id="inputInvBrideIg" placeholder="zuliamhr"
+                                        <input type="text" id="inputInvBrideIg" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="zuliamhr"
                                             class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                     </div>
                                     <div id="boxInvBridePhoto" class="min-w-0">
@@ -2630,7 +2642,7 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-700 mb-1">Instagram (tanpa @)</label>
-                                        <input type="text" id="inputInvGroomIg" placeholder="bagaspratama"
+                                        <input type="text" id="inputInvGroomIg" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="bagaspratama"
                                             class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                     </div>
                                     <div id="boxInvGroomPhoto" class="min-w-0">
@@ -2705,7 +2717,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Link Google Maps</label>
-                                    <input type="text" id="inputInvAkadMaps" placeholder="https://maps.app.goo.gl/..."
+                                    <input type="text" id="inputInvAkadMaps" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://maps.app.goo.gl/..."
                                         class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 </div>
                             </div>
@@ -2750,7 +2762,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Link Google Maps</label>
-                                    <input type="text" id="inputInvResepsiMaps" placeholder="https://maps.app.goo.gl/..."
+                                    <input type="text" id="inputInvResepsiMaps" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://maps.app.goo.gl/..."
                                         class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 </div>
                             </div>
@@ -2866,12 +2878,12 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Link Video YouTube</label>
-                                    <input type="text" id="inputInvYoutubeUrl" placeholder="https://youtu.be/..."
+                                    <input type="text" id="inputInvYoutubeUrl" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://youtu.be/..."
                                         class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Tautan Musik Latar (.mp3)</label>
-                                    <input type="text" id="inputInvAudioUrl" placeholder="Kosongkan untuk musik romantis bawaan"
+                                    <input type="text" id="inputInvAudioUrl" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Kosongkan untuk musik romantis bawaan"
                                         class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 </div>
                             </div>
@@ -2934,7 +2946,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp Konfirmasi</label>
-                                    <input type="tel" id="inputInvWaConfirmation" placeholder="0812xxxxxxxx"
+                                    <input type="tel" id="inputInvWaConfirmation" inputmode="tel" autocomplete="tel" placeholder="0812xxxxxxxx"
                                         class="w-full px-3.5 py-2.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                     <div class="mt-3 flex items-center gap-2.5">
                                         <input type="checkbox" id="inputInvIsActive" checked class="w-4 h-4 rounded text-[#D4A574] focus:ring-[#D4A574]/30 shrink-0">
@@ -3041,26 +3053,26 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
-                        <input type="text" id="inputAddUserFullName" required placeholder="Contoh: Rian Pratama"
+                        <input type="text" id="inputAddUserFullName" required autocomplete="name" autocapitalize="words" placeholder="Contoh: Rian Pratama"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">No. Handphone (WhatsApp) *</label>
-                            <input type="tel" id="inputAddUserPhone" required placeholder="081234567890"
+                            <input type="tel" id="inputAddUserPhone" inputmode="tel" autocomplete="tel" required placeholder="081234567890"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email (Opsional)</label>
-                            <input type="email" id="inputAddUserEmail" placeholder="nama@email.com"
+                            <input type="email" id="inputAddUserEmail" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="nama@email.com"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Awal *</label>
-                        <input type="password" id="inputAddUserPassword" required minlength="6" placeholder="Minimal 6 karakter"
+                        <input type="password" id="inputAddUserPassword" required autocomplete="new-password" minlength="6" placeholder="Minimal 6 karakter"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         <p class="text-[11px] text-slate-400 mt-1">Berikan kata sandi ini kepada anggota untuk login pertama kali.</p>
                     </div>
@@ -3111,19 +3123,19 @@
                 <div class="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7 py-4 space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
-                        <input type="text" id="inputEditUserFullName" required
+                        <input type="text" id="inputEditUserFullName" required autocomplete="name" autocapitalize="words"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">No. Handphone *</label>
-                            <input type="tel" id="inputEditUserPhone" required
+                            <input type="tel" id="inputEditUserPhone" inputmode="tel" autocomplete="tel" required
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email</label>
-                            <input type="email" id="inputEditUserEmail"
+                            <input type="email" id="inputEditUserEmail" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                         </div>
                     </div>
@@ -3173,13 +3185,13 @@
                 <div class="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7 py-4 space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Baru *</label>
-                        <input type="password" id="inputResetPasswordNew" required minlength="6" placeholder="Minimal 6 karakter"
+                        <input type="password" id="inputResetPasswordNew" required autocomplete="new-password" minlength="6" placeholder="Minimal 6 karakter"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Konfirmasi Kata Sandi Baru *</label>
-                        <input type="password" id="inputResetPasswordConfirm" required minlength="6" placeholder="Ulangi kata sandi baru"
+                        <input type="password" id="inputResetPasswordConfirm" required autocomplete="new-password" minlength="6" placeholder="Ulangi kata sandi baru"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
@@ -3224,7 +3236,7 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Harga Satuan (Rp) *</label>
-                        <input type="number" inputmode="numeric" id="inputAddonPrice" required min="0" placeholder="Contoh: 350000"
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="inputAddonPrice" required min="0" placeholder="Contoh: 350000"
                             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                     </div>
 
@@ -3237,7 +3249,7 @@
                             </div>
                             <div class="flex-1 min-w-0 space-y-1.5">
                                 <input type="file" id="inputAddonImageFile" accept="image/*" onchange="handleAddonImageFileSelected(this)" class="block w-full min-w-0 overflow-hidden text-xs text-slate-500 file:mr-2.5 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#F9F3EC] file:text-[#C59563] hover:file:bg-[#F4ECE2] cursor-pointer">
-                                <input type="text" id="inputAddonImageUrl" placeholder="Atau tempel URL gambar..." oninput="updateAddonImagePreview(this.value)"
+                                <input type="text" id="inputAddonImageUrl" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Atau tempel URL gambar..." oninput="updateAddonImagePreview(this.value)"
                                     class="w-full px-3 py-2 sm:py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                             </div>
                         </div>
@@ -3674,6 +3686,59 @@
 
         updatePwaInstallUI();
         syncOnlineStatusUI();
+
+        const LOGIN_INPUT_MODES = {
+            tel: {
+                inputmode: 'tel',
+                autocomplete: 'tel',
+                placeholder: 'Masukkan No. Handphone (08xxxxxxxxxx)',
+            },
+            email: {
+                inputmode: 'email',
+                autocomplete: 'email',
+                placeholder: 'Masukkan Email atau Username',
+            },
+        };
+
+        function setLoginInputMode(mode, shouldFocus = false) {
+            const resolvedMode = Object.prototype.hasOwnProperty.call(LOGIN_INPUT_MODES, mode) ? mode : 'tel';
+            const config = LOGIN_INPUT_MODES[resolvedMode];
+            const phoneInput = document.getElementById('loginPhone');
+            const telBtn = document.getElementById('btnLoginModeTel');
+            const emailBtn = document.getElementById('btnLoginModeEmail');
+
+            if (phoneInput) {
+                phoneInput.setAttribute('inputmode', config.inputmode);
+                phoneInput.setAttribute('autocomplete', config.autocomplete);
+                phoneInput.setAttribute('placeholder', config.placeholder);
+            }
+
+            const activeCls = 'px-2 py-0.5 rounded-md bg-white text-[#9A6E3E] shadow-2xs transition';
+            const inactiveCls = 'px-2 py-0.5 rounded-md text-stone-500 hover:text-stone-700 transition';
+            if (telBtn) {
+                telBtn.className = resolvedMode === 'tel' ? activeCls : inactiveCls;
+                telBtn.setAttribute('aria-pressed', resolvedMode === 'tel' ? 'true' : 'false');
+            }
+            if (emailBtn) {
+                emailBtn.className = resolvedMode === 'email' ? activeCls : inactiveCls;
+                emailBtn.setAttribute('aria-pressed', resolvedMode === 'email' ? 'true' : 'false');
+            }
+
+            try {
+                localStorage.setItem('superadmin_login_mode', resolvedMode);
+            } catch (_) {}
+
+            if (shouldFocus && phoneInput) {
+                phoneInput.focus();
+            }
+        }
+        window.setLoginInputMode = setLoginInputMode;
+
+        let savedLoginMode = 'tel';
+        try {
+            savedLoginMode = localStorage.getItem('superadmin_login_mode') || 'tel';
+        } catch (_) {}
+        setLoginInputMode(savedLoginMode, false);
 
         // Inisialisasi Tanggal
         const dateEl = document.getElementById('currentDateDisplay');
@@ -5857,7 +5922,7 @@
                         </label>
                         <div class="flex items-center justify-between sm:justify-end gap-2 pl-6 sm:pl-0 shrink-0">
                             <span class="text-[11px] text-slate-500 font-medium">+ Biaya (Rp):</span>
-                            <input type="number" inputmode="numeric" id="pkg_model_price_${m.id}" value="0" min="0" disabled
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="pkg_model_price_${m.id}" value="0" min="0" disabled
                                 class="w-32 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 text-right font-mono focus:outline-none focus:ring-1 focus:ring-[#D4A574] disabled:bg-slate-100 disabled:text-slate-400">
                         </div>
                     </div>
@@ -6271,7 +6336,7 @@
                         </label>
                         <div class="flex items-center justify-between sm:justify-end gap-2 pl-6 sm:pl-0 shrink-0">
                             <span class="text-[11px] text-slate-500 font-medium">+ Biaya (Rp):</span>
-                            <input type="number" inputmode="numeric" id="pkg_price_${p.id}" value="0" min="0" disabled
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="pkg_price_${p.id}" value="0" min="0" disabled
                                 class="w-32 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 text-right font-mono focus:outline-none focus:ring-1 focus:ring-[#D4A574] disabled:bg-slate-100 disabled:text-slate-400">
                         </div>
                     </div>
