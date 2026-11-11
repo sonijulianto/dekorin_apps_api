@@ -1037,9 +1037,24 @@ func TestVisualEditorSupportAndSeedStripping(t *testing.T) {
 		}
 	}
 
-	// 2. Pastikan aset JS runtime visual editor ada
-	if _, err := os.Stat(filepath.Join(repoRoot, "web", "assets", "invitation_visual_editor.js")); err != nil {
+	// 2. Pastikan aset JS runtime visual editor ada dan menjaga kontainer komposit Love Story / Gallery
+	veBytes, err := os.ReadFile(filepath.Join(repoRoot, "web", "assets", "invitation_visual_editor.js"))
+	if err != nil {
 		t.Fatalf("invitation_visual_editor.js missing: %v", err)
+	}
+	veJS := string(veBytes)
+	for _, marker := range []string{
+		`editType === 'love_story'`,
+		`editType === 'gallery'`,
+		`ls-slide-date`,
+		`ls-slide-title`,
+		`ls-slide-desc`,
+		`ls-timeline-item`,
+		`-tl-card-wrap`,
+	} {
+		if !strings.Contains(veJS, marker) {
+			t.Errorf("invitation_visual_editor.js missing love story / composite DOM guard %s", marker)
+		}
 	}
 
 	// 3. Pastikan injeksi ?edit=1 menyertakan seed tanpa kredensial sensitif dan menutup tag script dengan aman

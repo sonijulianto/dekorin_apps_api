@@ -392,6 +392,11 @@
         return;
       }
 
+      // Allow Love Story carousel arrows/dots to switch slides in Edit Mode
+      if (target.closest('#lsPrevBtn, #lsNextBtn, #loveStoryDots .ls-dot')) {
+        return;
+      }
+
       // Allow our bg_photo floating pill
       if (target.closest('.dekorin-ve-bg-pill')) {
         return;
@@ -630,6 +635,16 @@
         return;
       }
 
+      if (
+        editType === 'love_story' ||
+        editType === 'gallery' ||
+        editType === 'couple_nick' ||
+        editType === 'bank_1' ||
+        editType === 'bank_2'
+      ) {
+        return;
+      }
+
       if (editType === 'textarea' && key === 'quotes') {
         el.textContent = value || '';
         return;
@@ -721,21 +736,35 @@
       }
     }
 
-    // Update Love Story live
+    // Update Love Story live across all templates
     if (key === 'love_story') {
-      var items = parseLoveStoryItems(value);
+      var rawItems = parseLoveStoryItems(value);
+      var items = rawItems.map(function (it) {
+        return {
+          date: String(it.date || it.tanggal || '').trim(),
+          title: String(it.title || it.judul || '').trim(),
+          desc: String(it.description || it.desc || it.deskripsi || it.body || it.story || '').trim()
+        };
+      }).filter(function (it) {
+        return it.date || it.title || it.desc;
+      });
+
       var taTimeline = document.getElementById('ta17Timeline') || document.getElementById('ta3Timeline');
       if (taTimeline) {
         var prefix = taTimeline.id.indexOf('ta3') !== -1 ? 'ta3' : 'ta17';
         var lineEl = taTimeline.querySelector('.' + prefix + '-timeline-line');
+        var heartSvg = '<svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>';
         var itemsHtml = items.map(function (it) {
           return (
-            '<div class="' + prefix + '-tl-item">' +
-            '  <div class="' + prefix + '-tl-dot"></div>' +
-            '  <div class="' + prefix + '-tl-card">' +
-            (it.date ? '<div class="' + prefix + '-tl-date">' + escapeHtml(it.date) + '</div>' : '') +
-            (it.title ? '<h4 class="' + prefix + '-tl-title">' + escapeHtml(it.title) + '</h4>' : '') +
-            (it.description ? '<p class="' + prefix + '-tl-desc">' + escapeHtml(it.description) + '</p>' : '') +
+            '<div class="' + prefix + '-tl-item ' + prefix + '-anim anim-up">' +
+            '  <div class="' + prefix + '-tl-marker">' + heartSvg + '</div>' +
+            '  <div class="' + prefix + '-tl-card-wrap">' +
+            '    <div class="' + prefix + '-tl-arrow"></div>' +
+            '    <div class="' + prefix + '-tl-card">' +
+            (it.date ? '<span class="' + prefix + '-tl-date">' + escapeHtml(it.date) + '</span>' : '') +
+            (it.title ? '<span class="' + prefix + '-tl-title">' + escapeHtml(it.title) + '</span>' : '') +
+            (it.desc ? '<div class="' + prefix + '-tl-body">' + escapeHtml(it.desc) + '</div>' : '') +
+            '    </div>' +
             '  </div>' +
             '</div>'
           );
@@ -752,7 +781,7 @@
             '<div class="pn4-story-card pn-anim anim-zoomIn is-visible">' +
             (it.date ? '<span class="pn4-story-date">' + escapeHtml(it.date) + '</span>' : '') +
             (it.title ? '<span class="pn4-story-title">' + escapeHtml(it.title) + '</span>' : '') +
-            (it.description ? '<p class="pn4-story-body">' + escapeHtml(it.description) + '</p>' : '') +
+            (it.desc ? '<p class="pn4-story-body">' + escapeHtml(it.desc) + '</p>' : '') +
             '</div>'
           );
         }).join('');
@@ -762,11 +791,12 @@
       if (jawa2Story) {
         jawa2Story.innerHTML = items.map(function (it) {
           return (
-            '<div class="ls-item">' +
-            '  <div class="ls-card">' +
-            (it.date ? '<div class="ls-date">' + escapeHtml(it.date) + '</div>' : '') +
-            (it.title ? '<div class="ls-title">' + escapeHtml(it.title) + '</div>' : '') +
-            (it.description ? '<div class="ls-desc">' + escapeHtml(it.description) + '</div>' : '') +
+            '<div class="ls-timeline-item">' +
+            '  <div class="ls-timeline-icon"><i class="fas fa-heart"></i></div>' +
+            '  <div class="ls-timeline-card">' +
+            (it.date ? '<div class="ls-slide-date">' + escapeHtml(it.date) + '</div>' : '') +
+            (it.title ? '<div class="ls-slide-title">' + escapeHtml(it.title) + '</div>' : '') +
+            '<div class="ls-slide-desc">' + escapeHtml(it.desc) + '</div>' +
             '  </div>' +
             '</div>'
           );
@@ -777,13 +807,51 @@
       if (jawa3Slides) {
         jawa3Slides.innerHTML = items.map(function (it, idx) {
           return (
-            '<div class="ls-slide' + (idx === 0 ? ' active' : '') + '">' +
-            (it.date ? '<div class="ls-date">' + escapeHtml(it.date) + '</div>' : '') +
-            (it.title ? '<div class="ls-title">' + escapeHtml(it.title) + '</div>' : '') +
-            (it.description ? '<div class="ls-desc">' + escapeHtml(it.description) + '</div>' : '') +
+            '<div class="ls-slide' + (idx === 0 ? ' active' : '') + '" data-idx="' + idx + '">' +
+            (it.date ? '<div class="ls-slide-date">' + escapeHtml(it.date) + '</div>' : '') +
+            (it.title ? '<div class="ls-slide-title">' + escapeHtml(it.title) + '</div>' : '') +
+            '<div class="ls-slide-desc">' + escapeHtml(it.desc) + '</div>' +
             '</div>'
           );
         }).join('');
+
+        var dotsWrap = document.getElementById('loveStoryDots');
+        var prevBtn = document.getElementById('lsPrevBtn');
+        var nextBtn = document.getElementById('lsNextBtn');
+        var activeIdx = 0;
+
+        function setActiveJawa3Slide(nextIdx) {
+          if (!items.length) return;
+          activeIdx = ((nextIdx % items.length) + items.length) % items.length;
+          jawa3Slides.querySelectorAll('.ls-slide').forEach(function (s, i) {
+            s.classList.toggle('active', i === activeIdx);
+          });
+          if (dotsWrap) {
+            dotsWrap.querySelectorAll('.ls-dot').forEach(function (d, i) {
+              d.classList.toggle('active', i === activeIdx);
+            });
+          }
+        }
+
+        if (dotsWrap) {
+          dotsWrap.innerHTML = items.map(function (_, idx) {
+            return '<span class="ls-dot' + (idx === 0 ? ' active' : '') + '" data-ls-idx="' + idx + '"></span>';
+          }).join('');
+          dotsWrap.querySelectorAll('.ls-dot').forEach(function (dot) {
+            dot.addEventListener('click', function () {
+              var i = parseInt(dot.getAttribute('data-ls-idx') || '0', 10);
+              setActiveJawa3Slide(i);
+            });
+          });
+        }
+
+        if (prevBtn && nextBtn) {
+          var single = items.length <= 1;
+          prevBtn.style.display = single ? 'none' : '';
+          nextBtn.style.display = single ? 'none' : '';
+          prevBtn.onclick = function () { setActiveJawa3Slide(activeIdx - 1); };
+          nextBtn.onclick = function () { setActiveJawa3Slide(activeIdx + 1); };
+        }
       }
     }
 
