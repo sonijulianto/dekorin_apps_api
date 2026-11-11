@@ -1430,7 +1430,7 @@ func injectVisualEditorAssets(htmlStr string, invitation models.Invitation, temp
 	seedBytes, _ := json.Marshal(seedInv)
 	safeSeed := strings.ReplaceAll(string(seedBytes), "</", "<\\/")
 	editorInjection := fmt.Sprintf(
-		`<script id="dekorin-visual-editor-seed" type="application/json">%s</script><script src="/assets/invitation_visual_editor.js?v=20261111"></script></body>`,
+		`<script id="dekorin-visual-editor-seed" type="application/json">%s</script><script src="/assets/invitation_visual_editor.js?v=20261111-2"></script></body>`,
 		safeSeed,
 	)
 
