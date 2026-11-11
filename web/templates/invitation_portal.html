@@ -3023,6 +3023,15 @@
       }
     });
 
+    function setPortalVisualIframeLocked(locked) {
+      const iframe = document.getElementById('portalVisualEditorIframe');
+      if (iframe) {
+        iframe.style.pointerEvents = locked ? 'none' : 'auto';
+        iframe.style.touchAction = locked ? 'none' : 'auto';
+      }
+      postToVisualIframe('lock_scroll', { locked: !!locked });
+    }
+
     function showPortalVisualFieldModal(title, bodyHtml, applyLabel) {
       document.getElementById('pvFieldModalTitle').textContent = title || 'Edit Konten';
       document.getElementById('pvFieldModalBody').innerHTML = bodyHtml;
@@ -3034,12 +3043,14 @@
         footer.classList.remove('hidden');
         applyBtn.textContent = applyLabel || 'Terapkan';
       }
+      setPortalVisualIframeLocked(true);
       document.getElementById('portalVisualFieldModal').classList.remove('hidden');
     }
 
     function closePortalVisualFieldModal() {
       document.getElementById('portalVisualFieldModal').classList.add('hidden');
       portalVisualCurrentEdit = null;
+      setPortalVisualIframeLocked(false);
     }
 
     function openPortalVisualTextModal(msg) {
@@ -3427,11 +3438,13 @@
       setVal('pvSetAudio', cur.audio_url || '');
       setVal('pvSetYoutube', cur.youtube_url || '');
       setVal('pvSetWa', cur.wa_confirmation || '');
+      setPortalVisualIframeLocked(true);
       document.getElementById('portalVisualSettingsModal').classList.remove('hidden');
     }
 
     function closePortalVisualSettings() {
       document.getElementById('portalVisualSettingsModal').classList.add('hidden');
+      setPortalVisualIframeLocked(false);
     }
 
     function applyPortalVisualSettings() {

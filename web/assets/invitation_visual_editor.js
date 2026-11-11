@@ -802,6 +802,34 @@
 
   window.dekorinSetEditMode = setEditMode;
 
+  var scrollLockSaved = null;
+  window.dekorinSetScrollLocked = function (locked) {
+    var html = document.documentElement;
+    var body = document.body;
+    if (!html || !body) return;
+
+    if (locked) {
+      if (!scrollLockSaved) {
+        scrollLockSaved = {
+          htmlOverflow: html.style.overflow || '',
+          bodyOverflow: body.style.overflow || '',
+          htmlTouch: html.style.touchAction || '',
+          bodyTouch: body.style.touchAction || ''
+        };
+      }
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      html.style.touchAction = 'none';
+      body.style.touchAction = 'none';
+    } else if (scrollLockSaved) {
+      html.style.overflow = scrollLockSaved.htmlOverflow;
+      body.style.overflow = scrollLockSaved.bodyOverflow;
+      html.style.touchAction = scrollLockSaved.htmlTouch;
+      body.style.touchAction = scrollLockSaved.bodyTouch;
+      scrollLockSaved = null;
+    }
+  };
+
   window.dekorinToggleGate = function (showGate) {
     // TA17 & TA3
     var taGate = document.getElementById('ta17ModalGate') || document.getElementById('ta3ModalGate');
@@ -855,6 +883,8 @@
       setEditMode(msg.enabled);
     } else if (msg.action === 'toggle_gate') {
       window.dekorinToggleGate(!!msg.showGate);
+    } else if (msg.action === 'lock_scroll') {
+      window.dekorinSetScrollLocked(!!msg.locked);
     }
   });
 
