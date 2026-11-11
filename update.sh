@@ -43,7 +43,7 @@ fi
 
 # 4. Unduh File Template HTML Terbaru (Dijalankan SETELAH tar agar tidak tertimpa)
 echo "⬇️  Mengunduh template HTML terbaru..."
-for t in landing superadmin client_form invitation_portal template_pn4 template_ta3 template_ta17 template_jawa3 template_jawa2; do
+for t in landing superadmin client_form invitation_portal template_pn4 template_ta3 template_ta17 template_jawa3 template_jawa2 template_ultah1; do
     echo "  -> web/templates/${t}.html"
     curl -s -f -L -o "web/templates/${t}.html" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/templates/${t}.html?v=$TIMESTAMP"
 done
@@ -115,6 +115,16 @@ for pf in cover-default.jpg bride-default.jpg groom-default.jpg gallery1.jpg gal
     curl -s -f -L -o "web/assets/templates/jawa2/photos/${pf}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/jawa2/photos/${pf}?v=$TIMESTAMP" || true
 done
 
+# 4g. Unduh Aset Template Pita & Bola Disko (Birthday - ultah1)
+echo "⬇️  Mengunduh aset template Pita & Bola Disko (ultah1)..."
+mkdir -p web/assets/templates/ultah1/photos
+for f in balon-bintang.png balon-hati.png bola-disko.png default-song.mp3 hiasan-kanan.png hiasan-kiri.png logo_bca.png logo_bni.png logo_bri.png logo_mandiri.png pita.png thumbnail.jpg untaian-bawah.png; do
+    curl -s -f -L -o "web/assets/templates/ultah1/${f}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ultah1/${f}?v=$TIMESTAMP" || true
+done
+for pf in cover-default.jpg profile-default.jpg closing-default.jpg bride-default.jpg groom-default.jpg gallery1.jpg gallery2.jpg gallery3.jpg gallery4.jpg; do
+    curl -s -f -L -o "web/assets/templates/ultah1/photos/${pf}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/templates/ultah1/photos/${pf}?v=$TIMESTAMP" || true
+done
+
 # 5. Icons & Branding
 curl -s -f -L -o web/assets/icons/google-maps-icon.webp "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/google-maps-icon.webp?v=$TIMESTAMP"
 curl -s -f -L -o web/assets/icons/logo_bri.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/logo_bri.png?v=$TIMESTAMP" || true
@@ -131,6 +141,7 @@ curl -s -f -L -o web/assets/icons/pwa-maskable-192.png "https://raw.githubuserco
 curl -s -f -L -o web/assets/icons/pwa-maskable-512.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/pwa-maskable-512.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/superadmin-manifest.json "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/superadmin-manifest.json?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/superadmin-sw.js "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/superadmin-sw.js?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/invitation_visual_editor.js "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/invitation_visual_editor.js?v=$TIMESTAMP" || true
 
 # 6. Konfigurasi Nginx: Limit upload 150M & HTTP Security Headers
 if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then

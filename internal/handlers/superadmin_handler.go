@@ -211,6 +211,9 @@ func GetAllCompanies(c *fiber.Ctx) error {
 		results = append(results, models.CompanyDetailResponse{
 			ID:              comp.ID,
 			Name:            comp.Name,
+			Category:        models.NormalizeVendorCategory(comp.Category),
+			City:            comp.City,
+			IsPublicListed:  comp.IsPublicListed,
 			Address:         comp.Address,
 			Phone:           comp.Phone,
 			Email:           comp.Email,
@@ -432,6 +435,7 @@ func GetMyCompanyProfile(c *fiber.Ctx) error {
 		})
 	}
 	comp.InvoiceTemplate = EffectiveInvoiceTemplate(comp.InvoiceTemplate)
+	comp.Category = models.NormalizeVendorCategory(comp.Category)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil memuat profil usaha",
@@ -462,6 +466,17 @@ func UpdateMyCompanyProfile(c *fiber.Ctx) error {
 
 	if strings.TrimSpace(req.Name) != "" {
 		comp.Name = strings.TrimSpace(req.Name)
+	}
+	if strings.TrimSpace(req.Category) != "" {
+		comp.Category = models.NormalizeVendorCategory(req.Category)
+	} else if strings.TrimSpace(comp.Category) == "" {
+		comp.Category = "decoration"
+	}
+	if req.City != "" || strings.TrimSpace(comp.City) != "" {
+		comp.City = strings.TrimSpace(req.City)
+	}
+	if req.IsPublicListed != nil {
+		comp.IsPublicListed = *req.IsPublicListed
 	}
 	comp.Address = strings.TrimSpace(req.Address)
 	if req.Phone != "" {

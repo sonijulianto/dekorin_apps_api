@@ -8,8 +8,8 @@ type Invitation struct {
 	CompanyID      string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
 	Slug           string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"slug"` // URL slug, misal: bagas-zulia
 	Title          string    `gorm:"type:varchar(200);not null" json:"title"`           // misal: The Wedding of Bagas & Zulia
-	Template       string    `gorm:"type:varchar(50);default:'ta17'" json:"template"` // pn4, ta3, ta17, jawa3, jawa2
-	EventType      string    `gorm:"type:varchar(50);default:'wedding'" json:"event_type"` // wedding, khitan
+	Template       string    `gorm:"type:varchar(50);default:'ta17'" json:"template"` // pn4, ta3, ta17, jawa3, jawa2, ultah1
+	EventType      string    `gorm:"type:varchar(50);default:'wedding'" json:"event_type"` // wedding, khitan, birthday
 	CoverImage     string    `gorm:"type:text" json:"cover_image"`
 	Quotes         string    `gorm:"type:text" json:"quotes"` // Kutipan ayat suci / mutiara
 
@@ -78,6 +78,7 @@ type Invitation struct {
 	EditToken     string `gorm:"type:varchar(100);index;default:''" json:"edit_token"` // Token rahasia kelola mandiri (32+ char)
 	EditPin       string `gorm:"type:varchar(20);default:''" json:"edit_pin"`          // PIN 6 digit login manual
 	GuestListJSON string `gorm:"type:text" json:"guest_list_json"`                     // Daftar tamu generator WA tersimpan (JSON)
+	WeddingPlanID string `gorm:"type:varchar(50);index;default:''" json:"wedding_plan_id"` // ID Wedding Plan pengantin yang mengklaim undangan ini
 
 	IsActive  bool      `gorm:"default:true;index" json:"is_active"`
 	CreatedAt time.Time `gorm:"index" json:"created_at"`

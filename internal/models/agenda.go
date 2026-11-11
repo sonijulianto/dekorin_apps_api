@@ -55,6 +55,7 @@ type Agenda struct {
 	FormStatus           string      `gorm:"type:varchar(50);default:'pending'" json:"form_status"` // pending, filled
 	IsFormDraft          bool        `gorm:"default:false;index" json:"is_form_draft"`
 	DpAmount             float64     `gorm:"type:decimal(15,2);default:0" json:"dp_amount"`
+	WeddingPlanID        string      `gorm:"type:varchar(50);index;default:''" json:"wedding_plan_id"`
 	Notes                string           `gorm:"type:text" json:"notes"`
 	ClientForm           *ClientForm      `gorm:"foreignKey:AgendaID" json:"client_form,omitempty"`
 	AgendaProperties     []AgendaProperty `gorm:"foreignKey:AgendaID" json:"agenda_properties,omitempty"`

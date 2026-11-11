@@ -1978,10 +1978,10 @@
     <!-- =========================================================
          1. OPENING GATE COVER
          ========================================================= -->
-    <section id="gate-cover" style="background-image: url('{{ $coverPhoto }}');">
+    <section id="gate-cover" style="background-image: url('{{ $coverPhoto }}');" data-edit-field="cover_image" data-edit-type="bg_photo" data-edit-aspect="9:16" data-edit-label="Foto Sampul">
         <div class="gate-inner">
             <p class="gate-subtitle">{{ if eq .EventType "khitan" }}TASYAKURAN KHITANAN{{ else }}THE WEDDING OF{{ end }}</p>
-            <h1 class="gate-couple">{{ $coupleLabel }}</h1>
+            <h1 class="gate-couple" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">{{ $coupleLabel }}</h1>
 
             <div class="gate-spacer"></div>
 
@@ -2034,10 +2034,10 @@
     <main id="cover">
         <!-- Desktop Left Sticky Pane -->
         <aside class="pn4-left-sticky-col">
-            <div class="pn4-left-sticky-inner" style="background-image: url('{{ $stickyPhoto }}');">
+            <div class="pn4-left-sticky-inner" style="background-image: url('{{ $stickyPhoto }}');" data-edit-field="sec1_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Panel Kiri">
                 <div class="pn4-left-sticky-content">
                     <p class="sticky-kicker">{{ if eq .EventType "khitan" }}UNDANGAN TASYAKURAN KHITAN{{ else }}OUR WEDDING INVITATION{{ end }}</p>
-                    <h2 class="sticky-couple">{{ $coupleLabel }}</h2>
+                    <h2 class="sticky-couple" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">{{ $coupleLabel }}</h2>
                     <p class="sticky-yth">Kepada Yth. Bapak / Ibu /Saudara/i</p>
                     <p class="sticky-guest" id="stickyGuestName">{{ .GuestTo }}</p>
                 </div>
@@ -2050,8 +2050,8 @@
             <!-- SECTION 1: HERO -->
             <section class="sec-hero">
                 <p class="hero-kicker pn-anim anim-fadeInDown">{{ if eq .EventType "khitan" }}TASYAKURAN KHITANAN{{ else }}THE WEDDING OF{{ end }}</p>
-                <h2 class="hero-couple pn-anim anim-zoomIn">{{ $coupleLabel }}</h2>
-                <p class="hero-date pn-anim anim-fadeInUp" id="heroDateDots">{{ if .AkadDate }}{{ .AkadDate }}{{ else if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}23 . 08 . 2025{{ end }}</p>
+                <h2 class="hero-couple pn-anim anim-zoomIn" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">{{ $coupleLabel }}</h2>
+                <p class="hero-date pn-anim anim-fadeInUp" id="heroDateDots" data-edit-field="akad_date" data-edit-type="date" data-edit-label="Tanggal Acara Utama">{{ if .AkadDate }}{{ .AkadDate }}{{ else if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}23 . 08 . 2025{{ end }}</p>
 
                 <a href="#COUPLE" class="hero-scroll-icon" aria-label="Scroll ke bawah">
                     <svg viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg"><path d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"></path></svg>
@@ -2073,9 +2073,9 @@
                     <p class="pn4-quote-arabic">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ مِنْ أَنْفُسِكُمْ أَزْوَاجًا لِتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُمْ مَوَدَّةً وَرَحْمَةً إِنَّ فِي ذَلِكَ لَآيَاتٍ لِقَوْمٍ يَتَفَكَّرُونَ</p>
                     {{ end }}
                     {{ if .Quotes }}
-                        <p class="pn4-quote-text">{{ .Quotes }}</p>
+                        <p class="pn4-quote-text" data-edit-field="quotes" data-edit-type="textarea" data-edit-label="Kutipan Ayat / Doa">{{ .Quotes }}</p>
                     {{ else }}
-                        <p class="pn4-quote-text">"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya. Dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir."</p>
+                        <p class="pn4-quote-text" data-edit-field="quotes" data-edit-type="textarea" data-edit-label="Kutipan Ayat / Doa">"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya. Dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir."</p>
                         <p class="pn4-quote-ref">( Q.S. Ar-Rum: 21 )</p>
                     {{ end }}
                 </div>
@@ -2090,12 +2090,12 @@
                         <p class="pn4-couple-intro pn-anim anim-zoomIn">Dengan memohon rahmat dan ridho Allah Subhanahu Wa Ta’ala, insyaaAllah kami bermaksud menyelenggarakan acara Tasyakuran Khitanan putra kami:</p>
 
                         <div class="pn4-person-frame pn-anim anim-fadeInUp">
-                            <div class="pn4-person-photo" style="background-image: url('{{ $groomPhoto }}');">
+                            <div class="pn4-person-photo" style="background-image: url('{{ $groomPhoto }}');" data-edit-field="groom_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Anak">
                                 <div class="pn4-person-glass">
-                                    <h3 class="pn4-person-name">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h3>
+                                    <h3 class="pn4-person-name" data-edit-field="child_name" data-edit-type="text" data-edit-label="Nama Lengkap Anak">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h3>
                                     <p class="pn4-person-meta">
-                                        {{ if .ChildOrder }}{{ .ChildOrder }} dari<br>{{ end }}
-                                        {{ if .GroomParents }}<strong>{{ .GroomParents }}</strong>{{ end }}
+                                        <span data-edit-field="child_order" data-edit-type="child_order" data-edit-label="Urutan Anak">{{ if .ChildOrder }}{{ .ChildOrder }} dari{{ end }}</span><br>
+                                        {{ if .GroomParents }}<strong data-edit-field="groom_parents" data-edit-type="text" data-edit-label="Nama Orang Tua">{{ .GroomParents }}</strong>{{ end }}
                                     </p>
                                 </div>
                             </div>
@@ -2109,15 +2109,15 @@
 
                         <!-- Bride Card -->
                         <div class="pn4-person-frame pn-anim anim-fadeInUp">
-                            <div class="pn4-person-photo" style="background-image: url('{{ $bridePhoto }}');">
+                            <div class="pn4-person-photo" style="background-image: url('{{ $bridePhoto }}');" data-edit-field="bride_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Mempelai Wanita">
                                 <div class="pn4-person-glass">
-                                    <h3 class="pn4-person-name">{{ if .BrideName }}{{ .BrideName }}{{ else }}Putri Pratiwi{{ end }}</h3>
+                                    <h3 class="pn4-person-name" data-edit-field="bride_name" data-edit-type="text" data-edit-label="Nama Lengkap Mempelai Wanita">{{ if .BrideName }}{{ .BrideName }}{{ else }}Putri Pratiwi{{ end }}</h3>
                                     <p class="pn4-person-meta">
-                                        {{ if .BrideChildOrder }}{{ .BrideChildOrder }} dari<br>{{ else }}Putri tercinta dari<br>{{ end }}
-                                        {{ if .BrideParents }}{{ .BrideParents }}{{ else }}Bapak Mempelai Wanita &amp; Ibu Mempelai Wanita{{ end }}
+                                        <span data-edit-field="bride_child_order" data-edit-type="child_order" data-edit-label="Urutan Anak Wanita">{{ if .BrideChildOrder }}{{ .BrideChildOrder }} dari{{ else }}Putri tercinta dari{{ end }}</span><br>
+                                        <span data-edit-field="bride_parents" data-edit-type="text" data-edit-label="Nama Orang Tua Wanita">{{ if .BrideParents }}{{ .BrideParents }}{{ else }}Bapak Mempelai Wanita &amp; Ibu Mempelai Wanita{{ end }}</span>
                                     </p>
                                     {{ if .BrideInstagram }}
-                                    <a href="https://www.instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="pn4-btn-dark">
+                                    <a href="https://www.instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="pn4-btn-dark" data-edit-field="bride_instagram" data-edit-type="instagram" data-edit-label="Instagram Mempelai Wanita">
                                         <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
                                         <span class="ig-handle-txt">{{ .BrideInstagram }}</span>
                                     </a>
@@ -2130,15 +2130,15 @@
 
                         <!-- Groom Card -->
                         <div class="pn4-person-frame pn-anim anim-fadeInUp">
-                            <div class="pn4-person-photo" style="background-image: url('{{ $groomPhoto }}');">
+                            <div class="pn4-person-photo" style="background-image: url('{{ $groomPhoto }}');" data-edit-field="groom_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Mempelai Pria">
                                 <div class="pn4-person-glass">
-                                    <h3 class="pn4-person-name">{{ if .GroomName }}{{ .GroomName }}{{ else }}Putra Pratama{{ end }}</h3>
+                                    <h3 class="pn4-person-name" data-edit-field="groom_name" data-edit-type="text" data-edit-label="Nama Lengkap Mempelai Pria">{{ if .GroomName }}{{ .GroomName }}{{ else }}Putra Pratama{{ end }}</h3>
                                     <p class="pn4-person-meta">
-                                        {{ if .GroomChildOrder }}{{ .GroomChildOrder }} dari<br>{{ else }}Putra tercinta dari<br>{{ end }}
-                                        {{ if .GroomParents }}{{ .GroomParents }}{{ else }}Bapak Mempelai Pria &amp; Ibu Mempelai Pria{{ end }}
+                                        <span data-edit-field="groom_child_order" data-edit-type="child_order" data-edit-label="Urutan Anak Pria">{{ if .GroomChildOrder }}{{ .GroomChildOrder }} dari{{ else }}Putra tercinta dari{{ end }}</span><br>
+                                        <span data-edit-field="groom_parents" data-edit-type="text" data-edit-label="Nama Orang Tua Pria">{{ if .GroomParents }}{{ .GroomParents }}{{ else }}Bapak Mempelai Pria &amp; Ibu Mempelai Pria{{ end }}</span>
                                     </p>
                                     {{ if .GroomInstagram }}
-                                    <a href="https://www.instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="pn4-btn-dark">
+                                    <a href="https://www.instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="pn4-btn-dark" data-edit-field="groom_instagram" data-edit-type="instagram" data-edit-label="Instagram Mempelai Pria">
                                         <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
                                         <span class="ig-handle-txt">{{ .GroomInstagram }}</span>
                                     </a>
@@ -2188,25 +2188,27 @@
                         <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg>
                     </div>
 
-                    <p class="pn4-ev-dayname" id="akadDayName">Minggu</p>
-                    <div class="pn4-ev-daynum-row">
-                        <span class="pn4-ev-vbar"></span>
-                        <span class="pn4-ev-daynum" id="akadDayNum" data-target="23">23</span>
-                        <span class="pn4-ev-vbar"></span>
+                    <div data-edit-field="akad_date" data-edit-type="date" data-edit-label="Tanggal Akad / Acara Utama">
+                        <p class="pn4-ev-dayname" id="akadDayName">Minggu</p>
+                        <div class="pn4-ev-daynum-row">
+                            <span class="pn4-ev-vbar"></span>
+                            <span class="pn4-ev-daynum" id="akadDayNum" data-target="23">23</span>
+                            <span class="pn4-ev-vbar"></span>
+                        </div>
+                        <p class="pn4-ev-monthyear" id="akadMonthYear">September 2025</p>
                     </div>
-                    <p class="pn4-ev-monthyear" id="akadMonthYear">September 2025</p>
-                    <p class="pn4-ev-time">{{ if .AkadTime }}{{ .AkadTime }}{{ else }}07.00 WIB - Selesai{{ end }}</p>
+                    <p class="pn4-ev-time" data-edit-field="akad_time" data-edit-type="time" data-edit-label="Jam Akad">{{ if .AkadTime }}{{ .AkadTime }}{{ else }}07.00 WIB - Selesai{{ end }}</p>
 
                     <div class="pn4-icon-divider">
                         <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
                     </div>
 
                     <p class="pn4-ev-place-lbl">Bertempat Di,</p>
-                    <p class="pn4-ev-venue">{{ if .AkadVenue }}{{ .AkadVenue }}{{ else }}Kediaman Mempelai Wanita{{ end }}</p>
-                    <p class="pn4-ev-address">{{ if .AkadAddress }}{{ .AkadAddress }}{{ else }}Lokasi Acara{{ end }}</p>
+                    <p class="pn4-ev-venue" data-edit-field="akad_venue" data-edit-type="text" data-edit-label="Tempat / Gedung Akad">{{ if .AkadVenue }}{{ .AkadVenue }}{{ else }}Kediaman Mempelai Wanita{{ end }}</p>
+                    <p class="pn4-ev-address" data-edit-field="akad_address" data-edit-type="textarea" data-edit-label="Alamat Lengkap Akad">{{ if .AkadAddress }}{{ .AkadAddress }}{{ else }}Lokasi Acara{{ end }}</p>
 
                     {{ if .AkadMapsURL }}
-                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light" data-edit-field="akad_maps_url" data-edit-type="maps" data-edit-label="Link Google Maps Akad">
                         <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
                         <span>Lihat Lokasi</span>
                     </a>
@@ -2223,30 +2225,32 @@
                         <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg>
                     </div>
 
-                    <p class="pn4-ev-dayname" id="resepsiDayName">Minggu</p>
-                    <div class="pn4-ev-daynum-row">
-                        <span class="pn4-ev-vbar"></span>
-                        <span class="pn4-ev-daynum" id="resepsiDayNum" data-target="23">23</span>
-                        <span class="pn4-ev-vbar"></span>
+                    <div data-edit-field="resepsi_date" data-edit-type="date" data-edit-label="Tanggal Resepsi">
+                        <p class="pn4-ev-dayname" id="resepsiDayName">Minggu</p>
+                        <div class="pn4-ev-daynum-row">
+                            <span class="pn4-ev-vbar"></span>
+                            <span class="pn4-ev-daynum" id="resepsiDayNum" data-target="23">23</span>
+                            <span class="pn4-ev-vbar"></span>
+                        </div>
+                        <p class="pn4-ev-monthyear" id="resepsiMonthYear">September 2025</p>
                     </div>
-                    <p class="pn4-ev-monthyear" id="resepsiMonthYear">September 2025</p>
-                    <p class="pn4-ev-time">{{ if .ResepsiTime }}{{ .ResepsiTime }}{{ else }}10.00 WIB - Selesai{{ end }}</p>
+                    <p class="pn4-ev-time" data-edit-field="resepsi_time" data-edit-type="time" data-edit-label="Jam Resepsi">{{ if .ResepsiTime }}{{ .ResepsiTime }}{{ else }}10.00 WIB - Selesai{{ end }}</p>
 
                     <div class="pn4-icon-divider">
                         <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
                     </div>
 
                     <p class="pn4-ev-place-lbl">Bertempat Di,</p>
-                    <p class="pn4-ev-venue">{{ if .ResepsiVenue }}{{ .ResepsiVenue }}{{ else if .AkadVenue }}{{ .AkadVenue }}{{ else }}Kediaman Mempelai Wanita{{ end }}</p>
-                    <p class="pn4-ev-address">{{ if .ResepsiAddress }}{{ .ResepsiAddress }}{{ else if .AkadAddress }}{{ .AkadAddress }}{{ else }}Lokasi Acara{{ end }}</p>
+                    <p class="pn4-ev-venue" data-edit-field="resepsi_venue" data-edit-type="text" data-edit-label="Tempat / Gedung Resepsi">{{ if .ResepsiVenue }}{{ .ResepsiVenue }}{{ else if .AkadVenue }}{{ .AkadVenue }}{{ else }}Kediaman Mempelai Wanita{{ end }}</p>
+                    <p class="pn4-ev-address" data-edit-field="resepsi_address" data-edit-type="textarea" data-edit-label="Alamat Lengkap Resepsi">{{ if .ResepsiAddress }}{{ .ResepsiAddress }}{{ else if .AkadAddress }}{{ .AkadAddress }}{{ else }}Lokasi Acara{{ end }}</p>
 
                     {{ if .ResepsiMapsURL }}
-                    <a href="{{ .ResepsiMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                    <a href="{{ .ResepsiMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light" data-edit-field="resepsi_maps_url" data-edit-type="maps" data-edit-label="Link Google Maps Resepsi">
                         <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
                         <span>Lihat Lokasi</span>
                     </a>
                     {{ else if .AkadMapsURL }}
-                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="pn4-btn-light" data-edit-field="resepsi_maps_url" data-edit-type="maps" data-edit-label="Link Google Maps Resepsi">
                         <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
                         <span>Lihat Lokasi</span>
                     </a>
@@ -2256,7 +2260,7 @@
 
                 <!-- Live Streaming Card -->
                 {{ if or .BrideInstagram .GroomInstagram .YoutubeURL }}
-                <div class="pn4-stream-card pn-anim anim-fadeInUp" style="background-image: url('{{ $streamPhoto }}');">
+                <div class="pn4-stream-card pn-anim anim-fadeInUp" style="background-image: url('{{ $streamPhoto }}');" data-edit-field="event_photo" data-edit-type="bg_photo" data-edit-aspect="free" data-edit-label="Foto Live Streaming">
                     <img src="/assets/templates/pn4/video-pn1.png" alt="" class="pn4-event-ornament" style="margin-bottom: 4px;">
                     <div class="pn4-dual-heading light" style="margin-bottom: 4px;">
                         <span class="pn4-script-sub">Live</span>
@@ -2265,18 +2269,18 @@
                     <p class="pn4-stream-desc">Bagi tamu undangan yang berhalangan hadir dan ingin menyaksikan acara {{ if eq .EventType "khitan" }}kami{{ else }}pernikahan kami{{ end }} silahkan ikuti live streaming acara kami dengan klik tombol di bawah.</p>
                     <div class="pn4-stream-btns">
                         {{ if .BrideInstagram }}
-                        <a href="https://www.instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                        <a href="https://www.instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="pn4-btn-light" data-edit-field="bride_instagram" data-edit-type="instagram" data-edit-label="Instagram Mempelai Wanita">
                             <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
                             <span>Instagram Live</span>
                         </a>
                         {{ else if .GroomInstagram }}
-                        <a href="https://www.instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                        <a href="https://www.instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="pn4-btn-light" data-edit-field="groom_instagram" data-edit-type="instagram" data-edit-label="Instagram Mempelai Pria">
                             <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg>
                             <span>Instagram Live</span>
                         </a>
                         {{ end }}
                         {{ if .YoutubeURL }}
-                        <a href="{{ .YoutubeURL }}" target="_blank" rel="noopener" class="pn4-btn-light">
+                        <a href="{{ .YoutubeURL }}" target="_blank" rel="noopener" class="pn4-btn-light" data-edit-field="youtube_url" data-edit-type="youtube" data-edit-label="Link Video / Live YouTube">
                             <svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path></svg>
                             <span>Youtube Live</span>
                         </a>
@@ -2297,7 +2301,7 @@
                     </div>
 
                     {{ if .YoutubeEmbedURL }}
-                    <div class="pn4-video-wrap pn-anim anim-fadeInUp">
+                    <div class="pn4-video-wrap pn-anim anim-fadeInUp" data-edit-field="youtube_url" data-edit-type="youtube" data-edit-label="Link Video YouTube">
                         <iframe src="{{ .YoutubeEmbedURL }}?rel=0" title="Wedding Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
                     </div>
                     {{ end }}
@@ -2310,7 +2314,7 @@
                             {{ end }}
                         {{ end }}
                     </div>
-                    <div class="pn4-justified-gallery" id="pn4JustifiedGallery"></div>
+                    <div class="pn4-justified-gallery" id="pn4JustifiedGallery" data-edit-field="gallery_images" data-edit-type="gallery" data-edit-label="Galeri Foto"></div>
                 </div>
                 {{ end }}
 
@@ -2324,7 +2328,7 @@
                     <div class="pn4-icon-divider" style="width: 140px;">
                         <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M458.4 64.3C400.6 15.7 311.3 23 256 79.3 200.7 23 111.4 15.6 53.6 64.3-21.6 127.6-10.6 230.8 43 285.5l175.4 178.7c10 10.2 23.4 15.9 37.6 15.9 14.3 0 27.6-5.6 37.6-15.8L469 285.6c53.5-54.7 64.7-157.9-10.6-221.3zm-23.6 187.5L259.4 430.5c-2.4 2.4-4.4 2.4-6.8 0L77.2 251.8c-36.5-37.2-43.9-107.6 7.3-150.7 38.9-32.7 98.9-27.8 136.5 10.5l35 35.7 35-35.7c37.8-38.5 97.8-43.2 136.5-10.6 51.1 43.1 43.5 113.9 7.3 150.8z"></path></svg>
                     </div>
-                    <div class="pn4-story-list" id="pn4StoryList"></div>
+                    <div class="pn4-story-list" id="pn4StoryList" data-edit-field="love_story" data-edit-type="love_story" data-edit-label="Kisah Cinta (Love Story)"></div>
                 </div>
                 {{ end }}
             </section>
@@ -2335,9 +2339,11 @@
             <section id="gift">
                 <div class="pn4-gift-polaroids">
                     <div class="pn4-polaroid left pn-anim anim-fadeInLeft" id="giftPolLeft"
-                         style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else if $customCover }}{{ $customCover }}{{ else }}/assets/templates/pn4/photos/LeniArdi5.jpeg{{ end }}');"></div>
+                         style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else if $customCover }}{{ $customCover }}{{ else }}/assets/templates/pn4/photos/LeniArdi5.jpeg{{ end }}');"
+                         data-edit-field="sec1_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Polaroid Kiri"></div>
                     <div class="pn4-polaroid right pn-anim anim-fadeInRight" id="giftPolRight"
-                         style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else if $customCover }}{{ $customCover }}{{ else }}/assets/templates/pn4/photos/LeniArdi1.jpeg{{ end }}');"></div>
+                         style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else if $customCover }}{{ $customCover }}{{ else }}/assets/templates/pn4/photos/LeniArdi1.jpeg{{ end }}');"
+                         data-edit-field="closing_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Polaroid Kanan"></div>
                 </div>
 
                 <svg class="pn4-gift-main-icon pn-anim anim-zoomIn" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg"><path d="M425.7,77.369H398.424A53.658,53.658,0,0,0,350.263,0a73.108,73.108,0,0,0-73.026,73.026v4.343H249.21V73.026A73.108,73.108,0,0,0,176.184,0a53.658,53.658,0,0,0-48.161,77.369H94.3a55.682,55.682,0,0,0-55.619,55.618V464.381A55.682,55.682,0,0,0,94.3,520H425.7a55.682,55.682,0,0,0,55.619-55.619V132.987A55.682,55.682,0,0,0,425.7,77.369ZM212.763,490H94.3a25.648,25.648,0,0,1-25.619-25.619V132.987A25.648,25.648,0,0,1,94.3,107.369h118.46ZM219.21,77.369H176.184a23.685,23.685,0,0,1,0-47.369A43.075,43.075,0,0,1,219.21,73.026ZM277.237,490H242.763V107.369h34.474Zm30-416.974A43.076,43.076,0,0,1,350.263,30a23.685,23.685,0,0,1,0,47.369H307.237ZM451.316,464.381A25.648,25.648,0,0,1,425.7,490H307.237V107.369H425.7a25.648,25.648,0,0,1,25.619,25.618Z"></path><path d="M426.189,349.915A40.339,40.339,0,0,0,380,342.265a40.221,40.221,0,0,0-48.023,62.574c.487.688,37.327,37.633,37.327,37.633a15.179,15.179,0,0,0,21.392,0s36.84-36.945,37.327-37.633a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.634L380,410.742l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M426.189,169.907A40.341,40.341,0,0,0,380,162.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.635L380,230.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M186.189,349.907A40.341,40.341,0,0,0,140,342.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924Zm-21.177,35.635L140,410.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path><path d="M140,162.258a40.22,40.22,0,0,0-48.023,62.573c.487.689,37.327,37.634,37.327,37.634a15.18,15.18,0,0,0,21.392,0s36.84-36.945,37.327-37.634a40.32,40.32,0,0,0-1.834-54.924h0A40.341,40.341,0,0,0,140,162.258Zm25.012,43.284L140,230.735l-25.012-25.193a10.223,10.223,0,0,1,14.457-14.457,15,15,0,0,0,21.11,0,10.223,10.223,0,0,1,14.457,14.457Z"></path></svg>
@@ -2358,7 +2364,7 @@
 
                 <div id="amplop">
                     {{ if .BankAccount1 }}
-                    <div class="pn4-bank-item">
+                    <div class="pn4-bank-item" data-edit-field="bank_1" data-edit-type="bank_1" data-edit-label="Rekening Bank 1">
                         <div class="pn4-bank-top">
                             <div>
                                 <p class="pn4-bank-holder">{{ .BankHolder1 }}</p>
@@ -2374,7 +2380,7 @@
                     {{ end }}
 
                     {{ if .BankAccount2 }}
-                    <div class="pn4-bank-item">
+                    <div class="pn4-bank-item" data-edit-field="bank_2" data-edit-type="bank_2" data-edit-label="Rekening Bank 2">
                         <div class="pn4-bank-top">
                             <div>
                                 <p class="pn4-bank-holder">{{ .BankHolder2 }}</p>
@@ -2393,7 +2399,7 @@
                     <div class="pn4-phys-gift">
                         <svg class="pn4-phys-gift-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20,7H18.262A5.137,5.137,0,0,0,20,3a1,1,0,0,0-2,0c0,2.622-2.371,3.53-4.174,3.841A9.332,9.332,0,0,0,15,3,3,3,0,0,0,9,3a9.332,9.332,0,0,0,1.174,3.841C8.371,6.53,6,5.622,6,3A1,1,0,0,0,4,3,5.137,5.137,0,0,0,5.738,7H4a4,4,0,0,0-4,4v1a2,2,0,0,0,2,2v5a5.006,5.006,0,0,0,5,5H17a5.006,5.006,0,0,0,5-5V14a2,2,0,0,0,2-2V11A4,4,0,0,0,20,7ZM12,2a1,1,0,0,1,1,1,7.71,7.71,0,0,1-1,3.013A7.71,7.71,0,0,1,11,3,1,1,0,0,1,12,2ZM2,11A2,2,0,0,1,4,9h7v3H2Zm2,8V14h7v8H7A3,3,0,0,1,4,19Zm16,0a3,3,0,0,1-3,3H13V14h7Zm-7-7V9h7a2,2,0,0,1,2,2v1Z"></path></svg>
                         <p class="pn4-phys-gift-lbl">Anda Juga Bisa Mengirim Kado Fisik Ke Alamat Berikut :</p>
-                        <p class="pn4-phys-gift-addr">{{ .GiftAddress }}</p>
+                        <p class="pn4-phys-gift-addr" data-edit-field="gift_address" data-edit-type="textarea" data-edit-label="Alamat Kirim Kado Fisik">{{ .GiftAddress }}</p>
                         <button type="button" class="pn4-copy-btn" data-copy="{{ .GiftAddress }}">
                             <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
                             <span>Copy Alamat</span>
@@ -2435,8 +2441,8 @@
 
             <!-- SECTION 6: #WISHES (Portrait + RSVP + Ucapan & Doa + Quote) -->
             <section id="WISHES">
-                <div class="pn4-wishes-portrait pn-anim anim-zoomIn" style="background-image: url('{{ $wishesPhoto }}');">
-                    <span class="pn4-wishes-sig">{{ $coupleLabel }}</span>
+                <div class="pn4-wishes-portrait pn-anim anim-zoomIn" style="background-image: url('{{ $wishesPhoto }}');" data-edit-field="closing_photo" data-edit-type="bg_photo" data-edit-aspect="3:4" data-edit-label="Foto Penutup / Wishes">
+                    <span class="pn4-wishes-sig" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">{{ $coupleLabel }}</span>
                 </div>
 
                 <!-- RSVP Form -->
@@ -2522,7 +2528,7 @@
                 </div>
 
                 {{ if .TurutMengundangList }}
-                <div class="pn4-turut-box pn-anim anim-fadeInUp">
+                <div class="pn4-turut-box pn-anim anim-fadeInUp" data-edit-field="turut_mengundang" data-edit-type="textarea" data-edit-label="Daftar Turut Mengundang">
                     <h3 class="pn4-turut-title">Turut Mengundang</h3>
                     <ul class="pn4-turut-list">
                         {{ range .TurutMengundangList }}
@@ -2545,7 +2551,7 @@
             <section class="sec-closing">
                 <p class="closing-thanks pn-anim anim-zoomIn">Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i, berkenan hadir dan memberikan do’a restu kepada Kami.</p>
                 <p class="closing-kami">Kami yang berbahagia</p>
-                <h2 class="closing-couple">{{ $coupleLabel }}</h2>
+                <h2 class="closing-couple" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">{{ $coupleLabel }}</h2>
 
                 <a href="#cover" class="closing-arrow-up" id="closingArrowUp" aria-label="Kembali ke atas">
                     <span class="closing-arrow-fallback" id="closingArrowFallback">

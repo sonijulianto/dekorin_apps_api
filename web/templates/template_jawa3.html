@@ -1481,7 +1481,7 @@
         <div class="cover-top">
             <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="cover-gunungan">
             <p class="cover-sub">{{ if eq .EventType "khitan" }}Tasyakuran Khitan{{ else }}The Wedding Of{{ end }}</p>
-            <h1 class="cover-couple">
+            <h1 class="cover-couple" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">
                 {{ if eq .EventType "khitan" }}
                     {{ if .ChildNickname }}{{ .ChildNickname }}{{ else if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}
                 {{ else }}
@@ -1512,7 +1512,7 @@
         <div class="motionText" id="heroMotionText">
             <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="hero-gunungan">
             <p class="hero-tag">{{ if eq .EventType "khitan" }}TASYAKURAN KHITAN{{ else }}THE WEDDING OF{{ end }}</p>
-            <h2 class="hero-couple-names">
+            <h2 class="hero-couple-names" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">
                 {{ if eq .EventType "khitan" }}
                     {{ if .ChildNickname }}{{ .ChildNickname }}{{ else if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}
                 {{ else }}
@@ -1521,7 +1521,7 @@
                     {{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}
                 {{ end }}
             </h2>
-            <p class="hero-date">{{ if .AkadDate }}{{ .AkadDate }}{{ else }}{{ .ResepsiDate }}{{ end }}</p>
+            <p class="hero-date" data-edit-field="akad_date" data-edit-type="date" data-edit-label="Tanggal Acara Utama">{{ if .AkadDate }}{{ .AkadDate }}{{ else }}{{ .ResepsiDate }}{{ end }}</p>
         </div>
     </section>
 
@@ -1542,32 +1542,32 @@
                 <!-- Khitan Profile -->
                 <div class="couple-photo-stage">
                     <div class="oval-photo-frame">
-                        <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}">
+                        <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}" data-edit-field="groom_photo" data-edit-type="photo" data-edit-aspect="3:4" data-edit-label="Foto Anak">
                     </div>
                     <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
                 </div>
-                <div class="person-nickname">{{ if .ChildNickname }}{{ .ChildNickname }}{{ else }}{{ .GroomNickname }}{{ end }}</div>
-                <h3 class="person-fullname">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h3>
+                <div class="person-nickname" data-edit-field="child_nickname" data-edit-type="text" data-edit-label="Nama Panggilan Anak">{{ if .ChildNickname }}{{ .ChildNickname }}{{ else }}{{ .GroomNickname }}{{ end }}</div>
+                <h3 class="person-fullname" data-edit-field="child_name" data-edit-type="text" data-edit-label="Nama Lengkap Anak">{{ if .ChildName }}{{ .ChildName }}{{ else }}{{ .GroomName }}{{ end }}</h3>
                 <p class="person-parents">
-                    {{ if .ChildOrder }}{{ .ChildOrder }}<br>{{ else if .GroomChildOrder }}{{ .GroomChildOrder }}<br>{{ end }}
-                    {{ .GroomParents }}
+                    <span data-edit-field="child_order" data-edit-type="child_order" data-edit-label="Urutan Anak">{{ if .ChildOrder }}{{ .ChildOrder }}{{ else if .GroomChildOrder }}{{ .GroomChildOrder }}{{ end }}</span><br>
+                    <span data-edit-field="groom_parents" data-edit-type="text" data-edit-label="Nama Orang Tua">{{ .GroomParents }}</span>
                 </p>
             {{ else }}
                 <!-- Bride Block -->
                 <div class="couple-photo-stage">
                     <div class="oval-photo-frame">
-                        <img src="{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/templates/jawa3/photos/bride-default.jpg{{ end }}" alt="{{ .BrideName }}">
+                        <img src="{{ if .BridePhoto }}{{ .BridePhoto }}{{ else }}/assets/templates/jawa3/photos/bride-default.jpg{{ end }}" alt="{{ .BrideName }}" data-edit-field="bride_photo" data-edit-type="photo" data-edit-aspect="3:4" data-edit-label="Foto Mempelai Wanita">
                     </div>
                     <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
                 </div>
-                <div class="person-nickname">{{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}</div>
-                <h3 class="person-fullname">{{ .BrideName }}</h3>
+                <div class="person-nickname" data-edit-field="bride_nickname" data-edit-type="text" data-edit-label="Nama Panggilan Mempelai Wanita">{{ if .BrideNickname }}{{ .BrideNickname }}{{ else }}{{ .BrideName }}{{ end }}</div>
+                <h3 class="person-fullname" data-edit-field="bride_name" data-edit-type="text" data-edit-label="Nama Lengkap Mempelai Wanita">{{ .BrideName }}</h3>
                 <p class="person-parents">
-                    {{ if .BrideChildOrder }}{{ .BrideChildOrder }} dari<br>{{ end }}
-                    {{ .BrideParents }}
+                    <span data-edit-field="bride_child_order" data-edit-type="child_order" data-edit-label="Urutan Anak Wanita">{{ if .BrideChildOrder }}{{ .BrideChildOrder }} dari{{ end }}</span><br>
+                    <span data-edit-field="bride_parents" data-edit-type="text" data-edit-label="Nama Orang Tua Wanita">{{ .BrideParents }}</span>
                 </p>
                 {{ if .BrideInstagram }}
-                <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="person-ig-btn">
+                <a href="https://instagram.com/{{ .BrideInstagram }}" target="_blank" rel="noopener" class="person-ig-btn" data-edit-field="bride_instagram" data-edit-type="instagram" data-edit-label="Instagram Mempelai Wanita">
                     <i class="fab fa-instagram"></i>
                     <span>@{{ .BrideInstagram }}</span>
                 </a>
@@ -1579,18 +1579,18 @@
                 <!-- Groom Block -->
                 <div class="couple-photo-stage">
                     <div class="oval-photo-frame">
-                        <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}">
+                        <img src="{{ if .GroomPhoto }}{{ .GroomPhoto }}{{ else }}/assets/templates/jawa3/photos/groom-default.jpg{{ end }}" alt="{{ .GroomName }}" data-edit-field="groom_photo" data-edit-type="photo" data-edit-aspect="3:4" data-edit-label="Foto Mempelai Pria">
                     </div>
                     <img src="/assets/templates/jawa3/floral-corner.png" alt="" class="oval-floral-Corner">
                 </div>
-                <div class="person-nickname">{{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}{{ .GroomName }}{{ end }}</div>
-                <h3 class="person-fullname">{{ .GroomName }}</h3>
+                <div class="person-nickname" data-edit-field="groom_nickname" data-edit-type="text" data-edit-label="Nama Panggilan Mempelai Pria">{{ if .GroomNickname }}{{ .GroomNickname }}{{ else }}{{ .GroomName }}{{ end }}</div>
+                <h3 class="person-fullname" data-edit-field="groom_name" data-edit-type="text" data-edit-label="Nama Lengkap Mempelai Pria">{{ .GroomName }}</h3>
                 <p class="person-parents">
-                    {{ if .GroomChildOrder }}{{ .GroomChildOrder }} dari<br>{{ end }}
-                    {{ .GroomParents }}
+                    <span data-edit-field="groom_child_order" data-edit-type="child_order" data-edit-label="Urutan Anak Pria">{{ if .GroomChildOrder }}{{ .GroomChildOrder }} dari{{ end }}</span><br>
+                    <span data-edit-field="groom_parents" data-edit-type="text" data-edit-label="Nama Orang Tua Pria">{{ .GroomParents }}</span>
                 </p>
                 {{ if .GroomInstagram }}
-                <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="person-ig-btn">
+                <a href="https://instagram.com/{{ .GroomInstagram }}" target="_blank" rel="noopener" class="person-ig-btn" data-edit-field="groom_instagram" data-edit-type="instagram" data-edit-label="Instagram Mempelai Pria">
                     <i class="fab fa-instagram"></i>
                     <span>@{{ .GroomInstagram }}</span>
                 </a>
@@ -1606,7 +1606,7 @@
         <canvas class="snow-canvas" id="snowCanvas1"></canvas>
         <div class="savedate-inner reveal-up">
             <h2 class="savedate-title">Save The Date</h2>
-            <p class="savedate-quote">
+            <p class="savedate-quote" data-edit-field="quotes" data-edit-type="textarea" data-edit-label="Kutipan Ayat / Doa">
                 {{ if .Quotes }}
                     {{ .Quotes }}
                 {{ else }}
@@ -1646,7 +1646,7 @@
     <!-- =====================================================
          5. WEDDING EVENT (#acara)
          ===================================================== -->
-    <section id="acara" style="background-image: url('{{ if .EventPhoto }}{{ .EventPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery4.jpg{{ end }}');">
+    <section id="acara" style="background-image: url('{{ if .EventPhoto }}{{ .EventPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery4.jpg{{ end }}');" data-edit-field="event_photo" data-edit-type="bg_photo" data-edit-aspect="free" data-edit-label="Foto Latar Acara">
         <div class="acara-overlay"></div>
         <div class="acara-inner">
             <div class="dual-title-wrap reveal-up">
@@ -1662,17 +1662,17 @@
                 <div class="event-pill-inner">
                     <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="event-gunungan">
                     <h3 class="event-card-title">{{ if eq .EventType "khitan" }}Tasyakuran Khitan{{ else }}Akad Nikah{{ end }}</h3>
-                    <div class="event-card-date">{{ .AkadDate }}</div>
+                    <div class="event-card-date" data-edit-field="akad_date" data-edit-type="date" data-edit-label="Tanggal Akad / Acara Utama">{{ .AkadDate }}</div>
                     {{ if .AkadTime }}
-                    <div class="event-card-time">Pukul : {{ .AkadTime }}</div>
+                    <div class="event-card-time">Pukul : <span data-edit-field="akad_time" data-edit-type="time" data-edit-label="Jam Akad">{{ .AkadTime }}</span></div>
                     {{ end }}
                     <div class="event-loc-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <p class="event-card-address">
-                        {{ if .AkadVenue }}<strong>{{ .AkadVenue }}</strong><br>{{ end }}
-                        {{ .AkadAddress }}
+                        {{ if .AkadVenue }}<strong data-edit-field="akad_venue" data-edit-type="text" data-edit-label="Tempat / Gedung Akad">{{ .AkadVenue }}</strong><br>{{ end }}
+                        <span data-edit-field="akad_address" data-edit-type="textarea" data-edit-label="Alamat Lengkap Akad">{{ .AkadAddress }}</span>
                     </p>
                     {{ if .AkadMapsURL }}
-                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="event-map-btn">
+                    <a href="{{ .AkadMapsURL }}" target="_blank" rel="noopener" class="event-map-btn" data-edit-field="akad_maps_url" data-edit-type="maps" data-edit-label="Link Google Maps Akad">
                         <i class="fas fa-map-marked-alt"></i>
                         <span>Google Map</span>
                     </a>
@@ -1686,17 +1686,17 @@
                 <div class="event-pill-inner">
                     <img src="/assets/templates/jawa3/gunungan.png" alt="Gunungan" class="event-gunungan">
                     <h3 class="event-card-title">{{ if eq .EventType "khitan" }}Ramah Tamah{{ else }}Resepsi{{ end }}</h3>
-                    <div class="event-card-date">{{ if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}{{ .AkadDate }}{{ end }}</div>
+                    <div class="event-card-date" data-edit-field="resepsi_date" data-edit-type="date" data-edit-label="Tanggal Resepsi">{{ if .ResepsiDate }}{{ .ResepsiDate }}{{ else }}{{ .AkadDate }}{{ end }}</div>
                     {{ if .ResepsiTime }}
-                    <div class="event-card-time">Pukul : {{ .ResepsiTime }}</div>
+                    <div class="event-card-time">Pukul : <span data-edit-field="resepsi_time" data-edit-type="time" data-edit-label="Jam Resepsi">{{ .ResepsiTime }}</span></div>
                     {{ end }}
                     <div class="event-loc-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <p class="event-card-address">
-                        {{ if .ResepsiVenue }}<strong>{{ .ResepsiVenue }}</strong><br>{{ end }}
-                        {{ .ResepsiAddress }}
+                        {{ if .ResepsiVenue }}<strong data-edit-field="resepsi_venue" data-edit-type="text" data-edit-label="Tempat / Gedung Resepsi">{{ .ResepsiVenue }}</strong><br>{{ end }}
+                        <span data-edit-field="resepsi_address" data-edit-type="textarea" data-edit-label="Alamat Lengkap Resepsi">{{ .ResepsiAddress }}</span>
                     </p>
                     {{ if .ResepsiMapsURL }}
-                    <a href="{{ .ResepsiMapsURL }}" target="_blank" rel="noopener" class="event-map-btn">
+                    <a href="{{ .ResepsiMapsURL }}" target="_blank" rel="noopener" class="event-map-btn" data-edit-field="resepsi_maps_url" data-edit-type="maps" data-edit-label="Link Google Maps Resepsi">
                         <i class="fas fa-map-marked-alt"></i>
                         <span>Google Map</span>
                     </a>
@@ -1706,7 +1706,7 @@
             {{ end }}
 
             {{ if .TurutMengundangList }}
-            <div class="turut-card reveal-up">
+            <div class="turut-card reveal-up" data-edit-field="turut_mengundang" data-edit-type="textarea" data-edit-label="Daftar Turut Mengundang">
                 <h4 class="turut-title">Turut Mengundang</h4>
                 <ul class="turut-list">
                     {{ range .TurutMengundangList }}
@@ -1725,13 +1725,13 @@
     <section id="livestream">
         <div class="reveal-up">
             <h2 class="livestream-title">live streaming</h2>
-            <div class="video-embed-box">
+            <div class="video-embed-box" data-edit-field="youtube_url" data-edit-type="youtube" data-edit-label="Link Video YouTube">
                 <iframe src="{{ .YoutubeEmbedURL }}" title="Live Streaming Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
             </div>
             <p class="livestream-desc">
                 Temui kami secara virtual untuk menyaksikan acara pernikahan kami melalui siaran langsung
             </p>
-            <a href="{{ if .YoutubeURL }}{{ .YoutubeURL }}{{ else }}{{ .YoutubeEmbedURL }}{{ end }}" target="_blank" rel="noopener" class="jawa-std-btn">
+            <a href="{{ if .YoutubeURL }}{{ .YoutubeURL }}{{ else }}{{ .YoutubeEmbedURL }}{{ end }}" target="_blank" rel="noopener" class="jawa-std-btn" data-edit-field="youtube_url" data-edit-type="youtube" data-edit-label="Link Video / Live YouTube">
                 <i class="fas fa-camera-retro"></i>
                 <span>JOIN LIVE</span>
             </a>
@@ -1749,7 +1749,7 @@
             <span class="dual-title-serif-tan">Foto</span>
         </div>
 
-        <div class="gallery-grid reveal-up">
+        <div class="gallery-grid reveal-up" data-edit-field="gallery_images" data-edit-type="gallery" data-edit-label="Galeri Foto">
             {{ range .GalleryList }}
             <div class="gallery-item">
                 <img src="{{ . }}" alt="Galeri Momen" loading="lazy">
@@ -1763,10 +1763,10 @@
          8. LOVE STORY (#cerita)
          ===================================================== -->
     {{ if and (ne .EventType "khitan") .LoveStory }}
-    <section id="cerita" style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}/assets/templates/jawa3/photos/gallery3.jpg{{ end }}');">
+    <section id="cerita" style="background-image: url('{{ if .Sec1Photo }}{{ .Sec1Photo }}{{ else }}/assets/templates/jawa3/photos/gallery3.jpg{{ end }}');" data-edit-field="sec1_photo" data-edit-type="bg_photo" data-edit-aspect="free" data-edit-label="Foto Latar Love Story">
         <div class="glass reveal-up">
             <h2 class="cerita-heading">LOVE STORY</h2>
-            <div class="ls-carousel-wrap" id="loveStoryStage">
+            <div class="ls-carousel-wrap" id="loveStoryStage" data-edit-field="love_story" data-edit-type="love_story" data-edit-label="Kisah Cinta (Love Story)">
                 <button type="button" class="ls-nav-btn ls-prev" id="lsPrevBtn" aria-label="Sebelumnya">
                     <i class="fas fa-chevron-left"></i>
                 </button>
@@ -1798,7 +1798,7 @@
                     </p>
 
                     {{ if .BankAccount1 }}
-                    <div class="bank-block">
+                    <div class="bank-block" data-edit-field="bank_1" data-edit-type="bank_1" data-edit-label="Rekening Bank 1">
                         <img class="bank-logo-img" data-bank-name="{{ .BankName1 }}" src="/assets/templates/jawa3/logo_bca.png" alt="{{ .BankName1 }}">
                         <div class="bank-holder">{{ .BankHolder1 }}</div>
                         <div class="bank-number">{{ .BankAccount1 }}</div>
@@ -1814,7 +1814,7 @@
                     {{ end }}
 
                     {{ if .BankAccount2 }}
-                    <div class="bank-block">
+                    <div class="bank-block" data-edit-field="bank_2" data-edit-type="bank_2" data-edit-label="Rekening Bank 2">
                         <img class="bank-logo-img" data-bank-name="{{ .BankName2 }}" src="/assets/templates/jawa3/logo_mandiri.png" alt="{{ .BankName2 }}">
                         <div class="bank-holder">{{ .BankHolder2 }}</div>
                         <div class="bank-number">{{ .BankAccount2 }}</div>
@@ -1835,7 +1835,7 @@
                             <i class="fas fa-gift"></i>
                         </div>
                         <div class="bank-holder" style="font-family:'Cormorant Infant',serif;font-size:18px;">Kirim Kado</div>
-                        <p class="gift-intro" style="margin:6px 0 12px;">{{ .GiftAddress }}</p>
+                        <p class="gift-intro" style="margin:6px 0 12px;" data-edit-field="gift_address" data-edit-type="textarea" data-edit-label="Alamat Kirim Kado Fisik">{{ .GiftAddress }}</p>
                         <button type="button" class="jawa-copy-btn" onclick="copyText('{{ .GiftAddress | js }}', this)">
                             <i class="far fa-copy"></i>
                             <span>Copy Alamat</span>
@@ -1872,7 +1872,7 @@
     <!-- =====================================================
          10. RSVP & UCAPAN DOA (#ucapan)
          ===================================================== -->
-    <section id="ucapan" style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery5.jpg{{ end }}');">
+    <section id="ucapan" style="background-image: url('{{ if .ClosingPhoto }}{{ .ClosingPhoto }}{{ else }}/assets/templates/jawa3/photos/gallery5.jpg{{ end }}');" data-edit-field="closing_photo" data-edit-type="bg_photo" data-edit-aspect="free" data-edit-label="Foto Latar Ucapan">
         <div class="ucapan-overlay"></div>
         <div class="ucapan-inner">
             <div class="rsvp-header-block reveal-up">
@@ -1934,7 +1934,7 @@
     <section id="penutup">
         <div class="reveal-up">
             <p class="closing-thanks">Terima Kasih</p>
-            <h2 class="closing-couple">
+            <h2 class="closing-couple" data-edit-field="couple_nick" data-edit-type="couple_nick" data-edit-label="Nama Panggilan Pasangan">
                 {{ if eq .EventType "khitan" }}
                     {{ if .ChildNickname }}{{ .ChildNickname }}{{ else }}{{ .GroomName }}{{ end }}
                 {{ else }}

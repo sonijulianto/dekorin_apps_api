@@ -1252,12 +1252,14 @@
                                 <option value="pn4">Monochrome PN4</option>
                                 <option value="jawa3">Art Jawa Coklat 3</option>
                                 <option value="jawa2">Art Jawa Biru 2</option>
+                                <option value="ultah1">Pita &amp; Bola Disko</option>
                             </select>
                             <select id="filterInvitationType" onchange="filterInvitations()"
                                 class="w-full sm:w-auto px-2.5 sm:px-3 py-2.5 sm:py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]">
                                 <option value="all">Semua Acara</option>
                                 <option value="wedding">Pernikahan (Wedding)</option>
                                 <option value="khitan">Khitanan (Khitan)</option>
+                                <option value="birthday">Ulang Tahun (Birthday)</option>
                             </select>
                         </div>
                         <span class="text-xs text-slate-500 font-medium" id="invitationCountInfo">Memuat undangan...</span>
@@ -2504,10 +2506,17 @@
                                 </div>
                                 <!-- Art Jawa Biru 2 -->
                                 <div id="tmplCard_jawa2" onclick="selectInvTemplate('jawa2')" 
-                                    class="inv-template-card cursor-pointer p-3 sm:p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center col-span-2 sm:col-span-1">
+                                    class="inv-template-card cursor-pointer p-3 sm:p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
                                     <div class="w-9 h-9 rounded-full bg-[#284B73] text-[#6EC1E4] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">💠</div>
                                     <div class="font-bold text-xs text-slate-800 mt-2 leading-snug">Art Jawa Biru 2</div>
                                     <div class="text-[10px] text-[#284B73] font-semibold">Javanese Royal Blue</div>
+                                </div>
+                                <!-- Pita & Bola Disko (Birthday) -->
+                                <div id="tmplCard_ultah1" onclick="selectInvTemplate('ultah1')" 
+                                    class="inv-template-card cursor-pointer p-3 sm:p-3.5 rounded-2xl border-2 border-slate-200 transition hover:shadow-md text-center">
+                                    <div class="w-9 h-9 rounded-full bg-[#FFF4F7] text-[#C8102E] border border-[#F7C6D9] flex items-center justify-center mx-auto text-sm shadow-xs font-bold">🎀</div>
+                                    <div class="font-bold text-xs text-slate-800 mt-2 leading-snug">Pita &amp; Bola Disko</div>
+                                    <div class="text-[10px] text-[#C8102E] font-semibold">Coquette Birthday Party</div>
                                 </div>
                             </div>
                         </div>
@@ -2523,7 +2532,7 @@
 
                         <div id="wrapperInvEventType">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">2. Jenis Acara</label>
-                            <div class="grid grid-cols-2 sm:flex gap-2">
+                            <div class="grid grid-cols-3 sm:flex gap-2">
                                 <button type="button" id="btnInvTypeWedding" onclick="selectInvEventType('wedding')"
                                     class="px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold border border-[#D4A574] bg-[#D4A574] text-white transition flex items-center justify-center gap-1.5">
                                     <span>💍</span> Pernikahan
@@ -2531,6 +2540,10 @@
                                 <button type="button" id="btnInvTypeKhitan" onclick="selectInvEventType('khitan')"
                                     class="px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1.5">
                                     <span>🕌</span> Khitanan
+                                </button>
+                                <button type="button" id="btnInvTypeBirthday" onclick="selectInvEventType('birthday')"
+                                    class="px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1.5">
+                                    <span>🎂</span> Ulang Tahun
                                 </button>
                             </div>
                         </div>
@@ -8182,15 +8195,19 @@
                 'pn4': { name: 'Monochrome PN4', bg: 'bg-[#343434] text-white border-[#262627]', dot: 'bg-white' },
                 'jawa3': { name: 'Art Jawa Coklat 3', bg: 'bg-[#4F2323] text-[#D7BB83] border-[#79110E]', dot: 'bg-[#D7BB83]' },
                 'jawa2': { name: 'Art Jawa Biru 2', bg: 'bg-[#284B73] text-white border-[#1B3554]', dot: 'bg-[#6EC1E4]' },
+                'ultah1': { name: 'Pita & Bola Disko', bg: 'bg-[#FFF4F7] text-[#C8102E] border-[#F7C6D9]', dot: 'bg-[#C8102E]' },
             };
 
             if (tbody) {
                 tbody.innerHTML = list.map(inv => {
                     const tmpl = tmplBadges[inv.template] || { name: inv.template || 'Default', bg: 'bg-slate-100 text-slate-700 border-slate-200', dot: 'bg-slate-500' };
                     const isKhitan = inv.event_type === 'khitan';
+                    const isBirthday = inv.event_type === 'birthday';
                     const coupleText = isKhitan
                         ? `<span class="font-bold text-slate-800">${escapeHtml(inv.child_name || inv.groom_name || 'Anak')}</span> <span class="text-[10px] text-emerald-600 font-semibold">(Khitan)</span>`
-                        : `<span class="font-bold text-slate-800">${escapeHtml(inv.groom_nickname || inv.groom_name)}</span> &amp; <span class="font-bold text-slate-800">${escapeHtml(inv.bride_nickname || inv.bride_name)}</span>`;
+                        : isBirthday
+                            ? `<span class="font-bold text-slate-800">${escapeHtml(inv.child_name || inv.groom_name || inv.bride_name || 'Birthday')}</span> <span class="text-[10px] text-[#C8102E] font-semibold">(Ulang Tahun)</span>`
+                            : `<span class="font-bold text-slate-800">${escapeHtml(inv.groom_nickname || inv.groom_name)}</span> &amp; <span class="font-bold text-slate-800">${escapeHtml(inv.bride_nickname || inv.bride_name)}</span>`;
                     
                     const wishCount = typeof inv.wishes_count === 'number' ? inv.wishes_count : ((inv.wishes && Array.isArray(inv.wishes)) ? inv.wishes.length : 0);
                     const statusBadge = inv.is_active
@@ -8265,9 +8282,12 @@
                 mobileContainer.innerHTML = list.map(inv => {
                     const tmpl = tmplBadges[inv.template] || { name: inv.template || 'Default', bg: 'bg-slate-100 text-slate-700 border-slate-200', dot: 'bg-slate-500' };
                     const isKhitan = inv.event_type === 'khitan';
+                    const isBirthday = inv.event_type === 'birthday';
                     const coupleText = isKhitan
                         ? `<span class="font-bold text-slate-900">${escapeHtml(inv.child_name || inv.groom_name || 'Anak')}</span> <span class="text-[10px] text-emerald-600 font-semibold">(Khitan)</span>`
-                        : `<span class="font-bold text-slate-900">${escapeHtml(inv.groom_nickname || inv.groom_name)}</span> &amp; <span class="font-bold text-slate-900">${escapeHtml(inv.bride_nickname || inv.bride_name)}</span>`;
+                        : isBirthday
+                            ? `<span class="font-bold text-slate-900">${escapeHtml(inv.child_name || inv.groom_name || inv.bride_name || 'Birthday')}</span> <span class="text-[10px] text-[#C8102E] font-semibold">(Ulang Tahun)</span>`
+                            : `<span class="font-bold text-slate-900">${escapeHtml(inv.groom_nickname || inv.groom_name)}</span> &amp; <span class="font-bold text-slate-900">${escapeHtml(inv.bride_nickname || inv.bride_name)}</span>`;
                     const wishCount = typeof inv.wishes_count === 'number' ? inv.wishes_count : ((inv.wishes && Array.isArray(inv.wishes)) ? inv.wishes.length : 0);
                     const statusBadge = inv.is_active
                         ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200/60">Aktif</span>`
@@ -8395,12 +8415,15 @@
 
         function applyAdminTemplateRules(tmplId) {
             const isSakura = tmplId === 'ta3' || tmplId === 'ta17';
+            const isUltah = tmplId === 'ultah1' || tmplId === 'pita-bola-disko' || tmplId === 'birthday-1';
 
             // 1. Jenis Acara
             const wrapType = document.getElementById('wrapperInvEventType');
             if (wrapType) wrapType.classList.toggle('hidden', isSakura);
             if (isSakura) {
                 selectInvEventType('wedding');
+            } else if (isUltah) {
+                selectInvEventType('birthday');
             }
 
             // 2. Sakura Notice Boxes
@@ -8472,6 +8495,7 @@
             document.getElementById('inputInvEventType').value = type;
             const btnWedding = document.getElementById('btnInvTypeWedding');
             const btnKhitan = document.getElementById('btnInvTypeKhitan');
+            const btnBirthday = document.getElementById('btnInvTypeBirthday');
             const secWedding = document.getElementById('secInvCoupleWedding');
             const secKhitan = document.getElementById('secInvCoupleKhitan');
 
@@ -8480,41 +8504,66 @@
             const slugInput = document.getElementById('inputInvSlug');
             const quotesInput = document.getElementById('inputInvQuotes');
 
+            [btnWedding, btnKhitan, btnBirthday].forEach(b => {
+                if (!b) return;
+                b.classList.remove('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
+                b.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+            });
+
             if (type === 'khitan') {
-                btnKhitan.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
-                btnKhitan.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-                btnWedding.classList.remove('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
-                btnWedding.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+                if (btnKhitan) {
+                    btnKhitan.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
+                    btnKhitan.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                }
                 secWedding.classList.add('hidden');
                 secKhitan.classList.remove('hidden');
                 if (isNew) {
-                    if (!titleInput.value || titleInput.value.startsWith('The Wedding of')) {
+                    if (!titleInput.value || titleInput.value.startsWith('The Wedding of') || titleInput.value.startsWith('Birthday Party of')) {
                         titleInput.value = 'Tasyakuran Khitanan Rayyan';
                     }
-                    if (!slugInput.value || slugInput.value.startsWith('bagas-zulia')) {
+                    if (!slugInput.value || slugInput.value.startsWith('bagas-zulia') || slugInput.value.startsWith('birthday-')) {
                         const rand = Math.floor(1000 + Math.random() * 9000);
                         slugInput.value = 'khitan-rayyan-' + rand;
                     }
-                    if (!quotesInput.value || quotesInput.value.includes('Ar-Rum')) {
+                    if (!quotesInput.value || quotesInput.value.includes('Ar-Rum') || quotesInput.value.includes('sweet birthday')) {
                         quotesInput.value = '“Semoga menjadi anak yang sholeh, berbakti kepada kedua orang tua, serta berguna bagi nusa, bangsa, dan agama. Aamiin ya Rabbal \'Alamin.”';
                     }
                 }
+            } else if (type === 'birthday') {
+                if (btnBirthday) {
+                    btnBirthday.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
+                    btnBirthday.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                }
+                secWedding.classList.add('hidden');
+                secKhitan.classList.remove('hidden');
+                if (isNew) {
+                    if (!titleInput.value || titleInput.value.startsWith('The Wedding of') || titleInput.value.startsWith('Tasyakuran Khitanan')) {
+                        titleInput.value = 'Birthday Party of Amel';
+                    }
+                    if (!slugInput.value || slugInput.value.startsWith('bagas-zulia') || slugInput.value.startsWith('khitan-rayyan')) {
+                        const rand = Math.floor(1000 + Math.random() * 9000);
+                        slugInput.value = 'birthday-amel-' + rand;
+                    }
+                    if (!quotesInput.value || quotesInput.value.includes('Ar-Rum') || quotesInput.value.includes('anak yang sholeh')) {
+                        quotesInput.value = 'Please join us for a sweet birthday celebration filled with laughter, music, and unforgettable memories.';
+                    }
+                }
             } else {
-                btnWedding.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
-                btnWedding.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-                btnKhitan.classList.remove('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
-                btnKhitan.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+                if (btnWedding) {
+                    btnWedding.classList.add('bg-[#D4A574]', 'text-white', 'border-[#D4A574]');
+                    btnWedding.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                }
                 secWedding.classList.remove('hidden');
                 secKhitan.classList.add('hidden');
                 if (isNew) {
-                    if (!titleInput.value || titleInput.value.startsWith('Tasyakuran Khitanan')) {
+                    if (!titleInput.value || titleInput.value.startsWith('Tasyakuran Khitanan') || titleInput.value.startsWith('Birthday Party of')) {
                         titleInput.value = 'The Wedding of Bagas & Zulia';
                     }
-                    if (!slugInput.value || slugInput.value.startsWith('khitan-rayyan')) {
+                    if (!slugInput.value || slugInput.value.startsWith('khitan-rayyan') || slugInput.value.startsWith('birthday-')) {
                         const rand = Math.floor(1000 + Math.random() * 9000);
                         slugInput.value = 'bagas-zulia-' + rand;
                     }
-                    if (!quotesInput.value || quotesInput.value.includes('anak yang sholeh')) {
+                    if (!quotesInput.value || quotesInput.value.includes('anak yang sholeh') || quotesInput.value.includes('sweet birthday')) {
                         quotesInput.value = '"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)';
                     }
                 }
@@ -8522,16 +8571,20 @@
         }
 
         function autoGenerateInvSlug() {
-            const isKhitan = document.getElementById('inputInvEventType').value === 'khitan';
+            const evType = document.getElementById('inputInvEventType').value;
+            const isKhitan = evType === 'khitan';
+            const isBirthday = evType === 'birthday';
             const slugInput = document.getElementById('inputInvSlug');
             const titleInput = document.getElementById('inputInvTitle');
 
-            if (isKhitan) {
+            if (isKhitan || isBirthday) {
                 const child = (document.getElementById('inputInvChildNickname')?.value || document.getElementById('inputInvChildName')?.value || '').trim();
                 if (child) {
                     const clean = child.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-                    if (!slugInput.dataset.manual || slugInput.value.startsWith('khitan-rayyan-')) slugInput.value = 'khitan-' + clean;
-                    if (!titleInput.dataset.manual || titleInput.value.startsWith('Tasyakuran Khitanan Rayyan')) titleInput.value = 'Tasyakuran Khitanan ' + child;
+                    const prefix = isBirthday ? 'birthday-' : 'khitan-';
+                    const titlePrefix = isBirthday ? 'Birthday Party of ' : 'Tasyakuran Khitanan ';
+                    if (!slugInput.dataset.manual || slugInput.value.startsWith('khitan-rayyan-') || slugInput.value.startsWith('birthday-amel-')) slugInput.value = prefix + clean;
+                    if (!titleInput.dataset.manual || titleInput.value.startsWith('Tasyakuran Khitanan Rayyan') || titleInput.value.startsWith('Birthday Party of Amel')) titleInput.value = titlePrefix + child;
                 }
             } else {
                 const g = (document.getElementById('inputInvGroomNickname')?.value || '').trim();
@@ -8743,9 +8796,9 @@
                 const inv = json.data;
                 if (!inv) return;
 
-                const activeTmpl = ['ta17', 'ta3', 'pn4', 'jawa3', 'jawa2'].includes(inv.template) ? inv.template : 'ta17';
+                const activeTmpl = ['ta17', 'ta3', 'pn4', 'jawa3', 'jawa2', 'ultah1'].includes(inv.template) ? inv.template : 'ta17';
                 selectInvTemplate(activeTmpl);
-                selectInvEventType(inv.event_type || 'wedding');
+                selectInvEventType(inv.event_type || (activeTmpl === 'ultah1' ? 'birthday' : 'wedding'));
 
                 document.getElementById('inputInvTitle').value = inv.title || '';
                 document.getElementById('inputInvTitle').dataset.manual = '1';
@@ -8847,7 +8900,8 @@
             const isSakura = selectedTmpl === 'ta3' || selectedTmpl === 'ta17';
             const isJawa = selectedTmpl === 'jawa3' || selectedTmpl === 'art-jawa-coklat-3' || selectedTmpl === 'jawa-coklat-3';
             const eventType = isSakura ? 'wedding' : document.getElementById('inputInvEventType').value;
-            const isKhitan = !isSakura && eventType === 'khitan';
+            const isKhitan = !isSakura && (eventType === 'khitan' || eventType === 'birthday');
+            const defaultSingleName = eventType === 'birthday' ? 'Amel' : 'Rayyan';
 
             const payload = {
                 title: document.getElementById('inputInvTitle').value.trim(),
@@ -8858,7 +8912,7 @@
                 cover_image: isJawa ? '/assets/templates/jawa3/bg-cover.jpg' : document.getElementById('inputInvCoverImage').value,
                 
                 groom_name: isKhitan
-                    ? (document.getElementById('inputInvChildName').value.trim() || 'Rayyan')
+                    ? (document.getElementById('inputInvChildName').value.trim() || defaultSingleName)
                     : document.getElementById('inputInvGroomName').value.trim(),
                 groom_nickname: isKhitan
                     ? document.getElementById('inputInvChildNickname').value.trim()

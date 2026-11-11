@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"math"
@@ -164,6 +166,11 @@ func CreateInvitation(c *fiber.Ctx) error {
 		})
 	}
 
+	isUltah1 := req.Template == "ultah1" || req.Template == "pita-bola-disko" || req.Template == "birthday-1"
+	if isUltah1 && strings.TrimSpace(req.EventType) == "" {
+		req.EventType = "birthday"
+	}
+
 	if req.EventType == "khitan" {
 		if strings.TrimSpace(req.ChildName) == "" && strings.TrimSpace(req.GroomName) == "" {
 			req.ChildName = "Rayyan Althaf Pratama"
@@ -177,6 +184,41 @@ func CreateInvitation(c *fiber.Ctx) error {
 		}
 		if strings.TrimSpace(req.ChildOrder) == "" {
 			req.ChildOrder = "Putra pertama dari"
+		}
+	} else if req.EventType == "birthday" {
+		if strings.TrimSpace(req.ChildName) == "" && strings.TrimSpace(req.BrideName) == "" && strings.TrimSpace(req.GroomName) == "" {
+			req.ChildName = "Kirana Ayudia"
+		}
+		if strings.TrimSpace(req.ChildName) == "" {
+			if strings.TrimSpace(req.BrideName) != "" {
+				req.ChildName = req.BrideName
+			} else {
+				req.ChildName = req.GroomName
+			}
+		}
+		if strings.TrimSpace(req.GroomName) == "" {
+			req.GroomName = req.ChildName
+		}
+		if strings.TrimSpace(req.BrideName) == "" {
+			req.BrideName = req.ChildName
+		}
+		if strings.TrimSpace(req.ChildNickname) == "" {
+			if strings.TrimSpace(req.BrideNickname) != "" {
+				req.ChildNickname = req.BrideNickname
+			} else if strings.TrimSpace(req.GroomNickname) != "" {
+				req.ChildNickname = req.GroomNickname
+			} else {
+				req.ChildNickname = "Kirana"
+			}
+		}
+		if strings.TrimSpace(req.BrideNickname) == "" {
+			req.BrideNickname = req.ChildNickname
+		}
+		if strings.TrimSpace(req.GroomNickname) == "" {
+			req.GroomNickname = req.ChildNickname
+		}
+		if strings.TrimSpace(req.ChildOrder) == "" {
+			req.ChildOrder = "Sweet Seventeen"
 		}
 	} else {
 		if strings.TrimSpace(req.GroomName) == "" {
@@ -206,39 +248,71 @@ func CreateInvitation(c *fiber.Ctx) error {
 	}
 
 	if strings.TrimSpace(req.AkadDate) == "" {
-		req.AkadDate = "Sabtu, 20 Desember 2026"
+		if req.EventType == "birthday" || isUltah1 {
+			req.AkadDate = "Sabtu, 21 Agustus 2027"
+		} else {
+			req.AkadDate = "Sabtu, 20 Desember 2026"
+		}
 	}
 	if strings.TrimSpace(req.AkadTime) == "" {
-		req.AkadTime = "08:00 - 10:00 WIB"
+		if req.EventType == "birthday" || isUltah1 {
+			req.AkadTime = "19:00 WIB"
+		} else {
+			req.AkadTime = "08:00 - 10:00 WIB"
+		}
 	}
 	if strings.TrimSpace(req.AkadVenue) == "" {
-		req.AkadVenue = "Masjid Agung Al-Barkah"
+		if req.EventType == "birthday" || isUltah1 {
+			req.AkadVenue = "The Pink Terrace"
+		} else {
+			req.AkadVenue = "Masjid Agung Al-Barkah"
+		}
 	}
 	if strings.TrimSpace(req.AkadAddress) == "" {
-		req.AkadAddress = "Jl. Veteran No. 46, RT.004/RW.001, Marga Jaya, Bekasi Selatan"
+		if req.EventType == "birthday" || isUltah1 {
+			req.AkadAddress = "Jl. Kemang Raya No. 8, Jakarta Selatan"
+		} else {
+			req.AkadAddress = "Jl. Veteran No. 46, RT.004/RW.001, Marga Jaya, Bekasi Selatan"
+		}
 	}
 	if strings.TrimSpace(req.AkadMapsURL) == "" {
 		req.AkadMapsURL = "https://maps.app.goo.gl/9bN52xXn"
 	}
 
 	if strings.TrimSpace(req.ResepsiDate) == "" {
-		req.ResepsiDate = "Sabtu, 20 Desember 2026"
+		req.ResepsiDate = req.AkadDate
 	}
 	if strings.TrimSpace(req.ResepsiTime) == "" {
-		req.ResepsiTime = "11:00 - 14:00 WIB"
+		if req.EventType == "birthday" || isUltah1 {
+			req.ResepsiTime = req.AkadTime
+		} else {
+			req.ResepsiTime = "11:00 - 14:00 WIB"
+		}
 	}
 	if strings.TrimSpace(req.ResepsiVenue) == "" {
-		req.ResepsiVenue = "Grand Ballroom Hotel Santika"
+		if req.EventType == "birthday" || isUltah1 {
+			req.ResepsiVenue = req.AkadVenue
+		} else {
+			req.ResepsiVenue = "Grand Ballroom Hotel Santika"
+		}
 	}
 	if strings.TrimSpace(req.ResepsiAddress) == "" {
-		req.ResepsiAddress = "Jl. Jend. Ahmad Yani No. 1, RT.001/RW.005, Margajaya, Bekasi Selatan"
+		if req.EventType == "birthday" || isUltah1 {
+			req.ResepsiAddress = req.AkadAddress
+		} else {
+			req.ResepsiAddress = "Jl. Jend. Ahmad Yani No. 1, RT.001/RW.005, Margajaya, Bekasi Selatan"
+		}
 	}
 	if strings.TrimSpace(req.ResepsiMapsURL) == "" {
 		req.ResepsiMapsURL = "https://maps.app.goo.gl/9bN52xXn"
 	}
 
 	if strings.TrimSpace(req.Quotes) == "" {
-		req.Quotes = `"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)`
+		if req.EventType == "birthday" || isUltah1 {
+			req.Quotes = "Aku mengundang kamu merayakan ulang tahunku yang ke-17. Dandan yang cantik dan ganteng, ya. Datang biar makin seru!"
+		} else {
+			req.Quotes = `"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang." (QS. Ar-Rum: 21)`
+		}
 	}
 	req.BankName1 = strings.TrimSpace(req.BankName1)
 	req.BankAccount1 = strings.TrimSpace(req.BankAccount1)
@@ -250,17 +324,36 @@ func CreateInvitation(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.WaConfirmation) == "" {
 		req.WaConfirmation = "081234567890"
 	}
-	if strings.TrimSpace(req.TurutMengundang) == "" {
+	if strings.TrimSpace(req.TurutMengundang) == "" && req.EventType != "birthday" && !isUltah1 {
 		req.TurutMengundang = "Keluarga Besar Bpk. Bambang & Ibu Siti\nKeluarga Besar Bpk. Agus & Ibu Dewi"
 	}
-	if strings.TrimSpace(req.LoveStory) == "" {
+	if strings.TrimSpace(req.LoveStory) == "" && req.EventType != "birthday" && !isUltah1 {
 		req.LoveStory = `[{"date":"1 September 2021","title":"Pertama Kali Bertemu","description":"Kami pertama kali bertemu di sebuah seminar kampus dan saling bertukar kontak."},{"date":"14 Februari 2023","title":"Komitmen Bersama","description":"Setelah melewati berbagai suka dan duka bersama, kami memutuskan untuk berkomitmen melangkah ke jenjang yang lebih serius."},{"date":"20 Oktober 2025","title":"Lamaran","description":"Dengan restu dari kedua keluarga besar, kami melangsungkan prosesi lamaran dan menyatukan tekad untuk menikah."}]`
 	}
 
 	isIllustration := req.Template == "ta3" || req.Template == "ta17" || req.Template == "ocean-ta17" || req.Template == "blue-ta17"
 	isJawa3 := req.Template == "jawa3" || req.Template == "art-jawa-coklat-3" || req.Template == "jawa-coklat-3"
 	isJawa2 := req.Template == "jawa2" || req.Template == "art-jawa-biru-2" || req.Template == "jawa-biru-2"
-	if isJawa3 {
+	if isUltah1 {
+		if strings.TrimSpace(req.CoverImage) == "" || req.CoverImage == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
+			req.CoverImage = "/assets/templates/ultah1/photos/cover-default.jpg"
+		}
+		if strings.TrimSpace(req.Sec1Photo) == "" || req.Sec1Photo == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.Sec1Photo = "/assets/templates/ultah1/photos/closing-default.jpg"
+		}
+		if strings.TrimSpace(req.GroomPhoto) == "" || req.GroomPhoto == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
+			req.GroomPhoto = "/assets/templates/ultah1/photos/profile-default.jpg"
+		}
+		if strings.TrimSpace(req.BridePhoto) == "" || req.BridePhoto == "/assets/templates/pn4/photos/LeniArdi16.jpeg" {
+			req.BridePhoto = "/assets/templates/ultah1/photos/profile-default.jpg"
+		}
+		if strings.TrimSpace(req.ClosingPhoto) == "" || req.ClosingPhoto == "/assets/templates/pn4/photos/LeniArdi2.jpeg" {
+			req.ClosingPhoto = "/assets/templates/ultah1/photos/closing-default.jpg"
+		}
+		if strings.TrimSpace(req.GalleryImages) == "" || strings.HasPrefix(req.GalleryImages, "/assets/templates/pn4/photos/LeniArdi2.jpeg") {
+			req.GalleryImages = "/assets/templates/ultah1/photos/gallery1.jpg,/assets/templates/ultah1/photos/gallery2.jpg,/assets/templates/ultah1/photos/gallery3.jpg,/assets/templates/ultah1/photos/gallery4.jpg"
+		}
+	} else if isJawa3 {
 		// Foto cover utama template Jawa 3 dikunci permanen menggunakan bg-cover bawaan
 		req.CoverImage = "/assets/templates/jawa3/bg-cover.jpg"
 		if strings.TrimSpace(req.Sec1Photo) == "" || req.Sec1Photo == "/assets/templates/pn4/photos/LeniArdi15.jpeg" {
@@ -358,6 +451,16 @@ func CreateInvitation(c *fiber.Ctx) error {
 			} else {
 				slug = fmt.Sprintf("khitan-%s", uuid.New().String()[:6])
 			}
+		} else if req.EventType == "birthday" {
+			childNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.ChildNickname), " ", "-"))
+			if childNick == "" {
+				childNick = strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.ChildName), " ", "-"))
+			}
+			if childNick != "" {
+				slug = fmt.Sprintf("ultah-%s", childNick)
+			} else {
+				slug = fmt.Sprintf("ultah-%s", uuid.New().String()[:6])
+			}
 		} else {
 			groomNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.GroomNickname), " ", "-"))
 			brideNick := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(req.BrideNickname), " ", "-"))
@@ -373,6 +476,8 @@ func CreateInvitation(c *fiber.Ctx) error {
 	if title == "" {
 		if req.EventType == "khitan" {
 			title = fmt.Sprintf("Tasyakuran Khitanan %s", req.ChildName)
+		} else if req.EventType == "birthday" {
+			title = fmt.Sprintf("Birthday Party of %s", req.ChildName)
 		} else {
 			title = fmt.Sprintf("The Wedding of %s & %s", req.GroomNickname, req.BrideNickname)
 		}
@@ -402,8 +507,10 @@ func CreateInvitation(c *fiber.Ctx) error {
 		templateName = "jawa2"
 	} else if templateName == "art-jawa-coklat-3" || templateName == "jawa-coklat-3" {
 		templateName = "jawa3"
+	} else if templateName == "pita-bola-disko" || templateName == "birthday-1" {
+		templateName = "ultah1"
 	}
-	if templateName != "pn4" && templateName != "ta3" && templateName != "ta17" && templateName != "jawa3" && templateName != "jawa2" {
+	if templateName != "pn4" && templateName != "ta3" && templateName != "ta17" && templateName != "jawa3" && templateName != "jawa2" && templateName != "ultah1" {
 		templateName = "ta17"
 	}
 
@@ -512,8 +619,10 @@ func UpdateInvitation(c *fiber.Ctx) error {
 			tmpl = "jawa2"
 		} else if tmpl == "art-jawa-coklat-3" || tmpl == "jawa-coklat-3" {
 			tmpl = "jawa3"
+		} else if tmpl == "pita-bola-disko" || tmpl == "birthday-1" {
+			tmpl = "ultah1"
 		}
-		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" && tmpl != "jawa2" {
+		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" && tmpl != "jawa2" && tmpl != "ultah1" {
 			tmpl = "ta17"
 		}
 		invitation.Template = tmpl
@@ -826,8 +935,10 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 	var invitation models.Invitation
 	var wishes []models.InvitationWish
 
+	isPreviewOrEdit := c.Query("preview") == "1" || c.Query("edit") == "1"
+
 	// Cek In-Memory Cache terlebih dahulu untuk kecepatan render instan (<1ms) & hemat koneksi PostgreSQL
-	if cachedInv, cachedWishes, found := utils.GlobalInvitationCache.Get(slug); found && c.Query("preview") != "1" {
+	if cachedInv, cachedWishes, found := utils.GlobalInvitationCache.Get(slug); found && !isPreviewOrEdit {
 		invitation = *cachedInv
 		wishes = cachedWishes
 	} else {
@@ -838,14 +949,14 @@ func ShowPublicInvitation(c *fiber.Ctx) error {
 		// Ambil daftar ucapan (dibatasi 50 ucapan terbaru pada initial render agar HTML tetap ringan)
 		config.DB.Where("invitation_id = ?", invitation.ID).Order("created_at DESC").Limit(50).Find(&wishes)
 
-		// Simpan ke memory cache jika bukan mode preview
-		if c.Query("preview") != "1" {
+		// Simpan ke memory cache jika bukan mode preview / visual editor
+		if !isPreviewOrEdit {
 			utils.GlobalInvitationCache.Set(slug, invitation, wishes)
 		}
 	}
 
-	// Jika undangan dinonaktifkan sementara (Draft) dan bukan mode preview portal
-	if !invitation.IsActive && c.Query("preview") != "1" {
+	// Jika undangan dinonaktifkan sementara (Draft) dan bukan mode preview / editor
+	if !invitation.IsActive && !isPreviewOrEdit {
 		c.Set("Content-Type", "text/html; charset=utf-8")
 		return c.Status(fiber.StatusOK).SendString(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Undangan Sedang Disiapkan</title><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF7F2;font-family:'Plus Jakarta Sans',sans-serif;padding:24px;"><div style="max-width:420px;background:#fff;border:1px solid rgba(212,165,116,0.3);border-radius:24px;padding:32px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.04);"><div style="font-size:40px;margin-bottom:12px;">✨</div><h1 style="margin:0 0 8px;font-size:20px;color:#2C2C2C;">Undangan Sedang Disiapkan</h1><p style="margin:0;font-size:14px;color:#64748B;line-height:1.6;">Tautan undangan ini sedang dalam tahap penyempurnaan oleh tuan rumah. Silakan kunjungi kembali nanti.</p></div></body></html>`)
 	}
@@ -1021,6 +1132,35 @@ func getSampleInvitationForTemplate(templateName string) (models.Invitation, []m
 		inv.ClosingPhoto = "/assets/templates/jawa2/photos/cover-default.jpg"
 		inv.GalleryImages = "/assets/templates/jawa2/photos/gallery1.jpg, /assets/templates/jawa2/photos/gallery2.jpg, /assets/templates/jawa2/photos/gallery3.jpg, /assets/templates/jawa2/photos/gallery4.jpg, /assets/templates/jawa2/photos/gallery5.jpg, /assets/templates/jawa2/photos/gallery6.jpg, /assets/templates/jawa2/photos/gallery7.jpg, /assets/templates/jawa2/photos/gallery8.jpg"
 		inv.AudioURL = "/assets/templates/jawa2/default-song.mp3"
+	case "ultah1", "pita-bola-disko", "birthday-1":
+		inv.EventType = "birthday"
+		inv.Title = "Sweet Seventeen Kirana Ayudia"
+		inv.ChildName = "Kirana Ayudia"
+		inv.ChildNickname = "Kirana"
+		inv.ChildOrder = "Sweet Seventeen"
+		inv.BrideName = "Kirana Ayudia"
+		inv.BrideNickname = "Kirana"
+		inv.GroomName = "Kirana Ayudia"
+		inv.GroomNickname = "Kirana"
+		inv.Quotes = "Aku mengundang kamu merayakan ulang tahunku yang ke-17. Dandan yang cantik dan ganteng, ya. Datang biar makin seru!"
+		inv.AkadDate = "Sabtu, 21 Agustus 2027"
+		inv.AkadTime = "19:00"
+		inv.AkadVenue = "The Pink Terrace"
+		inv.AkadAddress = "Jl. Kemang Raya No. 8, Jakarta Selatan"
+		inv.AkadMapsURL = "https://maps.google.com"
+		inv.ResepsiDate = "Sabtu, 21 Agustus 2027"
+		inv.ResepsiTime = "19:00"
+		inv.ResepsiVenue = "The Pink Terrace"
+		inv.ResepsiAddress = "Jl. Kemang Raya No. 8, Jakarta Selatan"
+		inv.ResepsiMapsURL = "https://maps.google.com"
+		inv.CoverImage = "/assets/templates/ultah1/photos/cover-default.jpg"
+		inv.BridePhoto = "/assets/templates/ultah1/photos/profile-default.jpg"
+		inv.GroomPhoto = "/assets/templates/ultah1/photos/profile-default.jpg"
+		inv.Sec1Photo = "/assets/templates/ultah1/photos/closing-default.jpg"
+		inv.ClosingPhoto = "/assets/templates/ultah1/photos/closing-default.jpg"
+		inv.GalleryImages = "/assets/templates/ultah1/photos/gallery1.jpg, /assets/templates/ultah1/photos/gallery2.jpg, /assets/templates/ultah1/photos/gallery3.jpg, /assets/templates/ultah1/photos/gallery4.jpg"
+		inv.AudioURL = "/assets/templates/ultah1/default-song.mp3"
+		inv.LoveStory = ""
 	default: // ta17
 		inv.CoverImage = "/assets/templates/ta17/couple-welcome.png"
 		inv.GroomPhoto = "/assets/templates/ta17/groom-default.png"
@@ -1119,6 +1259,21 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 				child = "Putra Kami"
 			}
 			ogTitle = "Tasyakuran Khitan " + child
+		} else if invitation.EventType == "birthday" {
+			child := strings.TrimSpace(invitation.ChildNickname)
+			if child == "" {
+				child = strings.TrimSpace(invitation.ChildName)
+			}
+			if child == "" {
+				child = strings.TrimSpace(invitation.BrideNickname)
+			}
+			if child == "" {
+				child = strings.TrimSpace(invitation.BrideName)
+			}
+			if child == "" {
+				child = "Kirana"
+			}
+			ogTitle = "Birthday Party of " + child
 		} else {
 			bride := strings.TrimSpace(invitation.BrideNickname)
 			if bride == "" {
@@ -1149,6 +1304,8 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 	if ogDate == "" {
 		if invitation.EventType == "khitan" {
 			ogDate = "Tasyakuran Khitan"
+		} else if invitation.EventType == "birthday" {
+			ogDate = "Acara Ulang Tahun"
 		} else {
 			ogDate = "Acara Pernikahan"
 		}
@@ -1178,6 +1335,8 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 			ogImage = "/assets/templates/jawa3/bg-cover.jpg"
 		case "jawa2", "art-jawa-biru-2", "jawa-biru-2":
 			ogImage = "/assets/templates/jawa2/photos/cover-default.jpg"
+		case "ultah1", "pita-bola-disko", "birthday-1":
+			ogImage = "/assets/templates/ultah1/photos/cover-default.jpg"
 		default:
 			ogImage = "/assets/templates/ta17/couple-welcome.png"
 		}
@@ -1231,6 +1390,8 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 		templateFile = "template_jawa3.html"
 	case "jawa2", "art-jawa-biru-2", "jawa-biru-2":
 		templateFile = "template_jawa2.html"
+	case "ultah1", "pita-bola-disko", "birthday-1":
+		templateFile = "template_ultah1.html"
 	default:
 		// Fallback otomatis ke Ocean Blossom (TA17) untuk template lama / selain yang disisakan
 		templateFile = "template_ta17.html"
@@ -1245,5 +1406,36 @@ func renderInvitationHTML(c *fiber.Ctx, invitation models.Invitation, wishes []m
 	c.Set("Pragma", "no-cache")
 	c.Set("Expires", "0")
 	c.Set("Content-Type", "text/html; charset=utf-8")
+
+	if c.Query("edit") == "1" {
+		var buf bytes.Buffer
+		if err := tmpl.Execute(&buf, data); err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Gagal merender template editor: " + err.Error())
+		}
+		return c.SendString(injectVisualEditorAssets(buf.String(), invitation, templateName))
+	}
+
 	return tmpl.Execute(c.Response().BodyWriter(), data)
+}
+
+// injectVisualEditorAssets menyisipkan seed JSON (tanpa kredensial sensitif) dan runtime visual editor pada mode ?edit=1.
+func injectVisualEditorAssets(htmlStr string, invitation models.Invitation, templateName string) string {
+	seedInv := invitation
+	seedInv.Template = templateName
+	seedInv.EditToken = ""
+	seedInv.EditPin = ""
+	seedInv.GuestListJSON = ""
+	seedInv.Wishes = nil
+
+	seedBytes, _ := json.Marshal(seedInv)
+	safeSeed := strings.ReplaceAll(string(seedBytes), "</", "<\\/")
+	editorInjection := fmt.Sprintf(
+		`<script id="dekorin-visual-editor-seed" type="application/json">%s</script><script src="/assets/invitation_visual_editor.js?v=20261111"></script></body>`,
+		safeSeed,
+	)
+
+	if idx := strings.LastIndex(htmlStr, "</body>"); idx != -1 {
+		return htmlStr[:idx] + editorInjection + htmlStr[idx+len("</body>"):]
+	}
+	return htmlStr + editorInjection
 }

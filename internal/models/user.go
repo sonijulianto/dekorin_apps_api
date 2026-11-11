@@ -10,7 +10,7 @@ type User struct {
 	Phone     string    `gorm:"type:varchar(25);index;default:''" json:"phone"`
 	Email     string    `gorm:"type:varchar(100);default:''" json:"email"`
 	Password  string    `gorm:"type:varchar(255);not null" json:"-"` // JSON di-ignore agar password tidak bocor
-	Role      string    `gorm:"type:varchar(20);default:'crew';not null" json:"role"` // 'superadmin', 'owner', 'admin', 'crew'
+	Role      string    `gorm:"type:varchar(20);default:'crew';not null" json:"role"` // 'superadmin', 'owner', 'admin', 'crew', 'couple'
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 

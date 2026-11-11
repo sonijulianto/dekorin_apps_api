@@ -337,9 +337,69 @@
       </section>
 
       <!-- ===================================================== -->
-      <!-- TAB 2: EDIT DATA UNDANGAN (SELF-SERVICE EDITOR)       -->
+      <!-- TAB 2: EDIT DATA UNDANGAN (VISUAL + FORM EDITOR)      -->
       <!-- ===================================================== -->
-      <section id="tab-editor" class="hidden space-y-5 animate-fade-up">
+      <section id="tab-editor" class="hidden space-y-4 animate-fade-up">
+
+        <!-- TOP MODE SWITCHER (VISUAL vs FORM) -->
+        <div class="bg-white rounded-2xl border border-[#D4A574]/30 p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-xs">
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="btnModeVisual" onclick="setPortalEditorMode('visual')"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold gold-gradient text-white shadow-xs transition">
+              ✨ Visual Editor
+            </button>
+            <button type="button" id="btnModeForm" onclick="setPortalEditorMode('form')"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-[#F9F3EC] transition">
+              📝 Mode Form
+            </button>
+          </div>
+          <div id="visualEditorUnsavedBadge" class="hidden text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+            ● Ada perubahan belum disimpan
+          </div>
+        </div>
+
+        <!-- A. VISUAL EDITOR CONTAINER (DEFAULT) -->
+        <div id="portalVisualEditorContainer" class="space-y-3">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-3 flex flex-wrap items-center justify-between gap-2 shadow-xs">
+            <p class="text-xs text-slate-600">
+              <span class="font-bold text-[#C59563]">Tips:</span> Klik langsung <strong>tulisan</strong> atau <strong>foto</strong> pada undangan untuk menggantinya.
+            </p>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" id="btnVisualTogglePreview" onclick="togglePortalVisualPreview()"
+                class="px-3 py-1.5 rounded-xl bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30 text-xs font-bold hover:bg-[#D4A574]/20 transition">
+                👁️ Pratinjau
+              </button>
+              <button type="button" id="btnVisualToggleGate" onclick="togglePortalVisualGate()"
+                class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition">
+                🚪 Lihat Sampul
+              </button>
+              <button type="button" onclick="openPortalVisualSettings()"
+                class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition">
+                ⚙️ Pengaturan
+              </button>
+              <button type="button" id="btnVisualSave" onclick="savePortalVisualDraft()"
+                class="px-4 py-1.5 rounded-xl gold-gradient text-white text-xs font-bold shadow-xs hover:opacity-95 transition">
+                💾 Simpan
+              </button>
+            </div>
+          </div>
+
+          <div class="mx-auto w-full max-w-[440px] bg-white rounded-[28px] border-4 border-[#2C2C2C] shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-[#2C2C2C] text-white px-4 py-2 flex items-center justify-between text-[11px]">
+              <span class="flex items-center gap-1.5 font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Editor Interaktif Langsung</span>
+              </span>
+              <span id="visualEditorTplLabel" class="text-white/70 font-mono">ta17</span>
+            </div>
+            <iframe id="portalVisualEditorIframe" src="about:blank" class="w-full h-[74vh] min-h-[540px] bg-[#FAF7F2] border-0"></iframe>
+          </div>
+
+          <input type="file" id="portalVisualPhotoInput" accept="image/*" class="hidden" onchange="handlePortalVisualPhotoPicked(this)">
+        </div>
+
+        <!-- B. FORM EDITOR CONTAINER (OPTIONAL FALLBACK) -->
+        <div id="portalFormEditorContainer" class="hidden space-y-5">
 
         <!-- SUB-NAVIGATION PILLS -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-2 sticky top-[61px] md:top-[109px] z-20 shadow-xs">
@@ -377,7 +437,7 @@
             <!-- JENIS ACARA -->
             <div id="eventTypeSelectorSection" class="space-y-1.5">
               <label class="block text-xs font-bold text-slate-700">Pilih Kategori Acara</label>
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-3 gap-3">
                 <label class="cursor-pointer">
                   <input type="radio" name="event_type" value="wedding" onchange="handleEventTypeChange()" class="sr-only peer" checked>
                   <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#D4A574] peer-checked:bg-[#F9F3EC]/60 transition text-center">
@@ -390,6 +450,13 @@
                   <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#2E8B57] peer-checked:bg-emerald-50/50 transition text-center">
                     <div class="text-xl mb-1">🕌</div>
                     <div class="text-xs font-bold text-[#2C2C2C]">Tasyakuran Khitan</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="event_type" value="birthday" onchange="handleEventTypeChange()" class="sr-only peer">
+                  <div class="p-3.5 rounded-2xl border-2 border-slate-200 peer-checked:border-[#C8102E] peer-checked:bg-rose-50/50 transition text-center">
+                    <div class="text-xl mb-1">🎀</div>
+                    <div class="text-xs font-bold text-[#2C2C2C]">Ulang Tahun</div>
                   </div>
                 </label>
               </div>
@@ -887,6 +954,7 @@
           </div>
 
         </form>
+        </div>
       </section>
 
       <!-- ===================================================== -->
@@ -1074,6 +1142,79 @@
   </div>
 
   <!-- ========================================================= -->
+  <!-- MODAL VISUAL EDITOR: EDIT TULISAN / GALERI / KISAH CINTA  -->
+  <!-- ========================================================= -->
+  <div id="portalVisualFieldModal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#D4A574]/30 overflow-hidden max-h-[88vh] flex flex-col animate-fade-up">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-[#FAF7F2]">
+        <div class="min-w-0">
+          <p class="text-[10px] font-extrabold uppercase tracking-wider text-[#C59563]">Visual Editor</p>
+          <h3 id="pvFieldModalTitle" class="text-sm font-bold text-[#2C2C2C] truncate">Edit Konten</h3>
+        </div>
+        <button type="button" onclick="closePortalVisualFieldModal()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-slate-800 font-bold text-xs">✕</button>
+      </div>
+      <div id="pvFieldModalBody" class="p-5 overflow-y-auto space-y-4"></div>
+      <div id="pvFieldModalFooter" class="px-5 py-3.5 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+        <button type="button" onclick="closePortalVisualFieldModal()" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-600">Batal</button>
+        <button type="button" id="pvFieldModalApplyBtn" onclick="applyPortalVisualFieldModal()" class="px-5 py-2 rounded-xl gold-gradient text-white text-xs font-bold shadow-xs">Terapkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL VISUAL EDITOR: PENGATURAN NON-VISUAL                -->
+  <!-- ========================================================= -->
+  <div id="portalVisualSettingsModal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#D4A574]/30 overflow-hidden max-h-[90vh] flex flex-col animate-fade-up">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-[#FAF7F2]">
+        <div>
+          <p class="text-[10px] font-extrabold uppercase tracking-wider text-[#C59563]">Pengaturan Undangan</p>
+          <h3 class="text-sm font-bold text-[#2C2C2C]">Tema, Tautan URL &amp; Media</h3>
+        </div>
+        <button type="button" onclick="closePortalVisualSettings()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-slate-800 font-bold text-xs">✕</button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Desain Template</label>
+          <select id="pvSetTemplate" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm bg-white"></select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Kategori Acara</label>
+          <select id="pvSetEventType" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm bg-white">
+            <option value="wedding">Pernikahan (Wedding)</option>
+            <option value="khitan">Tasyakuran Khitan</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Judul Undangan</label>
+          <input type="text" id="pvSetTitle" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Kode Link (Slug URL)</label>
+          <input type="text" id="pvSetSlug" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-mono">
+          <p class="text-[11px] text-amber-600 mt-1">⚠️ Hindari mengubah slug jika link sudah disebar ke tamu.</p>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Link Musik Latar (.mp3)</label>
+          <input type="text" id="pvSetAudio" placeholder="Kosongkan untuk musik default" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Link Video / Live YouTube (Opsional)</label>
+          <input type="text" id="pvSetYoutube" placeholder="https://youtu.be/..." class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Nomor WA Konfirmasi Hadiah</label>
+          <input type="tel" id="pvSetWa" placeholder="081234567890" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm">
+        </div>
+      </div>
+      <div class="px-5 py-3.5 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+        <button type="button" onclick="closePortalVisualSettings()" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-600">Batal</button>
+        <button type="button" onclick="applyPortalVisualSettings()" class="px-5 py-2 rounded-xl gold-gradient text-white text-xs font-bold shadow-xs">Terapkan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
   <!-- JAVASCRIPT APPLICATION LOGIC                              -->
   <!-- ========================================================= -->
   <script>
@@ -1085,7 +1226,8 @@
       { id: 'ta3', name: 'Sakura Blossom TA3', tag: 'Romantic Floral & Arch', color: '#D4A373', bg: '#FFF5F5', type: 'wedding' },
       { id: 'pn4', name: 'Monochrome PN4', tag: 'Editorial Monochrome', color: '#343434', bg: '#F1F1F1', type: 'wedding' },
       { id: 'jawa3', name: 'Art Jawa Coklat 3', tag: 'Javanese Royal & Wayang', color: '#4F2323', bg: '#FFFCF3', type: 'wedding' },
-      { id: 'jawa2', name: 'Art Jawa Biru 2', tag: 'Javanese Royal Blue & Wayang', color: '#284B73', bg: '#F6F8FB', type: 'wedding' }
+      { id: 'jawa2', name: 'Art Jawa Biru 2', tag: 'Javanese Royal Blue & Wayang', color: '#284B73', bg: '#F6F8FB', type: 'wedding' },
+      { id: 'ultah1', name: 'Pita & Bola Disko', tag: 'Sweet Seventeen & Birthday Party', color: '#C8102E', bg: '#FFF4F7', type: 'birthday' }
     ];
 
     const PHOTO_SLOTS_CONFIG = [
@@ -1307,9 +1449,9 @@
       if (!inv) return;
 
       const publicUrl = getPublicInvitationUrl(inv.slug);
-      const isKhitan = inv.event_type === 'khitan';
+      const isKhitan = inv.event_type === 'khitan' || inv.event_type === 'birthday';
       const displayCouple = isKhitan
-        ? (inv.child_name || inv.groom_name || 'Tasyakuran Khitan')
+        ? (inv.child_name || inv.groom_name || (inv.event_type === 'birthday' ? 'Acara Ulang Tahun' : 'Tasyakuran Khitan'))
         : `${inv.bride_nickname || inv.bride_name || 'Mempelai Wanita'} & ${inv.groom_nickname || inv.groom_name || 'Mempelai Pria'}`;
 
       // Header
@@ -1348,7 +1490,7 @@
       // Populate Form Editor
       const eventRadios = document.querySelectorAll('input[name="event_type"]');
       eventRadios.forEach(r => { r.checked = (r.value === (inv.event_type || 'wedding')); });
-      selectedTemplateId = ['ta17', 'ta3', 'pn4', 'jawa3', 'jawa2'].includes(inv.template) ? inv.template : 'ta17';
+      selectedTemplateId = ['ta17', 'ta3', 'pn4', 'jawa3', 'jawa2', 'ultah1'].includes(inv.template) ? inv.template : 'ta17';
 
       setVal('f_title', inv.title);
       setVal('f_slug', inv.slug);
@@ -1435,6 +1577,14 @@
       loadGuestListState(inv.guest_list_json);
       selectWaTemplate(activeWaTemplate);
       setGuestFilter(activeGuestFilter);
+
+      if (typeof setPortalVisualDirty === 'function') {
+        setPortalVisualDirty(false);
+      }
+      portalVisualIframeLoadedSlug = '';
+      if (currentActiveMainTab === 'editor' && portalEditorMode === 'visual' && typeof loadPortalVisualIframe === 'function') {
+        loadPortalVisualIframe(true);
+      }
     }
 
     function setVal(id, val) {
@@ -1470,6 +1620,9 @@
       });
 
       if (tabName === 'editor') {
+        if (typeof setPortalEditorMode === 'function') {
+          setPortalEditorMode(portalEditorMode || 'visual', { skipSync: true });
+        }
         switchEditorSubTab(currentActiveSubTab);
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1477,6 +1630,7 @@
 
     function openEditorSubTab(subTab) {
       currentActiveSubTab = subTab;
+      portalEditorMode = 'visual';
       switchMainTab('editor');
     }
 
@@ -1552,13 +1706,14 @@
     // =========================================================
     function handleEventTypeChange() {
       const selectedType = document.querySelector('input[name="event_type"]:checked')?.value || 'wedding';
-      const isKhitan = selectedType === 'khitan';
+      const isKhitan = selectedType === 'khitan' || selectedType === 'birthday';
+      const isBirthday = selectedType === 'birthday';
 
       document.getElementById('khitanFieldsBox').classList.toggle('hidden', !isKhitan);
       document.getElementById('weddingFieldsBox').classList.toggle('hidden', isKhitan);
 
-      document.getElementById('labelAkadCardTitle').textContent = isKhitan ? 'Acara Khitanan / Syukuran' : 'Akad Nikah / Pemberkatan';
-      document.getElementById('labelResepsiCardTitle').textContent = isKhitan ? 'Ramah Tamah / Hiburan' : "Resepsi / Walimatul 'Ursy";
+      document.getElementById('labelAkadCardTitle').textContent = isBirthday ? 'Acara Utama Ulang Tahun' : (isKhitan ? 'Acara Khitanan / Syukuran' : 'Akad Nikah / Pemberkatan');
+      document.getElementById('labelResepsiCardTitle').textContent = isBirthday ? 'After Party / Hiburan (Opsional)' : (isKhitan ? 'Ramah Tamah / Hiburan' : "Resepsi / Walimatul 'Ursy");
       renderTemplatePicker();
     }
 
@@ -2039,75 +2194,57 @@
     }
 
     // =========================================================
-    // SAVE INVITATION CHANGES
+    // SAVE INVITATION CHANGES (SHARED FORM + VISUAL EDITOR)
     // =========================================================
-    async function handleSaveInvitation(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnSaveInvitation');
-      btn.disabled = true;
-      btn.textContent = '⏳ Menyimpan...';
-
+    function validateInvitationBeforeSave() {
       const isSakura = selectedTemplateId === 'ta3' || selectedTemplateId === 'ta17';
       const isMonochrome = selectedTemplateId === 'pn4';
       const eventType = isSakura ? 'wedding' : (document.querySelector('input[name="event_type"]:checked')?.value || 'wedding');
-      const isKhitan = !isSakura && eventType === 'khitan';
+      const isKhitan = !isSakura && (eventType === 'khitan' || eventType === 'birthday');
 
       if (isMonochrome) {
         if (!photoValues.cover_image) {
-          alert('Foto Sampul Utama (Cover) wajib diunggah untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Foto Sampul Utama (Cover) wajib diunggah untuk tema Monochrome (*Mandatory)!';
         }
         if (!isKhitan && !photoValues.bride_photo) {
-          alert('Foto Mempelai Wanita wajib diunggah untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Foto Mempelai Wanita wajib diunggah untuk tema Monochrome (*Mandatory)!';
         }
         if (!photoValues.groom_photo && !photoValues.child_photo) {
-          alert('Foto Mempelai Pria / Anak wajib diunggah untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Foto Mempelai Pria / Anak wajib diunggah untuk tema Monochrome (*Mandatory)!';
         }
         if (!photoValues.sec1_photo) {
-          alert('Foto Pembuka / Section 1 wajib diunggah untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Foto Pembuka / Section 1 wajib diunggah untuk tema Monochrome (*Mandatory)!';
         }
         if (!photoValues.event_photo) {
-          alert('Foto Countdown Acara wajib diunggah untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Foto Countdown Acara wajib diunggah untuk tema Monochrome (*Mandatory)!';
         }
         if (!photoValues.closing_photo) {
-          alert('Foto Penutup / Ucapan Terima Kasih wajib diunggah untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Foto Penutup / Ucapan Terima Kasih wajib diunggah untuk tema Monochrome (*Mandatory)!';
         }
         if (!galleryUrls || galleryUrls.length === 0) {
-          alert('Minimal unggah 1 foto galeri momen untuk tema Monochrome (*Mandatory)!');
-          btn.disabled = false;
-          btn.textContent = '💾 Simpan Perubahan Undangan';
-          return;
+          return 'Minimal unggah 1 foto galeri momen untuk tema Monochrome (*Mandatory)!';
         }
       }
+      return '';
+    }
+
+    function buildInvitationSavePayload() {
+      const isSakura = selectedTemplateId === 'ta3' || selectedTemplateId === 'ta17';
+      const eventType = isSakura ? 'wedding' : (document.querySelector('input[name="event_type"]:checked')?.value || 'wedding');
+      const isKhitan = !isSakura && (eventType === 'khitan' || eventType === 'birthday');
+      const isJawa3 = selectedTemplateId === 'jawa3' || selectedTemplateId === 'art-jawa-coklat-3' || selectedTemplateId === 'jawa-coklat-3';
 
       const childName = document.getElementById('f_child_name').value.trim();
       const childNickname = document.getElementById('f_child_nickname').value.trim();
       const childOrder = document.getElementById('f_child_order').value.trim();
       const khitanParents = document.getElementById('f_khitan_parents').value.trim();
 
-      const payload = {
+      return {
         slug: document.getElementById('f_slug').value.trim(),
         title: document.getElementById('f_title').value.trim(),
         template: selectedTemplateId,
         event_type: eventType,
-        cover_image: (selectedTemplateId === 'jawa3' || selectedTemplateId === 'art-jawa-coklat-3' || selectedTemplateId === 'jawa-coklat-3')
+        cover_image: isJawa3
           ? '/assets/templates/jawa3/bg-cover.jpg'
           : (photoValues.cover_image === '/assets/owlink/b9c1e420-cd8d-11f0-9fb2-69fd61d4e768.jpg' ? '' : (photoValues.cover_image || '')),
         quotes: document.getElementById('f_quotes').value.trim(),
@@ -2117,14 +2254,14 @@
         groom_child_order: isKhitan ? childOrder : document.getElementById('f_groom_child_order').value.trim(),
         groom_parents: isKhitan ? khitanParents : document.getElementById('f_groom_parents').value.trim(),
         groom_instagram: document.getElementById('f_groom_instagram').value.trim(),
-        groom_photo: isSakura ? '' : (isKhitan ? (photoValues.child_photo || photoValues.groom_photo || '') : (photoValues.groom_photo || '')),
+        groom_photo: isKhitan ? (photoValues.child_photo || photoValues.groom_photo || '') : (photoValues.groom_photo || ''),
 
         bride_name: isKhitan ? '' : document.getElementById('f_bride_name').value.trim(),
         bride_nickname: isKhitan ? '' : document.getElementById('f_bride_nickname').value.trim(),
         bride_child_order: isKhitan ? '' : document.getElementById('f_bride_child_order').value.trim(),
         bride_parents: isKhitan ? '' : document.getElementById('f_bride_parents').value.trim(),
         bride_instagram: isKhitan ? '' : document.getElementById('f_bride_instagram').value.trim(),
-        bride_photo: isSakura ? '' : (photoValues.bride_photo || ''),
+        bride_photo: isKhitan ? '' : (photoValues.bride_photo || ''),
 
         child_name: isSakura ? '' : childName,
         child_nickname: isSakura ? '' : childNickname,
@@ -2157,13 +2294,28 @@
         love_story: serializeLoveStoryFromUI(),
         turut_mengundang: document.getElementById('f_turut_mengundang').value.trim(),
 
-        sec1_photo: isSakura ? '' : (photoValues.sec1_photo || ''),
-        akad_photo: isSakura ? '' : (photoValues.akad_photo || ''),
-        resepsi_photo: isSakura ? '' : (photoValues.resepsi_photo || ''),
-        event_photo: isSakura ? '' : (photoValues.event_photo || ''),
-        closing_photo: isSakura ? '' : (photoValues.closing_photo || ''),
+        sec1_photo: photoValues.sec1_photo || '',
+        akad_photo: photoValues.akad_photo || '',
+        resepsi_photo: photoValues.resepsi_photo || '',
+        event_photo: photoValues.event_photo || '',
+        closing_photo: photoValues.closing_photo || '',
         is_active: document.getElementById('dashActiveToggle').checked
       };
+    }
+
+    async function executeSaveInvitation(btn, defaultLabel) {
+      const validationErr = validateInvitationBeforeSave();
+      if (validationErr) {
+        showToast(validationErr, 'error');
+        return false;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Menyimpan...';
+      }
+
+      const payload = buildInvitationSavePayload();
 
       try {
         const res = await fetch(`/api/invitation-portal/${encodeURIComponent(portalToken)}`, {
@@ -2175,18 +2327,27 @@
         if (!res.ok) {
           throw new Error(json.error || 'Gagal menyimpan perubahan');
         }
-        // Pertahankan wishes agar tidak hilang di state lokal
         const existingWishes = currentInvitation?.wishes || [];
         currentInvitation = json.data;
         currentInvitation.wishes = existingWishes;
         populatePortalUI();
         showToast('✨ Perubahan undangan berhasil disimpan!');
+        return true;
       } catch (err) {
         showToast(err.message, 'error');
+        return false;
       } finally {
-        btn.disabled = false;
-        btn.textContent = '💾 Simpan Perubahan';
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = defaultLabel;
+        }
       }
+    }
+
+    async function handleSaveInvitation(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveInvitation');
+      await executeSaveInvitation(btn, '💾 Simpan Perubahan');
     }
 
     async function handleQuickToggleActive(isActive) {
@@ -2627,6 +2788,679 @@
           </div>
         </div>
       `).join('');
+    }
+
+    // =========================================================
+    // VISUAL EDITOR CONTROLLER (CLICK-TO-EDIT IFRAME BRIDGE)
+    // =========================================================
+    let portalEditorMode = 'visual';
+    let portalVisualPreviewOff = false;
+    let portalVisualGateOpen = false;
+    let portalVisualDirty = false;
+    let portalVisualIframeLoadedSlug = '';
+    let portalVisualIframeLoadedTemplate = '';
+    let portalVisualCurrentEdit = null;
+    let portalVisualPendingPhotoField = null;
+    let portalVisualModalStories = [];
+
+    function setPortalVisualDirty(dirty) {
+      portalVisualDirty = !!dirty;
+      const badge = document.getElementById('visualEditorUnsavedBadge');
+      if (badge) badge.classList.toggle('hidden', !portalVisualDirty);
+    }
+
+    function postToVisualIframe(action, payload) {
+      const iframe = document.getElementById('portalVisualEditorIframe');
+      if (!iframe || !iframe.contentWindow) return;
+      iframe.contentWindow.postMessage(
+        Object.assign({ source: 'dekorin-portal-parent', action: action }, payload || {}),
+        '*'
+      );
+    }
+
+    function setPortalEditorMode(mode, opts) {
+      portalEditorMode = mode === 'form' ? 'form' : 'visual';
+      const visBox = document.getElementById('portalVisualEditorContainer');
+      const formBox = document.getElementById('portalFormEditorContainer');
+      const btnVis = document.getElementById('btnModeVisual');
+      const btnForm = document.getElementById('btnModeForm');
+
+      if (visBox) visBox.classList.toggle('hidden', portalEditorMode !== 'visual');
+      if (formBox) formBox.classList.toggle('hidden', portalEditorMode !== 'form');
+
+      if (btnVis) {
+        btnVis.className = portalEditorMode === 'visual'
+          ? 'px-3.5 py-2 rounded-xl text-xs font-bold gold-gradient text-white shadow-xs transition'
+          : 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-[#F9F3EC] transition';
+      }
+      if (btnForm) {
+        btnForm.className = portalEditorMode === 'form'
+          ? 'px-3.5 py-2 rounded-xl text-xs font-bold gold-gradient text-white shadow-xs transition'
+          : 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-[#F9F3EC] transition';
+      }
+
+      if (portalEditorMode === 'visual') {
+        loadPortalVisualIframe(false);
+        if (!opts || !opts.skipSync) {
+          postToVisualIframe('apply_patch', { patch: buildInvitationSavePayload() });
+        }
+      }
+    }
+
+    function loadPortalVisualIframe(forceReload) {
+      if (!currentInvitation || !currentInvitation.slug) return;
+      const iframe = document.getElementById('portalVisualEditorIframe');
+      const tplLabel = document.getElementById('visualEditorTplLabel');
+      if (!iframe) return;
+
+      const activeTpl = selectedTemplateId || currentInvitation.template || 'ta17';
+      if (tplLabel) tplLabel.textContent = activeTpl;
+
+      const sameLoaded =
+        !forceReload &&
+        portalVisualIframeLoadedSlug === currentInvitation.slug &&
+        portalVisualIframeLoadedTemplate === activeTpl &&
+        iframe.src &&
+        iframe.src !== 'about:blank';
+
+      if (sameLoaded) return;
+
+      portalVisualIframeLoadedSlug = currentInvitation.slug;
+      portalVisualIframeLoadedTemplate = activeTpl;
+      portalVisualPreviewOff = false;
+      portalVisualGateOpen = false;
+      updatePortalVisualToolbarUI();
+
+      // Always use same-origin path to comply with X-Frame-Options: SAMEORIGIN
+      const targetUrl =
+        `/invitation/${encodeURIComponent(currentInvitation.slug)}` +
+        `?preview=1&edit=1&template=${encodeURIComponent(activeTpl)}&_ve=${Date.now()}`;
+      iframe.src = targetUrl;
+    }
+
+    function updatePortalVisualToolbarUI() {
+      const prevBtn = document.getElementById('btnVisualTogglePreview');
+      const gateBtn = document.getElementById('btnVisualToggleGate');
+      if (prevBtn) {
+        prevBtn.textContent = portalVisualPreviewOff ? '✏️ Mode Edit' : '👁️ Pratinjau';
+        prevBtn.className = portalVisualPreviewOff
+          ? 'px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xs transition'
+          : 'px-3 py-1.5 rounded-xl bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30 text-xs font-bold hover:bg-[#D4A574]/20 transition';
+      }
+      if (gateBtn) {
+        gateBtn.textContent = portalVisualGateOpen ? '📖 Buka Isi' : '🚪 Lihat Sampul';
+      }
+    }
+
+    function togglePortalVisualPreview() {
+      portalVisualPreviewOff = !portalVisualPreviewOff;
+      updatePortalVisualToolbarUI();
+      postToVisualIframe('set_edit_mode', { enabled: !portalVisualPreviewOff });
+    }
+
+    function togglePortalVisualGate() {
+      portalVisualGateOpen = !portalVisualGateOpen;
+      updatePortalVisualToolbarUI();
+      postToVisualIframe('toggle_gate', { showGate: portalVisualGateOpen });
+    }
+
+    async function savePortalVisualDraft() {
+      const btn = document.getElementById('btnVisualSave');
+      await executeSaveInvitation(btn, '💾 Simpan');
+    }
+
+    // Mapping helpers: patch <-> portal form inputs
+    const PORTAL_FIELD_TO_INPUT_ID = {
+      slug: 'f_slug',
+      title: 'f_title',
+      quotes: 'f_quotes',
+      love_story: 'f_love_story',
+      turut_mengundang: 'f_turut_mengundang',
+      groom_name: 'f_groom_name',
+      groom_nickname: 'f_groom_nickname',
+      groom_child_order: 'f_groom_child_order',
+      groom_parents: 'f_groom_parents',
+      groom_instagram: 'f_groom_instagram',
+      bride_name: 'f_bride_name',
+      bride_nickname: 'f_bride_nickname',
+      bride_child_order: 'f_bride_child_order',
+      bride_parents: 'f_bride_parents',
+      bride_instagram: 'f_bride_instagram',
+      child_name: 'f_child_name',
+      child_nickname: 'f_child_nickname',
+      child_order: 'f_child_order',
+      akad_date: 'f_akad_date',
+      akad_time: 'f_akad_time',
+      akad_venue: 'f_akad_venue',
+      akad_address: 'f_akad_address',
+      akad_maps_url: 'f_akad_maps_url',
+      resepsi_date: 'f_resepsi_date',
+      resepsi_time: 'f_resepsi_time',
+      resepsi_venue: 'f_resepsi_venue',
+      resepsi_address: 'f_resepsi_address',
+      resepsi_maps_url: 'f_resepsi_maps_url',
+      bank_name_1: 'f_bank_name_1',
+      bank_account_1: 'f_bank_account_1',
+      bank_holder_1: 'f_bank_holder_1',
+      bank_name_2: 'f_bank_name_2',
+      bank_account_2: 'f_bank_account_2',
+      bank_holder_2: 'f_bank_holder_2',
+      gift_address: 'f_gift_address',
+      wa_confirmation: 'f_wa_confirmation',
+      audio_url: 'f_audio_url',
+      youtube_url: 'f_youtube_url'
+    };
+
+    function applyPatchToPortalState(patch) {
+      if (!patch || typeof patch !== 'object') return;
+      const eventType = document.querySelector('input[name="event_type"]:checked')?.value || 'wedding';
+      const isKhitan = eventType === 'khitan' || eventType === 'birthday';
+
+      Object.keys(patch).forEach(key => {
+        const val = patch[key] ?? '';
+        const inputId = PORTAL_FIELD_TO_INPUT_ID[key];
+        if (inputId) {
+          setVal(inputId, val);
+        }
+        if (key === 'groom_parents' && isKhitan) {
+          setVal('f_khitan_parents', val);
+        }
+        if (key === 'child_name' && isKhitan) setVal('f_groom_name', val);
+        if (key === 'child_nickname' && isKhitan) setVal('f_groom_nickname', val);
+        if (key === 'child_order' && isKhitan) setVal('f_groom_child_order', val);
+
+        if (key === 'love_story') {
+          renderLoveStoryEditor(val);
+        }
+        if (key === 'gallery_images') {
+          galleryUrls = String(val).split(',').map(s => s.trim()).filter(Boolean);
+          renderGalleryGrid();
+        }
+        if (key.endsWith('_photo') || key === 'cover_image') {
+          photoValues[key] = val;
+          if (key === 'groom_photo' && isKhitan) {
+            photoValues.child_photo = val;
+            updateSinglePhotoUI('child_photo');
+          }
+          updateSinglePhotoUI(key);
+        }
+        if (key === 'audio_url') {
+          refreshAudioPreview();
+        }
+      });
+
+      setPortalVisualDirty(true);
+      postToVisualIframe('apply_patch', { patch: patch });
+    }
+
+    // Listen to Visual Editor iframe events
+    window.addEventListener('message', function (ev) {
+      const msg = ev && ev.data;
+      if (!msg || typeof msg !== 'object' || msg.source !== 'dekorin-visual-editor') return;
+
+      if (msg.action === 'ready') {
+        postToVisualIframe('set_edit_mode', { enabled: !portalVisualPreviewOff });
+        postToVisualIframe('apply_patch', { patch: buildInvitationSavePayload() });
+        return;
+      }
+      if (msg.action === 'gate_opened') {
+        portalVisualGateOpen = false;
+        updatePortalVisualToolbarUI();
+        return;
+      }
+      if (msg.action === 'edit_text') {
+        openPortalVisualTextModal(msg);
+      } else if (msg.action === 'edit_couple_nick') {
+        openPortalVisualCoupleModal(msg);
+      } else if (msg.action === 'edit_bank') {
+        openPortalVisualBankModal(msg);
+      } else if (msg.action === 'edit_love_story') {
+        openPortalVisualLoveStoryModal(msg);
+      } else if (msg.action === 'edit_gallery') {
+        openPortalVisualGalleryModal(msg);
+      } else if (msg.action === 'edit_photo') {
+        openPortalVisualPhotoModal(msg);
+      }
+    });
+
+    function showPortalVisualFieldModal(title, bodyHtml, applyLabel) {
+      document.getElementById('pvFieldModalTitle').textContent = title || 'Edit Konten';
+      document.getElementById('pvFieldModalBody').innerHTML = bodyHtml;
+      const footer = document.getElementById('pvFieldModalFooter');
+      const applyBtn = document.getElementById('pvFieldModalApplyBtn');
+      if (applyLabel === null) {
+        footer.classList.add('hidden');
+      } else {
+        footer.classList.remove('hidden');
+        applyBtn.textContent = applyLabel || 'Terapkan';
+      }
+      document.getElementById('portalVisualFieldModal').classList.remove('hidden');
+    }
+
+    function closePortalVisualFieldModal() {
+      document.getElementById('portalVisualFieldModal').classList.add('hidden');
+      portalVisualCurrentEdit = null;
+    }
+
+    function openPortalVisualTextModal(msg) {
+      const field = msg.field;
+      const type = msg.type || 'text';
+      const currentVal = buildInvitationSavePayload()[field] ?? msg.currentValue ?? '';
+      portalVisualCurrentEdit = { kind: 'single_field', field: field, type: type };
+
+      let html = '';
+      if (type === 'textarea' || field === 'quotes' || field === 'turut_mengundang') {
+        html = `
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">${escapeHtml(msg.label)}</label>
+            <textarea id="pvSingleInput" rows="5" class="w-full rounded-2xl border border-slate-200 px-3.5 py-2.5 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#D4A574]/50">${escapeHtml(currentVal)}</textarea>
+            ${field === 'turut_mengundang' ? '<p class="text-[11px] text-slate-500 mt-1">Pisahkan setiap nama dengan baris baru (Enter).</p>' : ''}
+          </div>`;
+        if (field === 'quotes') {
+          html += `
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="document.getElementById('pvSingleInput').value = QUOTE_PRESETS.arrum" class="px-2.5 py-1 rounded-lg bg-[#F9F3EC] text-[#C59563] text-[11px] font-bold">QS. Ar-Rum 21</button>
+              <button type="button" onclick="document.getElementById('pvSingleInput').value = QUOTE_PRESETS.kristiani" class="px-2.5 py-1 rounded-lg bg-[#F9F3EC] text-[#C59563] text-[11px] font-bold">Matius 19:6</button>
+              <button type="button" onclick="document.getElementById('pvSingleInput').value = QUOTE_PRESETS.umum" class="px-2.5 py-1 rounded-lg bg-[#F9F3EC] text-[#C59563] text-[11px] font-bold">Kutipan Umum</button>
+            </div>`;
+        }
+      } else if (type === 'date') {
+        html = `
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">${escapeHtml(msg.label)}</label>
+            <input type="text" id="pvSingleInput" value="${escapeHtml(currentVal)}" placeholder="Contoh: Minggu, 25 Oktober 2026"
+              class="w-full rounded-2xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A574]/50">
+          </div>
+          <div class="p-3 rounded-2xl bg-[#F9F3EC]/70 border border-[#D4A574]/30">
+            <label class="block text-[11px] font-bold text-[#8B5E34] mb-1">📅 Pilih dari Kalender (Format Otomatis)</label>
+            <input type="date" onchange="applyFormattedDateToVisualInput(this.value)"
+              class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white">
+          </div>`;
+      } else if (type === 'maps') {
+        html = `
+          <div class="flex items-center gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+            <img src="/assets/icons/google-maps-icon.webp" alt="Google Maps" class="w-7 h-7 object-contain shrink-0">
+            <p class="text-[11px] text-slate-600">Salin link lokasi dari aplikasi Google Maps (Share -&gt; Copy link) lalu tempel di bawah.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">${escapeHtml(msg.label)}</label>
+            <input type="url" id="pvSingleInput" value="${escapeHtml(currentVal)}" placeholder="https://maps.app.goo.gl/..."
+              class="w-full rounded-2xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A574]/50">
+          </div>`;
+      } else if (type === 'time') {
+        html = `
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">${escapeHtml(msg.label)}</label>
+            <input type="text" id="pvSingleInput" value="${escapeHtml(currentVal)}" placeholder="Contoh: 08.00 - 10.00 WIB"
+              class="w-full rounded-2xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A574]/50">
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="document.getElementById('pvSingleInput').value='08.00 - 10.00 WIB'" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-semibold">08.00 - 10.00 WIB</button>
+            <button type="button" onclick="document.getElementById('pvSingleInput').value='11.00 - 14.00 WIB'" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-semibold">11.00 - 14.00 WIB</button>
+            <button type="button" onclick="document.getElementById('pvSingleInput').value='19.00 - Selesai'" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-semibold">19.00 - Selesai</button>
+          </div>`;
+      } else {
+        html = `
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">${escapeHtml(msg.label)}</label>
+            <input type="text" id="pvSingleInput" value="${escapeHtml(currentVal)}"
+              class="w-full rounded-2xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4A574]/50">
+            ${type === 'instagram' ? '<p class="text-[11px] text-slate-500 mt-1">Masukkan username saja tanpa tanda @</p>' : ''}
+          </div>`;
+      }
+
+      showPortalVisualFieldModal(msg.label || 'Edit Teks', html, 'Terapkan');
+      setTimeout(() => document.getElementById('pvSingleInput')?.focus(), 60);
+    }
+
+    function applyFormattedDateToVisualInput(isoDate) {
+      if (!isoDate) return;
+      const parts = isoDate.split('-');
+      if (parts.length !== 3) return;
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      if (isNaN(d.getTime())) return;
+      const formatted = `${INDO_DAYS_NAME[d.getDay()]}, ${d.getDate()} ${INDO_MONTHS_NAME[d.getMonth()]} ${d.getFullYear()}`;
+      const inp = document.getElementById('pvSingleInput');
+      if (inp) inp.value = formatted;
+    }
+
+    function openPortalVisualCoupleModal(msg) {
+      const cur = buildInvitationSavePayload();
+      const isKhitan = cur.event_type === 'khitan' || cur.event_type === 'birthday';
+      portalVisualCurrentEdit = { kind: 'couple_nick', isKhitan: isKhitan };
+
+      const html = isKhitan
+        ? `
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Panggilan Anak</label>
+            <input type="text" id="pvChildNick" value="${escapeHtml(cur.child_nickname || cur.groom_nickname || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Judul Undangan</label>
+            <input type="text" id="pvTitleInput" value="${escapeHtml(cur.title || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          </div>`
+        : `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Panggilan Pria</label>
+              <input type="text" id="pvGroomNick" value="${escapeHtml(cur.groom_nickname || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Panggilan Wanita</label>
+              <input type="text" id="pvBrideNick" value="${escapeHtml(cur.bride_nickname || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Judul Undangan (Browser &amp; Share Link)</label>
+            <input type="text" id="pvTitleInput" value="${escapeHtml(cur.title || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          </div>`;
+
+      showPortalVisualFieldModal('Nama Panggilan & Judul', html, 'Terapkan');
+    }
+
+    function openPortalVisualBankModal(msg) {
+      const idx = msg.bankIndex === '2' ? '2' : '1';
+      const cur = buildInvitationSavePayload();
+      portalVisualCurrentEdit = { kind: 'bank', bankIndex: idx };
+
+      const banks = ['BCA', 'BRI', 'BNI', 'Mandiri', 'BSI', 'GoPay', 'Dana', 'OVO', 'ShopeePay'];
+      const bankChips = banks.map(b =>
+        `<button type="button" onclick="document.getElementById('pvBankName').value='${b}'" class="px-2.5 py-1 rounded-lg bg-[#F9F3EC] text-[#C59563] text-[11px] font-bold">${b}</button>`
+      ).join('');
+
+      const html = `
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Bank / E-Wallet</label>
+          <input type="text" id="pvBankName" value="${escapeHtml(cur['bank_name_' + idx] || '')}" placeholder="Contoh: BCA / Mandiri / Dana" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          <div class="flex flex-wrap gap-1.5 mt-2">${bankChips}</div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Rekening / No. E-Wallet</label>
+          <input type="text" id="pvBankAcc" value="${escapeHtml(cur['bank_account_' + idx] || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-mono">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Atas Nama Pemilik Rekening</label>
+          <input type="text" id="pvBankHolder" value="${escapeHtml(cur['bank_holder_' + idx] || '')}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+        </div>
+        ${idx === '1' ? `
+        <div class="pt-2 border-t border-slate-100">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Kirim Kado Fisik (Opsional)</label>
+          <textarea id="pvGiftAddr" rows="2" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">${escapeHtml(cur.gift_address || '')}</textarea>
+        </div>` : ''}`;
+
+      showPortalVisualFieldModal(`Amplop Digital / Rekening #${idx}`, html, 'Terapkan');
+    }
+
+    function openPortalVisualLoveStoryModal() {
+      const raw = serializeLoveStoryFromUI();
+      portalVisualModalStories = parseLoveStoryString(raw);
+      if (portalVisualModalStories.length === 0) {
+        portalVisualModalStories.push({ date: '', title: '', description: '' });
+      }
+      portalVisualCurrentEdit = { kind: 'love_story' };
+      renderPortalVisualStoryModalBody();
+    }
+
+    function renderPortalVisualStoryModalBody() {
+      const itemsHtml = portalVisualModalStories.map((s, idx) => `
+        <div class="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#C59563]">✨ Momen #${idx + 1}</span>
+            <button type="button" onclick="removePortalVisualStoryRow(${idx})" class="text-xs text-rose-500 font-bold hover:underline">Hapus</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input type="text" data-ls-idx="${idx}" data-ls-key="date" value="${escapeHtml(s.date)}" placeholder="Waktu (mis. Juli 2023)" class="pv-ls-inp w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white">
+            <input type="text" data-ls-idx="${idx}" data-ls-key="title" value="${escapeHtml(s.title)}" placeholder="Judul Momen" class="pv-ls-inp w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white">
+          </div>
+          <textarea data-ls-idx="${idx}" data-ls-key="description" rows="2" placeholder="Ceritakan momen bahagia..." class="pv-ls-inp w-full rounded-xl border border-slate-200 px-3 py-2 text-xs bg-white">${escapeHtml(s.description)}</textarea>
+        </div>
+      `).join('');
+
+      const html = `
+        <div class="space-y-3">${itemsHtml}</div>
+        <button type="button" onclick="addPortalVisualStoryRow()" class="w-full py-2.5 rounded-xl border-2 border-dashed border-[#D4A574]/60 text-[#C59563] text-xs font-bold hover:bg-[#F9F3EC] transition">
+          + Tambah Momen Kisah
+        </button>`;
+      showPortalVisualFieldModal('Kelola Kisah Cinta (Love Story)', html, 'Terapkan');
+    }
+
+    function syncVisualStoryModalFromInputs() {
+      document.querySelectorAll('.pv-ls-inp').forEach(el => {
+        const idx = parseInt(el.dataset.lsIdx, 10);
+        const key = el.dataset.lsKey;
+        if (portalVisualModalStories[idx]) {
+          portalVisualModalStories[idx][key] = el.value;
+        }
+      });
+    }
+
+    function addPortalVisualStoryRow() {
+      syncVisualStoryModalFromInputs();
+      portalVisualModalStories.push({ date: '', title: '', description: '' });
+      renderPortalVisualStoryModalBody();
+    }
+
+    function removePortalVisualStoryRow(idx) {
+      syncVisualStoryModalFromInputs();
+      portalVisualModalStories.splice(idx, 1);
+      renderPortalVisualStoryModalBody();
+    }
+
+    function openPortalVisualGalleryModal() {
+      portalVisualCurrentEdit = { kind: 'gallery' };
+      renderPortalVisualGalleryBody();
+    }
+
+    function renderPortalVisualGalleryBody() {
+      const thumbs = galleryUrls.length === 0
+        ? '<p class="text-xs text-slate-400 text-center py-6 col-span-3">Belum ada foto galeri. Unggah foto momen di bawah ini.</p>'
+        : galleryUrls.map((u, idx) => `
+          <div class="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+            <img src="${escapeHtml(u)}" class="w-full h-full object-cover">
+            <button type="button" onclick="removePortalVisualGalleryItem(${idx})"
+              class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-white text-[11px] font-bold">✕</button>
+          </div>`).join('');
+
+      const html = `
+        <div class="grid grid-cols-3 gap-2.5 max-h-[45vh] overflow-y-auto">${thumbs}</div>
+        <div id="pvGalleryUploadStatus" class="hidden text-xs font-semibold text-[#C59563]">⏳ Mengunggah foto...</div>
+        <label class="block w-full text-center py-3 rounded-2xl gold-gradient text-white text-xs font-bold cursor-pointer shadow-xs">
+          📷 + Upload Foto Galeri (Bisa Banyak)
+          <input type="file" accept="image/*" multiple class="hidden" onchange="handlePortalVisualGalleryUpload(this)">
+        </label>`;
+      showPortalVisualFieldModal('Kelola Galeri Foto Momen', html, 'Selesai');
+    }
+
+    function removePortalVisualGalleryItem(idx) {
+      galleryUrls.splice(idx, 1);
+      applyPatchToPortalState({ gallery_images: galleryUrls.join(',') });
+      renderPortalVisualGalleryBody();
+    }
+
+    async function handlePortalVisualGalleryUpload(inputEl) {
+      const files = Array.from(inputEl.files || []);
+      if (!files.length) return;
+      const st = document.getElementById('pvGalleryUploadStatus');
+      if (st) st.classList.remove('hidden');
+      for (let i = 0; i < files.length; i++) {
+        if (st) st.textContent = `⏳ Mengunggah foto ${i + 1} dari ${files.length}...`;
+        try {
+          const url = await uploadFileToPortal(files[i]);
+          galleryUrls.push(url);
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+      inputEl.value = '';
+      applyPatchToPortalState({ gallery_images: galleryUrls.join(',') });
+      renderPortalVisualGalleryBody();
+      showToast('Foto galeri diperbarui! Klik Simpan untuk menyimpan ke server.');
+    }
+
+    function openPortalVisualPhotoModal(msg) {
+      const field = msg.field;
+      const isJawa3Cover = field === 'cover_image' && (selectedTemplateId === 'jawa3' || selectedTemplateId === 'art-jawa-coklat-3' || selectedTemplateId === 'jawa-coklat-3');
+      if (isJawa3Cover) {
+        showToast('Cover Art Jawa Coklat 3 terkunci menggunakan gunungan wayang bawaan.', 'info');
+        return;
+      }
+      const curUrl = photoValues[field] || msg.currentValue || '';
+      portalVisualPendingPhotoField = field;
+
+      const html = `
+        <div class="space-y-3 text-center">
+          <div class="mx-auto w-44 h-44 rounded-2xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center">
+            ${curUrl
+              ? `<img src="${escapeHtml(curUrl)}" class="w-full h-full object-cover">`
+              : '<span class="text-xs text-slate-400 px-3">Menggunakan foto bawaan tema</span>'}
+          </div>
+          <p class="text-xs text-slate-500">Pilih foto baru dari perangkat Anda. Hasil langsung terlihat di undangan.</p>
+          <button type="button" onclick="triggerPortalVisualSinglePhotoPick()"
+            class="w-full py-3 rounded-2xl gold-gradient text-white text-xs font-bold shadow-xs">
+            📷 Pilih &amp; Upload Foto Baru
+          </button>
+          ${curUrl ? `
+          <button type="button" onclick="resetPortalVisualSinglePhoto('${field}')"
+            class="w-full py-2.5 rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 text-xs font-bold">
+            ↺ Kembalikan ke Foto Bawaan Tema
+          </button>` : ''}
+        </div>`;
+      showPortalVisualFieldModal(msg.label || 'Ganti Foto', html, null);
+    }
+
+    function triggerPortalVisualSinglePhotoPick() {
+      const input = document.getElementById('portalVisualPhotoInput');
+      if (input) input.click();
+    }
+
+    function resetPortalVisualSinglePhoto(field) {
+      const patch = {};
+      patch[field] = '';
+      applyPatchToPortalState(patch);
+      closePortalVisualFieldModal();
+      showToast('Foto dikembalikan ke default tema.');
+    }
+
+    async function handlePortalVisualPhotoPicked(inputEl) {
+      const file = inputEl.files?.[0];
+      const field = portalVisualPendingPhotoField;
+      if (!file || !field) return;
+
+      closePortalVisualFieldModal();
+      showToast('⏳ Mengunggah foto ke server...', 'info');
+      try {
+        const uploadedUrl = await uploadFileToPortal(file);
+        const patch = {};
+        patch[field] = uploadedUrl;
+        applyPatchToPortalState(patch);
+        showToast('✨ Foto berhasil diganti! Klik Simpan jika selesai.');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        inputEl.value = '';
+        portalVisualPendingPhotoField = null;
+      }
+    }
+
+    function applyPortalVisualFieldModal() {
+      if (!portalVisualCurrentEdit) {
+        closePortalVisualFieldModal();
+        return;
+      }
+
+      if (portalVisualCurrentEdit.kind === 'single_field') {
+        const val = document.getElementById('pvSingleInput')?.value ?? '';
+        const patch = {};
+        patch[portalVisualCurrentEdit.field] = val.trim();
+        applyPatchToPortalState(patch);
+      } else if (portalVisualCurrentEdit.kind === 'couple_nick') {
+        const title = (document.getElementById('pvTitleInput')?.value || '').trim();
+        if (portalVisualCurrentEdit.isKhitan) {
+          const childNick = (document.getElementById('pvChildNick')?.value || '').trim();
+          applyPatchToPortalState({
+            child_nickname: childNick,
+            groom_nickname: childNick,
+            title: title
+          });
+        } else {
+          applyPatchToPortalState({
+            groom_nickname: (document.getElementById('pvGroomNick')?.value || '').trim(),
+            bride_nickname: (document.getElementById('pvBrideNick')?.value || '').trim(),
+            title: title
+          });
+        }
+      } else if (portalVisualCurrentEdit.kind === 'bank') {
+        const idx = portalVisualCurrentEdit.bankIndex;
+        const patch = {};
+        patch['bank_name_' + idx] = (document.getElementById('pvBankName')?.value || '').trim();
+        patch['bank_account_' + idx] = (document.getElementById('pvBankAcc')?.value || '').trim();
+        patch['bank_holder_' + idx] = (document.getElementById('pvBankHolder')?.value || '').trim();
+        const giftEl = document.getElementById('pvGiftAddr');
+        if (giftEl) patch.gift_address = giftEl.value.trim();
+        applyPatchToPortalState(patch);
+      } else if (portalVisualCurrentEdit.kind === 'love_story') {
+        syncVisualStoryModalFromInputs();
+        const cleaned = portalVisualModalStories
+          .map(s => ({
+            date: (s.date || '').trim(),
+            title: (s.title || '').trim(),
+            description: (s.description || '').trim()
+          }))
+          .filter(s => s.date || s.title || s.description);
+        applyPatchToPortalState({ love_story: cleaned.length ? JSON.stringify(cleaned) : '' });
+      }
+
+      closePortalVisualFieldModal();
+    }
+
+    function openPortalVisualSettings() {
+      const selTpl = document.getElementById('pvSetTemplate');
+      if (selTpl) {
+        selTpl.innerHTML = TEMPLATES_META.map(t =>
+          `<option value="${t.id}" ${t.id === selectedTemplateId ? 'selected' : ''}>${escapeHtml(t.name)} (${escapeHtml(t.tag)})</option>`
+        ).join('');
+      }
+      const cur = buildInvitationSavePayload();
+      setVal('pvSetEventType', cur.event_type || 'wedding');
+      setVal('pvSetTitle', cur.title || '');
+      setVal('pvSetSlug', cur.slug || '');
+      setVal('pvSetAudio', cur.audio_url || '');
+      setVal('pvSetYoutube', cur.youtube_url || '');
+      setVal('pvSetWa', cur.wa_confirmation || '');
+      document.getElementById('portalVisualSettingsModal').classList.remove('hidden');
+    }
+
+    function closePortalVisualSettings() {
+      document.getElementById('portalVisualSettingsModal').classList.add('hidden');
+    }
+
+    function applyPortalVisualSettings() {
+      const prevTemplate = selectedTemplateId;
+      const newTemplate = document.getElementById('pvSetTemplate').value || selectedTemplateId;
+      const newEventType = document.getElementById('pvSetEventType').value || 'wedding';
+
+      selectedTemplateId = newTemplate;
+      document.querySelectorAll('input[name="event_type"]').forEach(r => {
+        r.checked = (r.value === newEventType);
+      });
+      handleEventTypeChange();
+      applyTemplateFormRules(newTemplate);
+      renderTemplatePicker();
+
+      applyPatchToPortalState({
+        template: newTemplate,
+        event_type: newEventType,
+        title: (document.getElementById('pvSetTitle').value || '').trim(),
+        slug: (document.getElementById('pvSetSlug').value || '').trim(),
+        audio_url: (document.getElementById('pvSetAudio').value || '').trim(),
+        youtube_url: (document.getElementById('pvSetYoutube').value || '').trim(),
+        wa_confirmation: (document.getElementById('pvSetWa').value || '').trim()
+      });
+
+      closePortalVisualSettings();
+      if (prevTemplate !== newTemplate) {
+        loadPortalVisualIframe(true);
+      }
     }
   </script>
 </body>

@@ -266,35 +266,17 @@ func GetPortalInvitation(c *fiber.Ctx) error {
 	})
 }
 
-// UpdatePortalInvitation menangani PUT /api/invitation-portal/:token (Simpan perubahan mandiri pengantin)
-func UpdatePortalInvitation(c *fiber.Ctx) error {
-	token := c.Params("token")
-	invitation, err := findInvitationByEditToken(token)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Tautan akses kelola tidak valid atau sudah kedaluwarsa",
-		})
-	}
-
-	var req models.CreateOrUpdateInvitationRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Format data tidak valid",
-		})
-	}
-
+// applyPortalInvitationUpdates memvalidasi dan menerapkan perubahan field undangan untuk Portal Pengantin maupun Akun Couple.
+// Mengembalikan (httpStatus, errorMsg); jika httpStatus == 0 berarti validasi & penerapan berhasil (tinggal Save).
+func applyPortalInvitationUpdates(invitation *models.Invitation, req *models.CreateOrUpdateInvitationRequest) (int, string) {
 	// Validasi & perbarui slug jika diubah oleh pengantin
 	if strings.TrimSpace(req.Slug) != "" {
 		cleanSlug := sanitizeInvitationSlug(req.Slug)
 		if cleanSlug == "" || len(cleanSlug) < 3 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Kode tautan (slug) minimal 3 huruf/angka",
-			})
+			return fiber.StatusBadRequest, "Kode tautan (slug) minimal 3 huruf/angka"
 		}
 		if isReservedInvitationSlug(cleanSlug) {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Kode tautan tersebut tidak dapat digunakan, silakan pilih nama lain",
-			})
+			return fiber.StatusBadRequest, "Kode tautan tersebut tidak dapat digunakan, silakan pilih nama lain"
 		}
 		if cleanSlug != invitation.Slug {
 			var existingCount int64
@@ -302,9 +284,7 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 				Where("LOWER(slug) = ? AND id != ?", cleanSlug, invitation.ID).
 				Count(&existingCount)
 			if existingCount > 0 {
-				return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-					"error": "Tautan /" + cleanSlug + " sudah dipakai undangan lain. Silakan tambahkan angka atau nama panggilan lain.",
-				})
+				return fiber.StatusConflict, "Tautan /" + cleanSlug + " sudah dipakai undangan lain. Silakan tambahkan angka atau nama panggilan lain."
 			}
 			invitation.Slug = cleanSlug
 		}
@@ -319,8 +299,10 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 			tmpl = "jawa2"
 		} else if tmpl == "art-jawa-coklat-3" || tmpl == "jawa-coklat-3" {
 			tmpl = "jawa3"
+		} else if tmpl == "pita-bola-disko" || tmpl == "birthday-1" {
+			tmpl = "ultah1"
 		}
-		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" && tmpl != "jawa2" {
+		if tmpl != "pn4" && tmpl != "ta3" && tmpl != "ta17" && tmpl != "jawa3" && tmpl != "jawa2" && tmpl != "ultah1" {
 			tmpl = "ta17"
 		}
 		invitation.Template = tmpl
@@ -328,18 +310,31 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 
 	if invitation.EventType == "khitan" {
 		if strings.TrimSpace(req.ChildName) == "" && strings.TrimSpace(req.GroomName) == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Nama anak khitan wajib diisi",
-			})
+			return fiber.StatusBadRequest, "Nama anak khitan wajib diisi"
 		}
 		if strings.TrimSpace(req.GroomName) == "" {
 			req.GroomName = req.ChildName
 		}
+	} else if invitation.EventType == "birthday" {
+		if strings.TrimSpace(req.ChildName) == "" && strings.TrimSpace(req.BrideName) == "" && strings.TrimSpace(req.GroomName) == "" {
+			return fiber.StatusBadRequest, "Nama yang berulang tahun wajib diisi"
+		}
+		if strings.TrimSpace(req.ChildName) == "" {
+			if strings.TrimSpace(req.BrideName) != "" {
+				req.ChildName = req.BrideName
+			} else {
+				req.ChildName = req.GroomName
+			}
+		}
+		if strings.TrimSpace(req.GroomName) == "" {
+			req.GroomName = req.ChildName
+		}
+		if strings.TrimSpace(req.BrideName) == "" {
+			req.BrideName = req.ChildName
+		}
 	} else {
 		if strings.TrimSpace(req.GroomName) == "" || strings.TrimSpace(req.BrideName) == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Nama lengkap mempelai pria dan wanita wajib diisi",
-			})
+			return fiber.StatusBadRequest, "Nama lengkap mempelai pria dan wanita wajib diisi"
 		}
 	}
 
@@ -406,6 +401,32 @@ func UpdatePortalInvitation(c *fiber.Ctx) error {
 
 	if req.IsActive != nil {
 		invitation.IsActive = *req.IsActive
+	}
+
+	return 0, ""
+}
+
+// UpdatePortalInvitation menangani PUT /api/invitation-portal/:token (Simpan perubahan mandiri pengantin)
+func UpdatePortalInvitation(c *fiber.Ctx) error {
+	token := c.Params("token")
+	invitation, err := findInvitationByEditToken(token)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Tautan akses kelola tidak valid atau sudah kedaluwarsa",
+		})
+	}
+
+	var req models.CreateOrUpdateInvitationRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format data tidak valid",
+		})
+	}
+
+	if errStatus, errMsg := applyPortalInvitationUpdates(invitation, &req); errStatus != 0 {
+		return c.Status(errStatus).JSON(fiber.Map{
+			"error": errMsg,
+		})
 	}
 
 	if err := config.DB.Save(invitation).Error; err != nil {

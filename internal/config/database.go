@@ -76,6 +76,10 @@ func ConnectDB() {
 		&models.AgendaProperty{},
 		&models.CompanyRolePermission{},
 		&models.CompanyFormConfig{},
+		&models.WeddingPlan{},
+		&models.WeddingPlanMember{},
+		&models.WeddingPlanVendor{},
+		&models.WeddingTask{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
@@ -108,7 +112,7 @@ func ConnectDB() {
 // MigrateInvitationTemplates memigrasikan template undangan lama ke Ocean Blossom (ta17)
 func MigrateInvitationTemplates(db *gorm.DB) {
 	result := db.Model(&models.Invitation{}).
-		Where("template NOT IN ('pn4', 'ta3', 'ta17', 'jawa3', 'jawa2') OR template IS NULL OR template = ''").
+		Where("template NOT IN ('pn4', 'ta3', 'ta17', 'jawa3', 'jawa2', 'ultah1') OR template IS NULL OR template = ''").
 		Update("template", "ta17")
 	if result.Error != nil {
 		log.Println("⚠️ Peringatan saat migrasi template undangan: ", result.Error)

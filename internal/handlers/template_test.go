@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"io"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +13,7 @@ import (
 	"time"
 
 	"dekorin_apps_api/internal/models"
+	"github.com/gofiber/fiber/v2"
 )
 
 func TestParseAllInvitationTemplates(t *testing.T) {
@@ -27,6 +30,7 @@ func TestParseAllInvitationTemplates(t *testing.T) {
 		"template_ta17.html",
 		"template_jawa3.html",
 		"template_jawa2.html",
+		"template_ultah1.html",
 	}
 
 	testData := struct {
@@ -194,6 +198,7 @@ func TestGuestToLockedWhenProvided(t *testing.T) {
 		"template_ta17.html",
 		"template_jawa3.html",
 		"template_jawa2.html",
+		"template_ultah1.html",
 	}
 
 	// 1. With GuestTo = "Soni"
@@ -489,7 +494,7 @@ func TestBankLogoBriResolution(t *testing.T) {
 		t.Fatalf("Failed to get working directory: %v", err)
 	}
 
-	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html", "template_jawa3.html", "template_jawa2.html"}
+	targets := []string{"template_ta3.html", "template_ta17.html", "template_pn4.html", "template_jawa3.html", "template_jawa2.html", "template_ultah1.html"}
 	for _, target := range targets {
 		p := filepath.Join(wd, "..", "..", "web", "templates", target)
 		content, err := os.ReadFile(p)
@@ -520,6 +525,7 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 		"template_ta17.html",
 		"template_jawa3.html",
 		"template_jawa2.html",
+		"template_ultah1.html",
 	}
 
 	testDataWithoutGift := struct {
@@ -592,7 +598,7 @@ func TestGiftSectionHiddenWhenBankAccountsEmpty(t *testing.T) {
 				if strings.Contains(renderedWithout, `href="#gift"`) {
 					t.Errorf("%s rendered navbar link #gift when bank accounts are empty", target)
 				}
-			case "template_pn4.html", "template_jawa3.html", "template_jawa2.html":
+			case "template_pn4.html", "template_jawa3.html", "template_jawa2.html", "template_ultah1.html":
 				if strings.Contains(renderedWithout, `<section id="gift"`) {
 					t.Errorf("%s rendered <section id=\"gift\" when bank accounts are empty", target)
 				}
@@ -629,6 +635,7 @@ func TestSampleInvitationForTemplate(t *testing.T) {
 		{"jawa2", "template_jawa2.html"},
 		{"ta3", "template_ta3.html"},
 		{"pn4", "template_pn4.html"},
+		{"ultah1", "template_ultah1.html"},
 	}
 
 	for _, tc := range templates {
@@ -899,5 +906,201 @@ func TestJawa2UserProvidedPhotosAndNoWatermarks(t *testing.T) {
 		if !strings.Contains(rendered, g) {
 			t.Errorf("template_jawa2.html did not render user gallery photo: %s", g)
 		}
+	}
+}
+
+func TestUltah1BirthdayTemplateRendering(t *testing.T) {
+	tmplPath := filepath.Join("..", "..", "web", "templates", "template_ultah1.html")
+	content, err := os.ReadFile(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to read template_ultah1.html: %v", err)
+	}
+
+	rawHTML := string(content)
+	if strings.Contains(strings.ToLower(rawHTML), "owlink.id") {
+		t.Errorf("template_ultah1.html should not depend on external owlink.id CDN")
+	}
+
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		t.Fatalf("Failed to parse template_ultah1.html: %v", err)
+	}
+
+	customCover := "https://dekorin.my.id/uploads/birthday_cover.jpg"
+	customProfile := "https://dekorin.my.id/uploads/birthday_profile.jpg"
+	customClosing := "https://dekorin.my.id/uploads/birthday_closing.jpg"
+	customGallery := []string{
+		"https://dekorin.my.id/uploads/bday_gal1.jpg",
+		"https://dekorin.my.id/uploads/bday_gal2.jpg",
+		"https://dekorin.my.id/uploads/bday_gal3.jpg",
+	}
+
+	data := struct {
+		models.Invitation
+		GuestTo             string
+		HasGuestTo          bool
+		GalleryList         []string
+		Wishes              []models.InvitationWish
+		YoutubeEmbedURL     string
+		TurutMengundangList []string
+		OGTitle             string
+		OGDescription       string
+		OGImage             string
+		OGURL               string
+	}{
+		Invitation: models.Invitation{
+			ID:            "inv_ultah1_test",
+			Slug:          "amel-birthday",
+			Title:         "Birthday Party of Amel",
+			Template:      "ultah1",
+			EventType:     "birthday",
+			CoverImage:    customCover,
+			GroomName:     "Amelia Putri",
+			GroomNickname: "Amel",
+			GroomPhoto:    customProfile,
+			ChildName:     "Amelia Putri",
+			ChildNickname: "Amel",
+			ChildOrder:    "21st",
+			ClosingPhoto:  customClosing,
+			AkadDate:      "Minggu, 20 Desember 2026",
+			AkadTime:      "19:00 WIB - Selesai",
+			AkadVenue:     "The Glass House Venue",
+			AkadAddress:   "Jl. Senopati No. 88, Jakarta Selatan",
+			AkadMapsURL:   "https://maps.google.com",
+		},
+		GuestTo:     "Sahabat Terbaik",
+		HasGuestTo:  true,
+		GalleryList: customGallery,
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		t.Fatalf("Failed to execute template_ultah1.html: %v", err)
+	}
+
+	rendered := buf.String()
+	if !strings.Contains(rendered, customCover) {
+		t.Errorf("template_ultah1.html did not render custom CoverImage")
+	}
+	if !strings.Contains(rendered, customProfile) {
+		t.Errorf("template_ultah1.html did not render custom GroomPhoto / profile photo")
+	}
+	if !strings.Contains(rendered, customClosing) {
+		t.Errorf("template_ultah1.html did not render custom ClosingPhoto")
+	}
+	if !strings.Contains(rendered, "Amelia Putri") || !strings.Contains(rendered, "21st") {
+		t.Errorf("template_ultah1.html did not render birthday person name or age")
+	}
+	for _, g := range customGallery {
+		if !strings.Contains(rendered, g) {
+			t.Errorf("template_ultah1.html did not render custom gallery photo: %s", g)
+		}
+	}
+}
+
+func TestVisualEditorSupportAndSeedStripping(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+	repoRoot := filepath.Join(wd, "..", "..")
+
+	// 1. Pastikan seluruh 5 template aktif memiliki atribut data-edit-field & portal memiliki iframe Visual Editor
+	activeTemplates := []string{
+		"template_ta17.html",
+		"template_ta3.html",
+		"template_pn4.html",
+		"template_jawa2.html",
+		"template_jawa3.html",
+	}
+	for _, tf := range activeTemplates {
+		raw, err := os.ReadFile(filepath.Join(repoRoot, "web", "templates", tf))
+		if err != nil {
+			t.Fatalf("Failed to read %s: %v", tf, err)
+		}
+		html := string(raw)
+		for _, requiredAttr := range []string{`data-edit-field="couple_nick"`, `data-edit-field="groom_name"`, `data-edit-field="akad_venue"`} {
+			if !strings.Contains(html, requiredAttr) {
+				t.Errorf("%s missing visual editor annotation %s", tf, requiredAttr)
+			}
+		}
+	}
+
+	portalRaw, err := os.ReadFile(filepath.Join(repoRoot, "web", "templates", "invitation_portal.html"))
+	if err != nil {
+		t.Fatalf("Failed to read invitation_portal.html: %v", err)
+	}
+	portalHTML := string(portalRaw)
+	for _, marker := range []string{`id="portalVisualEditorIframe"`, `setPortalEditorMode('visual')`, `dekorin-visual-editor`} {
+		if !strings.Contains(portalHTML, marker) {
+			t.Errorf("invitation_portal.html missing marker %s", marker)
+		}
+	}
+
+	// 2. Pastikan aset JS runtime visual editor ada
+	if _, err := os.Stat(filepath.Join(repoRoot, "web", "assets", "invitation_visual_editor.js")); err != nil {
+		t.Fatalf("invitation_visual_editor.js missing: %v", err)
+	}
+
+	// 3. Pastikan injeksi ?edit=1 menyertakan seed tanpa kredensial sensitif dan menutup tag script dengan aman
+	inv := models.Invitation{
+		ID:            "inv_ve_test",
+		Slug:          "rani-budi",
+		Title:         "Pernikahan Rani & Budi",
+		Template:      "ta17",
+		GroomName:     "Budi </script><script>alert(1)</script>",
+		BrideName:     "Rani",
+		EditToken:     "SUPER-SECRET-TOKEN-DO-NOT-LEAK",
+		EditPin:       "998877",
+		GuestListJSON: `[{"name":"Rahasia"}]`,
+	}
+
+	injected := injectVisualEditorAssets("<html><body><h1>Test</h1></body></html>", inv, "pn4")
+	if !strings.Contains(injected, `id="dekorin-visual-editor-seed"`) || !strings.Contains(injected, `/assets/invitation_visual_editor.js`) {
+		t.Fatalf("injectVisualEditorAssets did not inject seed and runtime script")
+	}
+	if strings.Contains(injected, "SUPER-SECRET-TOKEN-DO-NOT-LEAK") || strings.Contains(injected, "998877") || strings.Contains(injected, `"Rahasia"`) {
+		t.Fatalf("injectVisualEditorAssets leaked sensitive EditToken, EditPin, or GuestListJSON")
+	}
+	if strings.Contains(injected, `</script><script>alert(1)</script>`) {
+		t.Fatalf("injectVisualEditorAssets failed to escape closing script tag in JSON seed")
+	}
+	if !strings.Contains(injected, `"template":"pn4"`) {
+		t.Fatalf("injectVisualEditorAssets did not apply template override into seed JSON")
+	}
+
+	// 4. Uji end-to-end renderInvitationHTML lewat Fiber context (?edit=1 vs public)
+	if err := os.Chdir(repoRoot); err != nil {
+		t.Fatalf("Failed to chdir to repoRoot: %v", err)
+	}
+	defer func() { _ = os.Chdir(wd) }()
+
+	app := fiber.New()
+	app.Get("/test-render", func(c *fiber.Ctx) error {
+		return renderInvitationHTML(c, inv, nil, "ta17")
+	})
+
+	reqPub := httptest.NewRequest("GET", "/test-render", nil)
+	respPub, err := app.Test(reqPub)
+	if err != nil {
+		t.Fatalf("Fiber public render failed: %v", err)
+	}
+	pubBytes, _ := io.ReadAll(respPub.Body)
+	if strings.Contains(string(pubBytes), "invitation_visual_editor.js") {
+		t.Errorf("Public render unexpectedly injected visual editor script")
+	}
+
+	reqEdit := httptest.NewRequest("GET", "/test-render?edit=1", nil)
+	respEdit, err := app.Test(reqEdit)
+	if err != nil {
+		t.Fatalf("Fiber edit render failed: %v", err)
+	}
+	editBytes, _ := io.ReadAll(respEdit.Body)
+	editStr := string(editBytes)
+	if !strings.Contains(editStr, "invitation_visual_editor.js") || !strings.Contains(editStr, `id="dekorin-visual-editor-seed"`) {
+		t.Errorf("Edit render missing visual editor assets")
+	}
+	if strings.Contains(editStr, "SUPER-SECRET-TOKEN-DO-NOT-LEAK") || strings.Contains(editStr, "998877") {
+		t.Errorf("Edit render leaked credentials in HTML response")
 	}
 }

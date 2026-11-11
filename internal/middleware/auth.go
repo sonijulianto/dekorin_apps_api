@@ -172,3 +172,20 @@ func GetCompanyID(c *fiber.Ctx) string {
 	cid, _ := c.Locals("company_id").(string)
 	return strings.TrimSpace(cid)
 }
+
+// GetUserID mengambil UserID user yang sedang login dari konteks
+func GetUserID(c *fiber.Ctx) string {
+	uid, _ := c.Locals("user_id").(string)
+	return strings.TrimSpace(uid)
+}
+
+// RequireVendor membatasi akses hanya untuk akun internal vendor/tim (owner, admin, crew, superadmin)
+// dan memblokir akun calon pengantin ('couple') agar data internal vendor tetap terisolasi.
+func RequireVendor() fiber.Handler {
+	return RequireRole("superadmin", "owner", "admin", "crew", "staff")
+}
+
+// RequireCouple membatasi akses hanya untuk akun Calon Pengantin ('couple') dan Superadmin.
+func RequireCouple() fiber.Handler {
+	return RequireRole("couple")
+}

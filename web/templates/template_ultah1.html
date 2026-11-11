@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ .OGTitle }}</title>
+
+    <!-- Open Graph / WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ .OGURL }}">
+    <meta property="og:title" content="{{ .OGTitle }}">
+    <meta property="og:description" content="{{ .OGDescription }}">
+    <meta property="og:image" content="{{ .OGImage }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ .OGTitle }}">
+    <meta name="twitter:description" content="{{ .OGDescription }}">
+    <meta name="twitter:image" content="{{ .OGImage }}">
+
+    <!-- Google Fonts: Bodoni Moda, Nunito, Pinyon Script -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=Nunito:ital,wght@0,300..800;1,300..800&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons & Animate.css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        :root {
+            --theme-title: #C8102E;
+            --theme-text: #7A4258;
+            --theme-bg: #FFF4F7;
+            --theme-secondary: #F7C6D9;
+            --font-title: 'Bodoni Moda', serif;
+            --font-content: 'Nunito', sans-serif;
+            --font-additional: 'Pinyon Script', cursive;
+            --rsvp-btn-font: 'Nunito', sans-serif;
+            --wish-btn-font: 'Nunito', sans-serif;
+            --gift-btn-font: 'Nunito', sans-serif;
+            --gift-accent: #C8102E;
+            --wb-gs: 1;
+            --wb-gx: 0px;
+            --wb-gt: 0px;
+            --ow-dvh: 8.44px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+            font-family: var(--font-content);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            scroll-behavior: smooth;
+        }
+
+        body.locked {
+            overflow: hidden !important;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        p, h1, h2, h3, h4 {
+            margin: 0;
+        }
+
+        /* ---- Layout Frame (Desktop Center 390-430px & Mobile Full) ---- */
+        .dl-page-wrap {
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background-color: var(--theme-bg);
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .dl-mobile-col {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background-color: var(--theme-bg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(122, 66, 88, 0.08);
+        }
+
+        /* ---- Cover / Sampul Overlay (#cover) ---- */
+        #cover {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+            z-index: 2000;
+            overflow: hidden;
+            transition: opacity 0.65s ease, visibility 0.65s ease;
+        }
+
+        #cover.dl-cover--closing {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #cover .wb-cover-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 390px;
+            height: 844px;
+            transform-origin: top left;
+            transform: translate(var(--wb-gx, 0px), var(--wb-gt, 0px)) scale(var(--wb-gs, 1));
+            overflow: hidden;
+        }
+
+        /* ---- Sections (.pd-seksi) ---- */
+        .pd-seksi {
+            position: relative;
+            width: 100%;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
+            padding-bottom: 2rem;
+        }
+
+        /* ---- Proportional 390px Groups (.pd-skala) ---- */
+        .pd-skala-wrap {
+            position: relative;
+            width: 100%;
+            overflow: visible;
+        }
+
+        .pd-skala-layer {
+            position: relative;
+            width: 390px;
+            transform-origin: top left;
+            transform: scale(var(--wb-gs, 1));
+        }
+
+        /* ---- Subpreset Custom CSS (1:1 from Pita & Bola Disko) ---- */
+        .pd-borang * { font-family: var(--rsvp-btn-font, inherit) !important; }
+        .pd-ucapan * { font-family: var(--wish-btn-font, inherit) !important; }
+        .pd-hadiah * { font-family: var(--gift-btn-font, inherit) !important; }
+        .pd-borang, .pd-ucapan, .pd-hadiah, .pd-kalender, .pd-hitung { align-self: stretch !important; font-size: 13px; }
+        .pd-borang input, .pd-borang select, .pd-borang textarea, .pd-hadiah input, .pd-hadiah select, .pd-hadiah textarea {
+            background: transparent !important;
+            border: 0 !important;
+            border-bottom: 1px solid currentColor !important;
+            border-radius: 0 !important;
+            color: inherit !important;
+            font-size: 13px !important;
+            padding: 8px 2px;
+            width: 100%;
+            outline: none;
+        }
+        .pd-borang input::placeholder, .pd-borang textarea::placeholder, .pd-hadiah input::placeholder, .pd-hadiah textarea::placeholder {
+            color: inherit !important;
+            opacity: .6;
+        }
+        .pd-borang label, .pd-borang p, .pd-hadiah p, .pd-hadiah label { color: inherit !important; }
+        .pd-ucapan input, .pd-ucapan textarea {
+            background: rgba(255,255,255,.55) !important;
+            border: 1px solid rgba(0,0,0,.12) !important;
+            border-radius: 12px !important;
+            color: inherit !important;
+            font-size: 13px !important;
+            padding: 10px 14px;
+            width: 100%;
+            outline: none;
+        }
+        .pd-borang button, .pd-ucapan button, .pd-hadiah button {
+            font-weight: 600 !important;
+            font-size: 11px !important;
+            letter-spacing: .16em !important;
+            text-transform: uppercase !important;
+            border-radius: 999px !important;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .pd-borang button:active, .pd-ucapan button:active, .pd-hadiah button:active {
+            transform: scale(0.98);
+        }
+        .pd-hadiah .gw__btn { color: rgba(255, 255, 255, .96) !important; }
+        .pd-ucapan b { font-weight: 700; font-size: 14px; letter-spacing: .03em; color: inherit; }
+        .pd-ucapan .message-wish { border-radius: 14px !important; box-shadow: none !important; }
+        .pd-tombol .btn-widget {
+            font-weight: 600 !important;
+            letter-spacing: .18em !important;
+            height: 40px;
+            padding: 0 24px !important;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            white-space: nowrap;
+            box-sizing: border-box;
+            text-decoration: none;
+        }
+        .pd-tombol .btn-widget:active, .pd-tombol-buka .obtn-widget:active { transform: scale(.98); }
+        .pd-hias:not(.is-editor), .pd-hias-gb:not(.is-editor) { pointer-events: none; user-select: none; }
+        .pd-jeda { opacity: 0; pointer-events: none; }
+        .pd-tamu .gn-name { display: block; line-height: 1.15; }
+        .pd-tombol-buka {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .pd-tombol-buka .obtn-widget {
+            font-family: var(--font-content);
+            font-weight: 600 !important;
+            font-size: 11px !important;
+            letter-spacing: .22em !important;
+            text-transform: uppercase !important;
+            padding: 13px 32px !important;
+            background-color: var(--theme-title);
+            color: var(--theme-bg);
+            border: none;
+            border-radius: 999px;
+            box-shadow: 0 12px 22px -14px rgba(0, 0, 0, .55) !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .pd-bentuk { pointer-events: none; }
+
+        /* ---- Bingkai Foto (warna garis = currentColor = token blok) ---- */
+        .pd-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 30%;
+            display: block;
+            box-sizing: border-box;
+            box-shadow: 0 22px 36px -22px rgba(0, 0, 0, .55);
+        }
+        .pd-bk-bulat img {
+            border: 6px solid rgba(255, 255, 255, .97) !important;
+            border-radius: 50% !important;
+            outline: 1.5px dashed currentColor;
+            outline-offset: 8px;
+        }
+        .pd-bk-polaroid img {
+            border: 8px solid rgba(255, 255, 255, .97) !important;
+            border-bottom-width: 38px !important;
+            border-radius: 3px !important;
+        }
+
+        /* ---- Kartu ---- */
+        .pd-kartu {
+            box-shadow: 0 18px 34px -28px rgba(0, 0, 0, .5);
+        }
+        .pd-nowrap, .pd-nowrap * { white-space: nowrap; }
+
+        /* ---- Hitung Mundur ---- */
+        .pd-hitung { align-self: center !important; }
+        .pd-hitung .db-countdown {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px !important;
+        }
+        .pd-hitung .db-cd {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .pd-hitung .db-cd span {
+            font-family: var(--font-title);
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 1.1;
+            color: var(--theme-title);
+        }
+        .pd-hitung .db-cd small {
+            font-family: var(--rsvp-btn-font, inherit);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            font-size: 8px;
+            opacity: .8;
+            white-space: nowrap;
+            margin-top: 4px;
+            color: var(--theme-title);
+        }
+        .pd-cd-pil .db-sep { display: none !important; }
+        .pd-cd-pil .db-cd {
+            background: rgba(200, 16, 46, 0.12);
+            background: color-mix(in srgb, currentColor 12%, transparent);
+            border-radius: 999px;
+            padding: 16px 4px 14px;
+            min-width: 62px;
+        }
+
+        /* ---- Label Berikon (Jam & Lokasi) ---- */
+        .pd-berikon .btn-widget {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 2px 0 !important;
+            white-space: normal;
+            text-align: left;
+            line-height: 1.4;
+            color: var(--theme-text);
+            font-family: var(--font-content);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: flex-start;
+        }
+        .pd-berikon .btn-widget i, .pd-berikon .btn-widget svg {
+            font-size: 15px;
+            margin-right: 6px;
+            line-height: 1.1;
+            flex-shrink: 0;
+        }
+
+        /* ---- Jadwal / Party Rundown Tiket ---- */
+        .pd-rd-tiket {
+            background: rgba(200, 16, 46, 0.10);
+            background: color-mix(in srgb, currentColor 10%, transparent);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 14px;
+            width: 100%;
+            color: var(--theme-title);
+        }
+        .pd-rd-sobek {
+            border-right: 2px dashed rgba(200, 16, 46, 0.45);
+            border-right: 2px dashed color-mix(in srgb, currentColor 45%, transparent);
+            padding-right: 10px;
+            width: 78px;
+            flex-shrink: 0;
+            font-family: var(--font-title);
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.65;
+            color: var(--theme-title);
+            text-align: center;
+        }
+        .pd-rd-judul {
+            width: 196px;
+            flex: 1;
+            font-family: var(--font-content);
+            font-size: 14.5px;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--theme-text);
+            text-align: left;
+        }
+
+        /* ---- Galeri Photobooth Strip ---- */
+        .pd-galeri img {
+            box-sizing: border-box;
+            object-fit: cover;
+            width: 100%;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .pd-g-strip .gb-grid {
+            background: rgba(255, 255, 255, .97);
+            padding: 12px 12px 40px;
+            box-shadow: 0 18px 30px -18px rgba(0, 0, 0, .5);
+            transform: rotate(-2deg);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .pd-g-strip img {
+            aspect-ratio: 4 / 3;
+        }
+
+        /* ---- Gerak Halus Hiasan ---- */
+        @keyframes pd-goyang {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+        .pd-goyang-kiri img {
+            animation: pd-goyang 6s cubic-bezier(.45, 0, .55, 1) infinite;
+            transform-origin: 0 0;
+        }
+        .pd-goyang-kanan img {
+            animation: pd-goyang 6.6s cubic-bezier(.45, 0, .55, 1) infinite reverse;
+            transform-origin: 100% 0;
+        }
+        @keyframes pd-apung {
+            0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+            50% { transform: translate3d(0, -6px, 0) rotate(2deg); }
+        }
+        .pd-apung img {
+            animation: pd-apung 4.8s cubic-bezier(.45, 0, .55, 1) infinite;
+        }
+        @keyframes pd-ayun {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .pd-ayun img {
+            animation: pd-ayun 5s cubic-bezier(.45, 0, .55, 1) infinite;
+            transform-origin: 50% 0;
+        }
+        .pd-tunda-1 img { animation-delay: -1.4s; }
+        .pd-tunda-2 img { animation-delay: -2.6s; }
+
+        .pd-hias-gb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* ---- Warna Dress Code ---- */
+        .pd-warna {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 1px solid rgba(200, 16, 46, 0.25);
+            flex-shrink: 0;
+        }
+
+        /* ---- RSVP & Wishes Widget Styling ---- */
+        .pd-borang {
+            width: calc(100% - 56px);
+            margin: 18px 28px 0 28px;
+            color: var(--theme-text);
+        }
+        .pd-borang .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .pd-borang .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0 14px;
+        }
+        .pd-borang .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--theme-text);
+        }
+        .pd-borang .radio-label input[type="radio"] {
+            width: 15px !important;
+            height: 15px !important;
+            accent-color: var(--theme-title);
+            padding: 0;
+            margin: 0;
+        }
+        .pd-borang .rsvp-submit-btn,
+        .pd-ucapan .wish-submit-btn {
+            background-color: var(--theme-title) !important;
+            color: var(--theme-bg) !important;
+            padding: 12px 28px !important;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .pd-ucapan {
+            width: calc(100% - 44px);
+            margin: 18px 22px 0 22px;
+            color: var(--theme-text);
+        }
+        .pd-ucapan .wish-form-group {
+            margin-bottom: 10px;
+        }
+        .pd-ucapan .wishes-list {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .pd-ucapan .message-wish {
+            background-color: rgba(200, 16, 46, 0.07);
+            color: var(--theme-text);
+            padding: 13px 15px;
+            text-align: left;
+        }
+        .pd-ucapan .message-wish .wish-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .pd-ucapan .message-wish .wish-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(200, 16, 46, 0.14);
+            color: var(--theme-title);
+        }
+        .pd-ucapan .message-wish .wish-text {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 2px;
+            white-space: pre-line;
+        }
+        .pd-ucapan .message-wish .wish-time {
+            font-size: 10.5px;
+            opacity: 0.65;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* ---- Tanda Kasih / Gift Cards (.pd-hadiah) ---- */
+        .pd-hadiah {
+            width: calc(100% - 48px);
+            margin: 18px 24px 0 24px;
+            color: var(--theme-text);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .pd-hadiah .gw__card {
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(200, 16, 46, 0.18);
+            border-radius: 20px;
+            padding: 20px 18px;
+            text-align: center;
+            box-shadow: 0 14px 28px -22px rgba(0, 0, 0, 0.35);
+        }
+        .pd-hadiah .gw__logo {
+            height: 28px;
+            max-width: 110px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+            display: block;
+        }
+        .pd-hadiah .gw__bank {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--theme-title);
+            margin-bottom: 4px;
+        }
+        .pd-hadiah .gw__number {
+            font-family: var(--font-title);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--theme-text);
+            margin-bottom: 4px;
+        }
+        .pd-hadiah .gw__holder {
+            font-size: 12.5px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+        .pd-hadiah .gw__btn {
+            background-color: var(--theme-title) !important;
+            color: rgba(255, 255, 255, .96) !important;
+            padding: 9px 20px !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* ---- Floating Audio Button ---- */
+        .floating-audio-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--theme-title);
+            color: var(--theme-bg);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 6px 16px rgba(200, 16, 46, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            cursor: pointer;
+            z-index: 1500;
+            transition: transform 0.2s ease;
+        }
+        .floating-audio-btn.visible {
+            display: flex;
+        }
+        .floating-audio-btn.playing i {
+            animation: spinSlow 5s linear infinite;
+        }
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---- Lightbox Modal ---- */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 12, 18, 0.88);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .lightbox-overlay.active {
+            display: flex;
+        }
+        .lightbox-overlay img {
+            max-width: 92vw;
+            max-height: 86vh;
+            border: 6px solid #fff;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* ---- Scroll Reveal Animation ---- */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .reveal-up.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Brand Footer ---- */
+        .dl-brand {
+            padding: 26px 16px 34px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.5;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+        }
+        .dl-brand__by {
+            margin: 0 0 4px;
+            opacity: .65;
+            letter-spacing: .04em;
+        }
+        .dl-brand__name {
+            display: block;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: .03em;
+            color: var(--theme-title);
+            text-decoration: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate__animated, .pd-goyang-kiri img, .pd-goyang-kanan img, .pd-apung img, .pd-ayun img {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="locked">
+
+    <!-- Resolusi Data Nama, Panggilan, Judul Acara, dan Foto Default Ultah1 -->
+    {{ $nickname := "Kirana" }}
+    {{ if .ChildNickname }}{{ $nickname = .ChildNickname }}
+    {{ else if .BrideNickname }}{{ $nickname = .BrideNickname }}
+    {{ else if .GroomNickname }}{{ $nickname = .GroomNickname }}
+    {{ else if .ChildName }}{{ $nickname = .ChildName }}
+    {{ else if .BrideName }}{{ $nickname = .BrideName }}
+    {{ else if .GroomName }}{{ $nickname = .GroomName }}{{ end }}
+
+    {{ $fullname := "Kirana Ayudia" }}
+    {{ if .ChildName }}{{ $fullname = .ChildName }}
+    {{ else if .BrideName }}{{ $fullname = .BrideName }}
+    {{ else if .GroomName }}{{ $fullname = .GroomName }}
+    {{ else if .ChildNickname }}{{ $fullname = .ChildNickname }}
+    {{ else if .BrideNickname }}{{ $fullname = .BrideNickname }}
+    {{ else if .GroomNickname }}{{ $fullname = .GroomNickname }}{{ end }}
+
+    {{ $eventLabel := "sweet seventeen" }}
+    {{ $eventTitle := "Sweet Seventeen" }}
+    {{ if .ChildOrder }}
+        {{ $eventLabel = .ChildOrder }}
+        {{ $eventTitle = .ChildOrder }}
+    {{ end }}
+
+    {{ $coverPhoto := "/assets/templates/ultah1/photos/cover-default.jpg" }}
+    {{ if .CoverImage }}{{ $coverPhoto = .CoverImage }}{{ end }}
+
+    {{ $profilePhoto := "/assets/templates/ultah1/photos/profile-default.jpg" }}
+    {{ if .BridePhoto }}{{ $profilePhoto = .BridePhoto }}
+    {{ else if .GroomPhoto }}{{ $profilePhoto = .GroomPhoto }}
+    {{ else if .Sec1Photo }}{{ $profilePhoto = .Sec1Photo }}{{ end }}
+
+    {{ $closingPhoto := "/assets/templates/ultah1/photos/closing-default.jpg" }}
+    {{ if .ClosingPhoto }}{{ $closingPhoto = .ClosingPhoto }}
+    {{ else if .Sec1Photo }}{{ $closingPhoto = .Sec1Photo }}
+    {{ else if and .GroomPhoto (ne .GroomPhoto .BridePhoto) }}{{ $closingPhoto = .GroomPhoto }}{{ end }}
+
+    {{ $eventDate := "Sabtu, 21 Agustus 2027" }}
+    {{ if .AkadDate }}{{ $eventDate = .AkadDate }}
+    {{ else if .ResepsiDate }}{{ $eventDate = .ResepsiDate }}{{ end }}
+
+    {{ $eventTime := "19:00" }}
+    {{ if .AkadTime }}{{ $eventTime = .AkadTime }}
+    {{ else if .ResepsiTime }}{{ $eventTime = .ResepsiTime }}{{ end }}
+
+    {{ $eventVenue := "The Pink Terrace" }}
+    {{ if .AkadVenue }}{{ $eventVenue = .AkadVenue }}
+    {{ else if .ResepsiVenue }}{{ $eventVenue = .ResepsiVenue }}{{ end }}
+
+    {{ $eventAddress := "Jl. Kemang Raya No. 8, Jakarta Selatan" }}
+    {{ if .AkadAddress }}{{ $eventAddress = .AkadAddress }}
+    {{ else if .ResepsiAddress }}{{ $eventAddress = .ResepsiAddress }}{{ end }}
+
+    {{ $mapsLink := "https://maps.google.com" }}
+    {{ if .AkadMapsURL }}{{ $mapsLink = .AkadMapsURL }}
+    {{ else if .ResepsiMapsURL }}{{ $mapsLink = .ResepsiMapsURL }}{{ end }}
+
+    <!-- ==================== SAMPUL / COVER (#cover) ==================== -->
+    <div id="cover" class="pd-sampul">
+        <div class="wb-cover-layer" id="cover-layer">
+            <!-- shape-mvtfeaj8-0: Warna alas -->
+            <div class="pd-bentuk" style="position:absolute; top:0; left:0; width:390px; height:844px; background-color:var(--theme-bg); z-index:0;"></div>
+
+            <!-- image-mvtfeaj8-1: Hiasan sudut kiri -->
+            <div class="pd-hias-gb pd-goyang-kiri animate__animated animate__fadeIn" style="position:absolute; top:-34px; left:-46px; width:206px; height:212px; z-index:4;">
+                <img src="/assets/templates/ultah1/hiasan-kiri.png" alt="">
+            </div>
+
+            <!-- image-mvtfeaja-2: Hiasan sudut kanan -->
+            <div class="pd-hias-gb pd-goyang-kanan animate__animated animate__fadeIn" style="position:absolute; top:-34px; left:230px; width:206px; height:212px; z-index:4;">
+                <img src="/assets/templates/ultah1/hiasan-kanan.png" alt="">
+            </div>
+
+            <!-- text-mvtfeaja-3: sweet seventeen -->
+            <p class="animate__animated animate__fadeInUp" style="position:absolute; top:148px; left:20px; width:350px; z-index:11; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:4px; text-transform:uppercase; text-align:center; color:var(--theme-title); animation-delay:0.15s;">
+                {{ $eventLabel }}
+            </p>
+
+            <!-- text-mvtfeajb-4: nama_panggilan_wanita -->
+            <p class="animate__animated animate__fadeInUp" style="position:absolute; top:166px; left:20px; width:350px; z-index:11; font-family:var(--font-additional); font-size:64px; font-weight:400; line-height:1.05; text-align:center; color:var(--theme-title); animation-delay:0.3s;">
+                {{ $nickname }}
+            </p>
+
+            <!-- image-mvtfeajb-5: Foto sampul Polaroid -->
+            <div class="pd-foto pd-bk-polaroid animate__animated animate__fadeIn" style="position:absolute; top:262px; left:87px; width:216px; height:270px; transform:rotate(-4deg); color:var(--theme-title); z-index:5;">
+                <img src="{{ $coverPhoto }}" alt="{{ $fullname }}">
+            </div>
+
+            <!-- image-mvtfeajb-6: Pita atas foto sampul -->
+            <div class="pd-hias-gb pd-ayun animate__animated animate__fadeIn" style="position:absolute; top:236px; left:160px; width:70px; height:99px; z-index:7;">
+                <img src="/assets/templates/ultah1/pita.png" alt="">
+            </div>
+
+            <!-- image-mvtfeajb-7: Balon hati kanan -->
+            <div class="pd-hias-gb pd-apung animate__animated animate__fadeIn" style="position:absolute; top:258px; left:296px; width:62px; height:65px; z-index:6;">
+                <img src="/assets/templates/ultah1/balon-hati.png" alt="">
+            </div>
+
+            <!-- image-mvtfeajb-8: Balon bintang kiri -->
+            <div class="pd-hias-gb pd-apung pd-tunda-1 animate__animated animate__fadeIn" style="position:absolute; top:340px; left:22px; width:58px; height:57px; z-index:6;">
+                <img src="/assets/templates/ultah1/balon-bintang.png" alt="">
+            </div>
+
+            <!-- image-mvtfeajb-9: Bola disko kanan bawah -->
+            <div class="pd-hias-gb pd-ayun pd-tunda-2 animate__animated animate__fadeIn" style="position:absolute; top:470px; left:306px; width:50px; height:50px; z-index:6;">
+                <img src="/assets/templates/ultah1/bola-disko.png" alt="">
+            </div>
+
+            <!-- text-mvtfeajb-a: you're invited to my birthday party -->
+            <p class="animate__animated animate__fadeInUp" style="position:absolute; top:572px; left:20px; width:350px; z-index:11; font-family:var(--font-content); font-size:9px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text); animation-delay:0.6s;">
+                you're invited to my birthday party
+            </p>
+
+            <!-- text-mvtfeajc-c: kepada yang terhormat -->
+            <p class="animate__animated animate__fadeIn" style="position:absolute; top:596px; left:30px; width:330px; z-index:15; font-family:var(--font-content); font-size:8.5px; font-weight:600; line-height:1.5; letter-spacing:2.4px; text-transform:uppercase; text-align:center; color:var(--theme-text); animation-delay:0.5s;">
+                kepada yang terhormat
+            </p>
+
+            <!-- guest_name-mvtfeajc-d: Nama Tamu -->
+            <div class="pd-tamu animate__animated animate__fadeIn" style="position:absolute; top:612px; left:30px; width:330px; z-index:16; text-align:center; color:var(--theme-title); font-family:var(--font-additional); font-size:26px; animation-delay:0.55s;">
+                <span class="gn-name">{{ .GuestTo }}</span>
+            </div>
+
+            <!-- open_button-mvtfeajc-e: Buka Undangan -->
+            <div class="pd-tombol-buka animate__animated animate__fadeInUp" style="position:absolute; top:658px; left:0; width:390px; z-index:17; text-align:center; animation-delay:0.65s;">
+                <button type="button" class="obtn-widget" id="btn-open-invitation" onclick="openInvitation()">
+                    <i class="bi bi-envelope-open"></i>
+                    <span>Buka Undangan</span>
+                </button>
+            </div>
+
+            <!-- image-mvtfeajb-b: Untaian bawah sampul -->
+            <div class="pd-hias-gb animate__animated animate__fadeIn" style="position:absolute; top:736px; left:-40px; width:470px; height:202px; z-index:4;">
+                <img src="/assets/templates/ultah1/untaian-bawah.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== KONTEN UTAMA ==================== -->
+    <div class="dl-page-wrap">
+        <main class="dl-mobile-col" id="app-col">
+
+            <!-- 1. SECTION: SAVE THE DATE (canvas-mvtfeajd-x) -->
+            <section id="save-the-date" class="pd-seksi">
+                <!-- image-mvtfeajc-f: Balon hati kiri -->
+                <div class="pd-hias-gb pd-apung" style="position:absolute; top:54px; left:22px; width:40px; height:42px; z-index:3;">
+                    <img src="/assets/templates/ultah1/balon-hati.png" alt="">
+                </div>
+                <!-- image-mvtfeajc-g: Balon bintang kanan (anchorX: right) -->
+                <div class="pd-hias-gb pd-apung pd-tunda-2" style="position:absolute; top:86px; right:24px; width:36px; height:36px; z-index:3;">
+                    <img src="/assets/templates/ultah1/balon-bintang.png" alt="">
+                </div>
+
+                <!-- text-mvtfeajc-h: save the date -->
+                <p class="reveal-up" style="position:relative; margin:64px 30px 0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    save the date
+                </p>
+
+                <!-- text-mvtfeajc-i: Sweet Seventeen -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    {{ $eventTitle }}
+                </p>
+
+                <!-- group-mvtfeajd-o: Baris tanggal (date | month | year) -->
+                <div class="reveal-up" style="position:relative; width:100%; margin-top:18px; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:12px;">
+                    <p id="std-date-num" style="width:66px; font-family:var(--font-title); font-size:36px; font-weight:500; line-height:1.2; letter-spacing:1.5px; text-align:center; color:var(--theme-title);">21</p>
+                    <div style="width:1px; height:40px; background-color:rgba(200, 16, 46, 0.45);"></div>
+                    <p id="std-month-name" class="pd-nowrap" style="width:128px; font-family:var(--font-title); font-size:15px; font-weight:600; line-height:1.2; letter-spacing:1.4px; text-transform:uppercase; text-align:center; color:var(--theme-title);">AGUSTUS</p>
+                    <div style="width:1px; height:40px; background-color:rgba(200, 16, 46, 0.45);"></div>
+                    <p id="std-year-num" class="pd-nowrap" style="width:104px; font-family:var(--font-title); font-size:36px; font-weight:500; line-height:1.2; letter-spacing:1.5px; text-align:center; color:var(--theme-title);">2027</p>
+                </div>
+
+                <!-- text-mvtfeajd-p: Hari -->
+                <p id="std-day-name" class="reveal-up" style="position:relative; margin:4px 30px 0 30px; font-family:var(--font-content); font-size:10px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    SABTU
+                </p>
+
+                <!-- group-mvtfeajd-r: Garis -->
+                <div class="reveal-up" style="position:relative; width:100%; margin-top:16px; display:flex; justify-content:center; align-items:center;">
+                    <div style="width:300px; height:1px; background-color:rgba(200, 16, 46, 0.4);"></div>
+                </div>
+
+                <!-- group-mvtfeajd-u: Jam & tempat -->
+                <div class="reveal-up" style="position:relative; width:100%; margin-top:14px; display:flex; flex-direction:row; align-items:flex-start; justify-content:center; gap:8px;">
+                    <div class="pd-berikon" style="width:110px;">
+                        <span class="btn-widget">
+                            <i class="bi bi-clock"></i>
+                            <span id="std-time-label">{{ $eventTime }}</span>
+                        </span>
+                    </div>
+                    <div class="pd-berikon" style="width:200px;">
+                        <a href="{{ $mapsLink }}" target="_blank" rel="noopener noreferrer" class="btn-widget">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ $eventVenue }}</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- text-mvtfeajd-v: Alamat jalan -->
+                <p class="reveal-up" style="position:relative; margin:2px 60px 0 60px; font-family:var(--font-content); font-size:12px; font-weight:400; line-height:1.65; text-align:center; color:rgba(122, 66, 88, 0.8);">
+                    {{ $eventAddress }}
+                </p>
+
+                <!-- text-mvtfeajd-w: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:40px;"></p>
+            </section>
+
+            <!-- 2. SECTION: TENTANG AKU / PROFILE & GREETING (canvas-mvtfeajd-18) -->
+            <section id="tentang-aku" class="pd-seksi">
+                <!-- group-mvtfeajd-12: Foto bulat (baseW: 390, baseH: 300) -->
+                <div class="pd-skala-wrap reveal-up" data-base-h="300" style="margin-top:30px;">
+                    <div class="pd-skala-layer" style="height:300px;">
+                        <!-- image-mvtfeajd-y: Foto profil bulat -->
+                        <div class="pd-foto pd-bk-bulat" style="position:absolute; top:30px; left:79px; width:232px; height:232px; color:var(--theme-title); z-index:3;">
+                            <img src="{{ $profilePhoto }}" alt="{{ $fullname }}">
+                        </div>
+                        <!-- image-mvtfeajd-z: Balon hati -->
+                        <div class="pd-hias-gb pd-apung" style="position:absolute; top:8px; left:274px; width:70px; height:73px; transform:rotate(8deg); z-index:4;">
+                            <img src="/assets/templates/ultah1/balon-hati.png" alt="">
+                        </div>
+                        <!-- image-mvtfeajd-10: Balon bintang -->
+                        <div class="pd-hias-gb pd-apung pd-tunda-1" style="position:absolute; top:196px; left:34px; width:60px; height:59px; z-index:4;">
+                            <img src="/assets/templates/ultah1/balon-bintang.png" alt="">
+                        </div>
+                        <!-- image-mvtfeajd-11: Pita -->
+                        <div class="pd-hias-gb" style="position:absolute; top:222px; left:290px; width:52px; height:73px; transform:rotate(14deg); z-index:4;">
+                            <img src="/assets/templates/ultah1/pita.png" alt="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- text-mvtfeajd-13: nama_wanita -->
+                <p class="reveal-up" style="position:relative; margin:10px 24px 0 24px; font-family:var(--font-additional); font-size:40px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    {{ $fullname }}
+                </p>
+
+                <!-- block-mvtfeajd-16: Kartu salam -->
+                <div class="pd-kartu reveal-up" style="position:relative; width:334px; max-width:calc(100% - 56px); margin:18px 28px 0 28px; padding:26px 20px; border-radius:26px; background-color:rgba(247, 198, 217, 0.38); color:var(--theme-title); display:flex; flex-direction:column; align-items:center;">
+                    <p style="font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-title);">
+                        hai, teman-teman!
+                    </p>
+                    <p style="margin-top:8px; font-family:var(--font-content); font-size:14px; font-weight:400; line-height:1.65; text-align:center; color:var(--theme-text);">
+                        {{ if .Quotes }}{{ .Quotes }}{{ else }}Aku mengundang kamu merayakan ulang tahunku yang ke-17. Dandan yang cantik dan ganteng, ya. Datang biar makin seru!{{ end }}
+                    </p>
+                </div>
+
+                <!-- text-mvtfeajd-17: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:40px;"></p>
+            </section>
+
+            <!-- 3. SECTION: HITUNG MUNDUR (canvas-mvtfeaje-1e) -->
+            <section id="countdown" class="pd-seksi">
+                <!-- image-mvtfeajd-19: Hiasan kecil pita -->
+                <div class="pd-hias-gb pd-apung" style="position:relative; width:42px; height:59px; margin:40px 0 8px 0;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeajd-1a: menuju hari-H -->
+                <p class="reveal-up" style="position:relative; margin:0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    menuju hari-H
+                </p>
+
+                <!-- text-mvtfeajd-1b: Hitung Mundur -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    Hitung Mundur
+                </p>
+
+                <!-- date-mvtfeajd-1c: Countdown pil -->
+                <div class="pd-hitung pd-cd-pil reveal-up" style="position:relative; margin:18px 16px 0 16px; color:var(--theme-title);">
+                    <div class="db-countdown">
+                        <div class="db-cd">
+                            <span id="cd-days">00</span>
+                            <small>Hari</small>
+                        </div>
+                        <span class="db-sep">:</span>
+                        <div class="db-cd">
+                            <span id="cd-hours">00</span>
+                            <small>Jam</small>
+                        </div>
+                        <span class="db-sep">:</span>
+                        <div class="db-cd">
+                            <span id="cd-mins">00</span>
+                            <small>Menit</small>
+                        </div>
+                        <span class="db-sep">:</span>
+                        <div class="db-cd">
+                            <span id="cd-secs">00</span>
+                            <small>Detik</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- text-mvtfeaje-1d: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:40px;"></p>
+            </section>
+
+            <!-- 4. SECTION: SUSUNAN ACARA / PARTY RUNDOWN (canvas-mvtfeaje-1t) -->
+            <section id="list-rundown" class="pd-seksi">
+                <!-- image-mvtfeaje-1f: Hiasan kecil pita -->
+                <div class="pd-hias-gb pd-apung" style="position:relative; width:42px; height:59px; margin:40px 0 8px 0;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeaje-1g: susunan acara -->
+                <p class="reveal-up" style="position:relative; margin:0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    susunan acara
+                </p>
+
+                <!-- text-mvtfeaje-1h: Party Rundown -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    Party Rundown
+                </p>
+
+                <!-- group-mvtfeaje-1r: Susunan acara tiket -->
+                <div id="rundown-tickets-wrap" class="reveal-up" style="position:relative; width:334px; max-width:calc(100% - 56px); margin:20px 28px 0 28px; display:flex; flex-direction:column; align-items:center;">
+                    <!-- Acara 1 -->
+                    <div class="pd-rd-tiket">
+                        <p class="pd-rd-sobek" id="rd-time-0">19:00</p>
+                        <p class="pd-rd-judul" id="rd-title-0">Pesta dimulai</p>
+                    </div>
+                    <!-- Acara 2 -->
+                    <div class="pd-rd-tiket">
+                        <p class="pd-rd-sobek" id="rd-time-1">20:00</p>
+                        <p class="pd-rd-judul" id="rd-title-1">Tiup lilin &amp; potong kue</p>
+                    </div>
+                    <!-- Acara 3 -->
+                    <div class="pd-rd-tiket">
+                        <p class="pd-rd-sobek" id="rd-time-2">20:30</p>
+                        <p class="pd-rd-judul" id="rd-title-2">Dansa &amp; foto bersama</p>
+                    </div>
+                </div>
+
+                <!-- text-mvtfeaje-1s: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:30px;"></p>
+            </section>
+
+            <!-- 5. SECTION: PHOTOBOOTH / GALERI (canvas-mvtfeaje-21) -->
+            {{ if .GalleryList }}
+            <section id="galeri" class="pd-seksi">
+                <!-- image-mvtfeaje-1u: Hiasan kecil pita -->
+                <div class="pd-hias-gb pd-apung" style="position:relative; width:42px; height:59px; margin:40px 0 8px 0;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeaje-1v: photobooth -->
+                <p class="reveal-up" style="position:relative; margin:0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    photobooth
+                </p>
+
+                <!-- text-mvtfeaje-1w: Momen seru -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    Momen seru
+                </p>
+
+                <!-- grid-mvtfeaje-1x: Photobooth Strip -->
+                <div class="pd-galeri pd-g-strip reveal-up" style="position:relative; width:210px; margin-top:26px; color:var(--theme-title); z-index:2;">
+                    <div class="gb-grid">
+                        {{ range .GalleryList }}
+                        <img src="{{ . }}" alt="Photobooth" onclick="openLightbox('{{ . }}')" loading="lazy">
+                        {{ end }}
+                    </div>
+                </div>
+
+                <!-- image-mvtfeaje-1y: Balon hati kanan (anchorX: right) -->
+                <div class="pd-hias-gb pd-apung" style="position:absolute; top:200px; right:34px; width:56px; height:58px; z-index:4;">
+                    <img src="/assets/templates/ultah1/balon-hati.png" alt="">
+                </div>
+
+                <!-- image-mvtfeaje-1z: Bola disko kiri -->
+                <div class="pd-hias-gb pd-ayun" style="position:absolute; top:300px; left:30px; width:60px; height:60px; z-index:4;">
+                    <img src="/assets/templates/ultah1/bola-disko.png" alt="">
+                </div>
+
+                <!-- text-mvtfeaje-20: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:60px;"></p>
+            </section>
+            {{ end }}
+
+            <!-- 6. SECTION: KODE BUSANA / DRESS CODE (canvas-mvtfeaje-2c) -->
+            <section id="dress-code" class="pd-seksi">
+                <!-- block-mvtfeaje-29: Kartu kode busana -->
+                <div class="pd-kartu reveal-up" style="position:relative; width:334px; max-width:calc(100% - 56px); margin:30px 28px 0 28px; padding:26px 20px; border-radius:26px; background-color:rgba(247, 198, 217, 0.30); color:var(--theme-title); display:flex; flex-direction:column; align-items:center;">
+                    <p style="font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                        Dress Code
+                    </p>
+                    <p style="margin-top:6px; font-family:var(--font-content); font-size:13.5px; font-weight:400; line-height:1.65; text-align:center; color:var(--theme-text);">
+                        Pakai nuansa pink, merah ceri, atau silver, ya!
+                    </p>
+                    <!-- group-mvtfeaje-28: Palet warna -->
+                    <div style="margin-top:16px; width:100%; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:14px;">
+                        <div class="pd-warna" style="background-color:#F7C6D9;" title="Pink"></div>
+                        <div class="pd-warna" style="background-color:#C8102E;" title="Merah Ceri"></div>
+                        <div class="pd-warna" style="background-color:#C9CCD3;" title="Perak"></div>
+                        <div class="pd-warna" style="background-color:#FFFFFF;" title="Putih"></div>
+                    </div>
+                </div>
+
+                <!-- image-mvtfeaje-2a: Pita kanan atas (anchorX: right) -->
+                <div class="pd-hias-gb" style="position:absolute; top:10px; right:40px; width:60px; height:85px; transform:rotate(12deg); z-index:4;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeaje-2b: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:30px;"></p>
+            </section>
+
+            <!-- 7. SECTION: RSVP / KONFIRMASI KEHADIRAN (canvas-mvtfeajf-2t) -->
+            <section id="rsvp" class="pd-seksi pd-seksi-isi">
+                <!-- image-mvtfeaje-2n: Hiasan kecil pita -->
+                <div class="pd-hias-gb pd-apung" style="position:relative; width:42px; height:59px; margin:64px 0 8px 0;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeajf-2o: konfirmasi kehadiran -->
+                <p class="reveal-up" style="position:relative; margin:0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    konfirmasi kehadiran
+                </p>
+
+                <!-- text-mvtfeajf-2p: Kamu datang, kan? -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    Kamu datang, kan?
+                </p>
+
+                <!-- text-mvtfeajf-2q: Mohon kabari kami kehadiran Anda melalui formulir berikut. -->
+                <p class="reveal-up" style="position:relative; margin:8px 44px 0 44px; font-family:var(--font-content); font-size:13.5px; font-weight:400; line-height:1.65; text-align:center; color:var(--theme-text);">
+                    Mohon kabari kami kehadiran Anda melalui formulir berikut.
+                </p>
+
+                <!-- rsvp-mvtfeajf-2r: Form RSVP -->
+                <div class="pd-borang reveal-up">
+                    <form id="rsvp-form" onsubmit="submitRsvpForm(event)">
+                        <div class="form-group">
+                            {{ if .HasGuestTo }}
+                            <input type="text" id="rsvp-name" name="guest_name" value="{{ .GuestTo }}" readonly required>
+                            {{ else }}
+                            <input type="text" id="rsvp-name" name="guest_name" placeholder="Nama lengkap" required>
+                            {{ end }}
+                        </div>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="rsvp_attendance" value="hadir" checked>
+                                <span>Ya, saya akan hadir</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="rsvp_attendance" value="tidak_hadir">
+                                <span>Maaf, belum bisa hadir</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <select id="rsvp-count" name="guest_count">
+                                <option value="1">1 Orang</option>
+                                <option value="2">2 Orang</option>
+                                <option value="3">3 Orang</option>
+                                <option value="4">4 Orang</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="rsvp-submit-btn" id="rsvp-submit-btn">Konfirmasi</button>
+                        <p id="rsvp-feedback" style="display:none; margin-top:10px; font-size:12px; text-align:center; color:var(--theme-title); font-weight:600;"></p>
+                    </form>
+                </div>
+
+                <!-- text-mvtfeajf-2s: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:44px;"></p>
+            </section>
+
+            <!-- 8. SECTION: UCAPAN / DOA & UCAPAN (canvas-mvtfeajf-2z) -->
+            <section id="ucapan" class="pd-seksi pd-seksi-isi">
+                <!-- image-mvtfeajf-2u: Hiasan kecil pita -->
+                <div class="pd-hias-gb pd-apung" style="position:relative; width:42px; height:59px; margin:44px 0 8px 0;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeajf-2v: doa & ucapan -->
+                <p class="reveal-up" style="position:relative; margin:0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    doa &amp; ucapan
+                </p>
+
+                <!-- text-mvtfeajf-2w: Tulis ucapanmu -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    Tulis ucapanmu
+                </p>
+
+                <!-- wishes-mvtfeajf-2x: Form & Daftar Ucapan -->
+                <div class="pd-ucapan reveal-up">
+                    <form id="wish-form" onsubmit="submitWishForm(event)">
+                        <div class="wish-form-group">
+                            {{ if .HasGuestTo }}
+                            <input type="text" id="wish-name" name="guest_name" value="{{ .GuestTo }}" readonly required>
+                            {{ else }}
+                            <input type="text" id="wish-name" name="guest_name" placeholder="Nama kamu" required>
+                            {{ end }}
+                        </div>
+                        <div class="wish-form-group">
+                            <textarea id="wish-message" name="message" rows="3" placeholder="Tulis doa &amp; ucapan selamat..." required></textarea>
+                        </div>
+                        <button type="submit" class="wish-submit-btn" id="wish-submit-btn">Kirim Ucapan</button>
+                    </form>
+
+                    <div class="wishes-list" id="wishes-list">
+                        {{ range .Wishes }}
+                        <div class="message-wish">
+                            <div class="wish-header">
+                                <b>{{ .GuestName }}</b>
+                                {{ if eq .Attendance "hadir" }}
+                                <span class="wish-badge">Hadir</span>
+                                {{ else if eq .Attendance "tidak_hadir" }}
+                                <span class="wish-badge" style="opacity:0.7;">Berhalangan</span>
+                                {{ end }}
+                            </div>
+                            <p class="wish-text">{{ .Message }}</p>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+
+                <!-- text-mvtfeajf-2y: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:44px;"></p>
+            </section>
+
+            <!-- 9. SECTION: TANDA KASIH / GIFT (canvas-mvtfeajf-36) -->
+            {{ if or .BankAccount1 .BankAccount2 .GiftAddress }}
+            <section id="gift" class="pd-seksi pd-seksi-isi">
+                <!-- image-mvtfeajf-30: Hiasan kecil pita -->
+                <div class="pd-hias-gb pd-apung" style="position:relative; width:42px; height:59px; margin:44px 0 8px 0;">
+                    <img src="/assets/templates/ultah1/pita.png" alt="">
+                </div>
+
+                <!-- text-mvtfeajf-31: tanda kasih -->
+                <p class="reveal-up" style="position:relative; margin:0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-text);">
+                    tanda kasih
+                </p>
+
+                <!-- text-mvtfeajf-32: Dengan sepenuh hati -->
+                <p class="reveal-up" style="position:relative; margin:4px 24px 0 24px; font-family:var(--font-additional); font-size:38px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    Dengan sepenuh hati
+                </p>
+
+                <!-- text-mvtfeajf-33: Doa dan kehadiran Anda sudah lebih dari cukup... -->
+                <p class="reveal-up" style="position:relative; margin:8px 40px 0 40px; font-family:var(--font-content); font-size:13.5px; font-weight:400; line-height:1.65; text-align:center; color:var(--theme-text);">
+                    Doa dan kehadiran Anda sudah lebih dari cukup. Bila ingin memberi tanda kasih, dapat melalui:
+                </p>
+
+                <!-- gift-mvtfeajf-34: Kartu Rekening & Alamat Kado -->
+                <div class="pd-hadiah reveal-up">
+                    {{ if .BankAccount1 }}
+                    <div class="gw__card">
+                        <img class="gw__logo bank-logo-img" data-bank="{{ .BankName1 }}" src="/assets/templates/ultah1/logo_bca.png" alt="{{ .BankName1 }}">
+                        <p class="gw__bank">{{ .BankName1 }}</p>
+                        <p class="gw__number" id="bank-num-1">{{ .BankAccount1 }}</p>
+                        {{ if .BankHolder1 }}<p class="gw__holder">a.n. {{ .BankHolder1 }}</p>{{ end }}
+                        <button type="button" class="gw__btn" onclick="copyText('{{ .BankAccount1 }}', this)">
+                            <i class="bi bi-copy"></i> <span>Salin Nomor</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if .BankAccount2 }}
+                    <div class="gw__card">
+                        <img class="gw__logo bank-logo-img" data-bank="{{ .BankName2 }}" src="/assets/templates/ultah1/logo_mandiri.png" alt="{{ .BankName2 }}">
+                        <p class="gw__bank">{{ .BankName2 }}</p>
+                        <p class="gw__number" id="bank-num-2">{{ .BankAccount2 }}</p>
+                        {{ if .BankHolder2 }}<p class="gw__holder">a.n. {{ .BankHolder2 }}</p>{{ end }}
+                        <button type="button" class="gw__btn" onclick="copyText('{{ .BankAccount2 }}', this)">
+                            <i class="bi bi-copy"></i> <span>Salin Nomor</span>
+                        </button>
+                    </div>
+                    {{ end }}
+
+                    {{ if .GiftAddress }}
+                    <div class="gw__card">
+                        <p class="gw__bank"><i class="bi bi-gift"></i> Kirim Kado</p>
+                        <p class="gw__holder" style="margin-top:4px; margin-bottom:12px; line-height:1.5;">{{ .GiftAddress }}</p>
+                        <button type="button" class="gw__btn" onclick="copyText('{{ .GiftAddress }}', this)">
+                            <i class="bi bi-copy"></i> <span>Salin Alamat</span>
+                        </button>
+                    </div>
+                    {{ end }}
+                </div>
+
+                <!-- text-mvtfeajf-35: Jeda -->
+                <p class="pd-hias pd-jeda" style="height:1px; margin-bottom:50px;"></p>
+            </section>
+            {{ end }}
+
+            <!-- 10. SECTION: PENUTUP / CLOSING (canvas-mvtfeaje-2m) -->
+            <section id="closing" class="pd-seksi" style="padding-bottom:0;">
+                <!-- group-mvtfeaje-2g: Foto penutup (baseW: 390, baseH: 280) -->
+                <div class="pd-skala-wrap reveal-up" data-base-h="280" style="margin-top:40px;">
+                    <div class="pd-skala-layer" style="height:280px;">
+                        <!-- image-mvtfeaje-2d: Foto penutup Polaroid -->
+                        <div class="pd-foto pd-bk-polaroid" style="position:absolute; top:26px; left:105px; width:180px; height:220px; transform:rotate(4deg); color:var(--theme-title); z-index:3;">
+                            <img src="{{ $closingPhoto }}" alt="{{ $fullname }}">
+                        </div>
+                        <!-- image-mvtfeaje-2e: Pita -->
+                        <div class="pd-hias-gb" style="position:absolute; top:6px; left:162px; width:64px; height:90px; z-index:4;">
+                            <img src="/assets/templates/ultah1/pita.png" alt="">
+                        </div>
+                        <!-- image-mvtfeaje-2f: Balon hati -->
+                        <div class="pd-hias-gb pd-apung" style="position:absolute; top:120px; left:286px; width:56px; height:58px; z-index:4;">
+                            <img src="/assets/templates/ultah1/balon-hati.png" alt="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- text-mvtfeaje-2h: can't wait to see you -->
+                <p class="reveal-up" style="position:relative; margin:10px 30px 0 30px; font-family:var(--font-content); font-size:10.5px; font-weight:600; line-height:1.5; letter-spacing:3px; text-transform:uppercase; text-align:center; color:var(--theme-title);">
+                    can't wait to see you
+                </p>
+
+                <!-- text-mvtfeaje-2i: nama_panggilan_wanita -->
+                <p class="reveal-up" style="position:relative; margin:6px 24px 0 24px; font-family:var(--font-additional); font-size:50px; font-weight:400; line-height:1.15; text-align:center; color:var(--theme-title);">
+                    {{ $nickname }}
+                </p>
+
+                <!-- text-mvtfeaje-2j: kata_penutup -->
+                <p class="reveal-up" style="position:relative; margin:8px 40px 0 40px; font-family:var(--font-content); font-size:14px; font-weight:400; line-height:1.65; text-align:center; color:var(--theme-text);">
+                    Kehadiranmu bikin malam ini makin berkesan!
+                </p>
+
+                <!-- group-mvtfeaje-2l: Untaian penutup (baseW: 390, baseH: 150) -->
+                <div class="pd-skala-wrap" data-base-h="150" style="margin-top:30px;">
+                    <div class="pd-skala-layer" style="height:150px;">
+                        <div class="pd-hias-gb" style="position:absolute; top:0; left:-40px; width:470px; height:202px; z-index:2;">
+                            <img src="/assets/templates/ultah1/untaian-bawah.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer Branding -->
+            <footer class="dl-brand">
+                <p class="dl-brand__by">Digital Invitation by</p>
+                <a href="https://dekorin.my.id" target="_blank" rel="noopener noreferrer" class="dl-brand__name">Dekorin</a>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Floating Music Button & Audio Element -->
+    <button type="button" class="floating-audio-btn" id="btn-audio" onclick="toggleAudio()" aria-label="Musik">
+        <i class="bi bi-disc" id="icon-audio"></i>
+    </button>
+    <audio id="bg-audio" loop preload="auto">
+        <source src="{{ if .AudioURL }}{{ .AudioURL }}{{ else }}/assets/templates/ultah1/default-song.mp3{{ end }}" type="audio/mpeg">
+    </audio>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <button type="button" class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <img id="lightbox-img" src="" alt="Preview">
+    </div>
+
+    <script>
+        // 1. Scale 390x844 Cover & .pd-skala-wrap groups proportionally (exact DynamicLayout behavior)
+        function updateLayoutScale() {
+            var col = document.getElementById('app-col');
+            var cover = document.getElementById('cover');
+            var colW = (col && col.clientWidth) ? col.clientWidth : Math.min(window.innerWidth, 430);
+            var gs = Math.round((colW / 390) * 1000) / 1000;
+            document.documentElement.style.setProperty('--wb-gs', String(gs));
+
+            // Scale .pd-skala-wrap heights to match scaled inner 390px layer
+            var skalaWraps = document.querySelectorAll('.pd-skala-wrap');
+            for (var i = 0; i < skalaWraps.length; i++) {
+                var baseH = parseFloat(skalaWraps[i].getAttribute('data-base-h')) || 280;
+                skalaWraps[i].style.height = Math.round(baseH * gs) + 'px';
+            }
+
+            // Cover 390x844 proportional fit & centering
+            if (cover) {
+                var cw = cover.clientWidth || colW;
+                var ch = cover.clientHeight || window.innerHeight;
+                var scaleW = cw / 390;
+                var scaleH = ch / 844;
+                var coverScale = Math.min(scaleW, scaleH);
+                // If viewport aspect is very close to mobile, fill width cleanly
+                if (cw <= 430) {
+                    coverScale = scaleW;
+                }
+                var gx = Math.round(((cw - 390 * coverScale) / 2) * 10) / 10;
+                var gt = Math.round(((ch - 844 * coverScale) / 2) * 10) / 10;
+                cover.style.setProperty('--wb-gs', String(Math.round(coverScale * 1000) / 1000));
+                cover.style.setProperty('--wb-gx', gx + 'px');
+                cover.style.setProperty('--wb-gt', gt + 'px');
+            }
+        }
+        window.addEventListener('resize', updateLayoutScale);
+        document.addEventListener('DOMContentLoaded', updateLayoutScale);
+        updateLayoutScale();
+
+        // 2. Buka Undangan (coverClose: fadeOut) & Autoplay Music
+        var isAudioPlaying = false;
+        function openInvitation() {
+            var cover = document.getElementById('cover');
+            if (cover) {
+                cover.classList.add('dl-cover--closing');
+            }
+            document.body.classList.remove('locked');
+            var btnAudio = document.getElementById('btn-audio');
+            if (btnAudio) {
+                btnAudio.classList.add('visible');
+            }
+            playAudio();
+            setTimeout(triggerRevealOnScroll, 150);
+        }
+
+        function playAudio() {
+            var audio = document.getElementById('bg-audio');
+            var btn = document.getElementById('btn-audio');
+            if (!audio) return;
+            audio.play().then(function() {
+                isAudioPlaying = true;
+                if (btn) btn.classList.add('playing');
+            }).catch(function() {
+                isAudioPlaying = false;
+                if (btn) btn.classList.remove('playing');
+            });
+        }
+
+        function toggleAudio() {
+            var audio = document.getElementById('bg-audio');
+            var btn = document.getElementById('btn-audio');
+            if (!audio) return;
+            if (audio.paused) {
+                audio.play();
+                isAudioPlaying = true;
+                if (btn) btn.classList.add('playing');
+            } else {
+                audio.pause();
+                isAudioPlaying = false;
+                if (btn) btn.classList.remove('playing');
+            }
+        }
+
+        // 3. Parse Event Date for Save The Date & Countdown Timer
+        var rawEventDate = "{{ $eventDate }}";
+        var rawEventTime = "{{ $eventTime }}";
+
+        function parseIndonesianOrISODate(dateStr, timeStr) {
+            var monthsMap = {
+                'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
+                'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11,
+                'january': 0, 'february': 1, 'march': 2, 'may': 4, 'june': 5,
+                'july': 6, 'august': 7, 'october': 9, 'december': 11
+            };
+            var monthNamesID = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+            var dayNamesID = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+
+            var hours = 19, mins = 0;
+            if (timeStr) {
+                var tm = timeStr.match(/(\d{1,2})[:.](\d{2})/);
+                if (tm) {
+                    hours = parseInt(tm[1], 10);
+                    mins = parseInt(tm[2], 10);
+                }
+            }
+
+            var target = null;
+            var s = (dateStr || '').trim();
+
+            // Check ISO YYYY-MM-DD
+            var isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (isoMatch) {
+                target = new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10), hours, mins, 0);
+            } else {
+                // Check Indonesian "Sabtu, 21 Agustus 2027"
+                var idMatch = s.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+                if (idMatch) {
+                    var d = parseInt(idMatch[1], 10);
+                    var mName = idMatch[2].toLowerCase();
+                    var y = parseInt(idMatch[3], 10);
+                    var mIdx = monthsMap[mName] !== undefined ? monthsMap[mName] : 7;
+                    target = new Date(y, mIdx, d, hours, mins, 0);
+                }
+            }
+
+            if (!target || isNaN(target.getTime())) {
+                target = new Date(2027, 7, 21, 19, 0, 0);
+            }
+
+            var dateEl = document.getElementById('std-date-num');
+            var monthEl = document.getElementById('std-month-name');
+            var yearEl = document.getElementById('std-year-num');
+            var dayEl = document.getElementById('std-day-name');
+
+            if (dateEl) dateEl.textContent = String(target.getDate()).padStart(2, '0');
+            if (monthEl) monthEl.textContent = monthNamesID[target.getMonth()];
+            if (yearEl) yearEl.textContent = String(target.getFullYear());
+            if (dayEl) dayEl.textContent = dayNamesID[target.getDay()];
+
+            return target;
+        }
+
+        var targetEventDate = parseIndonesianOrISODate(rawEventDate, rawEventTime);
+
+        function updateCountdown() {
+            var now = new Date().getTime();
+            var diff = targetEventDate.getTime() - now;
+            if (diff < 0) diff = 0;
+
+            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            var elD = document.getElementById('cd-days');
+            var elH = document.getElementById('cd-hours');
+            var elM = document.getElementById('cd-mins');
+            var elS = document.getElementById('cd-secs');
+
+            if (elD) elD.textContent = String(days).padStart(2, '0');
+            if (elH) elH.textContent = String(hours).padStart(2, '0');
+            if (elM) elM.textContent = String(mins).padStart(2, '0');
+            if (elS) elS.textContent = String(secs).padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 4. Custom Party Rundown from LoveStory JSON if provided
+        (function initPartyRundown() {
+            var rawRundown = {{ if .LoveStory }}{{ .LoveStory }}{{ else }}""{{ end }};
+            if (!rawRundown || typeof rawRundown !== 'string') return;
+            try {
+                var items = JSON.parse(rawRundown);
+                if (!Array.isArray(items) || items.length === 0) return;
+                var wrap = document.getElementById('rundown-tickets-wrap');
+                if (!wrap) return;
+                wrap.innerHTML = '';
+                items.forEach(function(item) {
+                    var timeTxt = item.year || item.date || item.time || '19:00';
+                    var titleTxt = item.title || item.story || '';
+                    if (!titleTxt) return;
+                    var row = document.createElement('div');
+                    row.className = 'pd-rd-tiket';
+                    var pTime = document.createElement('p');
+                    pTime.className = 'pd-rd-sobek';
+                    pTime.textContent = timeTxt;
+                    var pTitle = document.createElement('p');
+                    pTitle.className = 'pd-rd-judul';
+                    pTitle.textContent = titleTxt;
+                    row.appendChild(pTime);
+                    row.appendChild(pTitle);
+                    wrap.appendChild(row);
+                });
+            } catch (e) {}
+        })();
+
+        // 5. Bank Logo Resolver (BRI, BCA, Mandiri, BNI)
+        function resolveBankLogo(bankName) {
+            var n = (bankName || '').toLowerCase();
+            if (n.indexOf('bri') !== -1) return '/assets/templates/ultah1/logo_bri.png';
+            if (n.indexOf('mandiri') !== -1) return '/assets/templates/ultah1/logo_mandiri.png';
+            if (n.indexOf('bni') !== -1) return '/assets/templates/ultah1/logo_bni.png';
+            return '/assets/templates/ultah1/logo_bca.png';
+        }
+        document.querySelectorAll('.bank-logo-img').forEach(function(img) {
+            var bankName = img.getAttribute('data-bank') || '';
+            img.src = resolveBankLogo(bankName);
+        });
+
+        // 6. Copy to Clipboard Helper
+        function copyText(text, btnEl) {
+            if (!text) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text);
+            } else {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            if (btnEl) {
+                var span = btnEl.querySelector('span');
+                var orig = span ? span.textContent : btnEl.textContent;
+                if (span) span.textContent = 'Tersalin!';
+                setTimeout(function() {
+                    if (span) span.textContent = orig;
+                }, 1800);
+            }
+        }
+
+        // 7. Submit RSVP & Wishes to Backend API
+        var invitationSlug = "{{ .Slug }}";
+
+        function appendWishToDOM(guestName, attendance, message) {
+            var list = document.getElementById('wishes-list');
+            if (!list) return;
+            var card = document.createElement('div');
+            card.className = 'message-wish';
+            var badgeHtml = '';
+            if (attendance === 'hadir') {
+                badgeHtml = '<span class="wish-badge">Hadir</span>';
+            } else if (attendance === 'tidak_hadir') {
+                badgeHtml = '<span class="wish-badge" style="opacity:0.7;">Berhalangan</span>';
+            }
+            card.innerHTML = '<div class="wish-header"><b></b>' + badgeHtml + '</div><p class="wish-text"></p>';
+            card.querySelector('b').textContent = guestName;
+            card.querySelector('.wish-text').textContent = message;
+            list.insertBefore(card, list.firstChild);
+        }
+
+        function submitRsvpForm(e) {
+            e.preventDefault();
+            var nameInput = document.getElementById('rsvp-name');
+            var countInput = document.getElementById('rsvp-count');
+            var attRadio = document.querySelector('input[name="rsvp_attendance"]:checked');
+            var btn = document.getElementById('rsvp-submit-btn');
+            var fb = document.getElementById('rsvp-feedback');
+
+            var guestName = nameInput ? nameInput.value.trim() : '';
+            var attendance = attRadio ? attRadio.value : 'hadir';
+            var guestCount = countInput ? parseInt(countInput.value, 10) || 1 : 1;
+            if (!guestName) return;
+
+            var autoMsg = attendance === 'hadir'
+                ? 'Konfirmasi hadir (' + guestCount + ' orang).'
+                : 'Mohon maaf belum bisa hadir.';
+
+            if (btn) btn.disabled = true;
+            fetch('/api/invitations/' + encodeURIComponent(invitationSlug) + '/wishes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    guest_name: guestName,
+                    attendance: attendance,
+                    guest_count: guestCount,
+                    message: autoMsg
+                })
+            }).then(function(res) { return res.json(); })
+            .then(function() {
+                if (fb) {
+                    fb.style.display = 'block';
+                    fb.textContent = 'Terima kasih! Konfirmasi kehadiranmu sudah tercatat.';
+                }
+                appendWishToDOM(guestName, attendance, autoMsg);
+            }).catch(function() {})
+            .finally(function() {
+                if (btn) btn.disabled = false;
+            });
+        }
+
+        function submitWishForm(e) {
+            e.preventDefault();
+            var nameInput = document.getElementById('wish-name');
+            var msgInput = document.getElementById('wish-message');
+            var btn = document.getElementById('wish-submit-btn');
+
+            var guestName = nameInput ? nameInput.value.trim() : '';
+            var message = msgInput ? msgInput.value.trim() : '';
+            if (!guestName || !message) return;
+
+            if (btn) btn.disabled = true;
+            fetch('/api/invitations/' + encodeURIComponent(invitationSlug) + '/wishes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    guest_name: guestName,
+                    attendance: 'hadir',
+                    guest_count: 1,
+                    message: message
+                })
+            }).then(function(res) { return res.json(); })
+            .then(function() {
+                appendWishToDOM(guestName, 'hadir', message);
+                if (msgInput) msgInput.value = '';
+            }).catch(function() {})
+            .finally(function() {
+                if (btn) btn.disabled = false;
+            });
+        }
+
+        // 8. Lightbox Preview
+        function openLightbox(src) {
+            var lb = document.getElementById('lightbox');
+            var img = document.getElementById('lightbox-img');
+            if (lb && img) {
+                img.src = src;
+                lb.classList.add('active');
+            }
+        }
+        function closeLightbox() {
+            var lb = document.getElementById('lightbox');
+            if (lb) lb.classList.remove('active');
+        }
+
+        // 9. Scroll Reveal Observer
+        function triggerRevealOnScroll() {
+            var els = document.querySelectorAll('.reveal-up');
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.08 });
+                els.forEach(function(el) { io.observe(el); });
+            } else {
+                els.forEach(function(el) { el.classList.add('revealed'); });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', triggerRevealOnScroll);
+    </script>
+</body>
+</html>
