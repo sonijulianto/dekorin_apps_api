@@ -15,6 +15,9 @@
   window.__DEKORIN_VISUAL_EDITOR_READY__ = true;
 
   var isEditEnabled = true;
+  var isScrollLocked = false;
+  var clickBlockUntil = 0;
+  var lastTriggerTime = 0;
 
   function notifyHost(payload) {
     var msg = Object.assign({ source: 'dekorin-visual-editor' }, payload || {});
@@ -157,7 +160,11 @@
         var label = el.getAttribute('data-edit-label') || 'Ganti Foto';
         pill.textContent = '📷 ' + label;
         pill.addEventListener('click', function (ev) {
-          if (!isEditEnabled) return;
+          if (!isEditEnabled || isScrollLocked || Date.now() < clickBlockUntil) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            return;
+          }
           ev.preventDefault();
           ev.stopPropagation();
           triggerEditElement(el);
@@ -290,6 +297,12 @@
   }
 
   function triggerEditElement(el) {
+    if (isScrollLocked) return;
+    var now = Date.now();
+    if (now < clickBlockUntil) return;
+    if (now - lastTriggerTime < 450) return;
+    lastTriggerTime = now;
+
     var field = el.getAttribute('data-edit-field') || '';
     var type = el.getAttribute('data-edit-type') || 'text';
     var label = el.getAttribute('data-edit-label') || field;
@@ -379,6 +392,11 @@
     'click',
     function (e) {
       if (!isEditEnabled) return;
+      if (isScrollLocked || Date.now() < clickBlockUntil) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       var target = e.target;
       if (!target || typeof target.closest !== 'function') return;
 
@@ -872,11 +890,19 @@
 
   var scrollLockSaved = null;
   window.dekorinSetScrollLocked = function (locked) {
+    var shouldLock = !!locked;
+    isScrollLocked = shouldLock;
+    if (!shouldLock) {
+      // Absorb lingering delayed synthetic iOS clicks briefly after modal close
+      // while allowing scrolling to resume right away.
+      clickBlockUntil = Date.now() + 450;
+    }
+
     var html = document.documentElement;
     var body = document.body;
     if (!html || !body) return;
 
-    if (locked) {
+    if (shouldLock) {
       if (!scrollLockSaved) {
         scrollLockSaved = {
           htmlOverflow: html.style.overflow || '',
