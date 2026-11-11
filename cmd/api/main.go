@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -270,13 +271,8 @@ func main() {
 		return c.SendFile("./web/templates/landing.html")
 	})
 
-	// Web Superadmin Dashboard route
-	app.Get("/superadmin", func(c *fiber.Ctx) error {
-		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		c.Set("Pragma", "no-cache")
-		c.Set("Expires", "0")
-		return c.SendFile("./web/templates/superadmin.html")
-	})
+	// Web Superadmin Dashboard & PWA routes
+	registerSuperadminWebRoutes(app, "./web")
 
 	// Client Web Form routes (dengan rate limit untuk mencegah brute force token)
 	app.Get("/form/:token", formLimiter, handlers.ShowClientForm)                        // Public HTML form / summary view
@@ -357,4 +353,33 @@ func runLogCleanup() {
 	if res.Error == nil && res.RowsAffected > 0 {
 		log.Printf("🧹 [AutoClean] Berhasil membersihkan %d log API lama (> 30 hari)\n", res.RowsAffected)
 	}
+}
+
+func registerSuperadminWebRoutes(app *fiber.App, webDir string) {
+	app.Get("/superadmin", func(c *fiber.Ctx) error {
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Set("Pragma", "no-cache")
+		c.Set("Expires", "0")
+		return c.SendFile(filepath.Join(webDir, "templates", "superadmin.html"))
+	})
+
+	app.Get("/superadmin/manifest.json", func(c *fiber.Ctx) error {
+		if err := c.SendFile(filepath.Join(webDir, "assets", "superadmin-manifest.json")); err != nil {
+			return err
+		}
+		c.Set("Content-Type", "application/manifest+json; charset=utf-8")
+		c.Set("Cache-Control", "no-cache, must-revalidate")
+		return nil
+	})
+
+	app.Get("/superadmin/sw.js", func(c *fiber.Ctx) error {
+		if err := c.SendFile(filepath.Join(webDir, "assets", "superadmin-sw.js")); err != nil {
+			return err
+		}
+		c.Set("Content-Type", "application/javascript; charset=utf-8")
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Set("Pragma", "no-cache")
+		c.Set("Service-Worker-Allowed", "/superadmin")
+		return nil
+	})
 }

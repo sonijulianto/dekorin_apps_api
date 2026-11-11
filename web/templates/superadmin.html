@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Dekorin Admin">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Dekorin Admin">
     <meta name="theme-color" content="#D4A574">
     <title>DEKORIN - Web Admin Platform</title>
-    <!-- Favicon -->
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/superadmin/manifest.json?v=20261111">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/dekorin-favicon-32x32.png?v=20261103">
-    <link rel="icon" type="image/png" sizes="192x192" href="/assets/dekorin-favicon.png?v=20261103">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/dekorin-favicon.png?v=20261111">
     <link rel="shortcut icon" href="/assets/dekorin-favicon.ico?v=20261103">
-    <link rel="apple-touch-icon" href="/assets/dekorin-apple-touch-icon.png?v=20261103">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/dekorin-apple-touch-icon.png?v=20261111">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -23,6 +26,7 @@
         html, body {
             font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
+            overscroll-behavior-y: contain;
             -webkit-tap-highlight-color: transparent;
         }
         .sidebar-collapsed { width: 4.5rem !important; }
@@ -91,6 +95,18 @@
                     <span>Masuk ke Dashboard</span>
                 </button>
             </form>
+
+            <!-- PWA Install Prompt Box (Android/Desktop prompt atau panduan iOS Add to Home Screen) -->
+            <div id="loginPwaInstallBox" class="hidden mt-5 pt-5 border-t border-stone-100">
+                <button type="button" onclick="triggerPwaInstall()"
+                    class="w-full py-3 min-h-[44px] px-4 rounded-xl bg-[#F9F3EC] hover:bg-[#F3E7D8] border border-[#D4A574]/40 text-[#9A6E3E] font-bold text-xs flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                    <span>📲</span>
+                    <span id="loginPwaInstallLabel">Install Aplikasi Dekorin Admin</span>
+                </button>
+                <p id="loginPwaInstallSub" class="text-[11px] text-stone-400 text-center mt-2 leading-relaxed">
+                    Pasang ke layar utama HP Android &amp; iPhone agar akses lebih cepat seperti aplikasi.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -159,6 +175,10 @@
                             <p class="font-bold text-slate-900 truncate" id="dropdownUserName">Superadmin Dekorin</p>
                             <p class="text-[11px] text-slate-400 font-semibold" id="dropdownUserRole">Platform Administrator</p>
                         </div>
+                        <button type="button" id="btnDropdownInstallPwa" onclick="triggerPwaInstall()" class="hidden w-full text-left px-4 py-2.5 hover:bg-[#F9F3EC] text-[#C59563] font-semibold flex items-center gap-2 transition">
+                            <span>📲</span>
+                            <span id="dropdownInstallPwaLabel">Install Aplikasi (PWA)</span>
+                        </button>
                         <button onclick="openChangePasswordModal()" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 text-slate-700 font-semibold flex items-center gap-2 transition">
                             <svg class="w-4 h-4 text-[#D4A574]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                             <span>Ubah Kata Sandi</span>
@@ -339,11 +359,16 @@
                             <p class="text-stone-300 text-xs sm:text-sm mt-1.5 leading-relaxed">
                                 Kelola agenda acara langsung dari smartphone Android atau bagikan link APK ini ke tim Crew lapangan. Pengguna iPhone/iPad tetap nyaman mengelola semua fitur via Web Admin ini.
                             </p>
-                            <p id="iosInstallHint" class="hidden mt-2 text-[11px] text-[#E7CCA9] bg-white/10 border border-white/15 rounded-xl px-3 py-2">
-                                💡 <b>Tips Pengguna iOS (iPhone/iPad):</b> Ketuk ikon <b>Bagikan (Share)</b> di Safari lalu pilih <b>"Tambahkan ke Layar Utama"</b> agar Web Admin terbuka seperti aplikasi!
-                            </p>
+                            <button type="button" id="iosInstallHint" onclick="openIosPwaGuideModal()" class="hidden mt-2 text-left text-[11px] text-[#E7CCA9] bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl px-3 py-2 transition">
+                                💡 <b>Tips Pengguna iOS (iPhone/iPad):</b> Ketuk di sini untuk cara pasang Web Admin ke Layar Utama Safari agar terbuka seperti aplikasi!
+                            </button>
                         </div>
                         <div class="relative z-10 flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 w-full sm:w-auto">
+                            <button type="button" id="dashBtnInstallPwa" onclick="triggerPwaInstall()"
+                                class="hidden flex-1 sm:flex-initial px-4 py-3 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-100 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition backdrop-blur-sm">
+                                <span>📲</span>
+                                <span id="dashBtnInstallPwaLabel">Install Web App</span>
+                            </button>
                             <a id="dashBtnDownloadApk" href="/download/apk" target="_blank"
                                 class="flex-1 sm:flex-initial px-4 sm:px-5 py-3 rounded-2xl bg-[#D4A574] hover:bg-[#C59563] text-stone-900 font-extrabold text-xs sm:text-sm shadow-lg shadow-[#D4A574]/25 flex items-center justify-center gap-2 transition">
                                 <span>⬇️</span>
@@ -1581,6 +1606,74 @@
     <div id="appToast" class="hidden fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[70] max-w-[90vw] px-4 py-2.5 rounded-2xl bg-stone-900/95 text-white text-xs font-semibold shadow-xl border border-stone-700/60 flex items-center gap-2 transition-all duration-200">
         <span id="appToastIcon">✅</span>
         <span id="appToastMessage" class="leading-snug">Berhasil</span>
+    </div>
+
+    <!-- OFFLINE STATUS BANNER -->
+    <div id="pwaOfflineBanner" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-[65] max-w-[92vw] px-4 py-2 rounded-full bg-amber-950/95 text-amber-100 text-xs font-semibold shadow-lg border border-amber-500/40 flex items-center gap-2">
+        <span>📡</span>
+        <span>Koneksi internet terputus (Offline). Data membutuhkan koneksi aktif.</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: PANDUAN INSTALL PWA DI iOS (SAFARI) -->
+    <!-- ========================================== -->
+    <div id="iosPwaGuideModal" onclick="if(event.target === this) closeIosPwaGuideModal()" class="hidden fixed inset-0 z-[60] bg-stone-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full max-h-[90dvh] shadow-2xl flex flex-col overflow-hidden border border-stone-200">
+            <div class="w-10 h-1 rounded-full bg-stone-200 mx-auto mt-2.5 sm:hidden shrink-0"></div>
+            <div class="flex items-center justify-between border-b border-stone-100 px-5 py-3.5 shrink-0 bg-white">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-2xl bg-[#F9F3EC] border border-[#D4A574]/30 flex items-center justify-center shrink-0 overflow-hidden">
+                        <img src="/assets/dekorin-apple-touch-icon.png?v=20261111" alt="Dekorin" class="w-8 h-8 object-contain">
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base font-bold text-slate-900 truncate">Pasang Dekorin Admin (iOS)</h3>
+                        <p class="text-[11px] text-stone-400 truncate">Jadikan aplikasi di Layar Utama iPhone / iPad</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeIosPwaGuideModal()" class="w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center text-sm font-bold transition shrink-0">
+                    ✕
+                </button>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto overscroll-contain safe-footer-pb">
+                <div id="iosInAppBrowserWarning" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2">
+                    <p class="font-bold">⚠️ Sedang dibuka dari browser dalam aplikasi</p>
+                    <p class="text-[11px] leading-relaxed text-amber-800">
+                        Untuk memasang aplikasi di iPhone/iPad, silakan buka tautan ini di browser <b>Safari</b> terlebih dahulu (ketuk ikon <b>⋯</b> atau <b>🧭 Buka di Safari</b>).
+                    </p>
+                    <button type="button" onclick="copyCurrentAdminUrl()" class="w-full py-2 px-3 rounded-xl bg-white border border-amber-300 text-amber-900 font-bold text-[11px]">
+                        📋 Salin Link Web Admin
+                    </button>
+                </div>
+
+                <ol class="space-y-3 text-xs text-stone-700">
+                    <li class="flex items-start gap-3 p-3 rounded-2xl bg-[#FAF7F2] border border-stone-200/70">
+                        <span class="w-6 h-6 rounded-full bg-[#D4A574] text-white font-bold text-[11px] flex items-center justify-center shrink-0">1</span>
+                        <div>
+                            <p class="font-bold text-stone-900">Ketuk tombol Bagikan (Share)</p>
+                            <p class="text-[11px] text-stone-500 mt-0.5 leading-relaxed">Ketuk ikon kotak dengan panah ke atas <b>(⬆️)</b> pada bar menu browser Safari Anda.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3 p-3 rounded-2xl bg-[#FAF7F2] border border-stone-200/70">
+                        <span class="w-6 h-6 rounded-full bg-[#D4A574] text-white font-bold text-[11px] flex items-center justify-center shrink-0">2</span>
+                        <div>
+                            <p class="font-bold text-stone-900">Pilih "Tambahkan ke Layar Utama"</p>
+                            <p class="text-[11px] text-stone-500 mt-0.5 leading-relaxed">Gulir menu berbagi ke bawah lalu pilih <b>Tambahkan ke Layar Utama</b> / <b>Add to Home Screen</b>.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3 p-3 rounded-2xl bg-[#FAF7F2] border border-stone-200/70">
+                        <span class="w-6 h-6 rounded-full bg-[#D4A574] text-white font-bold text-[11px] flex items-center justify-center shrink-0">3</span>
+                        <div>
+                            <p class="font-bold text-stone-900">Ketuk "Tambah" (Add)</p>
+                            <p class="text-[11px] text-stone-500 mt-0.5 leading-relaxed">Ikon <b>Dekorin Admin</b> akan muncul di Home Screen dan terbuka layar penuh tanpa address bar.</p>
+                        </div>
+                    </li>
+                </ol>
+
+                <button type="button" onclick="closeIosPwaGuideModal()" class="w-full py-3 rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs shadow-md shadow-[#D4A574]/25 transition">
+                    Mengerti, Tutup
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- ========================================== -->
@@ -3423,16 +3516,164 @@
             }
         }
 
-        // Tampilkan tips Add to Home Screen khusus perangkat iOS
-        (function detectIOSDeviceHint() {
+        // ==========================================
+        // PWA CONTROLLER (ANDROID, DESKTOP & iOS)
+        // ==========================================
+        let deferredPwaPrompt = null;
+
+        function isStandaloneMode() {
+            return window.navigator.standalone === true ||
+                window.matchMedia('(display-mode: standalone)').matches ||
+                window.matchMedia('(display-mode: minimal-ui)').matches;
+        }
+
+        function isIOSDevice() {
             const ua = navigator.userAgent || '';
-            const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-            const hint = document.getElementById('iosInstallHint');
-            if (hint && isIOS && !isStandalone) {
-                hint.classList.remove('hidden');
+            return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        function isIOSInAppBrowser() {
+            if (!isIOSDevice()) return false;
+            const ua = navigator.userAgent || '';
+            // In-app webviews (WhatsApp/Instagram/Facebook/Line/Telegram) atau browser selain Safari yang membatasi Add to Home Screen
+            return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|WhatsApp|Telegram|CriOS|FxiOS|OPiOS/i.test(ua);
+        }
+
+        function openIosPwaGuideModal() {
+            const modal = document.getElementById('iosPwaGuideModal');
+            const warn = document.getElementById('iosInAppBrowserWarning');
+            if (warn) {
+                warn.classList.toggle('hidden', !isIOSInAppBrowser());
             }
-        })();
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeIosPwaGuideModal() {
+            const modal = document.getElementById('iosPwaGuideModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function copyCurrentAdminUrl() {
+            safeCopyToClipboard(window.location.origin + '/superadmin', 'Link Web Admin disalin! Silakan tempel di Safari.');
+        }
+
+        function updatePwaInstallUI() {
+            const standalone = isStandaloneMode();
+            const isIOS = isIOSDevice();
+            const canAndroidInstall = Boolean(deferredPwaPrompt);
+            const showInstallAction = !standalone && (canAndroidInstall || isIOS);
+
+            const iosHint = document.getElementById('iosInstallHint');
+            if (iosHint) {
+                iosHint.classList.toggle('hidden', standalone || !isIOS);
+            }
+
+            const loginBox = document.getElementById('loginPwaInstallBox');
+            const loginLabel = document.getElementById('loginPwaInstallLabel');
+            const loginSub = document.getElementById('loginPwaInstallSub');
+            if (loginBox) {
+                loginBox.classList.toggle('hidden', !showInstallAction);
+                if (loginLabel && loginSub) {
+                    if (canAndroidInstall) {
+                        loginLabel.innerText = 'Install Aplikasi Dekorin Admin';
+                        loginSub.innerText = 'Pasang langsung ke HP Android / Desktop agar akses cepat tanpa tab browser.';
+                    } else if (isIOS) {
+                        loginLabel.innerText = 'Pasang di Layar Utama (iPhone / iPad)';
+                        loginSub.innerText = 'Ketuk untuk melihat langkah memasang Web Admin ke Home Screen iOS.';
+                    }
+                }
+            }
+
+            const dropdownBtn = document.getElementById('btnDropdownInstallPwa');
+            const dropdownLabel = document.getElementById('dropdownInstallPwaLabel');
+            if (dropdownBtn) {
+                dropdownBtn.classList.toggle('hidden', !showInstallAction);
+                if (dropdownLabel) {
+                    dropdownLabel.innerText = isIOS && !canAndroidInstall
+                        ? 'Pasang ke Layar Utama (iOS)'
+                        : 'Install Aplikasi (PWA)';
+                }
+            }
+
+            const dashBtn = document.getElementById('dashBtnInstallPwa');
+            const dashLabel = document.getElementById('dashBtnInstallPwaLabel');
+            if (dashBtn) {
+                dashBtn.classList.toggle('hidden', !showInstallAction);
+                if (dashLabel) {
+                    dashLabel.innerText = isIOS && !canAndroidInstall
+                        ? 'Pasang di iPhone/iPad'
+                        : 'Install Web App';
+                }
+            }
+        }
+
+        async function triggerPwaInstall() {
+            const userMenu = document.getElementById('userDropdownMenu');
+            if (userMenu) userMenu.classList.add('hidden');
+
+            if (isStandaloneMode()) {
+                showToast('Aplikasi Web Admin sudah berjalan dalam mode aplikasi.');
+                return;
+            }
+
+            if (deferredPwaPrompt) {
+                try {
+                    deferredPwaPrompt.prompt();
+                    const choice = await deferredPwaPrompt.userChoice;
+                    if (choice && choice.outcome === 'accepted') {
+                        showToast('Memasang Dekorin Admin ke perangkat...');
+                    }
+                } catch (_) {
+                    // Abaikan jika browser membatalkan prompt
+                } finally {
+                    deferredPwaPrompt = null;
+                    updatePwaInstallUI();
+                }
+                return;
+            }
+
+            if (isIOSDevice()) {
+                openIosPwaGuideModal();
+                return;
+            }
+
+            showToast('Buka menu browser lalu pilih "Install app" / "Tambahkan ke layar utama".');
+        }
+
+        function syncOnlineStatusUI() {
+            const banner = document.getElementById('pwaOfflineBanner');
+            if (!banner) return;
+            banner.classList.toggle('hidden', navigator.onLine !== false);
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            updatePwaInstallUI();
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPwaPrompt = null;
+            updatePwaInstallUI();
+            showToast('Dekorin Admin berhasil dipasang sebagai aplikasi!');
+        });
+
+        window.addEventListener('online', () => {
+            syncOnlineStatusUI();
+            showToast('Koneksi internet kembali terhubung');
+        });
+        window.addEventListener('offline', syncOnlineStatusUI);
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register('/superadmin/sw.js', { scope: '/superadmin' })
+                    .catch((err) => console.warn('PWA Service Worker gagal didaftarkan:', err));
+            });
+        }
+
+        updatePwaInstallUI();
+        syncOnlineStatusUI();
 
         // Inisialisasi Tanggal
         const dateEl = document.getElementById('currentDateDisplay');
@@ -3688,7 +3929,16 @@
                 applyRolePermissions();
                 showDashboardUI();
                 await initializeDashboard();
-            } catch {
+            } catch (_) {
+                if (navigator.onLine === false) {
+                    showLogin();
+                    const errBox = document.getElementById('loginError');
+                    if (errBox) {
+                        errBox.innerText = 'Koneksi internet terputus. Sesi login Anda tetap tersimpan — aktifkan internet lalu muat ulang halaman.';
+                        errBox.classList.remove('hidden');
+                    }
+                    return;
+                }
                 handleLogout();
             }
         }
@@ -8943,7 +9193,7 @@
             if (e.key === 'Escape') {
                 closeMobileSidebar();
                 [
-                    'shareAppModal', 'modalViewData', 'modalPackage', 'modalDecorationModel',
+                    'shareAppModal', 'iosPwaGuideModal', 'modalViewData', 'modalPackage', 'modalDecorationModel',
                     'modalAgenda', 'modalInvitation', 'createModal', 'changePasswordModal',
                     'successModal', 'modalExpense', 'modalAddUser', 'modalEditUser',
                     'modalResetUserPassword', 'modalAddon', 'modalFormField', 'modalPendingLinks'

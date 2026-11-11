@@ -127,6 +127,10 @@ curl -s -f -L -o web/assets/dekorin-favicon.png "https://raw.githubusercontent.c
 curl -s -f -L -o web/assets/dekorin-favicon-32x32.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/dekorin-favicon-32x32.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/dekorin-favicon.ico "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/dekorin-favicon.ico?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/dekorin-apple-touch-icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/dekorin-apple-touch-icon.png?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/icons/pwa-maskable-192.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/pwa-maskable-192.png?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/icons/pwa-maskable-512.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/pwa-maskable-512.png?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/superadmin-manifest.json "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/superadmin-manifest.json?v=$TIMESTAMP" || true
+curl -s -f -L -o web/assets/superadmin-sw.js "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/superadmin-sw.js?v=$TIMESTAMP" || true
 
 # 6. Konfigurasi Nginx: Limit upload 150M & HTTP Security Headers
 if command -v nginx >/dev/null 2>&1 && [ -d /etc/nginx ]; then

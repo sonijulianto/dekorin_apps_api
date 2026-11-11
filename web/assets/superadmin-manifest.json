@@ -1,0 +1,42 @@
+{
+  "id": "/superadmin",
+  "name": "DEKORIN - Web Admin Platform",
+  "short_name": "Dekorin Admin",
+  "description": "Portal Web Admin Dekorin untuk pengelolaan agenda acara, katalog dekorasi, undangan digital, dan laporan usaha.",
+  "start_url": "/superadmin",
+  "scope": "/superadmin",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#F5F0EB",
+  "theme_color": "#D4A574",
+  "lang": "id-ID",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/dekorin-favicon.png?v=20261111",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo_icon.png?v=20261111",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/pwa-maskable-192.png?v=20261111",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icons/pwa-maskable-512.png?v=20261111",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
