@@ -73,10 +73,17 @@
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#C59563] via-[#D4A574] to-[#B88755] text-white p-5 sm:p-6 shadow-xl shadow-[#D4A574]/20">
       <div class="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
       <div class="relative z-10 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] uppercase font-bold tracking-widest text-white/90 bg-black/15 px-2.5 py-1 rounded-full">
-            Form Data Acara Klien
-          </span>
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-white/90 bg-black/15 px-2.5 py-1 rounded-full">
+              Form Data Acara Klien
+            </span>
+            {{if .EventTypeLabel}}
+            <span class="text-[10px] uppercase font-bold tracking-wider text-[#2C2C2C] bg-white/95 px-2.5 py-1 rounded-full shadow-2xs">
+              {{.EventTypeLabel}}
+            </span>
+            {{end}}
+          </div>
           <span class="text-[11px] font-mono text-white/90">ID: {{.FormToken}}</span>
         </div>
         <h2 class="font-serif-title text-xl sm:text-2xl font-bold leading-snug text-white">
@@ -613,10 +620,17 @@
       <div class="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-white/10 blur-lg pointer-events-none"></div>
 
       <div class="relative z-10 space-y-4">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] uppercase font-bold tracking-widest text-white/80 bg-black/15 px-2.5 py-1 rounded-full backdrop-blur-xs">
-            Ringkasan Konfirmasi Dekorasi
-          </span>
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-white/80 bg-black/15 px-2.5 py-1 rounded-full backdrop-blur-xs">
+              Ringkasan Konfirmasi Dekorasi
+            </span>
+            {{if .EventTypeLabel}}
+            <span class="text-[10px] uppercase font-bold tracking-wider text-[#2C2C2C] bg-white/95 px-2.5 py-1 rounded-full shadow-2xs">
+              {{.EventTypeLabel}}
+            </span>
+            {{end}}
+          </div>
           <span class="text-[11px] font-mono text-white/90">
             ID: {{.FormToken}}
           </span>

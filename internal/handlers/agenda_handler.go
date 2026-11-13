@@ -307,6 +307,8 @@ func CreateAgenda(c *fiber.Ctx) error {
 		})
 	}
 
+	eventType, eventLabel := ResolveAgendaEventTypeAndLabel(companyID, brandID, req.EventType, req.EventLabel)
+
 	agenda := models.Agenda{
 		ID:                   agendaID,
 		CompanyID:            companyID,
@@ -316,6 +318,8 @@ func CreateAgenda(c *fiber.Ctx) error {
 		BrandPhone:           brandPhone,
 		BrandInstagram:       brandInstagram,
 		BrandDescription:     brandDescription,
+		EventType:            eventType,
+		EventLabel:           eventLabel,
 		ClientName:           strings.TrimSpace(req.ClientName),
 		ClientPhone:          strings.TrimSpace(req.ClientPhone),
 		BackdropTitle:        backdropTitle,
@@ -1296,6 +1300,19 @@ func UpdateAgenda(c *fiber.Ctx) error {
 		}
 	}
 
+	// Update Jenis Acara jika diberikan
+	if req.EventType != nil {
+		rawLabel := ""
+		if req.EventLabel != nil {
+			rawLabel = *req.EventLabel
+		}
+		et, el := ResolveAgendaEventTypeAndLabel(agenda.CompanyID, agenda.BrandID, *req.EventType, rawLabel)
+		agenda.EventType = et
+		agenda.EventLabel = el
+	} else if req.EventLabel != nil && strings.TrimSpace(*req.EventLabel) != "" {
+		agenda.EventLabel = strings.TrimSpace(*req.EventLabel)
+	}
+
 	// Paket Dekorasi
 	packageChanged := false
 	if req.PackageID != nil {
@@ -1454,9 +1471,11 @@ func GenerateClientFormLink(c *fiber.Ctx) error {
 	userRole, _ := c.Locals("user_role").(string)
 
 	var body struct {
-		CompanyID string `json:"company_id"`
-		BrandID   string `json:"brand_id"`
-		Label     string `json:"label"`
+		CompanyID  string `json:"company_id"`
+		BrandID    string `json:"brand_id"`
+		EventType  string `json:"event_type"`
+		EventLabel string `json:"event_label"`
+		Label      string `json:"label"`
 	}
 	_ = c.BodyParser(&body)
 
@@ -1505,6 +1524,8 @@ func GenerateClientFormLink(c *fiber.Ctx) error {
 		clientPlaceholder = "Menunggu Isian Client"
 	}
 
+	eventType, eventLabel := ResolveAgendaEventTypeAndLabel(companyID, brandID, body.EventType, body.EventLabel)
+
 	draftAgenda := models.Agenda{
 		ID:               fmt.Sprintf("agd_%s", uuid.New().String()[:8]),
 		CompanyID:        companyID,
@@ -1514,6 +1535,8 @@ func GenerateClientFormLink(c *fiber.Ctx) error {
 		BrandPhone:       brandPhone,
 		BrandInstagram:   brandInstagram,
 		BrandDescription: brandDesc,
+		EventType:        eventType,
+		EventLabel:       eventLabel,
 		ClientName:       clientPlaceholder,
 		Status:           "upcoming",
 		PaymentStatus:    "unpaid",

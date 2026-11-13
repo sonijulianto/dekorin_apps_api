@@ -26,6 +26,8 @@ type BookingDetailViewData struct {
 	CompanyLogo            string
 	CompanyInstagram       string
 	CompanyBankInfo        string
+	EventType              string
+	EventTypeLabel         string
 	ClientName             string
 	ClientPhone            string
 	BackdropTitle          string
@@ -260,8 +262,8 @@ func ShowClientForm(c *fiber.Ctx) error {
 		companyPhoneClean = "62" + companyPhoneClean[1:]
 	}
 
-	// Ambil Konfigurasi Form Dinamis sesuai Company & Sub-Brand
-	formCfg, _ := GetEffectiveFormConfig(agenda.CompanyID, agenda.BrandID)
+	// Ambil Konfigurasi Form Dinamis sesuai Company, Sub-Brand & Jenis Acara
+	formCfg, _ := GetEffectiveFormConfig(agenda.CompanyID, agenda.BrandID, agenda.EventType)
 	isLocked, _ := IsClientFormComplete(agenda, formCfg)
 
 	// Ambil deskripsi & banner paket jika ada
@@ -440,6 +442,12 @@ func ShowClientForm(c *fiber.Ctx) error {
 		displayClientName = ""
 	}
 
+	normEventType := NormalizeEventType(agenda.EventType)
+	eventTypeLabel := ""
+	if normEventType != "" {
+		eventTypeLabel = GetEventTypeLabel(normEventType, agenda.EventLabel)
+	}
+
 	data := BookingDetailViewData{
 		CompanyName:            displayCompanyName,
 		CompanyPhone:           displayCompanyPhone,
@@ -448,6 +456,8 @@ func ShowClientForm(c *fiber.Ctx) error {
 		CompanyLogo:            displayCompanyLogo,
 		CompanyInstagram:       displayCompanyInstagram,
 		CompanyBankInfo:        company.BankInfo,
+		EventType:              normEventType,
+		EventTypeLabel:         eventTypeLabel,
 		ClientName:             displayClientName,
 		ClientPhone:            agenda.ClientPhone,
 		BackdropTitle:          agenda.BackdropTitle,
@@ -530,7 +540,7 @@ func UploadClientFormMedia(c *fiber.Ctx) error {
 		})
 	}
 
-	formCfg, _ := GetEffectiveFormConfig(agenda.CompanyID, agenda.BrandID)
+	formCfg, _ := GetEffectiveFormConfig(agenda.CompanyID, agenda.BrandID, agenda.EventType)
 	if locked, _ := IsClientFormComplete(agenda, formCfg); locked {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"error": "Form sudah terkunci sebagai ringkasan konfirmasi",
@@ -599,7 +609,7 @@ func SubmitClientForm(c *fiber.Ctx) error {
 		})
 	}
 
-	formCfg, _ := GetEffectiveFormConfig(agenda.CompanyID, agenda.BrandID)
+	formCfg, _ := GetEffectiveFormConfig(agenda.CompanyID, agenda.BrandID, agenda.EventType)
 
 	// Jika permintaan datang dari public client (tanpa Auth token admin) dan form sudah terkunci, tolak perubahan!
 	authHeader := strings.TrimSpace(c.Get("Authorization"))

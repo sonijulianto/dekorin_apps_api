@@ -872,13 +872,33 @@
                                 <p class="text-[11px] text-slate-400">Setiap Sub-Brand dapat memiliki daftar isian form yang berbeda.</p>
                             </div>
                             <span id="formConfigInheritedBadge" class="hidden px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                                Mengikuti template default (klik Simpan untuk kustomisasi khusus brand ini)
+                                Mengikuti template preset/default (klik Simpan untuk kustomisasi)
                             </span>
                         </div>
                         <div id="formConfigBrandTabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:flex-wrap">
                             <button type="button" onclick="selectFormConfigBrand('')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#D4A574] text-white whitespace-nowrap">
                                 Brand Utama
                             </button>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-100 space-y-2.5">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Jenis Acara / Template Form</h3>
+                                    <p class="text-[11px] text-slate-400">Pisahkan daftar pertanyaan untuk Wedding, Lamaran, Ulang Tahun, Aqiqah, atau buat jenis acara custom.</p>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button type="button" id="btnDeleteCustomEventType" onclick="deleteCustomFormTemplate()"
+                                        class="hidden px-3 py-1.5 rounded-xl text-[11px] font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition">
+                                        Hapus Template Custom
+                                    </button>
+                                    <button type="button" onclick="promptAddCustomEventType()"
+                                        class="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#F9F3EC] hover:bg-[#F3E7D8] text-[#C59563] border border-[#D4A574]/30 transition">
+                                        + Jenis Acara Custom
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="formConfigEventTypeTabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:flex-wrap"></div>
                         </div>
                     </div>
 
@@ -3381,16 +3401,27 @@
             <div class="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7 py-4 space-y-4 safe-footer-pb">
                 <!-- Quick Generator Card -->
                 <div class="p-4 rounded-2xl bg-[#F9F3EC] border border-[#D4A574]/30 space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Brand / Sub-Brand</label>
-                            <select id="inputGenerateLinkBrandId"
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Brand / Sub-Brand</label>
+                            <select id="inputGenerateLinkBrandId" onchange="refreshQuickLinkEventTypes()"
                                 class="w-full px-3 py-2.5 sm:py-2 rounded-xl border border-[#D4A574]/30 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30">
                                 <option value="">-- Brand Utama --</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Catatan Label Admin (Opsional)</label>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Jenis Acara / Template</label>
+                            <select id="inputGenerateLinkEventType"
+                                class="w-full px-3 py-2.5 sm:py-2 rounded-xl border border-[#D4A574]/30 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30">
+                                <option value="">Umum (Default)</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="lamaran">Lamaran</option>
+                                <option value="birthday">Ulang Tahun</option>
+                                <option value="aqiqah">Aqiqah</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Catatan Label (Opsional)</label>
                             <input type="text" id="inputGenerateLinkLabel" placeholder="Kosongkan jika langsung generate..."
                                 class="w-full px-3 py-2.5 sm:py-2 rounded-xl border border-[#D4A574]/30 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-[#D4A574]/30">
                         </div>
@@ -3462,6 +3493,9 @@
 
         // Form Config & Pending Links Cache
         let formConfigBrandId = '';
+        let formConfigEventType = '';
+        let formConfigEventLabel = 'Umum (Default)';
+        let formConfigTemplates = [];
         let formConfigFields = [];
         let formConfigShowPrice = true;
         let formConfigInherited = false;
@@ -9394,11 +9428,40 @@
         }
 
         // ==========================================
-        // PENGATURAN FORM CLIENT PER SUB-BRAND
+        // PENGATURAN FORM CLIENT PER SUB-BRAND & JENIS ACARA
         // ==========================================
+        const BUILTIN_EVENT_LABELS = {
+            '': 'Umum (Default)',
+            'wedding': 'Wedding',
+            'lamaran': 'Lamaran',
+            'birthday': 'Ulang Tahun',
+            'aqiqah': 'Aqiqah'
+        };
+
+        async function fetchFormTemplatesForBrand(brandId) {
+            try {
+                let url = `/api/company/form-config/templates?brand_id=${encodeURIComponent(brandId || '')}`;
+                if (selectedCompanyId) url += `&company_id=${encodeURIComponent(selectedCompanyId)}`;
+                const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+                const json = await res.json();
+                if (res.ok && Array.isArray(json.data)) {
+                    return json.data;
+                }
+            } catch (_) {}
+            return [
+                { event_type: '', event_label: 'Umum (Default)', is_system_preset: true },
+                { event_type: 'wedding', event_label: 'Wedding', is_system_preset: true },
+                { event_type: 'lamaran', event_label: 'Lamaran', is_system_preset: true },
+                { event_type: 'birthday', event_label: 'Ulang Tahun', is_system_preset: true },
+                { event_type: 'aqiqah', event_label: 'Aqiqah', is_system_preset: true }
+            ];
+        }
+
         async function loadFormConfigView() {
             await ensureAgendaMasterDataLoaded();
             renderFormConfigBrandTabs();
+            formConfigTemplates = await fetchFormTemplatesForBrand(formConfigBrandId);
+            renderFormConfigEventTypeTabs();
             await loadFormConfig();
         }
 
@@ -9415,8 +9478,48 @@
                 const isActive = formConfigBrandId === t.id;
                 return `
                     <button type="button" onclick="selectFormConfigBrand('${t.id}')"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition border ${isActive ? 'bg-[#D4A574] text-white border-[#D4A574] shadow-sm shadow-[#D4A574]/25' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}">
+                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition border whitespace-nowrap ${isActive ? 'bg-[#D4A574] text-white border-[#D4A574] shadow-sm shadow-[#D4A574]/25' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}">
                         ${t.name}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderFormConfigEventTypeTabs() {
+            const container = document.getElementById('formConfigEventTypeTabs');
+            const deleteBtn = document.getElementById('btnDeleteCustomEventType');
+            if (!container) return;
+
+            const list = (formConfigTemplates && formConfigTemplates.length > 0)
+                ? formConfigTemplates
+                : Object.entries(BUILTIN_EVENT_LABELS).map(([k, v]) => ({ event_type: k, event_label: v, is_system_preset: true }));
+
+            if (!list.some(t => (t.event_type || '') === (formConfigEventType || ''))) {
+                formConfigEventType = '';
+                formConfigEventLabel = BUILTIN_EVENT_LABELS[''];
+            }
+
+            const selectedTpl = list.find(t => (t.event_type || '') === (formConfigEventType || ''));
+            if (selectedTpl) {
+                formConfigEventLabel = selectedTpl.event_label || BUILTIN_EVENT_LABELS[selectedTpl.event_type] || selectedTpl.event_type;
+            }
+
+            if (deleteBtn) {
+                if (selectedTpl && !selectedTpl.is_system_preset && formConfigEventType !== '') {
+                    deleteBtn.classList.remove('hidden');
+                } else {
+                    deleteBtn.classList.add('hidden');
+                }
+            }
+
+            container.innerHTML = list.map(t => {
+                const et = t.event_type || '';
+                const isActive = (formConfigEventType || '') === et;
+                const dot = t.is_customized ? `<span class="inline-block w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-emerald-500'} ml-1.5"></span>` : '';
+                return `
+                    <button type="button" onclick="selectFormConfigEventType('${et.replace(/'/g, "\\'")}', '${(t.event_label || '').replace(/'/g, "\\'")}')"
+                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition border whitespace-nowrap inline-flex items-center ${isActive ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}">
+                        <span>${t.event_label || BUILTIN_EVENT_LABELS[et] || et}</span>${dot}
                     </button>
                 `;
             }).join('');
@@ -9425,7 +9528,79 @@
         async function selectFormConfigBrand(brandId) {
             formConfigBrandId = brandId || '';
             renderFormConfigBrandTabs();
+            formConfigTemplates = await fetchFormTemplatesForBrand(formConfigBrandId);
+            renderFormConfigEventTypeTabs();
             await loadFormConfig();
+        }
+
+        async function selectFormConfigEventType(eventType, eventLabel) {
+            formConfigEventType = eventType || '';
+            formConfigEventLabel = eventLabel || BUILTIN_EVENT_LABELS[formConfigEventType] || formConfigEventType;
+            renderFormConfigEventTypeTabs();
+            await loadFormConfig();
+        }
+
+        async function promptAddCustomEventType() {
+            const label = prompt('Masukkan nama jenis acara baru (contoh: Khitanan, Wisuda, Corporate Gathering):');
+            if (!label || !label.trim()) return;
+            const cleanLabel = label.trim();
+
+            try {
+                let url = '/api/company/form-config';
+                if (selectedCompanyId) url += `?company_id=${encodeURIComponent(selectedCompanyId)}`;
+
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        brand_id: formConfigBrandId,
+                        event_type: '__new__',
+                        event_label: cleanLabel,
+                        show_price: formConfigShowPrice,
+                        fields: formConfigFields
+                    })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal membuat template jenis acara');
+
+                const created = json.data || {};
+                formConfigEventType = created.event_type || '';
+                formConfigEventLabel = created.event_label || cleanLabel;
+                formConfigTemplates = await fetchFormTemplatesForBrand(formConfigBrandId);
+                renderFormConfigEventTypeTabs();
+                await loadFormConfig();
+                alert(`Template "${formConfigEventLabel}" berhasil dibuat! Silakan sesuaikan pertanyaannya.`);
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
+        }
+
+        async function deleteCustomFormTemplate() {
+            if (!formConfigEventType || BUILTIN_EVENT_LABELS[formConfigEventType]) return;
+            if (!confirm(`Hapus template custom "${formConfigEventLabel}"? Agenda lama tetap aman, tetapi template ini tidak akan muncul lagi.`)) return;
+
+            try {
+                let url = `/api/company/form-config?brand_id=${encodeURIComponent(formConfigBrandId)}&event_type=${encodeURIComponent(formConfigEventType)}`;
+                if (selectedCompanyId) url += `&company_id=${encodeURIComponent(selectedCompanyId)}`;
+
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal menghapus template');
+
+                formConfigEventType = '';
+                formConfigEventLabel = BUILTIN_EVENT_LABELS[''];
+                formConfigTemplates = await fetchFormTemplatesForBrand(formConfigBrandId);
+                renderFormConfigEventTypeTabs();
+                await loadFormConfig();
+            } catch (err) {
+                alert('Gagal: ' + err.message);
+            }
         }
 
         async function loadFormConfig() {
@@ -9437,7 +9612,7 @@
             }
 
             try {
-                let url = `/api/company/form-config?brand_id=${encodeURIComponent(formConfigBrandId)}`;
+                let url = `/api/company/form-config?brand_id=${encodeURIComponent(formConfigBrandId)}&event_type=${encodeURIComponent(formConfigEventType)}`;
                 if (selectedCompanyId) url += `&company_id=${encodeURIComponent(selectedCompanyId)}`;
 
                 const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
@@ -9448,10 +9623,11 @@
                 formConfigFields = Array.isArray(cfg.fields) ? cfg.fields : [];
                 formConfigShowPrice = cfg.show_price !== false;
                 formConfigInherited = !!json.is_inherited;
+                if (cfg.event_label) formConfigEventLabel = cfg.event_label;
 
                 if (showPriceToggle) showPriceToggle.checked = formConfigShowPrice;
                 if (inheritedBadge) {
-                    if (formConfigInherited && formConfigBrandId) inheritedBadge.classList.remove('hidden');
+                    if (formConfigInherited && (formConfigBrandId || formConfigEventType)) inheritedBadge.classList.remove('hidden');
                     else inheritedBadge.classList.add('hidden');
                 }
 
@@ -9709,6 +9885,8 @@
                     },
                     body: JSON.stringify({
                         brand_id: formConfigBrandId,
+                        event_type: formConfigEventType,
+                        event_label: formConfigEventLabel,
                         show_price: showPrice,
                         fields: orderedFields
                     })
@@ -9717,6 +9895,8 @@
                 if (!res.ok) throw new Error(json.error || 'Gagal menyimpan pengaturan form');
 
                 alert('Pengaturan daftar isian form client berhasil disimpan!');
+                formConfigTemplates = await fetchFormTemplatesForBrand(formConfigBrandId);
+                renderFormConfigEventTypeTabs();
                 await loadFormConfig();
             } catch (err) {
                 alert('Gagal: ' + err.message);
@@ -9731,7 +9911,7 @@
         async function confirmResetFormConfig() {
             if (!confirm('Kembalikan pengaturan form client ini ke setelan bawaan standar sistem?')) return;
             try {
-                let url = `/api/company/form-config/reset?brand_id=${encodeURIComponent(formConfigBrandId)}`;
+                let url = `/api/company/form-config/reset?brand_id=${encodeURIComponent(formConfigBrandId)}&event_type=${encodeURIComponent(formConfigEventType)}`;
                 if (selectedCompanyId) url += `&company_id=${encodeURIComponent(selectedCompanyId)}`;
 
                 const res = await fetch(url, {
@@ -9741,6 +9921,8 @@
                 const json = await res.json();
                 if (!res.ok) throw new Error(json.error || 'Gagal mereset pengaturan form');
 
+                formConfigTemplates = await fetchFormTemplatesForBrand(formConfigBrandId);
+                renderFormConfigEventTypeTabs();
                 await loadFormConfig();
                 alert('Pengaturan form berhasil dikembalikan ke default.');
             } catch (err) {
@@ -9770,6 +9952,22 @@
             } catch (_) {}
         }
 
+        async function refreshQuickLinkEventTypes() {
+            const brandId = document.getElementById('inputGenerateLinkBrandId')?.value || '';
+            const eventSelect = document.getElementById('inputGenerateLinkEventType');
+            if (!eventSelect) return;
+            const prevVal = eventSelect.value;
+            const templates = await fetchFormTemplatesForBrand(brandId);
+            eventSelect.innerHTML = templates.map(t => {
+                const et = t.event_type || '';
+                const lbl = t.event_label || BUILTIN_EVENT_LABELS[et] || et;
+                return `<option value="${et}">${lbl}</option>`;
+            }).join('');
+            if (templates.some(t => (t.event_type || '') === prevVal)) {
+                eventSelect.value = prevVal;
+            }
+        }
+
         async function openPendingLinksModal() {
             const modal = document.getElementById('modalPendingLinks');
             const newBox = document.getElementById('newlyGeneratedLinkBox');
@@ -9783,6 +9981,7 @@
                 brandSelect.innerHTML = '<option value="">-- Brand Utama --</option>' +
                     (companyBrandsCache || []).map(b => `<option value="${b.id}">${b.name}</option>`).join('');
             }
+            await refreshQuickLinkEventTypes();
 
             if (modal) modal.classList.remove('hidden');
             await loadPendingLinks();
@@ -9840,6 +10039,9 @@
                 const brandBadge = item.brand_name
                     ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#F9F3EC] text-[#C59563] border border-[#D4A574]/30">${item.brand_name}</span>`
                     : `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">Brand Utama</span>`;
+                const eventBadge = item.event_type
+                    ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-900 text-white">${item.event_label || BUILTIN_EVENT_LABELS[item.event_type] || item.event_type}</span>`
+                    : '';
                 const waText = encodeURIComponent(`Halo Kak, silakan lengkapi detail acara Anda melalui tautan formulir resmi berikut ini ya:\n\n${formUrl}\n\nTerima kasih!`);
 
                 return `
@@ -9847,6 +10049,7 @@
                         <div class="min-w-0 flex-1 space-y-1">
                             <div class="flex items-center gap-2 flex-wrap">
                                 ${brandBadge}
+                                ${eventBadge}
                                 <span class="text-xs sm:text-sm font-bold text-slate-800">${item.client_name || 'Menunggu Isian Client'}</span>
                                 <span class="text-[10px] text-slate-400">• ${createdStr}</span>
                             </div>
@@ -9874,6 +10077,9 @@
         async function generateQuickClientLink() {
             const btn = document.getElementById('btnGenerateQuickLink');
             const brandId = document.getElementById('inputGenerateLinkBrandId')?.value || '';
+            const eventSelect = document.getElementById('inputGenerateLinkEventType');
+            const eventType = eventSelect?.value || '';
+            const eventLabel = eventSelect && eventSelect.selectedIndex >= 0 ? eventSelect.options[eventSelect.selectedIndex].text : '';
             const label = document.getElementById('inputGenerateLinkLabel')?.value.trim() || '';
 
             if (btn) {
@@ -9891,6 +10097,8 @@
                     body: JSON.stringify({
                         company_id: selectedCompanyId || '',
                         brand_id: brandId,
+                        event_type: eventType,
+                        event_label: eventLabel,
                         label: label
                     })
                 });

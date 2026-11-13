@@ -151,10 +151,12 @@ func main() {
 	api.Put("/company/role-permissions", middleware.Protected(), middleware.RequireRole("owner"), handlers.UpdateCompanyRolePermissions)
 	api.Post("/company/role-permissions/reset", middleware.Protected(), middleware.RequireRole("owner"), handlers.ResetCompanyRolePermissions)
 
-	// Company Client Form Config routes (Pengaturan Daftar Isian Link Client per Sub-Brand)
+	// Company Client Form Config routes (Pengaturan Daftar Isian Link Client per Sub-Brand & Jenis Acara)
+	api.Get("/company/form-config/templates", middleware.Protected(), middleware.RequireVendor(), handlers.GetCompanyFormTemplates)
 	api.Get("/company/form-config", middleware.Protected(), middleware.RequireVendor(), handlers.GetCompanyFormConfig)
 	api.Put("/company/form-config", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.UpdateCompanyFormConfig)
 	api.Post("/company/form-config/reset", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.ResetCompanyFormConfig)
+	api.Delete("/company/form-config", middleware.Protected(), middleware.RequireRole("owner", "admin"), handlers.DeleteCompanyFormConfigTemplate)
 
 	// User routes
 	api.Get("/users", middleware.Protected(), middleware.RequireVendor(), handlers.GetAllUsers)

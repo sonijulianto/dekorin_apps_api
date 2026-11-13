@@ -32,6 +32,8 @@ type Agenda struct {
 	BrandPhone           string      `gorm:"type:varchar(50);default:''" json:"brand_phone"`
 	BrandInstagram       string      `gorm:"type:varchar(100);default:''" json:"brand_instagram"`
 	BrandDescription     string      `gorm:"type:text" json:"brand_description"`
+	EventType            string      `gorm:"type:varchar(50);index;default:''" json:"event_type"`
+	EventLabel           string      `gorm:"type:varchar(100);default:''" json:"event_label"`
 	ClientName           string      `gorm:"type:varchar(150);not null" json:"client_name"`
 	ClientPhone          string      `gorm:"type:varchar(50)" json:"client_phone"`
 	BackdropTitle        string      `gorm:"type:varchar(150)" json:"backdrop_title"`
@@ -133,6 +135,8 @@ func (a *Agenda) CalculateTotalBiaya() float64 {
 // CreateAgendaRequest adalah payload untuk membuat agenda baru
 type CreateAgendaRequest struct {
 	BrandID              string  `json:"brand_id"`
+	EventType            string  `json:"event_type"`
+	EventLabel           string  `json:"event_label"`
 	ClientName           string  `json:"client_name"`
 	ClientPhone          string  `json:"client_phone"`
 	BackdropTitle        string  `json:"backdrop_title"`
@@ -225,6 +229,8 @@ type UpdateAgendaLocationRequest struct {
 // UpdateAgendaRequest adalah payload untuk memperbarui data agenda secara lengkap
 type UpdateAgendaRequest struct {
 	BrandID              *string  `json:"brand_id"`
+	EventType            *string  `json:"event_type"`
+	EventLabel           *string  `json:"event_label"`
 	ClientName           string   `json:"client_name"`
 	ClientPhone          string   `json:"client_phone"`
 	BackdropTitle        string   `json:"backdrop_title"`

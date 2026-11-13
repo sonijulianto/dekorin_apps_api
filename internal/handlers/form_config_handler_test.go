@@ -194,3 +194,44 @@ func TestWebTemplatesJavaScriptSyntax(t *testing.T) {
 		}
 	}
 }
+
+func TestEventTypeNormalizationAndPresets(t *testing.T) {
+	if got := NormalizeEventType("Ulang Tahun"); got != "birthday" {
+		t.Errorf("Expected 'Ulang Tahun' -> 'birthday', got %q", got)
+	}
+	if got := NormalizeEventType("Engagement"); got != "lamaran" {
+		t.Errorf("Expected 'Engagement' -> 'lamaran', got %q", got)
+	}
+	if got := NormalizeEventType("Umum"); got != "" {
+		t.Errorf("Expected 'Umum' -> '', got %q", got)
+	}
+	if got := SlugifyCustomEventType("Khitanan Anak"); got != "custom_khitanan_anak" {
+		t.Errorf("Expected 'custom_khitanan_anak', got %q", got)
+	}
+	if got := GetEventTypeLabel("custom_khitanan_anak", ""); got != "Khitanan Anak" {
+		t.Errorf("Expected 'Khitanan Anak', got %q", got)
+	}
+
+	for _, et := range []string{"", "wedding", "lamaran", "birthday", "aqiqah"} {
+		fields := GetPresetFormFields(et)
+		if len(fields) == 0 {
+			t.Errorf("GetPresetFormFields(%q) returned empty", et)
+		}
+		hasBirthdayAge := false
+		hasLamaranSeat := false
+		for _, f := range fields {
+			if f.Key == "bday_age" {
+				hasBirthdayAge = true
+			}
+			if f.Key == "lamaran_seating" {
+				hasLamaranSeat = true
+			}
+		}
+		if et == "birthday" && !hasBirthdayAge {
+			t.Errorf("Expected birthday preset to include bday_age")
+		}
+		if et == "lamaran" && !hasLamaranSeat {
+			t.Errorf("Expected lamaran preset to include lamaran_seating")
+		}
+	}
+}

@@ -20,16 +20,27 @@ type FormFieldDefinition struct {
 	SortOrder   int      `json:"sort_order"`
 }
 
-// CompanyFormConfig menyimpan konfigurasi daftar isian form client per Perusahaan dan Sub-Brand
+// CompanyFormConfig menyimpan konfigurasi daftar isian form client per Perusahaan, Sub-Brand, dan Jenis Acara
 type CompanyFormConfig struct {
 	ID         string                `gorm:"primaryKey;type:varchar(50)" json:"id"`
 	CompanyID  string                `gorm:"type:varchar(50);index;not null" json:"company_id"`
 	BrandID    string                `gorm:"type:varchar(50);index;default:''" json:"brand_id"`
+	EventType  string                `gorm:"type:varchar(50);index;default:''" json:"event_type"`
+	EventLabel string                `gorm:"type:varchar(100);default:''" json:"event_label"`
 	ShowPrice  bool                  `gorm:"default:true" json:"show_price"`
 	FieldsJSON string                `gorm:"type:text;not null" json:"-"`
 	Fields     []FormFieldDefinition `gorm:"-" json:"fields"`
 	CreatedAt  time.Time             `json:"created_at"`
 	UpdatedAt  time.Time             `json:"updated_at"`
+}
+
+// FormTemplateSummary merangkum daftar jenis acara / template form yang tersedia untuk vendor
+type FormTemplateSummary struct {
+	EventType      string `json:"event_type"`
+	EventLabel     string `json:"event_label"`
+	IsSystemPreset bool   `json:"is_system_preset"`
+	IsCustomized   bool   `json:"is_customized"`
+	ShowPrice      bool   `json:"show_price"`
 }
 
 // AfterFind otomatis mengurai FieldsJSON menjadi slice Fields
@@ -45,9 +56,11 @@ func (c *CompanyFormConfig) AfterFind(tx *gorm.DB) error {
 
 // UpdateCompanyFormConfigRequest payload untuk menyimpan pengaturan form client
 type UpdateCompanyFormConfigRequest struct {
-	BrandID   string                `json:"brand_id"`
-	ShowPrice *bool                 `json:"show_price"`
-	Fields    []FormFieldDefinition `json:"fields"`
+	BrandID    string                `json:"brand_id"`
+	EventType  string                `json:"event_type"`
+	EventLabel string                `json:"event_label"`
+	ShowPrice  *bool                 `json:"show_price"`
+	Fields     []FormFieldDefinition `json:"fields"`
 }
 
 // CustomFormAnswer menyimpan satu jawaban field dari client beserta snapshot label & tipenya
