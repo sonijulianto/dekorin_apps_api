@@ -128,6 +128,9 @@ done
 # 5. Icons & Branding
 curl -s -f -L -o web/assets/icons/google-maps-icon.webp "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/google-maps-icon.webp?v=$TIMESTAMP"
 curl -s -f -L -o web/assets/icons/logo_bri.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/logo_bri.png?v=$TIMESTAMP" || true
+for ic in ai-magic.svg calendar.svg chat-arrow-grow.svg copy-alt.svg edit.svg expense.svg file-invoice-dollar.svg lock.svg marker.svg mobile-notch.svg print.svg share.svg shipping-fast.svg user.svg wa.svg wallet-income.svg; do
+    curl -s -f -L -o "web/assets/icons/${ic}" "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/icons/${ic}?v=$TIMESTAMP" || true
+done
 curl -s -f -L -o web/assets/favicon.ico "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.ico?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/favicon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/favicon.png?v=$TIMESTAMP" || true
 curl -s -f -L -o web/assets/apple-touch-icon.png "https://raw.githubusercontent.com/sonijulianto/dekorin_apps_api/main/web/assets/apple-touch-icon.png?v=$TIMESTAMP" || true
