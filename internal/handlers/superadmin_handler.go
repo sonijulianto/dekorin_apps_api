@@ -289,6 +289,7 @@ func CreateCompanyWithInitialOwner(c *fiber.Ctx) error {
 	company := models.Company{
 		ID:              companyID,
 		Name:            req.CompanyName,
+		Category:        models.NormalizeVendorCategory(req.CompanyCategory),
 		Address:         strings.TrimSpace(req.CompanyAddress),
 		Phone:           utils.NormalizePhone(req.CompanyPhone),
 		InvoiceTemplate: DefaultInvoiceTemplate,

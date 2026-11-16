@@ -177,6 +177,8 @@ func main() {
 	api.Put("/agendas/:id/schedule", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaSchedule)
 	api.Put("/agendas/:id/location", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaLocation)
 	api.Put("/agendas/:id/dp", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaDp)
+	api.Post("/agendas/:id/payments", middleware.Protected(), middleware.RequireVendor(), handlers.AddAgendaPayment)
+	api.Delete("/agendas/:id/payments/:payment_id", middleware.Protected(), middleware.RequireVendor(), handlers.DeleteAgendaPayment)
 	api.Put("/agendas/:id/transport", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaTransport)
 	api.Put("/agendas/:id/package", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaPackage)
 	api.Put("/agendas/:id/model", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaModel)

@@ -61,8 +61,22 @@ type Agenda struct {
 	Notes                string           `gorm:"type:text" json:"notes"`
 	ClientForm           *ClientForm      `gorm:"foreignKey:AgendaID" json:"client_form,omitempty"`
 	AgendaProperties     []AgendaProperty `gorm:"foreignKey:AgendaID" json:"agenda_properties,omitempty"`
+	Payments             []AgendaPayment  `gorm:"foreignKey:AgendaID" json:"payments,omitempty"`
 	CreatedAt            time.Time        `json:"created_at"`
 	UpdatedAt            time.Time        `json:"updated_at"`
+}
+
+// AgendaPayment mewakili riwayat pembayaran / termin DP pada sebuah agenda.
+type AgendaPayment struct {
+	ID            string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	CompanyID     string    `gorm:"type:varchar(50);index;default:'cmp_default'" json:"company_id"`
+	AgendaID      string    `gorm:"type:varchar(50);index;not null" json:"agenda_id"`
+	Amount        float64   `gorm:"type:decimal(15,2);not null;default:0" json:"amount"`
+	PaidAt        time.Time `gorm:"index" json:"paid_at"`
+	PaymentMethod string    `gorm:"type:varchar(100);default:''" json:"payment_method"`
+	Note          string    `gorm:"type:text;default:''" json:"note"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // HasPackage bernilai true jika agenda memilih paket atau memiliki harga paket > 0
@@ -162,6 +176,14 @@ type CreateAgendaRequest struct {
 // UpdateDpRequest adalah payload untuk input/update pembayaran DP
 type UpdateDpRequest struct {
 	DpAmount float64 `json:"dp_amount"`
+}
+
+// CreateAgendaPaymentRequest adalah payload untuk menambah riwayat pembayaran / termin DP baru
+type CreateAgendaPaymentRequest struct {
+	Amount        float64 `json:"amount"`
+	PaidAt        string  `json:"paid_at"`
+	PaymentMethod string  `json:"payment_method"`
+	Note          string  `json:"note"`
 }
 
 // UpdateTransportRequest adalah payload untuk input/update uang transport

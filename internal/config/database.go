@@ -62,6 +62,7 @@ func ConnectDB() {
 		&models.User{},
 		&models.Package{},
 		&models.Agenda{},
+		&models.AgendaPayment{},
 		&models.ClientForm{},
 		&models.Addon{},
 		&models.DecorationModel{},

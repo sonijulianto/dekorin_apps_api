@@ -12,6 +12,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // pickContextualModelPrice adalah fungsi murni untuk menentukan harga model berdasarkan konteks paket:
@@ -71,12 +72,19 @@ func syncClientFormPackageAndModel(agenda models.Agenda) {
 	}
 }
 
+// preloadAgendaRelations memuat relasi ClientForm dan riwayat pembayaran secara terurut.
+func preloadAgendaRelations(db *gorm.DB) *gorm.DB {
+	return db.Preload("ClientForm").Preload("Payments", func(tx *gorm.DB) *gorm.DB {
+		return tx.Order("paid_at ASC, created_at ASC")
+	})
+}
+
 // GetAgendas handles GET /api/agendas
 func GetAgendas(c *fiber.Ctx) error {
 	companyID := middleware.GetCompanyID(c)
 	userRole, _ := c.Locals("user_role").(string)
 	var agendas []models.Agenda
-	query := config.DB.Model(&models.Agenda{}).Preload("ClientForm").
+	query := preloadAgendaRelations(config.DB.Model(&models.Agenda{})).
 		Where("is_form_draft = ? OR is_form_draft IS NULL", false)
 
 	if strings.EqualFold(userRole, "superadmin") {
@@ -368,6 +376,27 @@ func CreateAgenda(c *fiber.Ctx) error {
 		})
 	}
 
+	if agenda.DpAmount > 0 {
+		now := time.Now()
+		note := "DP 1"
+		if agenda.PaymentStatus == "paid" && totalBiaya > 0 && agenda.DpAmount >= totalBiaya {
+			note = "Pelunasan"
+		}
+		initialPay := models.AgendaPayment{
+			ID:        fmt.Sprintf("pay_%s", uuid.New().String()[:8]),
+			CompanyID: agenda.CompanyID,
+			AgendaID:  agenda.ID,
+			Amount:    agenda.DpAmount,
+			PaidAt:    now,
+			Note:      note,
+			CreatedAt: now,
+			UpdatedAt: now,
+		}
+		if err := config.DB.Create(&initialPay).Error; err == nil {
+			agenda.Payments = []models.AgendaPayment{initialPay}
+		}
+	}
+
 	// Simpan atau Auto-populate Pick List Agenda
 	if len(req.AgendaProperties) > 0 {
 		for _, ap := range req.AgendaProperties {
@@ -511,6 +540,94 @@ func buildAgendaPaymentStatusUpdates(agenda models.Agenda, paymentStatus string,
 	return updates
 }
 
+// parsePaymentPaidAt mem-parsing string tanggal bayar dari client, default ke waktu sekarang jika kosong.
+func parsePaymentPaidAt(raw string) time.Time {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return time.Now()
+	}
+	layouts := []string{
+		time.RFC3339Nano,
+		time.RFC3339,
+		"2006-01-02T15:04:05",
+		"2006-01-02 15:04:05",
+		"2006-01-02 15:04",
+		"2006-01-02",
+	}
+	for _, layout := range layouts {
+		if parsed, err := time.ParseInLocation(layout, trimmed, time.Local); err == nil {
+			return parsed
+		}
+	}
+	return time.Now()
+}
+
+// ensureInitialPaymentRecord membuat catatan riwayat awal untuk agenda lama yang sudah
+// memiliki dp_amount > 0 sebelum fitur riwayat DP diaktifkan.
+func ensureInitialPaymentRecord(tx *gorm.DB, agenda *models.Agenda, now time.Time) error {
+	if agenda.DpAmount <= 0 {
+		return nil
+	}
+	var count int64
+	if err := tx.Model(&models.AgendaPayment{}).Where("agenda_id = ?", agenda.ID).Count(&count).Error; err != nil {
+		return err
+	}
+	if count > 0 {
+		return nil
+	}
+	paidAt := agenda.CreatedAt
+	if paidAt.IsZero() {
+		paidAt = now
+	}
+	initial := models.AgendaPayment{
+		ID:        fmt.Sprintf("pay_%s", uuid.New().String()[:8]),
+		CompanyID: agenda.CompanyID,
+		AgendaID:  agenda.ID,
+		Amount:    agenda.DpAmount,
+		PaidAt:    paidAt,
+		Note:      "DP Awal",
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	return tx.Create(&initial).Error
+}
+
+// syncAgendaPaymentsSummary menghitung ulang total dp_amount dan payment_status dari tabel agenda_payments.
+func syncAgendaPaymentsSummary(tx *gorm.DB, agendaID string, now time.Time) (models.Agenda, error) {
+	var agenda models.Agenda
+	if err := preloadAgendaRelations(tx).Where("id = ?", agendaID).First(&agenda).Error; err != nil {
+		return agenda, err
+	}
+
+	var totalPaid float64
+	for _, p := range agenda.Payments {
+		totalPaid += p.Amount
+	}
+
+	totalBiaya := agenda.CalculateTotalBiaya()
+	nextStatus := "unpaid"
+	if totalPaid > 0 {
+		if totalBiaya > 0 && totalPaid >= totalBiaya {
+			nextStatus = "paid"
+		} else {
+			nextStatus = "dp"
+		}
+	}
+
+	if err := tx.Model(&models.Agenda{}).Where("id = ?", agendaID).Updates(map[string]interface{}{
+		"dp_amount":      totalPaid,
+		"payment_status": nextStatus,
+		"updated_at":     now,
+	}).Error; err != nil {
+		return agenda, err
+	}
+
+	if err := preloadAgendaRelations(tx).Where("id = ?", agendaID).First(&agenda).Error; err != nil {
+		return agenda, err
+	}
+	return agenda, nil
+}
+
 // UpdateAgendaDp handles PUT /api/agendas/:id/dp
 func UpdateAgendaDp(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -531,7 +648,7 @@ func UpdateAgendaDp(c *fiber.Ctx) error {
 	userRole, _ := c.Locals("user_role").(string)
 
 	var agenda models.Agenda
-	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	query := preloadAgendaRelations(config.DB).Where("id = ?", id)
 	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
@@ -541,19 +658,191 @@ func UpdateAgendaDp(c *fiber.Ctx) error {
 		})
 	}
 
-	updates := buildAgendaDpUpdates(agenda, req.DpAmount, time.Now())
-	if err := config.DB.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error; err != nil {
+	now := time.Now()
+	err := config.DB.Transaction(func(tx *gorm.DB) error {
+		if err := ensureInitialPaymentRecord(tx, &agenda, now); err != nil {
+			return err
+		}
+		var payments []models.AgendaPayment
+		if err := tx.Where("agenda_id = ?", agenda.ID).Find(&payments).Error; err != nil {
+			return err
+		}
+		var currentSum float64
+		for _, p := range payments {
+			currentSum += p.Amount
+		}
+
+		if req.DpAmount == 0 {
+			if err := tx.Where("agenda_id = ?", agenda.ID).Delete(&models.AgendaPayment{}).Error; err != nil {
+				return err
+			}
+			_, err := syncAgendaPaymentsSummary(tx, agenda.ID, now)
+			return err
+		}
+
+		if req.DpAmount > currentSum {
+			note := "DP 1"
+			if len(payments) > 0 {
+				note = fmt.Sprintf("DP %d", len(payments)+1)
+			}
+			extra := models.AgendaPayment{
+				ID:        fmt.Sprintf("pay_%s", uuid.New().String()[:8]),
+				CompanyID: agenda.CompanyID,
+				AgendaID:  agenda.ID,
+				Amount:    req.DpAmount - currentSum,
+				PaidAt:    now,
+				Note:      note,
+				CreatedAt: now,
+				UpdatedAt: now,
+			}
+			if err := tx.Create(&extra).Error; err != nil {
+				return err
+			}
+			_, err := syncAgendaPaymentsSummary(tx, agenda.ID, now)
+			return err
+		}
+
+		updates := buildAgendaDpUpdates(agenda, req.DpAmount, now)
+		return tx.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error
+	})
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal mengupdate DP agenda: " + err.Error(),
 		})
 	}
 
-	// Reload with ClientForm
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Pembayaran DP berhasil diperbarui",
 		"data":    agenda,
+	})
+}
+
+// AddAgendaPayment handles POST /api/agendas/:id/payments
+func AddAgendaPayment(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var req models.CreateAgendaPaymentRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format request tidak valid",
+		})
+	}
+	if req.Amount <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nominal pembayaran harus lebih dari 0",
+		})
+	}
+
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var agenda models.Agenda
+	query := preloadAgendaRelations(config.DB).Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	now := time.Now()
+	paidAt := parsePaymentPaidAt(req.PaidAt)
+
+	var updated models.Agenda
+	err := config.DB.Transaction(func(tx *gorm.DB) error {
+		if err := ensureInitialPaymentRecord(tx, &agenda, now); err != nil {
+			return err
+		}
+
+		var existingCount int64
+		if err := tx.Model(&models.AgendaPayment{}).Where("agenda_id = ?", agenda.ID).Count(&existingCount).Error; err != nil {
+			return err
+		}
+
+		note := strings.TrimSpace(req.Note)
+		if note == "" {
+			note = fmt.Sprintf("DP %d", existingCount+1)
+		}
+
+		payment := models.AgendaPayment{
+			ID:            fmt.Sprintf("pay_%s", uuid.New().String()[:8]),
+			CompanyID:     agenda.CompanyID,
+			AgendaID:      agenda.ID,
+			Amount:        req.Amount,
+			PaidAt:        paidAt,
+			PaymentMethod: strings.TrimSpace(req.PaymentMethod),
+			Note:          note,
+			CreatedAt:     now,
+			UpdatedAt:     now,
+		}
+		if err := tx.Create(&payment).Error; err != nil {
+			return err
+		}
+
+		var syncErr error
+		updated, syncErr = syncAgendaPaymentsSummary(tx, agenda.ID, now)
+		return syncErr
+	})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal menambah riwayat pembayaran: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Riwayat pembayaran DP berhasil ditambahkan",
+		"data":    updated,
+	})
+}
+
+// DeleteAgendaPayment handles DELETE /api/agendas/:id/payments/:payment_id
+func DeleteAgendaPayment(c *fiber.Ctx) error {
+	id := c.Params("id")
+	paymentID := c.Params("payment_id")
+
+	companyID := middleware.GetCompanyID(c)
+	userRole, _ := c.Locals("user_role").(string)
+
+	var agenda models.Agenda
+	query := preloadAgendaRelations(config.DB).Where("id = ?", id)
+	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
+		query = query.Where("company_id = ?", companyID)
+	}
+	if err := query.First(&agenda).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Agenda tidak ditemukan",
+		})
+	}
+
+	now := time.Now()
+	var updated models.Agenda
+	err := config.DB.Transaction(func(tx *gorm.DB) error {
+		res := tx.Where("id = ? AND agenda_id = ?", paymentID, agenda.ID).Delete(&models.AgendaPayment{})
+		if res.Error != nil {
+			return res.Error
+		}
+		if res.RowsAffected == 0 {
+			return fiber.NewError(fiber.StatusNotFound, "Riwayat pembayaran tidak ditemukan")
+		}
+		var syncErr error
+		updated, syncErr = syncAgendaPaymentsSummary(tx, agenda.ID, now)
+		return syncErr
+	})
+	if err != nil {
+		if fErr, ok := err.(*fiber.Error); ok {
+			return c.Status(fErr.Code).JSON(fiber.Map{"error": fErr.Message})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal menghapus riwayat pembayaran: " + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Riwayat pembayaran DP berhasil dihapus",
+		"data":    updated,
 	})
 }
 
@@ -583,7 +872,7 @@ func UpdateAgendaPaymentStatus(c *fiber.Ctx) error {
 	userRole, _ := c.Locals("user_role").(string)
 
 	var agenda models.Agenda
-	query := config.DB.Preload("ClientForm").Where("id = ?", id)
+	query := preloadAgendaRelations(config.DB).Where("id = ?", id)
 	if !strings.EqualFold(userRole, "superadmin") && companyID != "" {
 		query = query.Where("company_id = ?", companyID)
 	}
@@ -593,15 +882,60 @@ func UpdateAgendaPaymentStatus(c *fiber.Ctx) error {
 		})
 	}
 
-	updates := buildAgendaPaymentStatusUpdates(agenda, req.PaymentStatus, time.Now())
-	if err := config.DB.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal memperbarui status pembayaran: " + err.Error(),
+	now := time.Now()
+	if req.PaymentStatus == "paid" {
+		err := config.DB.Transaction(func(tx *gorm.DB) error {
+			if err := ensureInitialPaymentRecord(tx, &agenda, now); err != nil {
+				return err
+			}
+			var payments []models.AgendaPayment
+			if err := tx.Where("agenda_id = ?", agenda.ID).Find(&payments).Error; err != nil {
+				return err
+			}
+			var totalPaid float64
+			for _, p := range payments {
+				totalPaid += p.Amount
+			}
+			totalBiaya := agenda.CalculateTotalBiaya()
+			if totalBiaya > totalPaid {
+				pelunasan := models.AgendaPayment{
+					ID:        fmt.Sprintf("pay_%s", uuid.New().String()[:8]),
+					CompanyID: agenda.CompanyID,
+					AgendaID:  agenda.ID,
+					Amount:    totalBiaya - totalPaid,
+					PaidAt:    now,
+					Note:      "Pelunasan",
+					CreatedAt: now,
+					UpdatedAt: now,
+				}
+				if err := tx.Create(&pelunasan).Error; err != nil {
+					return err
+				}
+			}
+			if _, err := syncAgendaPaymentsSummary(tx, agenda.ID, now); err != nil {
+				return err
+			}
+			return tx.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(map[string]interface{}{
+				"payment_status": "paid",
+				"updated_at":     now,
+			}).Error
 		})
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Gagal memperbarui status pembayaran: " + err.Error(),
+			})
+		}
+	} else {
+		updates := buildAgendaPaymentStatusUpdates(agenda, req.PaymentStatus, now)
+		if err := config.DB.Model(&models.Agenda{}).Where("id = ?", agenda.ID).Updates(updates).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Gagal memperbarui status pembayaran: " + err.Error(),
+			})
+		}
 	}
 
-	// Reload with ClientForm agar seluruh data (termasuk event_date_time) tetap konsisten
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	// Reload with ClientForm & Payments agar seluruh data tetap konsisten
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Status pembayaran berhasil diperbarui",
@@ -655,7 +989,7 @@ func UpdateAgendaStatus(c *fiber.Ctx) error {
 		})
 	}
 
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Status acara berhasil diperbarui",
@@ -707,7 +1041,7 @@ func UpdateAgendaTransport(c *fiber.Ctx) error {
 	}
 
 	// Reload with ClientForm
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Uang transport berhasil diperbarui",
@@ -815,7 +1149,7 @@ func UpdateAgendaPackage(c *fiber.Ctx) error {
 	syncClientFormPackageAndModel(agenda)
 
 	// Reload with ClientForm
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Paket agenda berhasil diperbarui",
@@ -901,7 +1235,7 @@ func UpdateAgendaModel(c *fiber.Ctx) error {
 	syncClientFormPackageAndModel(agenda)
 
 	// Reload with ClientForm
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Model dekorasi berhasil diperbarui",
@@ -959,7 +1293,7 @@ func UpdateAgendaNotes(c *fiber.Ctx) error {
 	}
 
 	// Reload with ClientForm
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Catatan agenda berhasil diperbarui",
@@ -1022,7 +1356,7 @@ func UpdateAgendaBrand(c *fiber.Ctx) error {
 		})
 	}
 
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Brand agenda berhasil diperbarui",
@@ -1122,7 +1456,7 @@ func UpdateAgendaSchedule(c *fiber.Ctx) error {
 		})
 	}
 
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Jadwal acara berhasil diperbarui",
@@ -1184,7 +1518,7 @@ func UpdateAgendaLocation(c *fiber.Ctx) error {
 		config.DB.Model(&models.ClientForm{}).Where("agenda_id = ?", agenda.ID).Update("event_address", agenda.EventAddress)
 	}
 
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Alamat dan lokasi acara berhasil diperbarui",
@@ -1456,7 +1790,7 @@ func UpdateAgenda(c *fiber.Ctx) error {
 
 	syncClientFormPackageAndModel(agenda)
 
-	config.DB.Model(&models.Agenda{}).Preload("ClientForm").Where("id = ?", id).First(&agenda)
+	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Agenda acara berhasil diperbarui",

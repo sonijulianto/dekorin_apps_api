@@ -142,13 +142,14 @@ type PublicVendorDetailResponse struct {
 
 // CreateCompanyRequest adalah payload saat Superadmin mendaftarkan usaha dan owner baru
 type CreateCompanyRequest struct {
-	CompanyName    string `json:"company_name"`
-	CompanyAddress string `json:"company_address"`
-	CompanyPhone   string `json:"company_phone"`
-	OwnerName      string `json:"owner_name"`
-	OwnerPhone     string `json:"owner_phone"`
-	OwnerEmail     string `json:"owner_email"`
-	OwnerPassword  string `json:"owner_password"`
+	CompanyName     string `json:"company_name"`
+	CompanyCategory string `json:"company_category"`
+	CompanyAddress  string `json:"company_address"`
+	CompanyPhone    string `json:"company_phone"`
+	OwnerName       string `json:"owner_name"`
+	OwnerPhone      string `json:"owner_phone"`
+	OwnerEmail      string `json:"owner_email"`
+	OwnerPassword   string `json:"owner_password"`
 }
 
 // CompanyBrand mewakili sub-brand di bawah satu badan usaha (Company)
