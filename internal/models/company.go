@@ -142,6 +142,15 @@ type PublicVendorDetailResponse struct {
 	Models   []PublicVendorModelItem   `json:"models"`
 }
 
+// RegisterVendorRequest adalah payload pendaftaran mandiri usaha & akun Owner baru dari Mobile/PWA
+type RegisterVendorRequest struct {
+	CompanyName     string `json:"company_name"`
+	CompanyCategory string `json:"company_category"`
+	OwnerName       string `json:"owner_name"`
+	OwnerPhone      string `json:"owner_phone"`
+	OwnerPassword   string `json:"owner_password"`
+}
+
 // CreateCompanyRequest adalah payload saat Superadmin mendaftarkan usaha dan owner baru
 type CreateCompanyRequest struct {
 	CompanyName     string `json:"company_name"`

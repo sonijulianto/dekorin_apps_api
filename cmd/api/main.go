@@ -92,6 +92,7 @@ func main() {
 	// Routes
 	auth.Post("/login", loginLimiter, handlers.Login)
 	auth.Post("/register-couple", loginLimiter, handlers.RegisterCouple)
+	auth.Post("/register-vendor", loginLimiter, handlers.RegisterVendor)
 	auth.Post("/change-password", middleware.Protected(), handlers.ChangePassword)
 
 	// Direktori Vendor Publik (dapat diakses oleh Calon Pengantin maupun Vendor terautentikasi)

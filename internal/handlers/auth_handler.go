@@ -251,6 +251,108 @@ func RegisterCouple(c *fiber.Ctx) error {
 	})
 }
 
+// RegisterVendor handles POST /api/auth/register-vendor untuk pendaftaran mandiri usaha & akun Owner baru
+func RegisterVendor(c *fiber.Ctx) error {
+	req := new(models.RegisterVendorRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Format data pendaftaran tidak valid",
+		})
+	}
+
+	companyName := strings.TrimSpace(req.CompanyName)
+	ownerName := strings.TrimSpace(req.OwnerName)
+	cleanPhone := utils.NormalizePhone(req.OwnerPhone)
+	password := strings.TrimSpace(req.OwnerPassword)
+
+	if companyName == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nama usaha wajib diisi",
+		})
+	}
+	if ownerName == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nama lengkap wajib diisi",
+		})
+	}
+	if cleanPhone == "" || len(cleanPhone) < 9 || len(cleanPhone) > 15 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Nomor WhatsApp / HP tidak valid (minimal 9 digit)",
+		})
+	}
+	if len(password) < 6 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Password minimal 6 karakter",
+		})
+	}
+
+	var existingCount int64
+	config.DB.Model(&models.User{}).Where("phone = ?", cleanPhone).Count(&existingCount)
+	if existingCount > 0 {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "Nomor WhatsApp / HP sudah terdaftar. Silakan masuk menggunakan akun Anda.",
+		})
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mengenkripsi password",
+		})
+	}
+
+	now := time.Now()
+	companyID := "cmp_" + uuid.New().String()[:8]
+	company := models.Company{
+		ID:              companyID,
+		Name:            companyName,
+		Category:        models.NormalizeVendorCategory(req.CompanyCategory),
+		InvoiceTemplate: DefaultInvoiceTemplate,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+	}
+
+	ownerUser := models.User{
+		ID:        "usr_" + uuid.New().String()[:12],
+		CompanyID: companyID,
+		FullName:  ownerName,
+		Phone:     cleanPhone,
+		Password:  string(hashed),
+		Role:      "owner",
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	err = config.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&company).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&ownerUser).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Gagal mendaftarkan usaha baru: " + err.Error(),
+		})
+	}
+
+	ownerUser.Company = &company
+	tokenString, userResp, err := issueAuthTokenAndResponse(ownerUser)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Akun berhasil dibuat, namun gagal membuat token login",
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Pendaftaran usaha berhasil",
+		"token":   tokenString,
+		"data":    userResp,
+	})
+}
+
 // ChangePassword handles POST /api/auth/change-password
 func ChangePassword(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
