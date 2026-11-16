@@ -333,7 +333,7 @@ func CreateCompanyWithInitialOwner(c *fiber.Ctx) error {
 	seedInitialPackagesAndAddonsForCompany(companyID)
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "Usaha Dekorasi & Akun Owner berhasil didaftarkan!",
+		"message": "Usaha & Akun Owner berhasil didaftarkan!",
 		"company": company,
 		"owner": models.UserResponse{
 			ID:        ownerUser.ID,

@@ -297,12 +297,12 @@
                             <a href="javascript:void(0)" onclick="switchView('packages')" id="nav-packages"
                                 class="flex items-center gap-2 py-2 md:py-1.5 px-2.5 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
                                 <i class="fi fi-rr-box-open text-stone-400 text-xs"></i>
-                                <span>Paket Dekorasi</span>
+                                <span>Master Paket</span>
                             </a>
                             <a href="javascript:void(0)" onclick="switchView('decoration-models')" id="nav-decoration-models"
                                 class="flex items-center gap-2 py-2 md:py-1.5 px-2.5 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
                                 <i class="fi fi-rr-picture text-stone-400 text-xs"></i>
-                                <span>Model Dekorasi</span>
+                                <span>Master Model</span>
                             </a>
                             <a href="javascript:void(0)" onclick="switchView('addons')" id="nav-addons"
                                 class="flex items-center gap-2 py-2 md:py-1.5 px-2.5 rounded-md text-stone-500 hover:text-[#C59563] hover:bg-[#F9F3EC]/50 transition">
@@ -582,7 +582,7 @@
 
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                         <div>
-                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Daftar Usaha Dekorasi (Companies)</h2>
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Daftar Usaha / Vendor (Companies)</h2>
                             <p class="text-xs text-slate-500 mt-0.5">Kelola seluruh vendor, alamat kantor, kontak, dan owner terdaftar.</p>
                         </div>
                         <button id="btnOpenCreateCompany" onclick="openCreateModal()" 
@@ -637,7 +637,7 @@
                             <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                                 <i class="fi fi-rr-users text-[#C59563]"></i> Manajemen Tim & Pengguna (Team)
                             </h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Kelola akun Owner, Administrator operasional, dan Crew lapangan pada usaha dekorasi.</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola akun Owner, Administrator operasional, dan Crew lapangan pada usaha.</p>
                         </div>
                         <div class="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                             <button onclick="switchView('role-permissions')" 
@@ -983,12 +983,12 @@
 
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                         <div>
-                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Master Paket Dekorasi</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Kelola paket pernikahan/acara, harga dasar, kelengkapan fasilitas, dan model dekorasi yang tersedia di dalam paket.</p>
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Master Paket</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola paket acara, harga dasar, kelengkapan fasilitas, dan model yang tersedia di dalam paket.</p>
                         </div>
                         <button onclick="openPackageModal()" 
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[42px] rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
-                            <span>+ Tambah Paket Dekorasi</span>
+                            <span>+ Tambah Paket</span>
                         </button>
                     </div>
 
@@ -1045,12 +1045,12 @@
 
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                         <div>
-                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Master Model Dekorasi</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Kelola foto model pelaminan/backdrop, lebar, harga referensi, dan paket terkait.</p>
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Master Model</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola foto model/portofolio, ukuran, harga referensi, dan paket terkait.</p>
                         </div>
                         <button onclick="openDecorationModelModal()" 
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[42px] rounded-xl bg-[#D4A574] hover:bg-[#C59563] text-white font-bold text-xs transition shadow-md shadow-[#D4A574]/25">
-                            <span>+ Tambah Model Dekorasi</span>
+                            <span>+ Tambah Model</span>
                         </button>
                     </div>
 
@@ -9492,7 +9492,7 @@
         function shareViaWhatsApp() {
             const directUrl = window.location.origin + '/download/apk';
             const vName = document.getElementById('shareModalVersionName')?.innerText || 'terbaru';
-            const message = `Halo tim Crew Dekorin 👋,\n\nSilakan unduh dan pasang aplikasi Dekorin versi ${vName} di smartphone Android kamu untuk memantau agenda dan checklist acara dekorasi:\n\n🔗 Link Download: ${directUrl}\n\nSetelah didownload, buka file APK untuk memasang aplikasi. Terima kasih!`;
+            const message = `Halo tim Crew Dekorin 👋,\n\nSilakan unduh dan pasang aplikasi Dekorin versi ${vName} di smartphone Android kamu untuk memantau agenda dan checklist acara:\n\n🔗 Link Download: ${directUrl}\n\nSetelah didownload, buka file APK untuk memasang aplikasi. Terima kasih!`;
             
             const waUrl = 'https://wa.me/?text=' + encodeURIComponent(message);
             window.open(waUrl, '_blank');

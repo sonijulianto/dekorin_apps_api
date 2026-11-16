@@ -235,3 +235,69 @@ func TestEventTypeNormalizationAndPresets(t *testing.T) {
 		}
 	}
 }
+
+func TestCategorySpecificDefaultFormFields(t *testing.T) {
+	// 1. Foto & Video (photo_video) hanya mengaktifkan 6 field default dengan 4 field mandatori yang sama dengan dekorasi
+	fgFields := GetDefaultFormFieldsForCategory("photo_video")
+	expectedActiveFG := map[string]bool{
+		"client_name":     true,
+		"client_phone":    true,
+		"event_date_time": true,
+		"event_address":   true,
+		"package_id":      true,
+		"notes":           true,
+	}
+	expectedRequired := map[string]bool{
+		"client_name":     true,
+		"client_phone":    true,
+		"event_date_time": true,
+		"event_address":   true,
+	}
+
+	activeCountFG := 0
+	for _, f := range fgFields {
+		if f.IsActive {
+			activeCountFG++
+		}
+		if f.IsActive != expectedActiveFG[f.Key] {
+			t.Errorf("photo_video field %q IsActive = %v; want %v", f.Key, f.IsActive, expectedActiveFG[f.Key])
+		}
+		if f.IsRequired != expectedRequired[f.Key] {
+			t.Errorf("photo_video field %q IsRequired = %v; want %v", f.Key, f.IsRequired, expectedRequired[f.Key])
+		}
+	}
+	if activeCountFG != len(expectedActiveFG) {
+		t.Errorf("photo_video active field count = %d; want %d", activeCountFG, len(expectedActiveFG))
+	}
+
+	// Preset wedding untuk photo_video tetap tidak mengaktifkan field dekorasi
+	fgWedding := GetPresetFormFieldsForCategory("wedding", "photo_video")
+	for _, f := range fgWedding {
+		if f.Key == "backdrop_title" || f.Key == "model_id" || f.Key == "decoration_theme" || f.Key == "color_preference" {
+			if f.IsActive {
+				t.Errorf("photo_video wedding preset should keep %q inactive", f.Key)
+			}
+		}
+	}
+
+	// 2. Dekorasi tetap menggunakan default standar (termasuk backdrop_title & model_id aktif)
+	decorFields := GetDefaultFormFieldsForCategory("decoration")
+	decorActive := map[string]bool{}
+	for _, f := range decorFields {
+		decorActive[f.Key] = f.IsActive
+	}
+	if !decorActive["backdrop_title"] || !decorActive["model_id"] {
+		t.Errorf("decoration defaults should keep backdrop_title and model_id active")
+	}
+
+	// 3. Kategori non-dekorasi lain (mis. WO) menonaktifkan field khusus dekorasi tapi menjaga field umum & mandatori
+	woFields := GetDefaultFormFieldsForCategory("wo")
+	for _, f := range woFields {
+		if (f.Key == "backdrop_title" || f.Key == "model_id" || f.Key == "decoration_theme" || f.Key == "color_preference") && f.IsActive {
+			t.Errorf("wo default should keep decoration field %q inactive", f.Key)
+		}
+		if f.IsRequired != expectedRequired[f.Key] {
+			t.Errorf("wo field %q IsRequired = %v; want %v", f.Key, f.IsRequired, expectedRequired[f.Key])
+		}
+	}
+}

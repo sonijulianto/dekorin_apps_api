@@ -276,6 +276,108 @@ func GetDefaultFormFields() []models.FormFieldDefinition {
 	}
 }
 
+func getCompanyCategory(companyID string) string {
+	if strings.TrimSpace(companyID) == "" {
+		return "decoration"
+	}
+	var comp models.Company
+	if err := config.DB.Select("category").Where("id = ?", companyID).First(&comp).Error; err == nil {
+		return models.NormalizeVendorCategory(comp.Category)
+	}
+	return "decoration"
+}
+
+// GetDefaultFormFieldsForCategory mengembalikan daftar field bawaan standar sesuai tipe/kategori usaha.
+func GetDefaultFormFieldsForCategory(companyCategory string) []models.FormFieldDefinition {
+	cat := models.NormalizeVendorCategory(companyCategory)
+	if cat == "decoration" {
+		return GetDefaultFormFields()
+	}
+
+	if cat == "photo_video" {
+		activeSet := map[string]bool{
+			"client_name":     true,
+			"client_phone":    true,
+			"event_date_time": true,
+			"event_address":   true,
+			"package_id":      true,
+			"notes":           true,
+		}
+		overrides := map[string]presetFieldOverride{
+			"client_name": {
+				Label:       "Nama Lengkap Pemesan",
+				Placeholder: "Contoh: Rian & Nisa / Ibu Rina",
+			},
+			"package_id": {
+				Label:       "Pilihan Paket",
+				Placeholder: "Pilih paket foto & video yang diinginkan",
+			},
+			"notes": {
+				Label:       "Catatan",
+				Placeholder: "Contoh: Konsep foto/video, jam mulai liputan, atau request khusus lainnya",
+			},
+		}
+		return applyCategoryDefaults(GetDefaultFormFields(), activeSet, overrides)
+	}
+
+	// Kategori vendor non-dekorasi lainnya (WO, MUA, Catering, Attire, Entertainment, Venue, Other)
+	inactiveForNonDecor := map[string]bool{
+		"backdrop_title":   true,
+		"model_id":         true,
+		"decoration_theme": true,
+		"color_preference": true,
+	}
+	base := GetDefaultFormFields()
+	activeSet := make(map[string]bool, len(base))
+	for _, f := range base {
+		if !inactiveForNonDecor[f.Key] {
+			activeSet[f.Key] = true
+		}
+	}
+	overrides := map[string]presetFieldOverride{
+		"package_id": {
+			Label:       "Pilihan Paket",
+			Placeholder: "Pilih paket layanan yang diinginkan",
+		},
+	}
+	return applyCategoryDefaults(base, activeSet, overrides)
+}
+
+func applyCategoryDefaults(
+	base []models.FormFieldDefinition,
+	activeSet map[string]bool,
+	overrides map[string]presetFieldOverride,
+) []models.FormFieldDefinition {
+	mandatoryKeys := map[string]bool{
+		"client_name":     true,
+		"client_phone":    true,
+		"event_date_time": true,
+		"event_address":   true,
+	}
+
+	result := make([]models.FormFieldDefinition, 0, len(base))
+	for _, f := range base {
+		f.IsActive = activeSet[f.Key]
+		f.IsRequired = f.IsActive && mandatoryKeys[f.Key]
+		if ov, ok := overrides[f.Key]; ok {
+			if ov.Label != "" {
+				f.Label = ov.Label
+			}
+			if ov.Placeholder != "" {
+				f.Placeholder = ov.Placeholder
+			}
+			if ov.IsActive != nil {
+				f.IsActive = *ov.IsActive
+			}
+			if ov.IsRequired != nil {
+				f.IsRequired = *ov.IsRequired
+			}
+		}
+		result = append(result, f)
+	}
+	return result
+}
+
 type presetFieldOverride struct {
 	Label       string
 	Placeholder string
@@ -286,7 +388,10 @@ type presetFieldOverride struct {
 func boolPtr(v bool) *bool { return &v }
 
 func buildPresetFields(overrides map[string]presetFieldOverride, extras []models.FormFieldDefinition) []models.FormFieldDefinition {
-	base := GetDefaultFormFields()
+	return buildPresetFieldsWithBase(GetDefaultFormFields(), overrides, extras)
+}
+
+func buildPresetFieldsWithBase(base []models.FormFieldDefinition, overrides map[string]presetFieldOverride, extras []models.FormFieldDefinition) []models.FormFieldDefinition {
 	result := make([]models.FormFieldDefinition, 0, len(base)+len(extras))
 	for _, f := range base {
 		if ov, ok := overrides[f.Key]; ok {
@@ -313,6 +418,36 @@ func buildPresetFields(overrides map[string]presetFieldOverride, extras []models
 		result[i].SortOrder = i + 1
 	}
 	return result
+}
+
+// GetPresetFormFieldsForCategory mengembalikan template field bawaan sesuai jenis acara & kategori usaha.
+func GetPresetFormFieldsForCategory(eventType string, companyCategory string) []models.FormFieldDefinition {
+	cat := models.NormalizeVendorCategory(companyCategory)
+	if cat == "decoration" {
+		return GetPresetFormFields(eventType)
+	}
+
+	base := GetDefaultFormFieldsForCategory(cat)
+	switch NormalizeEventType(eventType) {
+	case "wedding":
+		return buildPresetFieldsWithBase(base, map[string]presetFieldOverride{
+			"client_name": {Label: "Nama Kedua Pengantin / Pemesan", Placeholder: "Contoh: Rian & Nisa"},
+		}, nil)
+	case "lamaran":
+		return buildPresetFieldsWithBase(base, map[string]presetFieldOverride{
+			"client_name": {Label: "Nama Pasangan / Pemesan", Placeholder: "Contoh: Rian & Nisa"},
+		}, nil)
+	case "birthday":
+		return buildPresetFieldsWithBase(base, map[string]presetFieldOverride{
+			"client_name": {Label: "Nama Pemesan / Orang Tua", Placeholder: "Contoh: Ibu Rina / Kak Budi"},
+		}, nil)
+	case "aqiqah":
+		return buildPresetFieldsWithBase(base, map[string]presetFieldOverride{
+			"client_name": {Label: "Nama Orang Tua / Pemesan", Placeholder: "Contoh: Bapak Andi & Ibu Sari"},
+		}, nil)
+	default:
+		return base
+	}
 }
 
 // GetPresetFormFields mengembalikan template field bawaan sesuai jenis acara (wedding, lamaran, birthday, aqiqah, atau umum).
@@ -527,6 +662,8 @@ func GetEffectiveFormConfig(companyID string, brandID string, eventType string) 
 		return companyEventCfg, false
 	}
 
+	companyCategory := getCompanyCategory(companyID)
+
 	// 3. Jika jenis acara adalah preset bawaan sistem (wedding, lamaran, birthday, aqiqah)
 	if normEvent != "" && IsBuiltInEventType(normEvent) {
 		inheritedShowPrice := true
@@ -546,7 +683,7 @@ func GetEffectiveFormConfig(companyID string, brandID string, eventType string) 
 			EventType:  normEvent,
 			EventLabel: GetEventTypeLabel(normEvent, ""),
 			ShowPrice:  inheritedShowPrice,
-			Fields:     GetPresetFormFields(normEvent),
+			Fields:     GetPresetFormFieldsForCategory(normEvent, companyCategory),
 		}, true
 	}
 
@@ -567,14 +704,14 @@ func GetEffectiveFormConfig(companyID string, brandID string, eventType string) 
 		}
 	}
 
-	// 5. Fallback ke template standar sistem
+	// 5. Fallback ke template standar sistem sesuai kategori usaha
 	return models.CompanyFormConfig{
 		CompanyID:  companyID,
 		BrandID:    brandID,
 		EventType:  normEvent,
 		EventLabel: GetEventTypeLabel(normEvent, ""),
 		ShowPrice:  true,
-		Fields:     GetDefaultFormFields(),
+		Fields:     GetDefaultFormFieldsForCategory(companyCategory),
 	}, true
 }
 
@@ -786,7 +923,7 @@ func UpdateCompanyFormConfig(c *fiber.Ctx) error {
 	}
 
 	if len(sanitizedFields) == 0 && rawEventType == "__new__" {
-		sanitizedFields = GetDefaultFormFields()
+		sanitizedFields = GetDefaultFormFieldsForCategory(getCompanyCategory(companyID))
 	}
 
 	if len(sanitizedFields) == 0 {
