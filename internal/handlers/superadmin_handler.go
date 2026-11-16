@@ -136,6 +136,7 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 	companyInstagram := ""
 	companyBankInfo := ""
 	companyInvoiceTemplate := DefaultInvoiceTemplate
+	companyCategory := "decoration"
 	if user.Company != nil {
 		companyName = user.Company.Name
 		companyAddress = user.Company.Address
@@ -146,6 +147,7 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 		companyInstagram = user.Company.Instagram
 		companyBankInfo = user.Company.BankInfo
 		companyInvoiceTemplate = EffectiveInvoiceTemplate(user.Company.InvoiceTemplate)
+		companyCategory = models.NormalizeVendorCategory(user.Company.Category)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -161,6 +163,7 @@ func GetCurrentUserProfile(c *fiber.Ctx) error {
 			CompanyInstagram:       companyInstagram,
 			CompanyBankInfo:        companyBankInfo,
 			CompanyInvoiceTemplate: companyInvoiceTemplate,
+			CompanyCategory:        companyCategory,
 			FullName:               user.FullName,
 			Phone:                  user.Phone,
 			Email:                  user.Email,

@@ -30,6 +30,7 @@ type UserResponse struct {
 	CompanyInstagram       string   `json:"company_instagram,omitempty"`
 	CompanyBankInfo        string   `json:"company_bank_info,omitempty"`
 	CompanyInvoiceTemplate string   `json:"company_invoice_template,omitempty"`
+	CompanyCategory        string   `json:"company_category,omitempty"`
 	FullName               string   `json:"full_name"`
 	Phone                  string   `json:"phone"`
 	Email                  string   `json:"email"`

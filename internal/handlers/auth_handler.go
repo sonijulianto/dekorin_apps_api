@@ -41,6 +41,7 @@ func issueAuthTokenAndResponse(user models.User) (string, models.UserResponse, e
 	companyInstagram := ""
 	companyBankInfo := ""
 	companyInvoiceTemplate := DefaultInvoiceTemplate
+	companyCategory := "decoration"
 	if user.Company != nil {
 		companyName = user.Company.Name
 		companyAddress = user.Company.Address
@@ -51,6 +52,7 @@ func issueAuthTokenAndResponse(user models.User) (string, models.UserResponse, e
 		companyInstagram = user.Company.Instagram
 		companyBankInfo = user.Company.BankInfo
 		companyInvoiceTemplate = EffectiveInvoiceTemplate(user.Company.InvoiceTemplate)
+		companyCategory = models.NormalizeVendorCategory(user.Company.Category)
 	}
 
 	perms := GetEffectiveUserPermissions(user.CompanyID, user.Role)
@@ -70,6 +72,7 @@ func issueAuthTokenAndResponse(user models.User) (string, models.UserResponse, e
 		CompanyInstagram:       companyInstagram,
 		CompanyBankInfo:        companyBankInfo,
 		CompanyInvoiceTemplate: companyInvoiceTemplate,
+		CompanyCategory:        companyCategory,
 		FullName:               user.FullName,
 		Phone:                  user.Phone,
 		Email:                  user.Email,
