@@ -20,7 +20,9 @@ func NormalizeVendorCategory(raw string) string {
 		return "catering"
 	case "attire", "busana", "gaun":
 		return "attire"
-	case "entertainment", "mc", "musik", "band":
+	case "mc", "master_of_ceremony", "pembawa_acara":
+		return "mc"
+	case "entertainment", "musik", "band":
 		return "entertainment"
 	case "venue", "gedung":
 		return "venue"

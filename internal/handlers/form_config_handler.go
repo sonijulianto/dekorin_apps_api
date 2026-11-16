@@ -294,7 +294,7 @@ func GetDefaultFormFieldsForCategory(companyCategory string) []models.FormFieldD
 		return GetDefaultFormFields()
 	}
 
-	if cat == "photo_video" {
+	if cat == "photo_video" || cat == "mua" || cat == "mc" {
 		activeSet := map[string]bool{
 			"client_name":     true,
 			"client_phone":    true,
@@ -303,6 +303,16 @@ func GetDefaultFormFieldsForCategory(companyCategory string) []models.FormFieldD
 			"package_id":      true,
 			"notes":           true,
 		}
+		packagePlaceholders := map[string]string{
+			"photo_video": "Pilih paket foto & video yang diinginkan",
+			"mua":         "Pilih paket MUA / rias pengantin yang diinginkan",
+			"mc":          "Pilih paket MC / pembawa acara yang diinginkan",
+		}
+		notesPlaceholders := map[string]string{
+			"photo_video": "Contoh: Konsep foto/video, jam mulai liputan, atau request khusus lainnya",
+			"mua":         "Contoh: Jumlah orang dirias, jam mulai makeup, atau request look khusus",
+			"mc":          "Contoh: Konsep acara, susunan acara singkat, atau request khusus lainnya",
+		}
 		overrides := map[string]presetFieldOverride{
 			"client_name": {
 				Label:       "Nama Lengkap Pemesan",
@@ -310,11 +320,11 @@ func GetDefaultFormFieldsForCategory(companyCategory string) []models.FormFieldD
 			},
 			"package_id": {
 				Label:       "Pilihan Paket",
-				Placeholder: "Pilih paket foto & video yang diinginkan",
+				Placeholder: packagePlaceholders[cat],
 			},
 			"notes": {
 				Label:       "Catatan",
-				Placeholder: "Contoh: Konsep foto/video, jam mulai liputan, atau request khusus lainnya",
+				Placeholder: notesPlaceholders[cat],
 			},
 		}
 		return applyCategoryDefaults(GetDefaultFormFields(), activeSet, overrides)

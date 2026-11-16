@@ -24,7 +24,8 @@ func TestNormalizeVendorCategory(t *testing.T) {
 		{"photography", "photo_video"},
 		{"katering", "catering"},
 		{"Busana", "attire"},
-		{"MC", "entertainment"},
+		{"MC", "mc"},
+		{"band", "entertainment"},
 		{"gedung", "venue"},
 		{"souvenir", "other"},
 	}

@@ -237,9 +237,8 @@ func TestEventTypeNormalizationAndPresets(t *testing.T) {
 }
 
 func TestCategorySpecificDefaultFormFields(t *testing.T) {
-	// 1. Foto & Video (photo_video) hanya mengaktifkan 6 field default dengan 4 field mandatori yang sama dengan dekorasi
-	fgFields := GetDefaultFormFieldsForCategory("photo_video")
-	expectedActiveFG := map[string]bool{
+	// 1. Foto & Video (photo_video), MUA (mua), dan MC (mc) hanya mengaktifkan 6 field default dengan 4 field mandatori yang sama dengan dekorasi
+	expectedActiveSimple := map[string]bool{
 		"client_name":     true,
 		"client_phone":    true,
 		"event_date_time": true,
@@ -254,20 +253,23 @@ func TestCategorySpecificDefaultFormFields(t *testing.T) {
 		"event_address":   true,
 	}
 
-	activeCountFG := 0
-	for _, f := range fgFields {
-		if f.IsActive {
-			activeCountFG++
+	for _, cat := range []string{"photo_video", "mua", "mc"} {
+		fields := GetDefaultFormFieldsForCategory(cat)
+		activeCount := 0
+		for _, f := range fields {
+			if f.IsActive {
+				activeCount++
+			}
+			if f.IsActive != expectedActiveSimple[f.Key] {
+				t.Errorf("%s field %q IsActive = %v; want %v", cat, f.Key, f.IsActive, expectedActiveSimple[f.Key])
+			}
+			if f.IsRequired != expectedRequired[f.Key] {
+				t.Errorf("%s field %q IsRequired = %v; want %v", cat, f.Key, f.IsRequired, expectedRequired[f.Key])
+			}
 		}
-		if f.IsActive != expectedActiveFG[f.Key] {
-			t.Errorf("photo_video field %q IsActive = %v; want %v", f.Key, f.IsActive, expectedActiveFG[f.Key])
+		if activeCount != len(expectedActiveSimple) {
+			t.Errorf("%s active field count = %d; want %d", cat, activeCount, len(expectedActiveSimple))
 		}
-		if f.IsRequired != expectedRequired[f.Key] {
-			t.Errorf("photo_video field %q IsRequired = %v; want %v", f.Key, f.IsRequired, expectedRequired[f.Key])
-		}
-	}
-	if activeCountFG != len(expectedActiveFG) {
-		t.Errorf("photo_video active field count = %d; want %d", activeCountFG, len(expectedActiveFG))
 	}
 
 	// Preset wedding untuk photo_video tetap tidak mengaktifkan field dekorasi
