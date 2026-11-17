@@ -76,10 +76,10 @@ func HandleAIAssistant(c *fiber.Ctx) error {
 	}
 
 	// 1. Kumpulkan data bisnis real-time vendor ini (Read-Only)
-	businessContext := compileBusinessContext(companyID, userName)
+	businessContext, companyCategory := compileBusinessContext(companyID, userName)
 
-	// 2. Panggil Gemini dengan context grounding
-	reply, suggestions, err := callGeminiBusinessAssistant(apiKey, businessContext, req.History, userMsg)
+	// 2. Panggil Gemini dengan context grounding sesuai kategori usaha
+	reply, suggestions, err := callGeminiBusinessAssistant(apiKey, companyCategory, businessContext, req.History, userMsg)
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"status":  "error",
@@ -96,17 +96,102 @@ func HandleAIAssistant(c *fiber.Ctx) error {
 	})
 }
 
+type assistantCategoryMeta struct {
+	CategoryLabel string
+	VendorRole    string
+	PackageLabel  string
+	FocusHints    string
+}
+
+var assistantCategoryMetaMap = map[string]assistantCategoryMeta{
+	"decoration": {
+		CategoryLabel: "Dekorasi & Pelaminan",
+		VendorRole:    "vendor dekorasi acara/wedding",
+		PackageLabel:  "PAKET DEKORASI TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada kesiapan tim pemasangan/bongkar, properti/backdrop, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien.",
+	},
+	"wo": {
+		CategoryLabel: "Wedding Organizer (WO)",
+		VendorRole:    "vendor Wedding Organizer (WO) & event planner",
+		PackageLabel:  "PAKET LAYANAN WO TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada koordinasi rundown acara, kesiapan tim/crew lapangan, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi.",
+	},
+	"mua": {
+		CategoryLabel: "MUA & Rias Pengantin",
+		VendorRole:    "vendor Make Up Artist (MUA) & rias pengantin",
+		PackageLabel:  "PAKET RIAS & MUA TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada manajemen jam rias/touch-up, ketersediaan tim asisten MUA, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi atau pelaminan.",
+	},
+	"photo_video": {
+		CategoryLabel: "Fotografi & Videografi",
+		VendorRole:    "vendor fotografi & videografi acara",
+		PackageLabel:  "PAKET FOTO & VIDEO TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada penjadwalan tim fotografer/videografer, deadline editing/deliverables, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi atau pelaminan.",
+	},
+	"catering": {
+		CategoryLabel: "Katering & Konsumsi",
+		VendorRole:    "vendor katering & konsumsi acara",
+		PackageLabel:  "PAKET MENU KATERING TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada persiapan bahan/porsi, logistik pengiriman & tim pramusaji, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi atau pelaminan.",
+	},
+	"attire": {
+		CategoryLabel: "Busana & Gaun Pengantin",
+		VendorRole:    "vendor sewa/pembuatan busana & gaun pengantin",
+		PackageLabel:  "PAKET BUSANA TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada jadwal fitting, kesiapan laundry/perawatan busana, jadwal sewa bentrok, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi atau pelaminan.",
+	},
+	"mc": {
+		CategoryLabel: "MC / Pembawa Acara",
+		VendorRole:    "vendor MC / pembawa acara",
+		PackageLabel:  "PAKET LAYANAN MC TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada manajemen jam tampil, persiapan brief/susunan acara klien, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi atau pelaminan.",
+	},
+	"entertainment": {
+		CategoryLabel: "Musik & Hiburan",
+		VendorRole:    "vendor musik & hiburan acara",
+		PackageLabel:  "PAKET HIBURAN & MUSIK TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada kesiapan personel/band, kebutuhan sound/peralatan, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi atau pelaminan.",
+	},
+	"venue": {
+		CategoryLabel: "Venue & Gedung Acara",
+		VendorRole:    "pengelola venue & gedung acara",
+		PackageLabel:  "PAKET SEWA VENUE TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada ketersediaan slot tanggal/ruangan, persiapan kebersihan & fasilitas gedung, deteksi double-booking di hari yang sama, dan penagihan DP/pelunasan klien. Jangan menyebut properti dekorasi.",
+	},
+	"other": {
+		CategoryLabel: "Vendor Acara",
+		VendorRole:    "vendor jasa acara/wedding",
+		PackageLabel:  "PAKET LAYANAN TERPOPULER",
+		FocusHints:    "Fokuskan saran operasional pada kesiapan tim, jadwal bentrok di hari yang sama, dan penagihan DP/pelunasan klien. Jangan mengasumsikan vendor ini bergerak di bidang dekorasi.",
+	},
+}
+
+func getAssistantCategoryMeta(rawCategory string) (string, assistantCategoryMeta) {
+	norm := models.NormalizeVendorCategory(rawCategory)
+	if meta, ok := assistantCategoryMetaMap[norm]; ok {
+		return norm, meta
+	}
+	return "other", assistantCategoryMetaMap["other"]
+}
+
 // compileBusinessContext mengumpulkan data analitik aktual dari database secara read-only
-func compileBusinessContext(companyID, userName string) string {
+func compileBusinessContext(companyID, userName string) (string, string) {
 	now := time.Now()
 	loc := now.Location()
 
-	// Nama Perusahaan
+	// Nama & Kategori Perusahaan
 	var comp models.Company
-	compName := "Dekorin Vendor"
-	if err := config.DB.Where("id = ?", companyID).First(&comp).Error; err == nil && comp.Name != "" {
-		compName = comp.Name
+	compName := "Vendor Dekorin"
+	rawCategory := "decoration"
+	if err := config.DB.Where("id = ?", companyID).First(&comp).Error; err == nil {
+		if comp.Name != "" {
+			compName = comp.Name
+		}
+		if comp.Category != "" {
+			rawCategory = comp.Category
+		}
 	}
+	normCategory, catMeta := getAssistantCategoryMeta(rawCategory)
 
 	// Tanggal awal dan akhir bulan ini
 	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, loc)
@@ -235,8 +320,9 @@ func compileBusinessContext(companyID, userName string) string {
 	}
 
 	// Susun seluruh ringkasan menjadi dokumen konteks
-	return fmt.Sprintf(`[DATA RESMI REAL-TIME BISNIS DEKORIN]
+	contextDoc := fmt.Sprintf(`[DATA RESMI REAL-TIME BISNIS VENDOR]
 Nama Vendor: %s
+Kategori Usaha: %s (%s)
 Nama User / Penanya: %s
 Waktu Saat Ini: %s (%s)
 
@@ -257,34 +343,43 @@ Waktu Saat Ini: %s (%s)
 --- 3. DAFTAR TAGIHAN / KLIEN BELUM LUNAS ---
 %s
 
---- 4. PAKET DEKORASI TERPOPULER ---
+--- 4. %s ---
 %s
 `,
-		compName, userName, now.Format("02 January 2006 15:04 WIB"), now.Weekday().String(),
+		compName, catMeta.CategoryLabel, normCategory, userName, now.Format("02 January 2006 15:04 WIB"), now.Weekday().String(),
 		now.Month().String(), now.Year(),
 		len(monthAgendas), totalOmsetMonth, totalKasMasukMonth, piutangMonth, totalExpenseMonth,
 		expBreakdown.String(), labaBersihEstimasi, labaKasRiil,
 		conflictInfo.String(),
 		unpaidClients.String(),
+		catMeta.PackageLabel,
 		packageRank.String(),
 	)
+
+	return contextDoc, normCategory
 }
 
-// callGeminiBusinessAssistant memanggil Gemini API dengan system prompt dan business context
-func callGeminiBusinessAssistant(apiKey, businessContext string, history []AIAssistantMessage, userMsg string) (string, []string, error) {
-	systemPrompt := `Kamu adalah "Asisten Dekorin AI", partner dan penasihat bisnis cerdas khusus untuk Owner dan Admin vendor dekorasi acara/wedding.
-Tugasmu adalah menjawab pertanyaan pengguna secara akurat, ramah, profesional, dan memberikan wawasan/insight bisnis yang bernilai tambah berdasarkan data resmi yang disediakan.
+// buildAssistantSystemPrompt menyusun system prompt Asisten AI sesuai kategori usaha vendor
+func buildAssistantSystemPrompt(companyCategory, businessContext string) string {
+	_, catMeta := getAssistantCategoryMeta(companyCategory)
+	return fmt.Sprintf(`Kamu adalah "Asisten Dekorin AI", partner dan penasihat bisnis cerdas khusus untuk Owner dan Admin %s.
+Tugasmu adalah menjawab pertanyaan pengguna secara akurat, ramah, profesional, dan memberikan wawasan/insight bisnis yang relevan untuk bidang %s berdasarkan data resmi yang disediakan.
 
 ATURAN PENTING:
-1. SELALU rujuk angka, nama klien, jadwal, dan status dari [DATA RESMI REAL-TIME BISNIS DEKORIN] yang diberikan di bawah. Jangan mengarang angka atau fakta yang bertentangan dengan data resmi.
+1. SELALU rujuk angka, nama klien, jadwal, dan status dari [DATA RESMI REAL-TIME BISNIS VENDOR] yang diberikan di bawah. Jangan mengarang angka atau fakta yang bertentangan dengan data resmi.
 2. Format angka uang ke format Rupiah yang mudah dibaca (misal: "Rp 35.000.000" atau "Rp 35 Juta").
 3. Berikan jawaban yang terstruktur dengan poin-poin (bullet points atau bolding) yang rapi dan nyaman dibaca di layar HP.
-4. Jika ada potensi masalah bisnis (seperti jadwal bentrok di hari yang sama, atau piutang yang belum lunas menjelang hari H), berikan saran proaktif (tips operasional atau pengingat tim).
-5. Di akhir jawaban, berikan 2 hingga 3 rekomendasi pertanyaan lanjutan singkat yang relevan untuk diklik pengguna. Pisahkan pertanyaan rekomendasi tersebut dalam format tag khusus di baris paling akhir:
+4. Jika ada potensi masalah bisnis (seperti jadwal bentrok di hari yang sama, atau piutang yang belum lunas menjelang hari H), berikan saran proaktif. %s
+5. Di akhir jawaban, berikan 2 hingga 3 rekomendasi pertanyaan lanjutan singkat yang relevan dengan bidang usaha %s untuk diklik pengguna. Pisahkan pertanyaan rekomendasi tersebut dalam format tag khusus di baris paling akhir:
 [SUGGESTIONS: Pertanyaan 1 | Pertanyaan 2 | Pertanyaan 3]
 
 Konteks data bisnis vendor saat ini:
-` + businessContext
+%s`, catMeta.VendorRole, catMeta.CategoryLabel, catMeta.FocusHints, catMeta.CategoryLabel, businessContext)
+}
+
+// callGeminiBusinessAssistant memanggil Gemini API dengan system prompt dan business context
+func callGeminiBusinessAssistant(apiKey, companyCategory, businessContext string, history []AIAssistantMessage, userMsg string) (string, []string, error) {
+	systemPrompt := buildAssistantSystemPrompt(companyCategory, businessContext)
 
 	type geminiPartReq struct {
 		Text string `json:"text"`
