@@ -62,6 +62,8 @@ type Agenda struct {
 	ClientForm           *ClientForm      `gorm:"foreignKey:AgendaID" json:"client_form,omitempty"`
 	AgendaProperties     []AgendaProperty `gorm:"foreignKey:AgendaID" json:"agenda_properties,omitempty"`
 	Payments             []AgendaPayment  `gorm:"foreignKey:AgendaID" json:"payments,omitempty"`
+	AcceptedPartnerCost  float64          `gorm:"-" json:"accepted_partner_cost"`
+	PendingPartnerCost   float64          `gorm:"-" json:"pending_partner_cost"`
 	CreatedAt            time.Time        `json:"created_at"`
 	UpdatedAt            time.Time        `json:"updated_at"`
 }

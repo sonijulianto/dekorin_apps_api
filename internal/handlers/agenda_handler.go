@@ -164,6 +164,8 @@ func GetAgendas(c *fiber.Ctx) error {
 		}
 	}
 
+	EnrichAgendasWithPartnerCosts(agendas)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Berhasil mengambil data agenda",
 		"data":    agendas,
@@ -990,6 +992,7 @@ func UpdateAgendaStatus(c *fiber.Ctx) error {
 	}
 
 	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
+	SyncCollaborationPartnerAgendas(agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Status acara berhasil diperbarui",
@@ -1457,6 +1460,7 @@ func UpdateAgendaSchedule(c *fiber.Ctx) error {
 	}
 
 	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
+	SyncCollaborationPartnerAgendas(agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Jadwal acara berhasil diperbarui",
@@ -1519,6 +1523,7 @@ func UpdateAgendaLocation(c *fiber.Ctx) error {
 	}
 
 	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
+	SyncCollaborationPartnerAgendas(agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Alamat dan lokasi acara berhasil diperbarui",
@@ -1791,6 +1796,7 @@ func UpdateAgenda(c *fiber.Ctx) error {
 	syncClientFormPackageAndModel(agenda)
 
 	preloadAgendaRelations(config.DB.Model(&models.Agenda{})).Where("id = ?", id).First(&agenda)
+	SyncCollaborationPartnerAgendas(agenda)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Agenda acara berhasil diperbarui",

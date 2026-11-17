@@ -189,6 +189,19 @@ func main() {
 	api.Put("/agendas/:id/brand", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaBrand)
 	api.Delete("/agendas/:id", middleware.Protected(), middleware.RequireVendor(), handlers.DeleteAgenda)
 
+	// Collaboration & Push Notification routes
+	api.Post("/devices/token", middleware.Protected(), handlers.RegisterDeviceToken)
+	api.Delete("/devices/token", middleware.Protected(), handlers.UnregisterDeviceToken)
+	api.Get("/collaborations/vendors", middleware.Protected(), middleware.RequireVendor(), handlers.SearchCollaborationVendors)
+	api.Get("/collaborations/incoming", middleware.Protected(), middleware.RequireVendor(), handlers.GetIncomingCollaborations)
+	api.Post("/collaborations/:id/respond", middleware.Protected(), middleware.RequireVendor(), handlers.RespondCollaboration)
+	api.Delete("/collaborations/:id", middleware.Protected(), middleware.RequireVendor(), handlers.CancelAgendaCollaboration)
+	api.Get("/agendas/:id/collaborations", middleware.Protected(), middleware.RequireVendor(), handlers.GetAgendaCollaborations)
+	api.Post("/agendas/:id/collaborations", middleware.Protected(), middleware.RequireVendor(), handlers.CreateAgendaCollaboration)
+	api.Get("/notifications", middleware.Protected(), handlers.GetNotifications)
+	api.Post("/notifications/:id/read", middleware.Protected(), handlers.MarkNotificationRead)
+	api.Post("/notifications/read-all", middleware.Protected(), handlers.MarkAllNotificationsRead)
+
 	// Expense routes
 	api.Get("/expenses", middleware.Protected(), middleware.RequireVendor(), handlers.GetExpenses)
 	api.Post("/expenses", middleware.Protected(), middleware.RequireVendor(), handlers.CreateExpense)

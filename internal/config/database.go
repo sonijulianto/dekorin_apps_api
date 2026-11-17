@@ -81,6 +81,9 @@ func ConnectDB() {
 		&models.WeddingPlanMember{},
 		&models.WeddingPlanVendor{},
 		&models.WeddingTask{},
+		&models.UserDeviceToken{},
+		&models.AgendaCollaboration{},
+		&models.AppNotification{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
