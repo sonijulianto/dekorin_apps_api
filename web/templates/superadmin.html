@@ -348,6 +348,16 @@
                         <span class="nav-text">API Log</span>
                     </a>
 
+                    <!-- FE Error Logs (Direct - Superadmin Only) -->
+                    <a href="javascript:void(0)" onclick="switchView('clientlogs')" id="nav-clientlogs-direct"
+                        class="superadmin-only hidden nav-item flex items-center justify-between px-3 py-3 md:py-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                        <div class="flex items-center">
+                            <span class="nav-icon text-base mr-3 text-rose-500 flex items-center justify-center shrink-0"><i class="fi fi-rr-bug"></i></span>
+                            <span class="nav-text">FE Error Logs</span>
+                        </div>
+                        <span id="sidebarClientLogsBadge" class="nav-text hidden text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold">0</span>
+                    </a>
+
                     <!-- 9. Download Mobile App (Untuk Semua Role: Owner, Admin, Superadmin) -->
                     <div class="pt-3 pb-1">
                         <hr class="border-stone-200/70">
@@ -1443,6 +1453,134 @@
                             <!-- Right: Pagination Buttons -->
                             <div id="apiLogPaginationButtons" class="flex items-center justify-center sm:justify-end flex-wrap gap-1 select-none">
                                 <!-- Injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- VIEW 7B: FE CLIENT ERROR LOGS (SUPERADMIN) -->
+                <!-- ============================================== -->
+                <div id="viewClientLogs" class="hidden space-y-4">
+                    <!-- Summary & Filter Row -->
+                    <div class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-700">Monitor Error Aplikasi Flutter (APK & Web PWA)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-200">
+                                    Open: <span id="clientLogOpenCount">0</span>
+                                </span>
+                                <span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 font-semibold border border-rose-200">
+                                    Fatal Open: <span id="clientLogFatalCount">0</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <select id="clientLogStatusFilter" onchange="loadClientLogs(1)"
+                                class="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg focus:outline-none">
+                                <option value="open" selected>Status: Open</option>
+                                <option value="resolved">Status: Resolved</option>
+                                <option value="all">Status: Semua</option>
+                            </select>
+                            <select id="clientLogPlatformFilter" onchange="loadClientLogs(1)"
+                                class="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg focus:outline-none">
+                                <option value="all" selected>Platform: Semua</option>
+                                <option value="android">Android</option>
+                                <option value="web">Web PWA</option>
+                                <option value="ios">iOS</option>
+                            </select>
+                            <select id="clientLogLevelFilter" onchange="loadClientLogs(1)"
+                                class="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg focus:outline-none">
+                                <option value="all" selected>Level: Semua</option>
+                                <option value="fatal">Fatal</option>
+                                <option value="error">Error</option>
+                                <option value="warning">Warning</option>
+                            </select>
+                            <input type="text" id="clientLogSearchFilter" placeholder="Cari pesan error, route, stack trace..."
+                                onkeydown="if(event.key==='Enter') loadClientLogs(1)"
+                                class="flex-1 min-w-[200px] bg-slate-50 border border-slate-200 text-slate-700 text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-[#D4A574]" />
+                            <button onclick="loadClientLogs(1)"
+                                class="border border-[#D4A574] text-[#C59563] hover:bg-[#D4A574] hover:text-white transition-all font-semibold text-xs px-4 py-2 rounded-lg">
+                                Cari / Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Cards -->
+                    <div id="clientLogMobileCards" class="md:hidden space-y-2.5">
+                        <div class="bg-white rounded-2xl p-6 text-center text-xs text-slate-400 border border-slate-100">Memuat FE Error Logs...</div>
+                    </div>
+
+                    <!-- Desktop Table -->
+                    <div class="bg-white rounded-xl shadow-xs border border-slate-200/80 overflow-hidden">
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-[#D4A574] text-white text-[11px] font-bold uppercase tracking-wider select-none">
+                                    <tr>
+                                        <th class="py-3 px-3 w-20">LEVEL</th>
+                                        <th class="py-3 px-3 w-24">PLATFORM</th>
+                                        <th class="py-3 px-3 w-24">VERSI</th>
+                                        <th class="py-3 px-3 w-36">ROUTE / SCREEN</th>
+                                        <th class="py-3 px-3">ERROR MESSAGE</th>
+                                        <th class="py-3 px-3 text-center w-16">JML</th>
+                                        <th class="py-3 px-3 w-24">STATUS</th>
+                                        <th class="py-3 px-3 w-36">TERAKHIR</th>
+                                        <th class="py-3 px-3 text-center w-24">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientLogTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+                                    <tr><td colspan="9" class="text-center py-8 text-slate-400">Memuat FE Error Logs...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="px-4 py-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+                            <span class="text-xs text-slate-600 font-medium" id="clientLogPaginationInfo">Menampilkan 0 data</span>
+                            <div id="clientLogPaginationButtons" class="flex items-center gap-1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Detail FE Error Log + Tombol Copy for AI -->
+                <div id="clientLogDetailModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+                    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+                        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800" id="clModalTitle">Detail FE Error</h3>
+                                <p class="text-[11px] text-slate-500 mt-0.5" id="clModalSubtitle">-</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="copyClientLogForAI()" id="clCopyAiBtn"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4A574] hover:bg-[#C59563] text-white text-xs font-bold transition shadow-xs">
+                                    <i class="fi fi-rr-copy-alt"></i> Copy for AI
+                                </button>
+                                <button onclick="toggleClientLogStatusFromModal()" id="clToggleStatusBtn"
+                                    class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
+                                    Tandai Resolved
+                                </button>
+                                <button onclick="closeClientLogDetailModal()" class="p-1.5 text-slate-400 hover:text-slate-700 text-lg leading-none">&times;</button>
+                            </div>
+                        </div>
+                        <div class="p-5 overflow-y-auto space-y-4 text-xs">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-100" id="clModalMeta"></div>
+                            <div>
+                                <div class="font-bold text-slate-700 mb-1">Error Message</div>
+                                <pre id="clModalErrorMessage" class="bg-rose-50 text-rose-900 p-3 rounded-xl border border-rose-100 whitespace-pre-wrap break-words font-mono text-[11px]"></pre>
+                            </div>
+                            <div id="clModalApiContextWrap" class="hidden">
+                                <div class="font-bold text-slate-700 mb-1">API Context</div>
+                                <pre id="clModalApiContext" class="bg-amber-50 text-amber-900 p-3 rounded-xl border border-amber-100 whitespace-pre-wrap break-words font-mono text-[11px]"></pre>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-700 mb-1">Breadcrumbs (Jejak Aksi Terakhir)</div>
+                                <pre id="clModalBreadcrumbs" class="bg-slate-900 text-slate-100 p-3 rounded-xl whitespace-pre-wrap break-words font-mono text-[11px] max-h-40 overflow-y-auto"></pre>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-700 mb-1">Stack Trace</div>
+                                <pre id="clModalStackTrace" class="bg-slate-900 text-emerald-300 p-3 rounded-xl whitespace-pre-wrap break-words font-mono text-[11px] max-h-64 overflow-y-auto"></pre>
                             </div>
                         </div>
                     </div>
@@ -4237,6 +4375,7 @@
             else if (currentView === 'invitations') loadInvitations();
             else if (currentView === 'reports') loadReports();
             else if (currentView === 'apilogs') loadApiLogs(1);
+            else if (currentView === 'clientlogs') loadClientLogs(1);
             else if (currentView === 'appversion') loadAppVersions();
         }
 
@@ -4261,7 +4400,7 @@
         function switchView(viewName) {
             closeMobileSidebar();
 
-            if ((viewName === 'appversion' || viewName === 'apilogs') && currentUserRole !== 'superadmin') {
+            if ((viewName === 'appversion' || viewName === 'apilogs' || viewName === 'clientlogs') && currentUserRole !== 'superadmin') {
                 alert('Akses ditolak: Menu ini hanya dapat diakses oleh Superadmin.');
                 switchView('dashboard');
                 return;
@@ -4276,7 +4415,7 @@
             currentView = viewName;
             
             // Sembunyikan semua section
-            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewRolePermissions', 'viewFormConfig', 'viewPackages', 'viewDecorationModels', 'viewAddons', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs', 'viewAppVersion'];
+            const views = ['viewDashboard', 'viewCompanies', 'viewUsers', 'viewRolePermissions', 'viewFormConfig', 'viewPackages', 'viewDecorationModels', 'viewAddons', 'viewAgendas', 'viewInvitations', 'viewReports', 'viewApiLogs', 'viewClientLogs', 'viewAppVersion'];
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if (el) el.classList.add('hidden');
@@ -4299,6 +4438,7 @@
                 'role-permissions': { el: 'viewRolePermissions', title: 'Hak Akses & Izin Role', path: 'Administration • Hak Akses & Izin Role', nav: 'nav-role-permissions', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'form-config': { el: 'viewFormConfig', title: 'Pengaturan Form Client', path: 'Administration • Pengaturan Form Client', nav: 'nav-form-config', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'apilogs': { el: 'viewApiLogs', title: 'API Log System', path: '<span class="text-slate-600 inline-flex items-center"><i class="fi fi-rr-terminal"></i></span> • API Log System', nav: 'nav-apilogs-direct' },
+                'clientlogs': { el: 'viewClientLogs', title: 'FE Error Logs', path: '<span class="text-rose-600 inline-flex items-center"><i class="fi fi-rr-bug"></i></span> • FE Error Logs', nav: 'nav-clientlogs-direct' },
                 'appversion': { el: 'viewAppVersion', title: 'Rilis & Pembaruan APK', path: 'Administration • Rilis APK', nav: 'nav-appversion', parentSubmenu: 'adminSubmenu', parentCaret: 'adminCaret' },
                 'packages': { el: 'viewPackages', title: 'Paket Dekorasi', path: 'Master • Paket Dekorasi', nav: 'nav-packages', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
                 'decoration-models': { el: 'viewDecorationModels', title: 'Master Model Dekorasi', path: 'Master • Model Dekorasi', nav: 'nav-decoration-models', parentSubmenu: 'masterSubmenu', parentCaret: 'masterCaret' },
@@ -10434,6 +10574,248 @@
                     markPaidBtn.disabled = false;
                     markPaidBtn.innerText = '✓ Tandai Lunas';
                 }
+            }
+        }
+
+        // ==========================================
+        // FE CLIENT ERROR LOGS (SUPERADMIN)
+        // ==========================================
+        let clientLogsCache = [];
+        let clientLogsCurrentPage = 1;
+        let activeClientLogItem = null;
+
+        async function loadClientLogs(page = 1) {
+            clientLogsCurrentPage = page;
+            const status = document.getElementById('clientLogStatusFilter')?.value || 'open';
+            const platform = document.getElementById('clientLogPlatformFilter')?.value || 'all';
+            const level = document.getElementById('clientLogLevelFilter')?.value || 'all';
+            const search = document.getElementById('clientLogSearchFilter')?.value?.trim() || '';
+
+            const tbody = document.getElementById('clientLogTableBody');
+            const mobileWrap = document.getElementById('clientLogMobileCards');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400">Memuat FE Error Logs...</td></tr>';
+
+            try {
+                const params = new URLSearchParams({ page, limit: 25, status, platform, level, search });
+                const res = await fetch(`/api/superadmin/client-logs?${params.toString()}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal memuat FE Error Logs');
+
+                clientLogsCache = json.data || [];
+                const meta = json.meta || {};
+                const openCountEl = document.getElementById('clientLogOpenCount');
+                const fatalCountEl = document.getElementById('clientLogFatalCount');
+                const badgeEl = document.getElementById('sidebarClientLogsBadge');
+                if (openCountEl) openCountEl.innerText = meta.open_count ?? 0;
+                if (fatalCountEl) fatalCountEl.innerText = meta.fatal_open_count ?? 0;
+                if (badgeEl) {
+                    if ((meta.open_count ?? 0) > 0) {
+                        badgeEl.innerText = meta.open_count;
+                        badgeEl.classList.remove('hidden');
+                    } else {
+                        badgeEl.classList.add('hidden');
+                    }
+                }
+
+                renderClientLogsTable(clientLogsCache, meta);
+            } catch (err) {
+                if (tbody) tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-rose-500">${escapeHtml(err.message)}</td></tr>`;
+                if (mobileWrap) mobileWrap.innerHTML = `<div class="bg-white rounded-2xl p-4 text-center text-xs text-rose-500 border border-rose-100">${escapeHtml(err.message)}</div>`;
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function renderClientLogsTable(items, meta) {
+            const tbody = document.getElementById('clientLogTableBody');
+            const mobileWrap = document.getElementById('clientLogMobileCards');
+            const infoEl = document.getElementById('clientLogPaginationInfo');
+            const btnsEl = document.getElementById('clientLogPaginationButtons');
+
+            if (!items || items.length === 0) {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400">Tidak ada log error FE ditemukan.</td></tr>';
+                if (mobileWrap) mobileWrap.innerHTML = '<div class="bg-white rounded-2xl p-6 text-center text-xs text-slate-400 border border-slate-100">Tidak ada log error FE ditemukan.</div>';
+                if (infoEl) infoEl.innerText = 'Menampilkan 0 data';
+                if (btnsEl) btnsEl.innerHTML = '';
+                return;
+            }
+
+            const levelBadge = (lvl) => {
+                if (lvl === 'fatal') return '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold uppercase text-[10px]">fatal</span>';
+                if (lvl === 'warning') return '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold uppercase text-[10px]">warning</span>';
+                return '<span class="px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-bold uppercase text-[10px]">error</span>';
+            };
+            const statusBadge = (st) => st === 'resolved'
+                ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px]">Resolved</span>'
+                : '<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold text-[10px]">Open</span>';
+
+            if (tbody) {
+                tbody.innerHTML = items.map(item => `
+                    <tr class="hover:bg-slate-50/80 transition cursor-pointer" onclick="openClientLogDetail('${item.id}')">
+                        <td class="py-2.5 px-3">${levelBadge(item.level)}</td>
+                        <td class="py-2.5 px-3 font-semibold uppercase text-[11px]">${escapeHtml(item.platform)}</td>
+                        <td class="py-2.5 px-3 font-mono text-[11px]">${escapeHtml(item.app_version || '-')}</td>
+                        <td class="py-2.5 px-3 font-mono text-[11px] truncate max-w-[140px]">${escapeHtml(item.route || '-')}</td>
+                        <td class="py-2.5 px-3">
+                            <div class="font-semibold text-slate-800 truncate max-w-[280px]">${escapeHtml(item.error_type || 'Error')}</div>
+                            <div class="text-[11px] text-slate-500 truncate max-w-[280px]">${escapeHtml(item.error_message)}</div>
+                        </td>
+                        <td class="py-2.5 px-3 text-center font-bold">${item.occurrence_count || 1}x</td>
+                        <td class="py-2.5 px-3">${statusBadge(item.status)}</td>
+                        <td class="py-2.5 px-3 text-[11px] text-slate-500">${item.last_seen_at ? new Date(item.last_seen_at).toLocaleString('id-ID') : '-'}</td>
+                        <td class="py-2.5 px-3 text-center" onclick="event.stopPropagation()">
+                            <button onclick="openClientLogDetail('${item.id}')" class="text-[#C59563] hover:underline font-semibold text-xs">Detail</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            if (mobileWrap) {
+                mobileWrap.innerHTML = items.map(item => `
+                    <div onclick="openClientLogDetail('${item.id}')" class="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-xs space-y-1.5 cursor-pointer">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">${levelBadge(item.level)} <span class="text-[11px] font-bold uppercase text-slate-600">${escapeHtml(item.platform)}</span> <span class="text-[11px] font-mono text-slate-400">${escapeHtml(item.app_version)}</span></div>
+                            ${statusBadge(item.status)}
+                        </div>
+                        <div class="text-xs font-bold text-slate-800 line-clamp-1">${escapeHtml(item.error_type || 'Error')} (${item.occurrence_count || 1}x)</div>
+                        <div class="text-[11px] text-slate-600 line-clamp-2">${escapeHtml(item.error_message)}</div>
+                        <div class="text-[10px] text-slate-400 flex justify-between">
+                            <span>${escapeHtml(item.route || '-')}</span>
+                            <span>${item.last_seen_at ? new Date(item.last_seen_at).toLocaleString('id-ID') : '-'}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const total = meta.total || items.length;
+            const limit = meta.limit || 25;
+            const page = meta.page || 1;
+            const totalPages = Math.max(1, Math.ceil(total / limit));
+            if (infoEl) infoEl.innerText = `Halaman ${page} dari ${totalPages} (Total ${total} grup error)`;
+            if (btnsEl) {
+                btnsEl.innerHTML = `
+                    <button ${page <= 1 ? 'disabled' : ''} onclick="loadClientLogs(${page - 1})" class="px-2.5 py-1 rounded border text-xs disabled:opacity-40">Prev</button>
+                    <button ${page >= totalPages ? 'disabled' : ''} onclick="loadClientLogs(${page + 1})" class="px-2.5 py-1 rounded border text-xs disabled:opacity-40">Next</button>
+                `;
+            }
+        }
+
+        function openClientLogDetail(id) {
+            const item = clientLogsCache.find(x => x.id === id);
+            if (!item) return;
+            activeClientLogItem = item;
+
+            document.getElementById('clModalTitle').innerText = `${item.error_type || 'FE Error'} (${item.occurrence_count || 1}x)`;
+            document.getElementById('clModalSubtitle').innerText = `ID: ${item.id} • Fingerprint: ${item.fingerprint}`;
+            document.getElementById('clModalMeta').innerHTML = `
+                <div><div class="text-[10px] text-slate-400">Platform</div><div class="font-bold uppercase">${escapeHtml(item.platform)}</div></div>
+                <div><div class="text-[10px] text-slate-400">App Version</div><div class="font-mono font-bold">${escapeHtml(item.app_version || '-')}</div></div>
+                <div><div class="text-[10px] text-slate-400">Route</div><div class="font-mono font-bold truncate">${escapeHtml(item.route || '-')}</div></div>
+                <div><div class="text-[10px] text-slate-400">User / Company</div><div class="font-mono truncate">${escapeHtml(item.user_id || 'guest')} / ${escapeHtml(item.company_id || '-')}</div></div>
+            `;
+            document.getElementById('clModalErrorMessage').innerText = item.error_message || '-';
+            document.getElementById('clModalStackTrace').innerText = item.stack_trace || '(tidak ada stack trace)';
+
+            try {
+                const bc = JSON.parse(item.breadcrumbs || '[]');
+                document.getElementById('clModalBreadcrumbs').innerText = Array.isArray(bc) && bc.length ? JSON.stringify(bc, null, 2) : '(kosong)';
+            } catch (_) {
+                document.getElementById('clModalBreadcrumbs').innerText = item.breadcrumbs || '(kosong)';
+            }
+
+            const apiWrap = document.getElementById('clModalApiContextWrap');
+            const apiEl = document.getElementById('clModalApiContext');
+            if (item.api_context && item.api_context !== '{}' && item.api_context !== 'null') {
+                apiWrap.classList.remove('hidden');
+                try {
+                    apiEl.innerText = JSON.stringify(JSON.parse(item.api_context), null, 2);
+                } catch (_) {
+                    apiEl.innerText = item.api_context;
+                }
+            } else {
+                apiWrap.classList.add('hidden');
+            }
+
+            const toggleBtn = document.getElementById('clToggleStatusBtn');
+            if (item.status === 'resolved') {
+                toggleBtn.innerText = 'Buka Kembali (Open)';
+                toggleBtn.className = 'px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition';
+            } else {
+                toggleBtn.innerText = 'Tandai Resolved';
+                toggleBtn.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition';
+            }
+
+            document.getElementById('clientLogDetailModal').classList.remove('hidden');
+        }
+
+        function closeClientLogDetailModal() {
+            document.getElementById('clientLogDetailModal').classList.add('hidden');
+            activeClientLogItem = null;
+        }
+
+        async function toggleClientLogStatusFromModal() {
+            if (!activeClientLogItem) return;
+            const nextStatus = activeClientLogItem.status === 'resolved' ? 'open' : 'resolved';
+            try {
+                const res = await fetch(`/api/superadmin/client-logs/${activeClientLogItem.id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: nextStatus })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Gagal memperbarui status');
+                closeClientLogDetailModal();
+                await loadClientLogs(clientLogsCurrentPage);
+                showToast(`Log error ditandai ${nextStatus.toUpperCase()}`);
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+        async function copyClientLogForAI() {
+            if (!activeClientLogItem) return;
+            const item = activeClientLogItem;
+            const stackLines = (item.stack_trace || '').split('\n');
+            const dekorinFrames = stackLines.filter(l => l.includes('package:dekorin_apps/')).slice(0, 8);
+            const promptText = [
+                `Tolong perbaiki error FE Dekorin berikut:`,
+                `- **Level / Status**: ${item.level} (${item.occurrence_count || 1}x terjadi)`,
+                `- **Platform / Versi**: ${item.platform} / ${item.app_version || '-'}`,
+                `- **Route / Screen**: ${item.route || '-'}`,
+                `- **Device**: ${item.device_info || '-'}`,
+                `- **Error Type**: ${item.error_type || '-'}`,
+                ``,
+                `**Error Message:**`,
+                '```',
+                item.error_message || '-',
+                '```',
+                dekorinFrames.length ? `\n**Baris Kode Dekorin Terkait:**\n\`\`\`\n${dekorinFrames.join('\n')}\n\`\`\`` : '',
+                item.api_context && item.api_context !== '{}' ? `\n**API Context:**\n\`\`\`json\n${item.api_context}\n\`\`\`` : '',
+                item.breadcrumbs && item.breadcrumbs !== '[]' ? `\n**Breadcrumbs (Jejak Aksi Terakhir):**\n\`\`\`json\n${item.breadcrumbs}\n\`\`\`` : '',
+                `\n**Full Stack Trace (ringkas):**\n\`\`\`\n${stackLines.slice(0, 20).join('\n')}\n\`\`\``
+            ].filter(Boolean).join('\n');
+
+            try {
+                await navigator.clipboard.writeText(promptText);
+                const btn = document.getElementById('clCopyAiBtn');
+                if (btn) {
+                    const prev = btn.innerHTML;
+                    btn.innerHTML = '<i class="fi fi-rr-check"></i> Tersalin!';
+                    setTimeout(() => { btn.innerHTML = prev; }, 2000);
+                }
+            } catch (err) {
+                alert('Gagal menyalin ke clipboard: ' + err.message);
             }
         }
     </script>

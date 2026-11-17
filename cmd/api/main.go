@@ -85,6 +85,18 @@ func main() {
 		},
 	})
 
+	// Rate Limiter untuk pengiriman log error FE (maksimal 30 log per menit per IP)
+	clientLogLimiter := limiter.New(limiter.Config{
+		Max:          30,
+		Expiration:   1 * time.Minute,
+		KeyGenerator: clientIP,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Terlalu banyak laporan error dalam waktu singkat.",
+			})
+		},
+	})
+
 	// Group routes
 	api := app.Group("/api")
 	auth := api.Group("/auth")
@@ -255,6 +267,11 @@ func main() {
 	api.Get("/apilog/get", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetApiLogs)
 	api.Get("/apilog/:id", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetApiLogByID)
 	api.Get("/apilogs", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetApiLogs)
+
+	// Client Error Logs routes (FE Flutter Android & Web)
+	api.Post("/client-logs", clientLogLimiter, middleware.OptionalProtected(), handlers.CreateClientErrorLog)
+	api.Get("/superadmin/client-logs", middleware.Protected(), middleware.RequireSuperadmin(), handlers.GetClientErrorLogs)
+	api.Patch("/superadmin/client-logs/:id/status", middleware.Protected(), middleware.RequireSuperadmin(), handlers.UpdateClientErrorLogStatus)
 
 	// App Version & In-App Update routes (Hanya Superadmin yang berhak upload & atur versi)
 	api.Get("/app/version", handlers.GetLatestAppVersion)

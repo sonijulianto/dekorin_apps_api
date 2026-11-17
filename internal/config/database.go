@@ -84,6 +84,7 @@ func ConnectDB() {
 		&models.UserDeviceToken{},
 		&models.AgendaCollaboration{},
 		&models.AppNotification{},
+		&models.ClientErrorLog{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
