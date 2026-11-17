@@ -332,10 +332,12 @@ func GetDefaultFormFieldsForCategory(companyCategory string) []models.FormFieldD
 
 	// Kategori vendor non-dekorasi lainnya (WO, MUA, Catering, Attire, Entertainment, Venue, Other)
 	inactiveForNonDecor := map[string]bool{
-		"backdrop_title":   true,
-		"model_id":         true,
-		"decoration_theme": true,
-		"color_preference": true,
+		"backdrop_title":      true,
+		"model_id":            true,
+		"addons":              true,
+		"decoration_theme":    true,
+		"color_preference":    true,
+		"reference_photo_url": true,
 	}
 	base := GetDefaultFormFields()
 	activeSet := make(map[string]bool, len(base))
@@ -650,9 +652,40 @@ func findFormConfigRecord(companyID string, brandID string, eventType string) (m
 	return models.CompanyFormConfig{}, false
 }
 
+func isDecorationOnlyFormField(f models.FormFieldDefinition) bool {
+	switch f.Key {
+	case "backdrop_title", "model_id", "addons", "decoration_theme", "color_preference", "reference_photo_url":
+		return true
+	}
+	t := strings.ToLower(strings.TrimSpace(f.Type))
+	return t == "model_picker" || t == "addon_picker"
+}
+
+func filterFieldsForCompanyCategory(fields []models.FormFieldDefinition, companyCategory string) []models.FormFieldDefinition {
+	if models.NormalizeVendorCategory(companyCategory) == "decoration" {
+		return fields
+	}
+	filtered := make([]models.FormFieldDefinition, 0, len(fields))
+	for _, f := range fields {
+		if isDecorationOnlyFormField(f) {
+			continue
+		}
+		f.SortOrder = len(filtered) + 1
+		filtered = append(filtered, f)
+	}
+	return filtered
+}
+
 // GetEffectiveFormConfig mengambil konfigurasi form untuk Company, Sub-Brand, dan Jenis Acara tertentu.
 // Mengembalikan (config, isInheritedFromParentOrDefault)
 func GetEffectiveFormConfig(companyID string, brandID string, eventType string) (models.CompanyFormConfig, bool) {
+	companyCategory := getCompanyCategory(companyID)
+	cfg, isInherited := getEffectiveFormConfigRaw(companyID, brandID, eventType, companyCategory)
+	cfg.Fields = filterFieldsForCompanyCategory(cfg.Fields, companyCategory)
+	return cfg, isInherited
+}
+
+func getEffectiveFormConfigRaw(companyID string, brandID string, eventType string, companyCategory string) (models.CompanyFormConfig, bool) {
 	brandID = strings.TrimSpace(brandID)
 	normEvent := NormalizeEventType(eventType)
 
@@ -671,8 +704,6 @@ func GetEffectiveFormConfig(companyID string, brandID string, eventType string) 
 		}
 		return companyEventCfg, false
 	}
-
-	companyCategory := getCompanyCategory(companyID)
 
 	// 3. Jika jenis acara adalah preset bawaan sistem (wedding, lamaran, birthday, aqiqah)
 	if normEvent != "" && IsBuiltInEventType(normEvent) {
