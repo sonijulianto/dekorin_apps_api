@@ -12,6 +12,7 @@ import (
 	"dekorin_apps_api/internal/middleware"
 	"dekorin_apps_api/internal/models"
 
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -213,6 +214,18 @@ func main() {
 	api.Get("/notifications", middleware.Protected(), handlers.GetNotifications)
 	api.Post("/notifications/:id/read", middleware.Protected(), handlers.MarkNotificationRead)
 	api.Post("/notifications/read-all", middleware.Protected(), handlers.MarkAllNotificationsRead)
+
+	// Collaboration Discussion / Chat routes (REST & WebSocket)
+	api.Get("/chat/rooms", middleware.Protected(), middleware.RequireVendor(), handlers.GetChatRooms)
+	api.Get("/chat/unread-counts", middleware.Protected(), middleware.RequireVendor(), handlers.GetChatUnreadCounts)
+	api.Get("/agendas/:id/chat/messages", middleware.Protected(), middleware.RequireVendor(), handlers.GetAgendaChatMessages)
+	api.Post("/agendas/:id/chat/messages", middleware.Protected(), middleware.RequireVendor(), handlers.SendAgendaChatMessage)
+	api.Post("/agendas/:id/chat/upload", middleware.Protected(), middleware.RequireVendor(), handlers.UploadAgendaChatImage)
+	api.Post("/agendas/:id/chat/read", middleware.Protected(), middleware.RequireVendor(), handlers.MarkAgendaChatRead)
+	api.Get("/agendas/:id/chat/crew", middleware.Protected(), middleware.RequireVendor(), handlers.GetAgendaChatCrew)
+	api.Post("/agendas/:id/chat/crew", middleware.Protected(), middleware.RequireVendor(), handlers.UpdateAgendaChatCrew)
+	api.Use("/ws/agendas/:id/chat", handlers.AgendaChatWebSocketUpgrade)
+	api.Get("/ws/agendas/:id/chat", websocket.New(handlers.HandleAgendaChatWebSocket))
 
 	// Expense routes
 	api.Get("/expenses", middleware.Protected(), middleware.RequireVendor(), handlers.GetExpenses)

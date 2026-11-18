@@ -179,6 +179,12 @@ func GetUserID(c *fiber.Ctx) string {
 	return strings.TrimSpace(uid)
 }
 
+// GetUserRole mengambil Role user yang sedang login dari konteks
+func GetUserRole(c *fiber.Ctx) string {
+	role, _ := c.Locals("user_role").(string)
+	return strings.TrimSpace(role)
+}
+
 // RequireVendor membatasi akses hanya untuk akun internal vendor/tim (owner, admin, crew, superadmin)
 // dan memblokir akun calon pengantin ('couple') agar data internal vendor tetap terisolasi.
 func RequireVendor() fiber.Handler {

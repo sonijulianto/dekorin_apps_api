@@ -369,6 +369,8 @@ func CancelAgendaCollaboration(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success"})
 	}
 
+	wasAccepted := collab.Status == "accepted"
+
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&collab).Updates(map[string]interface{}{
 			"status":     "cancelled",
@@ -393,6 +395,14 @@ func CancelAgendaCollaboration(c *fiber.Ctx) error {
 		collab.ID,
 		nil,
 	)
+
+	if wasAccepted {
+		partnerLabel := collab.PartnerCompanyName
+		if partnerLabel == "" {
+			partnerLabel = "Partner"
+		}
+		EnsureAndPostChatSystemMessage(collab.LeadAgendaID, fmt.Sprintf("Kolaborasi dengan %s telah dibatalkan", partnerLabel))
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  "success",
@@ -579,6 +589,17 @@ func RespondCollaboration(c *fiber.Ctx) error {
 	collab.PartnerAgendaID = newAgendaID
 	collab.RespondedByUserID = userID
 	collab.RespondedAt = &now
+
+	partnerLabel := collab.PartnerCompanyName
+	if partnerLabel == "" {
+		partnerLabel = "Vendor Partner"
+	}
+	catLabel := formatVendorCategoryLabel(collab.PartnerCategory)
+	if catLabel != "" {
+		EnsureAndPostChatSystemMessage(collab.LeadAgendaID, fmt.Sprintf("%s (%s) bergabung ke kolaborasi", partnerLabel, catLabel))
+	} else {
+		EnsureAndPostChatSystemMessage(collab.LeadAgendaID, fmt.Sprintf("%s bergabung ke kolaborasi", partnerLabel))
+	}
 
 	notifyCompanyAdminsAndPush(
 		collab.LeadCompanyID,

@@ -85,6 +85,10 @@ func ConnectDB() {
 		&models.AgendaCollaboration{},
 		&models.AppNotification{},
 		&models.ClientErrorLog{},
+		&models.AgendaChatRoom{},
+		&models.AgendaChatMessage{},
+		&models.AgendaChatRead{},
+		&models.AgendaChatMemberAssignment{},
 	)
 	if err != nil {
 		log.Println("⚠️ Peringatan saat auto migrate: ", err)
