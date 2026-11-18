@@ -88,8 +88,11 @@ func GetAgendas(c *fiber.Ctx) error {
 		Where("is_form_draft = ? OR is_form_draft IS NULL", false)
 
 	if strings.EqualFold(userRole, "superadmin") {
-		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+		qComp := c.Query("company_id")
+		if qComp != "" && qComp != "all" {
 			query = query.Where("company_id = ?", qComp)
+		} else if qComp == "" && companyID != "" {
+			query = query.Where("company_id = ?", companyID)
 		}
 	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
@@ -456,8 +459,11 @@ func GetPackages(c *fiber.Ctx) error {
 		Preload("PackageModels").
 		Preload("PackageModels.DecorationModel")
 	if strings.EqualFold(userRole, "superadmin") {
-		if qComp := c.Query("company_id"); qComp != "" && qComp != "all" {
+		qComp := c.Query("company_id")
+		if qComp != "" && qComp != "all" {
 			query = query.Where("company_id = ?", qComp)
+		} else if qComp == "" && companyID != "" {
+			query = query.Where("company_id = ?", companyID)
 		}
 	} else if companyID != "" {
 		query = query.Where("company_id = ?", companyID)
