@@ -26,6 +26,7 @@ type AgendaCollaboration struct {
 	PartnerAgendaID     string     `gorm:"type:varchar(50);index;default:''" json:"partner_agenda_id"`
 	PartnerPrice        float64    `gorm:"type:decimal(15,2);default:0" json:"partner_price"`
 	PartnerTransportFee float64    `gorm:"type:decimal(15,2);default:0" json:"partner_transport_fee"`
+	PartnerDpAmount     float64    `gorm:"type:decimal(15,2);default:0" json:"partner_dp_amount"`
 	Notes               string     `gorm:"type:text;default:''" json:"notes"`
 	Status              string     `gorm:"type:varchar(30);index;default:'pending'" json:"status"` // pending, accepted, rejected, cancelled
 	RejectReason        string     `gorm:"type:text;default:''" json:"reject_reason"`
@@ -65,6 +66,7 @@ type CreateCollaborationRequest struct {
 	PartnerCompanyID    string  `json:"partner_company_id"`
 	PartnerPrice        float64 `json:"partner_price"`
 	PartnerTransportFee float64 `json:"partner_transport_fee"`
+	PartnerDpAmount     float64 `json:"partner_dp_amount"`
 	Notes               string  `json:"notes"`
 }
 

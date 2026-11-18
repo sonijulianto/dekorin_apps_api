@@ -293,8 +293,11 @@ func CreateAgendaCollaboration(c *fiber.Ctx) error {
 	if partnerCompanyID == companyID {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Tidak dapat mengundang usaha Anda sendiri"})
 	}
-	if req.PartnerPrice < 0 || req.PartnerTransportFee < 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nominal harga dan transport tidak boleh negatif"})
+	if req.PartnerPrice < 0 || req.PartnerTransportFee < 0 || req.PartnerDpAmount < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nominal harga, transport, dan DP tidak boleh negatif"})
+	}
+	if req.PartnerDpAmount > req.PartnerPrice+req.PartnerTransportFee {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nominal DP tidak boleh melebihi total biaya partner"})
 	}
 
 	var partnerComp models.Company
@@ -322,6 +325,7 @@ func CreateAgendaCollaboration(c *fiber.Ctx) error {
 		PartnerCategory:     models.NormalizeVendorCategory(partnerComp.Category),
 		PartnerPrice:        req.PartnerPrice,
 		PartnerTransportFee: req.PartnerTransportFee,
+		PartnerDpAmount:     req.PartnerDpAmount,
 		Notes:               strings.TrimSpace(req.Notes),
 		Status:              "pending",
 		CreatedByUserID:     userID,
@@ -549,6 +553,20 @@ func RespondCollaboration(c *fiber.Ctx) error {
 		}
 	}
 
+	totalCost := collab.TotalCost()
+	dpAmount := collab.PartnerDpAmount
+	if dpAmount < 0 {
+		dpAmount = 0
+	}
+	paymentStatus := "unpaid"
+	if dpAmount > 0 {
+		if totalCost > 0 && dpAmount >= totalCost {
+			paymentStatus = "paid"
+		} else {
+			paymentStatus = "dp"
+		}
+	}
+
 	newAgenda := models.Agenda{
 		ID:            newAgendaID,
 		CompanyID:     companyID,
@@ -562,8 +580,9 @@ func RespondCollaboration(c *fiber.Ctx) error {
 		PackageName:   fmt.Sprintf("Kolaborasi: %s", collab.LeadCompanyName),
 		PackagePrice:  collab.PartnerPrice,
 		TransportFee:  collab.PartnerTransportFee,
+		DpAmount:      dpAmount,
 		Status:        "upcoming",
-		PaymentStatus: "unpaid",
+		PaymentStatus: paymentStatus,
 		FormToken:     formToken,
 		FormStatus:    "pending",
 		Notes:         partnerNotes,
@@ -572,6 +591,26 @@ func RespondCollaboration(c *fiber.Ctx) error {
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&newAgenda).Error; err != nil {
 			return err
+		}
+		if dpAmount > 0 {
+			note := "DP 1"
+			if paymentStatus == "paid" {
+				note = "Pelunasan"
+			}
+			initialPay := models.AgendaPayment{
+				ID:        fmt.Sprintf("pay_%s", uuid.New().String()[:8]),
+				CompanyID: companyID,
+				AgendaID:  newAgendaID,
+				Amount:    dpAmount,
+				PaidAt:    now,
+				Note:      note,
+				CreatedAt: now,
+				UpdatedAt: now,
+			}
+			if err := tx.Create(&initialPay).Error; err != nil {
+				return err
+			}
+			newAgenda.Payments = []models.AgendaPayment{initialPay}
 		}
 		return tx.Model(&collab).Updates(map[string]interface{}{
 			"status":               "accepted",
