@@ -16,6 +16,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -86,6 +88,7 @@
         <a href="#katalog" class="hover:text-brand-600 transition">Katalog & Paket</a>
         <a href="#undangan" class="hover:text-brand-600 transition">Undangan Digital</a>
         <a href="#alur" class="hover:text-brand-600 transition">Cara Kerja</a>
+        <a href="#mitra" class="hover:text-brand-600 transition">Mitra Vendor</a>
         <a href="#faq" class="hover:text-brand-600 transition">FAQ</a>
       </nav>
 
@@ -466,6 +469,51 @@
     </div>
   </section>
 
+  <!-- MITRA & PARTNER DEKORIN -->
+  <section id="mitra" class="py-20 bg-[#FAF7F2] border-b border-stone-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
+      <div class="max-w-3xl mx-auto text-center space-y-3">
+        <span class="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase text-brand-700 bg-brand-100 border border-brand-200 px-3.5 py-1 rounded-full">
+          <i class="fi fi-rr-store-alt text-brand-600"></i>
+          <span>Jaringan Mitra Resmi</span>
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-stone-900">
+          Vendor & Partner yang Telah Bergabung
+        </h2>
+        <p class="text-stone-600 text-sm sm:text-base">
+          Dipercaya oleh berbagai usaha dekorasi dan vendor acara untuk mengelola jadwal, tim, dan klien secara profesional.
+        </p>
+        <p id="partners-count-badge" class="hidden text-xs font-semibold text-brand-700"></p>
+      </div>
+
+      <div id="partners-loading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="h-44 rounded-3xl bg-white/80 border border-stone-200/70 animate-pulse"></div>
+        <div class="h-44 rounded-3xl bg-white/80 border border-stone-200/70 animate-pulse"></div>
+        <div class="h-44 rounded-3xl bg-white/80 border border-stone-200/70 animate-pulse hidden sm:block"></div>
+        <div class="h-44 rounded-3xl bg-white/80 border border-stone-200/70 animate-pulse hidden lg:block"></div>
+      </div>
+
+      <div id="partners-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+
+      <div id="partners-empty" class="hidden text-center py-10 px-6 rounded-3xl bg-white border border-stone-200/80 max-w-lg mx-auto">
+        <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mx-auto mb-3 text-xl">
+          <i class="fi fi-rr-shop"></i>
+        </div>
+        <p class="text-sm font-semibold text-stone-800">Daftar mitra sedang dipersiapkan</p>
+        <p class="text-xs text-stone-500 mt-1">Jadilah vendor pertama yang bergabung bersama ekosistem Dekorin.</p>
+      </div>
+
+      <div id="partners-toggle-wrap" class="hidden text-center pt-2">
+        <button id="partners-toggle-btn" type="button" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-brand-50 border border-brand-300 text-brand-800 font-bold text-xs sm:text-sm shadow-xs transition cursor-pointer">
+          <i class="fi fi-rr-apps"></i>
+          <span id="partners-toggle-label">Lihat Semua Mitra</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
   <!-- FAQ SECTION -->
   <section id="faq" class="py-20 bg-white border-b border-stone-200/70">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -537,6 +585,7 @@
           <a href="/superadmin" class="hover:text-brand-400 transition">Portal Web Admin</a>
           <a href="/download/apk" class="hover:text-brand-400 transition">Download Aplikasi Android</a>
           <a href="#fitur" class="hover:text-brand-400 transition">Fitur Unggulan</a>
+          <a href="#mitra" class="hover:text-brand-400 transition">Mitra Vendor</a>
           <a href="#undangan" class="hover:text-brand-400 transition">Undangan Digital</a>
         </div>
 
@@ -549,5 +598,175 @@
     </div>
   </footer>
 
+  <script>
+    (function () {
+      const CATEGORY_LABELS = {
+        decoration: 'Dekorasi',
+        wo: 'Wedding Organizer',
+        mua: 'MUA & Rias',
+        photo_video: 'Foto & Video',
+        catering: 'Katering',
+        attire: 'Busana & Gaun',
+        mc: 'MC',
+        entertainment: 'Hiburan & Musik',
+        venue: 'Venue',
+        other: 'Vendor Acara'
+      };
+
+      const INITIAL_LIMIT = 12;
+      let allPartners = [];
+      let showAll = false;
+
+      const gridEl = document.getElementById('partners-grid');
+      const loadingEl = document.getElementById('partners-loading');
+      const emptyEl = document.getElementById('partners-empty');
+      const countBadgeEl = document.getElementById('partners-count-badge');
+      const toggleWrapEl = document.getElementById('partners-toggle-wrap');
+      const toggleBtnEl = document.getElementById('partners-toggle-btn');
+      const toggleLabelEl = document.getElementById('partners-toggle-label');
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function getInitials(name) {
+        const words = String(name || '').trim().split(/\s+/).filter(Boolean);
+        if (words.length === 0) return 'DK';
+        if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+        return (words[0][0] + words[1][0]).toUpperCase();
+      }
+
+      function normalizeLogoUrl(url) {
+        const clean = String(url || '').trim();
+        if (!clean) return '';
+        if (/^https?:\/\//i.test(clean) || clean.startsWith('/')) {
+          return clean;
+        }
+        return '/' + clean.replace(/^\/+/, '');
+      }
+
+      function parseInstagram(raw) {
+        const clean = String(raw || '').trim();
+        if (!clean) return null;
+        if (/^https?:\/\//i.test(clean)) {
+          const match = clean.match(/instagram\.com\/([^/?#]+)/i);
+          const handle = match && match[1] ? '@' + match[1].replace(/^@/, '') : 'Instagram';
+          return { url: clean, label: handle };
+        }
+        const username = clean.replace(/^@+/, '').replace(/\/+$/, '');
+        if (!username || /\s/.test(username)) return null;
+        return {
+          url: 'https://instagram.com/' + encodeURIComponent(username),
+          label: '@' + username
+        };
+      }
+
+      function renderDefaultLogo(initials) {
+        return (
+          '<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-100 to-brand-200 border border-brand-300/70 flex flex-col items-center justify-center text-brand-800 shadow-2xs relative">' +
+            '<span class="font-extrabold text-base tracking-tight leading-none">' + escapeHtml(initials) + '</span>' +
+            '<i class="fi fi-rr-shop text-[10px] text-brand-600 mt-1"></i>' +
+          '</div>'
+        );
+      }
+
+      function renderPartnerCard(partner) {
+        const name = partner.name || 'Mitra Dekorin';
+        const initials = getInitials(name);
+        const logoUrl = normalizeLogoUrl(partner.logo_url);
+        const categoryLabel = CATEGORY_LABELS[partner.category] || 'Vendor Acara';
+        const city = String(partner.city || '').trim();
+        const ig = parseInstagram(partner.instagram);
+
+        const logoMarkup = logoUrl
+          ? '<div class="w-16 h-16 rounded-2xl bg-white border border-stone-200/80 overflow-hidden flex items-center justify-center shadow-2xs mx-auto">' +
+              '<img src="' + escapeHtml(logoUrl) + '" alt="' + escapeHtml(name) + '" loading="lazy" class="w-full h-full object-contain p-1.5" onerror="this.parentElement.outerHTML=decodeURIComponent(\'' + encodeURIComponent(renderDefaultLogo(initials)) + '\')">' +
+            '</div>'
+          : '<div class="flex justify-center">' + renderDefaultLogo(initials) + '</div>';
+
+        const cityMarkup = city
+          ? '<span class="inline-flex items-center gap-1 text-[11px] text-stone-500">' +
+              '<i class="fi fi-rr-marker text-brand-600 text-[10px]"></i>' +
+              '<span>' + escapeHtml(city) + '</span>' +
+            '</span>'
+          : '';
+
+        const igMarkup = ig
+          ? '<a href="' + escapeHtml(ig.url) + '" target="_blank" rel="noopener noreferrer" class="mt-auto pt-2 inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold text-brand-700 hover:text-brand-900 transition">' +
+              '<i class="fi fi-brands-instagram text-xs"></i>' +
+              '<span class="truncate max-w-[140px]">' + escapeHtml(ig.label) + '</span>' +
+            '</a>'
+          : '';
+
+        return (
+          '<article class="bg-white rounded-3xl p-5 border border-stone-200/80 card-shadow card-hover transition flex flex-col items-center text-center gap-3">' +
+            logoMarkup +
+            '<div class="space-y-1.5 w-full">' +
+              '<h3 class="font-bold text-sm text-stone-900 leading-snug line-clamp-2">' + escapeHtml(name) + '</h3>' +
+              '<div class="flex flex-wrap items-center justify-center gap-1.5">' +
+                '<span class="px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-800 text-[10px] font-semibold">' + escapeHtml(categoryLabel) + '</span>' +
+              '</div>' +
+              (cityMarkup ? '<div class="pt-0.5">' + cityMarkup + '</div>' : '') +
+            '</div>' +
+            igMarkup +
+          '</article>'
+        );
+      }
+
+      function renderPartners() {
+        loadingEl.classList.add('hidden');
+        if (!allPartners.length) {
+          gridEl.classList.add('hidden');
+          emptyEl.classList.remove('hidden');
+          toggleWrapEl.classList.add('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+        gridEl.classList.remove('hidden');
+
+        countBadgeEl.textContent = allPartners.length + ' Mitra & Sub-Brand Terdaftar';
+        countBadgeEl.classList.remove('hidden');
+
+        const visible = showAll ? allPartners : allPartners.slice(0, INITIAL_LIMIT);
+        gridEl.innerHTML = visible.map(renderPartnerCard).join('');
+
+        if (allPartners.length > INITIAL_LIMIT) {
+          toggleWrapEl.classList.remove('hidden');
+          toggleLabelEl.textContent = showAll
+            ? 'Tampilkan Lebih Sedikit'
+            : 'Lihat Semua Mitra (' + allPartners.length + ')';
+        } else {
+          toggleWrapEl.classList.add('hidden');
+        }
+      }
+
+      if (toggleBtnEl) {
+        toggleBtnEl.addEventListener('click', function () {
+          showAll = !showAll;
+          renderPartners();
+        });
+      }
+
+      fetch('/api/public/partners')
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          allPartners = Array.isArray(data && data.partners) ? data.partners : [];
+          renderPartners();
+        })
+        .catch(function () {
+          allPartners = [];
+          renderPartners();
+        });
+    })();
+  </script>
 </body>
 </html>

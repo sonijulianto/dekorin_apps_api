@@ -111,6 +111,7 @@ func main() {
 	// Direktori Vendor Publik (dapat diakses oleh Calon Pengantin maupun Vendor terautentikasi)
 	api.Get("/vendors/directory", middleware.Protected(), handlers.GetPublicVendors)
 	api.Get("/vendors/directory/:id", middleware.Protected(), handlers.GetPublicVendorDetail)
+	api.Get("/public/partners", handlers.GetLandingPartners)
 
 	// Couple / Calon Pengantin routes (Wedding Plan, Vendor & Budget, Checklist, Klaim Undangan)
 	couple := api.Group("/couple", middleware.Protected(), middleware.RequireCouple())

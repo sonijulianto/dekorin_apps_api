@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"math"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -216,5 +217,95 @@ func GetPublicVendorDetail(c *fiber.Ctx) error {
 			Packages: pubPkgs,
 			Models:   pubMods,
 		},
+	})
+}
+
+// LandingPartnerItem merepresentasikan entitas usaha (company maupun sub-company/brand secara terpisah)
+// untuk ditampilkan pada halaman landing page publik Dekorin.
+type LandingPartnerItem struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Category   string `json:"category"`
+	City       string `json:"city"`
+	LogoURL    string `json:"logo_url"`
+	Instagram  string `json:"instagram"`
+	IsSubBrand bool   `json:"is_sub_brand"`
+}
+
+// BuildLandingPartners menggabungkan seluruh Company dan CompanyBrand menjadi daftar terpisah,
+// mengurutkan yang memiliki logo terlebih dahulu lalu berdasarkan abjad nama usaha.
+func BuildLandingPartners(companies []models.Company, brands []models.CompanyBrand) []LandingPartnerItem {
+	compByID := make(map[string]models.Company, len(companies))
+	items := make([]LandingPartnerItem, 0, len(companies)+len(brands))
+
+	for _, comp := range companies {
+		compByID[comp.ID] = comp
+		name := strings.TrimSpace(comp.Name)
+		if name == "" {
+			continue
+		}
+		items = append(items, LandingPartnerItem{
+			ID:         comp.ID,
+			Name:       name,
+			Category:   models.NormalizeVendorCategory(comp.Category),
+			City:       strings.TrimSpace(comp.City),
+			LogoURL:    strings.TrimSpace(comp.LogoURL),
+			Instagram:  strings.TrimSpace(comp.Instagram),
+			IsSubBrand: false,
+		})
+	}
+
+	for _, brand := range brands {
+		name := strings.TrimSpace(brand.Name)
+		if name == "" {
+			continue
+		}
+		parent, hasParent := compByID[brand.CompanyID]
+		category := models.NormalizeVendorCategory("")
+		city := ""
+		if hasParent {
+			category = models.NormalizeVendorCategory(parent.Category)
+			city = strings.TrimSpace(parent.City)
+		}
+		items = append(items, LandingPartnerItem{
+			ID:         brand.ID,
+			Name:       name,
+			Category:   category,
+			City:       city,
+			LogoURL:    strings.TrimSpace(brand.LogoURL),
+			Instagram:  strings.TrimSpace(brand.Instagram),
+			IsSubBrand: true,
+		})
+	}
+
+	sort.SliceStable(items, func(i, j int) bool {
+		hasLogoI := items[i].LogoURL != ""
+		hasLogoJ := items[j].LogoURL != ""
+		if hasLogoI != hasLogoJ {
+			return hasLogoI
+		}
+		return strings.ToLower(items[i].Name) < strings.ToLower(items[j].Name)
+	})
+
+	return items
+}
+
+// GetLandingPartners handles GET /api/public/partners
+// Mengembalikan seluruh company dan sub-company secara terpisah untuk ditampilkan di landing page.
+func GetLandingPartners(c *fiber.Ctx) error {
+	var companies []models.Company
+	if err := config.DB.Find(&companies).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memuat daftar mitra company"})
+	}
+
+	var brands []models.CompanyBrand
+	if err := config.DB.Find(&brands).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memuat daftar sub-company"})
+	}
+
+	partners := BuildLandingPartners(companies, brands)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"total":    len(partners),
+		"partners": partners,
 	})
 }
