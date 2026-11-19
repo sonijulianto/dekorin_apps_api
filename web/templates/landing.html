@@ -67,13 +67,33 @@
       transform: translateY(-4px);
       box-shadow: 0 16px 40px -10px rgba(212, 165, 116, 0.25);
     }
+    .theme-carousel-track {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .theme-carousel-track::-webkit-scrollbar {
+      display: none;
+    }
+    .phone-preview-bezel {
+      box-shadow: 0 22px 36px -14px rgba(20, 20, 20, 0.55), 0 6px 14px -4px rgba(0, 0, 0, 0.25);
+    }
+    .phone-preview-iframe {
+      width: 390px;
+      height: 835px;
+      border: 0;
+      transform: scale(0.4);
+      transform-origin: top left;
+      pointer-events: none;
+      display: block;
+    }
   </style>
 </head>
 <body class="bg-[#FAF7F2] text-[#2C2C2C] antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col min-h-screen">
 
   <!-- TOP PROMO BANNER -->
-  <div class="bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white text-xs font-medium py-2.5 px-4 text-center tracking-wide shadow-sm">
-    ✨ Selamat Datang di <b>Dekorin</b> — Platform Digital Terpadu untuk Vendor Dekorasi & Event Organizer Indonesia.
+  <div class="bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white text-xs font-medium py-2.5 px-4 text-center tracking-wide shadow-sm flex items-center justify-center gap-1.5">
+    <i class="fi fi-rr-sparkles leading-none"></i>
+    <span>Selamat Datang di <b>Dekorin</b> — Platform Digital Terpadu untuk Vendor Dekorasi & Event Organizer Indonesia.</span>
   </div>
 
   <!-- HEADER -->
@@ -97,7 +117,8 @@
           Web Admin
         </a>
         <a href="/download/apk" class="bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-full shadow-md shadow-brand-500/25 transition transform active:scale-95 flex items-center gap-2">
-          <span>📲 Download APK</span>
+          <i class="fi fi-rr-mobile-notch leading-none"></i>
+          <span>Download APK</span>
         </a>
       </div>
     </div>
@@ -128,7 +149,8 @@
               <span>&rarr;</span>
             </a>
             <a href="/download/apk" class="w-full sm:w-auto px-7 py-4 bg-white hover:bg-stone-50 border border-brand-300 text-stone-800 rounded-full font-bold text-sm transition text-center shadow-xs flex items-center justify-center gap-2">
-              <span>📲 Unduh Aplikasi Android</span>
+              <i class="fi fi-rr-mobile-notch text-brand-600 leading-none"></i>
+              <span>Unduh Aplikasi Android</span>
             </a>
           </div>
 
@@ -170,7 +192,9 @@
                       <p class="text-[10px] uppercase tracking-wider text-white/80 font-medium">Mitra Vendor Dekorin</p>
                       <h4 class="font-bold text-sm">Wedding & Event Organizer</h4>
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-xs">✨</div>
+                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-xs">
+                      <i class="fi fi-rr-sparkles leading-none"></i>
+                    </div>
                   </div>
                   <div class="mt-3 pt-3 border-t border-white/20 flex justify-between text-xs">
                     <span>Agenda Bulan Ini: <b>14 Event</b></span>
@@ -187,24 +211,28 @@
                   <h5 class="font-bold text-xs text-stone-900">Laras & Bima (Gedung Graha)</h5>
                   <p class="text-[11px] text-stone-500">Tema: Rustic Modern Pastel (Paket Premium Gold)</p>
                   <div class="flex items-center justify-between pt-2 border-t border-stone-100 text-[10px]">
-                    <span class="font-semibold text-emerald-600">✓ DP Lunas (70%)</span>
+                    <span class="font-semibold text-emerald-600 inline-flex items-center gap-1"><i class="fi fi-rr-check-circle leading-none"></i> DP Lunas (70%)</span>
                     <span class="font-bold text-brand-600">5 Kru Bertugas</span>
                   </div>
                 </div>
 
                 <!-- Feature Mini Items -->
                 <div class="grid grid-cols-2 gap-2 text-center text-[10px]">
-                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs">
-                    📋 Checklist Properti
+                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs inline-flex items-center justify-center gap-1.5">
+                    <i class="fi fi-rr-list-check text-brand-600 leading-none"></i>
+                    <span>Checklist Properti</span>
                   </div>
-                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs">
-                    🗺️ Rute Google Maps
+                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs inline-flex items-center justify-center gap-1.5">
+                    <i class="fi fi-rr-map-marker text-brand-600 leading-none"></i>
+                    <span>Rute Google Maps</span>
                   </div>
-                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs">
-                    🖨️ Cetak Kwitansi
+                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs inline-flex items-center justify-center gap-1.5">
+                    <i class="fi fi-rr-print text-brand-600 leading-none"></i>
+                    <span>Cetak Kwitansi</span>
                   </div>
-                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs">
-                    💌 Undangan Digital
+                  <div class="bg-white p-2.5 rounded-xl border border-stone-200/70 font-semibold shadow-2xs inline-flex items-center justify-center gap-1.5">
+                    <i class="fi fi-rr-envelope text-brand-600 leading-none"></i>
+                    <span>Undangan Digital</span>
                   </div>
                 </div>
 
@@ -213,7 +241,9 @@
 
             <!-- Floating Badge -->
             <div class="absolute -bottom-5 -left-6 bg-white p-3.5 rounded-2xl shadow-xl border border-stone-200/80 flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-lg font-bold">✨</div>
+              <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-lg font-bold">
+                <i class="fi fi-rr-sparkles leading-none"></i>
+              </div>
               <div class="text-left">
                 <p class="text-xs font-bold text-stone-900">Pantau Kru Realtime</p>
                 <p class="text-[10px] text-stone-500">Langsung dari Smartphone</p>
@@ -245,7 +275,7 @@
         <!-- Fitur 1 -->
         <div class="bg-stone-50/70 rounded-3xl p-8 border border-stone-200/70 card-hover transition-all duration-300">
           <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-bold mb-6">
-            📅
+            <i class="fi fi-rr-calendar leading-none"></i>
           </div>
           <h3 class="text-lg font-bold text-stone-900 mb-2">Manajemen Agenda & Jadwal Booking</h3>
           <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
@@ -256,7 +286,7 @@
         <!-- Fitur 2 -->
         <div class="bg-stone-50/70 rounded-3xl p-8 border border-stone-200/70 card-hover transition-all duration-300">
           <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-bold mb-6">
-            🖼️
+            <i class="fi fi-rr-picture leading-none"></i>
           </div>
           <h3 class="text-lg font-bold text-stone-900 mb-2">Katalog Paket & Galeri Model Dekorasi</h3>
           <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
@@ -267,7 +297,7 @@
         <!-- Fitur 3 -->
         <div class="bg-stone-50/70 rounded-3xl p-8 border border-stone-200/70 card-hover transition-all duration-300">
           <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-bold mb-6">
-            📝
+            <i class="fi fi-rr-edit leading-none"></i>
           </div>
           <h3 class="text-lg font-bold text-stone-900 mb-2">Formulir Klien Online Tanpa Aplikasi</h3>
           <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
@@ -278,7 +308,7 @@
         <!-- Fitur 4 -->
         <div class="bg-stone-50/70 rounded-3xl p-8 border border-stone-200/70 card-hover transition-all duration-300">
           <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-bold mb-6">
-            💌
+            <i class="fi fi-rr-envelope leading-none"></i>
           </div>
           <h3 class="text-lg font-bold text-stone-900 mb-2">Undangan Pernikahan Digital Eksklusif</h3>
           <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
@@ -289,7 +319,7 @@
         <!-- Fitur 5 -->
         <div class="bg-stone-50/70 rounded-3xl p-8 border border-stone-200/70 card-hover transition-all duration-300">
           <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-bold mb-6">
-            🧾
+            <i class="fi fi-rr-file-invoice-dollar leading-none"></i>
           </div>
           <h3 class="text-lg font-bold text-stone-900 mb-2">Laporan Keuangan & Cetak Invoice</h3>
           <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
@@ -300,7 +330,7 @@
         <!-- Fitur 6 -->
         <div class="bg-stone-50/70 rounded-3xl p-8 border border-stone-200/70 card-hover transition-all duration-300">
           <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-bold mb-6">
-            👥
+            <i class="fi fi-rr-users-alt leading-none"></i>
           </div>
           <h3 class="text-lg font-bold text-stone-900 mb-2">Kolaborasi Tim Kru & Hak Akses</h3>
           <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
@@ -316,109 +346,42 @@
   <!-- KATALOG TEMA UNDANGAN DIGITAL DEKORIN -->
   <section id="undangan" class="py-20 bg-cream-light border-b border-stone-200/70">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-2xl mx-auto space-y-3 mb-14">
-        <span class="text-xs font-bold tracking-wider uppercase text-brand-600 bg-brand-100 px-3.5 py-1 rounded-full">Koleksi Desain Terpadu</span>
-        <h2 class="text-3xl sm:text-4xl font-bold text-stone-900">
-          Pilihan Tema Undangan Digital Dekorin
+
+      <div class="text-center max-w-2xl mx-auto space-y-3 mb-12">
+        <span class="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase text-brand-700 bg-brand-100 border border-brand-200 px-3.5 py-1 rounded-full">
+          <i class="fi fi-rr-envelope text-brand-600 leading-none"></i>
+          <span>Koleksi Desain Terpadu</span>
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight">
+          Pilihan Tema Undangan yang Siap Dipakai
         </h2>
-        <p class="text-stone-600 text-sm">
-          Tersedia beragam tema eksklusif yang siap dipadukan dengan konsep dekorasi Anda.
+        <p class="text-stone-600 text-sm sm:text-base">
+          Banyak pilihan tema premium dan langsung bisa digunakan tanpa ribet.
         </p>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <!-- Tema 1 -->
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/80 card-shadow card-hover transition-all space-y-4">
-          <div class="h-44 rounded-2xl bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 flex items-center justify-center text-center p-4 border border-rose-200/50">
-            <div>
-              <span class="text-xs font-bold text-rose-700 uppercase tracking-widest">Tema 01</span>
-              <h4 class="text-lg font-bold text-stone-800 mt-1">Modern Floral Elegance</h4>
-              <p class="text-[11px] text-stone-500 mt-0.5">Nuansa bunga anggun & lembut</p>
-            </div>
-          </div>
-          <div>
-            <h5 class="font-bold text-sm text-stone-900">Floral Botanical</h5>
-            <p class="text-xs text-stone-500 mt-1">Cocok untuk acara garden party, intimate wedding, dan tema pastel.</p>
-          </div>
-        </div>
+      <!-- Track Carousel / Grid Tema Undangan -->
+      <div id="theme-showcase-track" class="theme-carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 scroll-smooth"></div>
 
-        <!-- Tema 2 -->
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/80 card-shadow card-hover transition-all space-y-4">
-          <div class="h-44 rounded-2xl bg-gradient-to-br from-stone-800 via-stone-700 to-stone-900 flex items-center justify-center text-center p-4 text-white">
-            <div>
-              <span class="text-xs font-bold text-amber-300 uppercase tracking-widest">Tema 02</span>
-              <h4 class="text-lg font-bold text-white mt-1">Luxury Grey & Gold</h4>
-              <p class="text-[11px] text-stone-300 mt-0.5">Eksklusif, megah & formal</p>
-            </div>
-          </div>
-          <div>
-            <h5 class="font-bold text-sm text-stone-900">Luxury Grey</h5>
-            <p class="text-xs text-stone-500 mt-1">Sangat cocok untuk pesta ballroom gedung megah bertema modern glam.</p>
-          </div>
-        </div>
+      <!-- Navigasi Carousel (Panah Kiri/Kanan + Indikator Dots) -->
+      <div id="theme-carousel-controls" class="mt-5 flex items-center justify-between max-w-4xl mx-auto px-2">
+        <button id="theme-prev-btn" type="button" aria-label="Tema sebelumnya" class="w-10 h-10 rounded-full bg-brand-500 hover:bg-brand-600 text-white shadow-md shadow-brand-500/30 flex items-center justify-center transition active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fi fi-rr-angle-small-left text-xl leading-none"></i>
+        </button>
 
-        <!-- Tema 3 -->
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/80 card-shadow card-hover transition-all space-y-4">
-          <div class="h-44 rounded-2xl bg-gradient-to-br from-amber-100 via-stone-100 to-amber-50 flex items-center justify-center text-center p-4 border border-amber-200/60">
-            <div>
-              <span class="text-xs font-bold text-brand-700 uppercase tracking-widest">Tema 03</span>
-              <h4 class="text-lg font-bold text-stone-800 mt-1">Creamy Latte Aesthetic</h4>
-              <p class="text-[11px] text-stone-500 mt-0.5">Warm, cozy & aesthetic tone</p>
-            </div>
-          </div>
-          <div>
-            <h5 class="font-bold text-sm text-stone-900">Creamy Latte</h5>
-            <p class="text-xs text-stone-500 mt-1">Konsep earthy tone minimalis dan rustic wedding yang sedang tren saat ini.</p>
-          </div>
-        </div>
+        <div id="theme-dots" class="flex items-center justify-center gap-2"></div>
 
-        <!-- Tema 4 -->
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/80 card-shadow card-hover transition-all space-y-4">
-          <div class="h-44 rounded-2xl bg-gradient-to-br from-emerald-100 via-teal-50 to-green-50 flex items-center justify-center text-center p-4 border border-emerald-200/50">
-            <div>
-              <span class="text-xs font-bold text-emerald-800 uppercase tracking-widest">Tema 04</span>
-              <h4 class="text-lg font-bold text-stone-800 mt-1">Green Leaves Botanical</h4>
-              <p class="text-[11px] text-stone-500 mt-0.5">Kesegaran alam tropis</p>
-            </div>
-          </div>
-          <div>
-            <h5 class="font-bold text-sm text-stone-900">Green Leaves</h5>
-            <p class="text-xs text-stone-500 mt-1">Nuansa dedaunan hijau segar nan elegan untuk pernikahan outdoor & semi-outdoor.</p>
-          </div>
-        </div>
+        <button id="theme-next-btn" type="button" aria-label="Tema berikutnya" class="w-10 h-10 rounded-full bg-brand-500 hover:bg-brand-600 text-white shadow-md shadow-brand-500/30 flex items-center justify-center transition active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fi fi-rr-angle-small-right text-xl leading-none"></i>
+        </button>
+      </div>
 
-        <!-- Tema 5 -->
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/80 card-shadow card-hover transition-all space-y-4">
-          <div class="h-44 rounded-2xl bg-gradient-to-br from-green-800 via-emerald-700 to-teal-900 flex items-center justify-center text-center p-4 text-white">
-            <div>
-              <span class="text-xs font-bold text-amber-300 uppercase tracking-widest">Tema 05</span>
-              <h4 class="text-lg font-bold text-white mt-1">Khitan Green Syar'i</h4>
-              <p class="text-[11px] text-emerald-200 mt-0.5">Khitanan & Walimah Barokah</p>
-            </div>
-          </div>
-          <div>
-            <h5 class="font-bold text-sm text-stone-900">Khitanan Islami</h5>
-            <p class="text-xs text-stone-500 mt-1">Khusus acara walimatul khitan dengan ornamen islami hijau zamrud.</p>
-          </div>
-        </div>
-
-        <!-- Tema 6 -->
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/80 card-shadow card-hover transition-all space-y-4">
-          <div class="h-44 rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 flex items-center justify-center text-center p-4 text-white">
-            <div>
-              <span class="text-xs font-bold text-brand-300 uppercase tracking-widest">Tema 06</span>
-              <h4 class="text-lg font-bold text-white mt-1">Royal Modern Navy</h4>
-              <p class="text-[11px] text-slate-300 mt-0.5">Klasik, mewah & berwibawa</p>
-            </div>
-          </div>
-          <div>
-            <h5 class="font-bold text-sm text-stone-900">Modern Navy</h5>
-            <p class="text-xs text-stone-500 mt-1">Sentuhan warna biru navy pekat berpadu aksen gold khas Dekorin.</p>
-          </div>
-        </div>
-
+      <!-- Tombol Lihat Semua Tema -->
+      <div class="mt-8 text-center">
+        <button id="theme-toggle-all-btn" type="button" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs sm:text-sm shadow-lg shadow-brand-700/25 transition active:scale-95 cursor-pointer">
+          <span id="theme-toggle-all-label">Lihat Semua Tema</span>
+          <i id="theme-toggle-all-icon" class="fi fi-rr-arrow-small-right text-base leading-none"></i>
+        </button>
       </div>
 
     </div>
@@ -565,8 +528,9 @@
         <a href="/superadmin" class="w-full sm:w-auto px-8 py-3.5 bg-stone-900 hover:bg-black text-white font-bold text-sm rounded-full shadow-lg transition">
           Buka Web Admin Sekarang
         </a>
-        <a href="/download/apk" class="w-full sm:w-auto px-8 py-3.5 bg-white text-brand-700 hover:bg-brand-50 font-bold text-sm rounded-full shadow-lg transition">
-          📲 Unduh Aplikasi Android
+        <a href="/download/apk" class="w-full sm:w-auto px-8 py-3.5 bg-white text-brand-700 hover:bg-brand-50 font-bold text-sm rounded-full shadow-lg transition inline-flex items-center justify-center gap-2">
+          <i class="fi fi-rr-mobile-notch leading-none"></i>
+          <span>Unduh Aplikasi Android</span>
         </a>
       </div>
     </div>
@@ -597,6 +561,179 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      const INVITATION_THEMES = [
+        {
+          id: 'pn4',
+          name: 'Monochrome PN4',
+          tag: 'Editorial Monochrome',
+          poster: '/assets/templates/pn4/photos/LeniArdi2.jpeg'
+        },
+        {
+          id: 'ta17',
+          name: 'Ocean Blossom TA17',
+          tag: 'Pastel Blue & Floral',
+          poster: '/assets/templates/ta17/couple-welcome.png'
+        },
+        {
+          id: 'ta3',
+          name: 'Sakura Blossom TA3',
+          tag: 'Romantic Floral & Arch',
+          poster: '/assets/templates/ta3/couple-welcome.png'
+        },
+        {
+          id: 'jawa3',
+          name: 'Art Jawa Coklat 3',
+          tag: 'Javanese Royal & Wayang',
+          poster: '/assets/templates/jawa3/bg-cover.jpg'
+        },
+        {
+          id: 'jawa2',
+          name: 'Art Jawa Biru 2',
+          tag: 'Javanese Royal Blue',
+          poster: '/assets/templates/jawa2/photos/cover-default.jpg'
+        },
+        {
+          id: 'ultah1',
+          name: 'Pita & Bola Disko',
+          tag: 'Sweet Seventeen & Birthday',
+          poster: '/assets/templates/ultah1/photos/cover-default.jpg'
+        }
+      ];
+
+      const trackEl = document.getElementById('theme-showcase-track');
+      const controlsEl = document.getElementById('theme-carousel-controls');
+      const dotsEl = document.getElementById('theme-dots');
+      const prevBtn = document.getElementById('theme-prev-btn');
+      const nextBtn = document.getElementById('theme-next-btn');
+      const toggleAllBtn = document.getElementById('theme-toggle-all-btn');
+      const toggleAllLabel = document.getElementById('theme-toggle-all-label');
+      const toggleAllIcon = document.getElementById('theme-toggle-all-icon');
+
+      if (!trackEl) return;
+
+      let isGridMode = false;
+
+      function createThemeCard(theme) {
+        const previewUrl = '/preview/' + encodeURIComponent(theme.id);
+        return (
+          '<article class="theme-card snap-start shrink-0 w-[82%] sm:w-[calc(50%-10px)] lg:w-[calc(25%-15px)] bg-white rounded-2xl p-3.5 border border-stone-200/90 card-shadow card-hover transition-all flex flex-col">' +
+            '<div class="bg-[#EBEBEB] rounded-xl py-5 px-3 flex items-center justify-center relative overflow-hidden">' +
+              '<div class="relative w-[170px] h-[348px] rounded-[30px] bg-[#141414] p-[7px] phone-preview-bezel ring-1 ring-stone-700/70 select-none">' +
+                '<span class="absolute -left-[2.5px] top-[68px] w-[2.5px] h-7 bg-stone-700 rounded-l"></span>' +
+                '<span class="absolute -left-[2.5px] top-[104px] w-[2.5px] h-7 bg-stone-700 rounded-l"></span>' +
+                '<span class="absolute -right-[2.5px] top-[86px] w-[2.5px] h-11 bg-stone-700 rounded-r"></span>' +
+                '<div class="relative w-full h-full rounded-[23px] overflow-hidden bg-stone-900">' +
+                  '<div class="absolute top-2 left-1/2 -translate-x-1/2 w-[50px] h-[13px] bg-black rounded-full z-20 flex items-center justify-end pr-1.5 shadow-xs">' +
+                    '<span class="w-1.5 h-1.5 rounded-full bg-stone-700"></span>' +
+                  '</div>' +
+                  '<img src="' + theme.poster + '" alt="' + theme.name + '" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-80">' +
+                  '<iframe src="' + previewUrl + '" title="Preview ' + theme.name + '" loading="lazy" tabindex="-1" scrolling="no" class="phone-preview-iframe relative z-10 opacity-0 transition-opacity duration-500" onload="this.classList.remove(\'opacity-0\')"></iframe>' +
+                  '<a href="' + previewUrl + '" target="_blank" rel="noopener noreferrer" aria-label="Buka demo tema ' + theme.name + '" class="absolute inset-0 z-30"></a>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="pt-3.5 pb-3 text-center">' +
+              '<h3 class="font-bold text-sm text-stone-900 leading-snug">' + theme.name + '</h3>' +
+              '<p class="text-[11px] text-stone-500 mt-0.5">' + theme.tag + '</p>' +
+            '</div>' +
+            '<a href="' + previewUrl + '" target="_blank" rel="noopener noreferrer" class="mt-auto w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs text-center shadow-sm shadow-brand-500/25 transition inline-flex items-center justify-center gap-1.5">' +
+              '<span>Lihat Demo</span>' +
+              '<i class="fi fi-rr-arrow-up-right-from-square text-[11px] leading-none"></i>' +
+            '</a>' +
+          '</article>'
+        );
+      }
+
+      trackEl.innerHTML = INVITATION_THEMES.map(createThemeCard).join('');
+
+      function getStepWidth() {
+        const firstCard = trackEl.querySelector('.theme-card');
+        if (!firstCard) return 300;
+        return firstCard.getBoundingClientRect().width + 20;
+      }
+
+      function getPageCount() {
+        const maxScroll = Math.max(0, trackEl.scrollWidth - trackEl.clientWidth);
+        if (maxScroll <= 10) return 1;
+        return Math.max(2, Math.round(maxScroll / getStepWidth()) + 1);
+      }
+
+      function renderDots() {
+        if (!dotsEl) return;
+        const pages = getPageCount();
+        const maxScroll = Math.max(1, trackEl.scrollWidth - trackEl.clientWidth);
+        const ratio = Math.min(1, Math.max(0, trackEl.scrollLeft / maxScroll));
+        const activeIndex = Math.round(ratio * (pages - 1));
+
+        dotsEl.innerHTML = '';
+        for (let i = 0; i < pages; i++) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.setAttribute('aria-label', 'Slide ' + (i + 1));
+          btn.className = 'h-2.5 rounded-full transition-all cursor-pointer ' +
+            (i === activeIndex ? 'w-6 bg-brand-600' : 'w-2.5 bg-brand-300 hover:bg-brand-400');
+          btn.addEventListener('click', function () {
+            const targetLeft = pages <= 1 ? 0 : (maxScroll * i) / (pages - 1);
+            trackEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+          });
+          dotsEl.appendChild(btn);
+        }
+
+        if (prevBtn) prevBtn.disabled = trackEl.scrollLeft <= 5;
+        if (nextBtn) nextBtn.disabled = trackEl.scrollLeft >= maxScroll - 5;
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          trackEl.scrollBy({ left: -getStepWidth(), behavior: 'smooth' });
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          trackEl.scrollBy({ left: getStepWidth(), behavior: 'smooth' });
+        });
+      }
+
+      trackEl.addEventListener('scroll', function () {
+        if (!isGridMode) renderDots();
+      }, { passive: true });
+
+      window.addEventListener('resize', function () {
+        if (!isGridMode) renderDots();
+      });
+
+      if (toggleAllBtn) {
+        toggleAllBtn.addEventListener('click', function () {
+          isGridMode = !isGridMode;
+          const cards = trackEl.querySelectorAll('.theme-card');
+          if (isGridMode) {
+            trackEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-2 pt-1';
+            cards.forEach(function (card) {
+              card.className = 'theme-card bg-white rounded-2xl p-3.5 border border-stone-200/90 card-shadow card-hover transition-all flex flex-col';
+            });
+            if (controlsEl) controlsEl.classList.add('hidden');
+            if (toggleAllLabel) toggleAllLabel.textContent = 'Tampilkan Mode Slider';
+            if (toggleAllIcon) toggleAllIcon.className = 'fi fi-rr-apps text-sm leading-none';
+          } else {
+            trackEl.className = 'theme-carousel-track flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 scroll-smooth';
+            cards.forEach(function (card) {
+              card.className = 'theme-card snap-start shrink-0 w-[82%] sm:w-[calc(50%-10px)] lg:w-[calc(25%-15px)] bg-white rounded-2xl p-3.5 border border-stone-200/90 card-shadow card-hover transition-all flex flex-col';
+            });
+            if (controlsEl) controlsEl.classList.remove('hidden');
+            if (toggleAllLabel) toggleAllLabel.textContent = 'Lihat Semua Tema';
+            if (toggleAllIcon) toggleAllIcon.className = 'fi fi-rr-arrow-small-right text-base leading-none';
+            setTimeout(renderDots, 50);
+          }
+        });
+      }
+
+      setTimeout(renderDots, 100);
+    })();
+  </script>
 
   <script>
     (function () {
@@ -730,7 +867,7 @@
         emptyEl.classList.add('hidden');
         gridEl.classList.remove('hidden');
 
-        countBadgeEl.textContent = allPartners.length + ' Mitra & Sub-Brand Terdaftar';
+        countBadgeEl.textContent = allPartners.length + ' Mitra Terdaftar';
         countBadgeEl.classList.remove('hidden');
 
         const visible = showAll ? allPartners : allPartners.slice(0, INITIAL_LIMIT);
